@@ -8,7 +8,7 @@ interface AddOperatorFormProps {
   title?: string;
   onSubmit: (data: Operator) => void;
   initialData?: Partial<Operator>;
-  gameTypes: any[]; // <-- add this
+  gameTypes: any[];
   regions: any[];
   provinces: any[];
   cities: any[];
@@ -19,6 +19,13 @@ export interface AreaOfOperation {
   AreaOfOperationsOptionsId: number;
   AreaOfOperations: string;
   // any other properties if needed
+}
+
+interface City {
+  CityId: number;
+  CityName: string;
+  ProvinceId: number;
+  IsCity: boolean;
 }
 
 const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
@@ -39,9 +46,14 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
     cities: initialData.cities || "",
     gameTypes: initialData.gameTypes || "",
     areaOfOperations: initialData.areaOfOperations || "",
-    regions: initialData.regions || "",
-    provinces: initialData.provinces || "",
   });
+
+  const [hasExcludedCity, setHasExcludedCity] = useState(false);
+  const selectedAreaId = Number(formData.areaOfOperations); // ensure it's a number
+  const showRegionsAndProvinces = selectedAreaId === 1 || selectedAreaId === 2;
+  const showCities = selectedAreaId !== 1;
+  const showExcluded = selectedAreaId !== 2;
+  const [excludedCities, setExcludedCities] = useState<number[]>([]);
 
   //console.log("GAMETYPES:", gameTypes);
   //console.log("REGIONS", regions);
@@ -73,6 +85,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
   const cityOptions = filteredCities;
 
+  const availableExcludedCities = cityOptions.filter(
+    (opt) => !formData.cities.includes(opt.value)
+  );
+
   // Handle changes for normal inputs (text/select)
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -91,56 +107,73 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
     setFormData((prev) => ({
       ...prev,
-      [name]: value, // store just the value, or use logic below
+      [name]: value,
     }));
   };
 
   const handleMultiSelect = (name: string, selectedOptions: OptionType[]) => {
-    const selectedValues = selectedOptions.map(option => option.value);
-    const selectedValuesNum = selectedValues.map(v => Number(v)); // Convert all to numbers
+    const selectedValuesStr = selectedOptions.map((option) => option.value); // keep as string
+    const selectedValuesNum = selectedValuesStr.map((v) => Number(v)); // numbers for filtering
 
     if (name === "regions") {
       const filteredProvinces = provinces
-        .filter(province => selectedValuesNum.includes(province.RegionId))
-        .map(province => ({
-          value: province.ProvinceId,
+        .filter((province) => selectedValuesNum.includes(province.RegionId))
+        .map((province) => ({
+          value: province.ProvinceId.toString(),
           label: province.ProvinceName,
         }));
 
-      console.log("Selected region IDs:", selectedValuesNum);
+      console.log("Selected regions:", selectedValuesStr);
       console.log("Filtered provinces:", filteredProvinces);
 
       setFilteredProvinces(filteredProvinces);
       setFilteredCities([]);
 
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        regions: selectedValues,
+        regions: selectedValuesStr, // store as strings for select compatibility
         provinces: [],
         cities: [],
       }));
     } else if (name === "provinces") {
       const filteredCities = cities
-        .filter(city => selectedValuesNum.includes(city.ProvinceId))
-        .map(city => ({
-          value: city.CityId,
+        .filter((city) => selectedValuesNum.includes(city.ProvinceId)) // no IsCity check
+        .map((city) => ({
+          value: city.CityId.toString(),
           label: city.CityName.trim(),
         }));
+      console.log("Filtered cities without IsCity filter:", filteredCities);
 
-      console.log("Selected province IDs:", selectedValuesNum);
+      console.log("Selected provinces:", selectedValuesStr);
       console.log("Filtered cities:", filteredCities);
 
       setFilteredCities(filteredCities);
 
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        provinces: selectedValues,
+        provinces: selectedValuesStr, // store strings
         cities: [],
       }));
-    } else {
-      setFormData(prev => ({
+    } else if (name === "excludedCities") {
+      const newIncludedCities = formData.cities.filter(
+        (cityId: string) => !selectedValuesStr.includes(cityId)
+      );
+
+      setFormData((prev) => ({
         ...prev,
-        [name]: selectedValues,
+        cities: newIncludedCities,
+      }));
+
+      setExcludedCities(selectedValuesNum);
+    } else if (name === "cities") {
+      setFormData((prev) => ({
+        ...prev,
+        cities: selectedValuesStr,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: selectedValuesStr,
       }));
     }
   };
@@ -148,9 +181,34 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // prepare data for submission
+    const includedCities = formData.cities.map((cityId: string) => {
+      const city = cities.find((c) => c.CityId === Number(cityId));
+      return {
+        CityId: city?.CityId,
+        CityName: city?.CityName.trim() || "",
+        IsCity: true,
+      };
+    });
+
+    const excludedCitiesData = excludedCities.map((cityId: number) => {
+      const city = cities.find((c) => c.CityId === cityId);
+      return {
+        CityId: city?.CityId,
+        CityName: city?.CityName.trim() || "",
+        IsCity: false,
+      };
+    });
+
+    const combinedCities = [
+      ...includedCities.filter(
+        (city: City) => !excludedCities.includes(city.CityId)
+      ),
+      ...excludedCitiesData,
+    ];
+
     const submittedData: Operator = {
       ...formData,
+      Cities: combinedCities,
     };
 
     console.log("Submitted User Data:", submittedData);
@@ -175,6 +233,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           onChange={handleChange}
         />
       </div>
+
       <div>
         <label htmlFor="contactNumber" className="block text-sm">
           Phone Number
@@ -260,6 +319,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         />
       </div>
 
+      {/* Area of Operations */}
       <div>
         <label htmlFor="areaOfOperations" className="block text-sm mb-1">
           Area of Operations
@@ -272,90 +332,140 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             ) || null
           }
           options={areaOfOperationsOptions}
-          onChange={handleSelectChange}
+          onChange={(selected) => {
+            handleSelectChange(selected);
+            setHasExcludedCity(false); // reset if city-wide is toggled
+          }}
           placeholder="Select Area of Operations"
           error={false}
         />
       </div>
 
-      <div>
-        <label htmlFor="regions" className="block text-sm mb-1">
-          Area of Regional Operations
-        </label>
-        <Select
-          id="regions"
-          name="regions"
-          options={regionsOptions}
-          isMulti
-          onChange={(selected) =>
-            handleMultiSelect("regions", selected as OptionType[])
-          }
-          value={regionsOptions.filter((opt) =>
-            formData.regions.includes(opt.value)
+      {/* Area of Regional Operations */}
+      {showRegionsAndProvinces && (
+        <div>
+          <label htmlFor="regions" className="block text-sm mb-1">
+            Area of Regional Operations
+          </label>
+          <Select
+            id="regions"
+            name="regions"
+            options={regionsOptions}
+            isMulti
+            onChange={(selected) =>
+              handleMultiSelect("regions", selected as OptionType[])
+            }
+            className="react-select-container"
+            classNamePrefix="react-select"
+            placeholder="Regions"
+            menuPortalTarget={
+              typeof window !== "undefined" ? document.body : null
+            }
+            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+          />
+        </div>
+      )}
+
+      {/* Area of Provincial Operations */}
+      {showRegionsAndProvinces && (
+        <div>
+          <label htmlFor="provinces" className="block text-sm mb-1">
+            Area of Provincial Operations
+          </label>
+          <Select
+            id="provinces"
+            name="provinces"
+            options={provinceOptions}
+            isMulti
+            onChange={(selected) =>
+              handleMultiSelect("provinces", selected as OptionType[])
+            }
+            className="react-select-container"
+            classNamePrefix="react-select"
+            placeholder="Provinces"
+            menuPortalTarget={
+              typeof window !== "undefined" ? document.body : null
+            }
+            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+          />
+        </div>
+      )}
+
+      {formData.areaOfOperations && (
+        <>
+          {/* Area of City Operations */}
+          {showCities && (
+            <div>
+              <label htmlFor="cities" className="block text-sm mb-1">
+                Area of City Operations
+              </label>
+              <Select
+                id="cities"
+                name="cities"
+                options={cityOptions}
+                isMulti
+                onChange={(selected) =>
+                  handleMultiSelect("cities", selected as OptionType[])
+                }
+                value={cityOptions.filter((opt) =>
+                  formData.cities.includes(opt.value)
+                )}
+                className="react-select-container"
+                classNamePrefix="react-select"
+                placeholder="Cities"
+                menuPortalTarget={
+                  typeof window !== "undefined" ? document.body : null
+                }
+                styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+              />
+            </div>
           )}
-          className="react-select-container"
-          classNamePrefix="react-select"
-          placeholder="Regions"
-          menuPortalTarget={
-            typeof window !== "undefined" ? document.body : null
-          }
-          styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-        />
-      </div>
 
-      <div>
-        <label htmlFor="provinces" className="block text-sm mb-1">
-          Area of Provincial Operations
-        </label>
-        <Select
-          id="provinces"
-          name="provinces"
-          options={provinceOptions}
-          isMulti
-          onChange={(selected) =>
-            handleMultiSelect("provinces", selected as OptionType[])
-          }
-          value={provinceOptions.filter((opt) =>
-            formData.provinces.includes(opt.value)
+          {/* Hide Checkbox + Excluded City if Area is City Wide (value 2) */}
+          {showExcluded && (
+            <div>
+              <label className="inline-flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="form-checkbox h-5 w-5 text-[#0038A8] transition duration-150 ease-in-out"
+                  checked={hasExcludedCity}
+                  onChange={(e) => setHasExcludedCity(e.target.checked)}
+                />
+                <span className="text-gray-700">Is there excluded City?</span>
+              </label>
+            </div>
           )}
-          className="react-select-container"
-          classNamePrefix="react-select"
-          placeholder="Provinces"
-          menuPortalTarget={
-            typeof window !== "undefined" ? document.body : null
-          }
-          styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-        />
-      </div>
+        </>
+      )}
 
-      <div>
-        <label htmlFor="cities" className="block text-sm mb-1">
-          Area of City Operations
-        </label>
-        <Select
-          id="cities"
-          name="cities"
-          options={cityOptions}
-          isMulti
-          onChange={(selected) =>
-            handleMultiSelect("cities", selected as OptionType[])
-          }
-          value={cityOptions.filter((opt) =>
-            formData.cities.includes(opt.value)
-          )}
-          className="react-select-container"
-          classNamePrefix="react-select"
-          placeholder="Cities"
-          menuPortalTarget={
-            typeof window !== "undefined" ? document.body : null
-          }
-          styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-        />
-      </div>
-      
-
-
-
+      {formData.areaOfOperations && showExcluded && hasExcludedCity && (
+        <div>
+          <label htmlFor="excludedCities" className="block text-sm mb-1">
+            Excluded Cities
+          </label>
+          <Select
+            id="excludedCities"
+            name="excludedCities"
+            options={availableExcludedCities}
+            isMulti
+            onChange={(selected) =>
+              setExcludedCities(
+                (selected as OptionType[]).map((opt) => Number(opt.value))
+              )
+            }
+            value={availableExcludedCities.filter((opt) =>
+              excludedCities.includes(Number(opt.value))
+            )}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            placeholder="Select excluded cities"
+            menuPortalTarget={
+              typeof window !== "undefined" ? document.body : null
+            }
+            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+          />
+        </div>
+      )}
 
       <button
         type="submit"

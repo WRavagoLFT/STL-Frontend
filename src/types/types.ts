@@ -49,8 +49,6 @@ export interface Operator {
   address: string;
   gameTypes: string;
   areaOfOperations: string;
-  regions: any;
-  provinces: any;
   cities: any;
 
   data?: any; // for operator update

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useOperatorsData } from "../../../../store/useOperatorStore";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
-import { OperatorFieldFormPage } from "~/components/operators/OperatorForm";
-import { fetchOperators } from "~/services/userService";
 import { operatorTableColumns } from "~/config/operatorTableColumns";
 import CardsPage from "~/components/user/CardsData";
 import AddOperatorModal from "~/components/operators/AddOperator";
@@ -17,6 +15,7 @@ import {
   fetchProvinces,
   fetchRegions,
 } from "~/utils/api/location";
+import { fetchOperators } from "~/utils/api/operators";
 
 const OperatorsPage = () => {
   const { data, setData } = useOperatorsData();
@@ -24,12 +23,8 @@ const OperatorsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => setIsModalOpen(true);
-
   // Function to close modal
   const closeModal = () => setIsModalOpen(false);
-  useEffect(() => {
-    fetchOperators(setData);
-  }, [setData]);
 
   const tableColumns = operatorTableColumns();
 
@@ -43,8 +38,6 @@ const OperatorsPage = () => {
     regions,
     provinces,
     cities,
-    selectedRegion,
-    selectedProvince,
     areaOfOperations,
     setGameTypes,
     setRegions,
@@ -61,19 +54,21 @@ const OperatorsPage = () => {
         const provinces = await fetchProvinces();
         const cities = await fetchCities();
         const areaOfOperations = await fetchAreaOfOperations();
+        const operators = await fetchOperators();
 
         // Set into Zustand store
-        setGameTypes(gameTypesResponse.data); // <-- get data array here
-        setRegions(regions.data); // if these also return full response
+        setGameTypes(gameTypesResponse.data);
+        setRegions(regions.data);
         setProvinces(provinces.data);
         setCities(cities.data);
         setAreaOfOperations(areaOfOperations.data);
+        setData(operators.data);
 
-        console.log("Fetched and set game types:", gameTypes);
-        console.log("Fetched and set regions:", regions);
-        console.log("Fetched and set provinces:", provinces);
-        console.log("Fetched and set cities:", cities);
-        console.log("Fetched and set area of operations:", areaOfOperations);
+        //console.log("Fetched and set game types:", gameTypes);
+        //console.log("Fetched and set regions:", regions);
+        //console.log("Fetched and set provinces:", provinces);
+        //console.log("Fetched and set cities:", cities);
+        //console.log("Fetched and set area of operations:", areaOfOperations);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -85,23 +80,18 @@ const OperatorsPage = () => {
   const handleAddOperator = async (data: Operator): Promise<void> => {
     try {
       console.log("Adding operator:", data);
-
       const result = await addOperator(data);
-
       if (result.success) {
         console.log("Operator added successfully:", result.data);
-        // fetchUsers(roleConfig.roleId, setData);
+        fetchOperators();
       } else {
         console.error("Failed to add operator:", result.message);
         // Optionally show error to the user
       }
-
       setIsModalOpen(false);
     } catch (error) {
       console.error(
-        "Unexpected error in handleAddUser:",
-        (error as Error).message
-      );
+        "Unexpected error in handleAddOperator:", (error as Error).message);
     }
   };
 
