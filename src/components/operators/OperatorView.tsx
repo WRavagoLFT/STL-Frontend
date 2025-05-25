@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ReusableModalPageProps } from "~/types/interfaces";
 import Select from "react-select";
-import useUpdateModalState from "../../../store/useUpdateModalStore";
+import useUpdateModalState from "../../store/useUpdateModalStore";
 import Input from "../ui/inputs/TextInputs";
 import dayjs from "dayjs";
 

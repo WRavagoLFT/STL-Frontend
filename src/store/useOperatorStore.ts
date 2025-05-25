@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Operator } from "../src/types/types";
+import { Operator } from "../types/types";
 import { Column, Field } from "~/types/interfaces";
 
 export interface OperatorsState {

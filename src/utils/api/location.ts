@@ -39,20 +39,20 @@ export const fetchProvinces = async(filters?: {regionId: number}) => {
     }
 }
 
-export const fetchCities = async(filters?: {provinceId: number}) => {
+export const fetchCities = async(filters?: { availableOnly?: boolean }) => {
     try {
         const url = validateRelativeUrl("/location/getCities");
-        const response = await axiosInstance.get(url, {
-            params: {
-                regionId: filters?.provinceId
-            }
-        })
+        const params: Record<string, any> = {};
 
-        return response.data
+        //if (filters?.provinceId) params.provinceId = filters.provinceId;
+        if (filters?.availableOnly !== undefined) params.availableOnly = filters.availableOnly;
+
+        const response = await axiosInstance.get(url, { params });
+
+        return response.data;
     }
-
     catch (error) {
-        console.error("Error fetching provinces:", (error as Error).message);
+        console.error("Error fetching cities:", (error as Error).message);
         return { success: false, message: (error as Error).message, data: [] };
     }
 }

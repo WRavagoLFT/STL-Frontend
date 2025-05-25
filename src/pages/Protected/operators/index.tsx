@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useOperatorsData } from "../../../../store/useOperatorStore";
+import { useOperatorsData } from "../../../store/useOperatorStore";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { operatorTableColumns } from "~/config/operatorTableColumns";
@@ -7,7 +7,7 @@ import CardsPage from "~/components/user/CardsData";
 import AddOperatorModal from "~/components/operators/AddOperator";
 import { Operator } from "~/types/types";
 import { addOperator } from "~/utils/api/operators";
-import { useOperatorFormStore } from "../../../../store/useOperatorFormStore";
+import { useOperatorFormStore } from "../../../store/useOperatorFormStore";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import {
   fetchAreaOfOperations,
@@ -52,7 +52,7 @@ const OperatorsPage = () => {
         const gameTypesResponse = await fetchGameCategories();
         const regions = await fetchRegions();
         const provinces = await fetchProvinces();
-        const cities = await fetchCities();
+        const cities = await fetchCities({ availableOnly: true });
         const areaOfOperations = await fetchAreaOfOperations();
         const operators = await fetchOperators();
 
@@ -67,7 +67,7 @@ const OperatorsPage = () => {
         //console.log("Fetched and set game types:", gameTypes);
         //console.log("Fetched and set regions:", regions);
         //console.log("Fetched and set provinces:", provinces);
-        //console.log("Fetched and set cities:", cities);
+        console.log("Fetched and set cities:", cities);
         //console.log("Fetched and set area of operations:", areaOfOperations);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -124,6 +124,8 @@ const OperatorsPage = () => {
         cities={cities}
         areaOfOperations={areaOfOperations}
       />
+
+
     </div>
   );
 };

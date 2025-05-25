@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { useSideBarStore, gameType } from "../../../store/useSideBarStore";
+import { useSideBarStore, gameType } from "../../store/useSideBarStore";
 import { UserSectionData } from "../../data/AdminSectionData";
 import { getCurrentUser, logoutUser } from "~/utils/api/auth";
 import {

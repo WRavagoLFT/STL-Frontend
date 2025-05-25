@@ -8,17 +8,11 @@ interface AddOperatorFormProps {
   title?: string;
   onSubmit: (data: Operator) => void;
   initialData?: Partial<Operator>;
-  gameTypes: any[];
+  gameTypes: any[]; // <-- add this
   regions: any[];
   provinces: any[];
   cities: any[];
   areaOfOperations: any;
-}
-
-export interface AreaOfOperation {
-  AreaOfOperationsOptionsId: number;
-  AreaOfOperations: string;
-  // any other properties if needed
 }
 
 interface City {
@@ -26,6 +20,12 @@ interface City {
   CityName: string;
   ProvinceId: number;
   IsCity: boolean;
+}
+
+export interface AreaOfOperation {
+  AreaOfOperationsOptionsId: number;
+  AreaOfOperations: string;
+  // any other properties if needed
 }
 
 const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
@@ -112,18 +112,18 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   };
 
   const handleMultiSelect = (name: string, selectedOptions: OptionType[]) => {
-    const selectedValuesStr = selectedOptions.map((option) => option.value); // keep as string
-    const selectedValuesNum = selectedValuesStr.map((v) => Number(v)); // numbers for filtering
+    const selectedValues = selectedOptions.map((option) => option.value);
+    const selectedValuesNum = selectedValues.map((v) => Number(v)); // Convert all to numbers
 
     if (name === "regions") {
       const filteredProvinces = provinces
         .filter((province) => selectedValuesNum.includes(province.RegionId))
         .map((province) => ({
-          value: province.ProvinceId.toString(),
+          value: province.ProvinceId,
           label: province.ProvinceName,
         }));
 
-      console.log("Selected regions:", selectedValuesStr);
+      console.log("Selected region IDs:", selectedValuesNum);
       console.log("Filtered provinces:", filteredProvinces);
 
       setFilteredProvinces(filteredProvinces);
@@ -131,49 +131,32 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
       setFormData((prev) => ({
         ...prev,
-        regions: selectedValuesStr, // store as strings for select compatibility
+        regions: selectedValues,
         provinces: [],
         cities: [],
       }));
     } else if (name === "provinces") {
       const filteredCities = cities
-        .filter((city) => selectedValuesNum.includes(city.ProvinceId)) // no IsCity check
+        .filter((city) => selectedValuesNum.includes(city.ProvinceId))
         .map((city) => ({
-          value: city.CityId.toString(),
+          value: city.CityId,
           label: city.CityName.trim(),
         }));
-      console.log("Filtered cities without IsCity filter:", filteredCities);
 
-      console.log("Selected provinces:", selectedValuesStr);
+      console.log("Selected province IDs:", selectedValuesNum);
       console.log("Filtered cities:", filteredCities);
 
       setFilteredCities(filteredCities);
 
       setFormData((prev) => ({
         ...prev,
-        provinces: selectedValuesStr, // store strings
+        provinces: selectedValues,
         cities: [],
-      }));
-    } else if (name === "excludedCities") {
-      const newIncludedCities = formData.cities.filter(
-        (cityId: string) => !selectedValuesStr.includes(cityId)
-      );
-
-      setFormData((prev) => ({
-        ...prev,
-        cities: newIncludedCities,
-      }));
-
-      setExcludedCities(selectedValuesNum);
-    } else if (name === "cities") {
-      setFormData((prev) => ({
-        ...prev,
-        cities: selectedValuesStr,
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: selectedValuesStr,
+        [name]: selectedValues,
       }));
     }
   };
@@ -181,34 +164,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const includedCities = formData.cities.map((cityId: string) => {
-      const city = cities.find((c) => c.CityId === Number(cityId));
-      return {
-        CityId: city?.CityId,
-        CityName: city?.CityName.trim() || "",
-        IsCity: true,
-      };
-    });
-
-    const excludedCitiesData = excludedCities.map((cityId: number) => {
-      const city = cities.find((c) => c.CityId === cityId);
-      return {
-        CityId: city?.CityId,
-        CityName: city?.CityName.trim() || "",
-        IsCity: false,
-      };
-    });
-
-    const combinedCities = [
-      ...includedCities.filter(
-        (city: City) => !excludedCities.includes(city.CityId)
-      ),
-      ...excludedCitiesData,
-    ];
-
+    // prepare data for submission
     const submittedData: Operator = {
       ...formData,
-      Cities: combinedCities,
     };
 
     console.log("Submitted User Data:", submittedData);
@@ -440,22 +398,17 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
       {formData.areaOfOperations && showExcluded && hasExcludedCity && (
         <div>
-          <label htmlFor="excludedCities" className="block text-sm mb-1">
+          <label htmlFor="cities" className="block text-sm mb-1">
             Excluded Cities
           </label>
           <Select
-            id="excludedCities"
-            name="excludedCities"
+            id="cities"
+            name="cities"
             options={availableExcludedCities}
             isMulti
             onChange={(selected) =>
-              setExcludedCities(
-                (selected as OptionType[]).map((opt) => Number(opt.value))
-              )
-            }
-            value={availableExcludedCities.filter((opt) =>
-              excludedCities.includes(Number(opt.value))
-            )}
+                  handleMultiSelect("cities", selected as OptionType[])
+                }
             className="react-select-container"
             classNamePrefix="react-select"
             placeholder="Select excluded cities"

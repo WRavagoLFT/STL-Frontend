@@ -17,8 +17,8 @@ import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-compar
 import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettors&Bets";
 import ChartTopRegionByBetsandBettors from "~/components/betting-summary/bets-comparison/TopRegionBetting";
 
-import { useBettingStore, categoryType } from "../../../../store/useBettingStore";
-import { useSideBarStore } from "../../../../store/useSideBarStore";
+import { useBettingStore, categoryType } from "../../../store/useBettingStore";
+import { useSideBarStore } from "../../../store/useSideBarStore";
 
 import dayjs from 'dayjs';
 

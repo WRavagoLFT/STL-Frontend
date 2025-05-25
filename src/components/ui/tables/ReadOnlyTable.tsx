@@ -13,7 +13,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterListOffIcon from "@mui/icons-material/FilterListOff";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
-import useDetailTableStore from "../../../../store/useTableStore";
+import useDetailTableStore from "../../../store/useTableStore";
 import {
   SortableTableCell,
   filterData,

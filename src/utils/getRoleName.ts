@@ -1,4 +1,4 @@
-import useUserRoleStore from "../../store/useUserStore";
+import useUserRoleStore from "../store/useUserStore";
 
 const { roleId } = useUserRoleStore();
 

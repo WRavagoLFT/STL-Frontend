@@ -8,7 +8,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import useDetailTableStore from '../../store/useTableStore';
+import useDetailTableStore from '../store/useTableStore';
 import { SortableTableCellProps } from '../types/interfaces';
 import { User, Operator, SortConfig, EditLogFields } from '~/types/types';
 import { filterStyles } from '~/styles/theme';

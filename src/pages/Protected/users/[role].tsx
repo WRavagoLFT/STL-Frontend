@@ -2,10 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
-import UserFieldFormPage from "~/components/user/UserFormData";
 import { userTableColumns } from "~/config/userTableColumns";
-import useUserRoleStore from "../../../../store/useUserStore";
-import { userRoleFormFields } from "~/config/userFormFields";
+import useUserRoleStore from "../../../store/useUserStore";
 import CardsPage from "~/components/user/CardsData";
 import { addUser, fetchUsers } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
@@ -46,7 +44,7 @@ const RolePage = () => {
     }
   }, [roleConfig, setData]);
 
-  console.log("DATA USER", data);
+  //console.log("DATA USER", data);
 
   if (!roleConfig) {
     return (
@@ -58,9 +56,8 @@ const RolePage = () => {
 
   const { roleId, label, textlabel } = roleConfig;
   const tableColumns = userTableColumns(operatorMap);
-  const endpoint = userRoleFormFields[roleKey]?.endpoint;
 
-  console.log("operatormappp", operatorMap);
+  //console.log("operatormappp", operatorMap);
   const openModal = () => setIsModalOpen(true);
 
   // Function to close modal
@@ -127,7 +124,7 @@ const RolePage = () => {
         operatorMap={operatorMap}
         roleId={roleId}
         statsPerRegion={data}
-        endpoint={endpoint ?? { create: "", update: "" }}
+        //endpoint={endpoint ?? { create: "", update: "" }}
         source="users"
         onAddClick={openModal}
       />

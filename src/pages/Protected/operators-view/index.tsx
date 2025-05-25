@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import OperatorViewPage from "~/components/operators/OperatorView";
-import { useOperatorFormStore } from "../../../../store/useOperatorFormStore";
+import { useOperatorFormStore } from "../../../store/useOperatorFormStore";
 import {
   fetchCityData,
   fetchProvinceData,
@@ -10,7 +10,7 @@ import {
   fetchAreaOfOperations,
   fetchGameCategories,
 } from "~/services/userService";
-import { useOperatorsData } from "../../../../store/useOperatorStore";
+import { useOperatorsData } from "../../../store/useOperatorStore";
 import { operatorConfig } from "~/config/operatorFormFields";
 import { operatorSchema } from "~/schemas/operatorSchema";
 import { Operator } from "~/types/types";
