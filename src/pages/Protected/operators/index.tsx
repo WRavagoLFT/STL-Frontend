@@ -16,16 +16,13 @@ import {
   fetchRegions,
 } from "~/utils/api/location";
 import { fetchOperators } from "~/utils/api/operators";
-
+  
 const OperatorsPage = () => {
   const { data, setData } = useOperatorsData();
   const textlabel = "Operators";
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const openModal = () => setIsModalOpen(true);
-  // Function to close modal
   const closeModal = () => setIsModalOpen(false);
-
   const tableColumns = operatorTableColumns();
 
   const dashboardData = data.map((op) => ({
@@ -98,7 +95,10 @@ const OperatorsPage = () => {
   return (
     <div className="mx-auto px-0 py-1">
       <h1 className="text-3xl font-bold mb-3">Small Town Lottery Operators</h1>
-      <CardsPage dashboardData={data} textlabel={textlabel} />
+      <CardsPage 
+        dashboardData={data} 
+        textlabel={textlabel}
+      />
       <ChartsDataPage
         userType="operator"
         pageType="operator"
@@ -111,9 +111,6 @@ const OperatorsPage = () => {
         source="operators"
         onAddClick={openModal}
       />
-
-      {/* <OperatorFieldFormPage /> */}
-
       <AddOperatorModal
         open={isModalOpen}
         onClose={closeModal}
@@ -124,7 +121,6 @@ const OperatorsPage = () => {
         cities={cities}
         areaOfOperations={areaOfOperations}
       />
-
 
     </div>
   );

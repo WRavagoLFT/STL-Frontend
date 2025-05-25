@@ -45,6 +45,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
     phoneNumber: initialData.phoneNumber || "",
     email: initialData.email || "",
     userTypeId: userTypeId,
+    // OperatorId: initialData.OperatorId || "",
     operatorId:
       operatorOptions.find(
         (opt) => opt.value === String(initialData.operatorId)

@@ -9,9 +9,10 @@ import { addUser, fetchUsers } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
 import { User } from "~/types/types";
 import { RegionUser } from "~/types/interfaces";
+import UpdateUserModal from "~/components/user/UpdateUser";
 
 const roleMap: Record<string, { label: string; textlabel: string; roleId: number }> = {
-  managers: {
+managers: {
     label: "Small Town Lottery Manager",
     textlabel: "Managers",
     roleId: 2,
@@ -26,15 +27,11 @@ const roleMap: Record<string, { label: string; textlabel: string; roleId: number
 const RolePage = () => {
   const { query } = useRouter();
   const role = query.role as string;
-  const roleKey = role?.toLowerCase().includes("manager")
-    ? "manager"
-    : "executive";
+  const roleKey = role?.toLowerCase().includes("manager") ? "manager" : "executive";
   const roleConfig = roleMap[role?.toLowerCase() || ""];
-
   const operatorMap = useUserRoleStore((state) => state.operatorMap);
   const setOperatorMap = useUserRoleStore((state) => state.setOperatorMap);
   const { data, setData } = useUserRoleStore();
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (roleConfig?.roleId) {
@@ -45,6 +42,7 @@ const RolePage = () => {
   }, [roleConfig, setData]);
 
   //console.log("DATA USER", data);
+  //console.log("operatormappp", operatorMap);
 
   if (!roleConfig) {
     return (
@@ -57,11 +55,29 @@ const RolePage = () => {
   const { roleId, label, textlabel } = roleConfig;
   const tableColumns = userTableColumns(operatorMap);
 
-  //console.log("operatormappp", operatorMap);
-  const openModal = () => setIsModalOpen(true);
+  // States
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
-  // Function to close modal
-  const closeModal = () => setIsModalOpen(false);
+  // Handlers
+  const openCreateModal = () => {
+    setIsCreateModalOpen(true);
+  };
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+
+  const openUpdateModal = (user: User) => {
+    setSelectedUser(user);
+    setIsUpdateModalOpen(true);
+  };
+
+  const closeUpdateModal = () => {
+    setSelectedUser(null);
+    setIsUpdateModalOpen(false);
+  };
 
   // Helper function (can be extracted)
   const toRegionUser = (
@@ -84,10 +100,10 @@ const RolePage = () => {
     return null;
   };
 
-  // In your parent component render:
   const normalizedData = data
     .map(toRegionUser)
     .filter((u): u is RegionUser & { OperatorName?: string } => u !== null);
+
 
   const handleAddUser = async (data: User): Promise<void> => {
     try {
@@ -103,7 +119,7 @@ const RolePage = () => {
         // Optionally show error to the user
       }
 
-      setIsModalOpen(false);
+      setIsCreateModalOpen(false);
     } catch (error) {
       console.error(
         "Unexpected error in handleAddUser:",
@@ -115,8 +131,17 @@ const RolePage = () => {
   return (
     <div className="mx-auto px-0 py-1">
       <h1 className="text-3xl font-bold mb-3">{label}</h1>
-      <CardsPage dashboardData={data} roleLabel={label} textlabel={textlabel} />
-      <ChartsDataPage pageType={roleKey} dashboardData={normalizedData} />
+      <CardsPage 
+        dashboardData={data} 
+        roleLabel={label} 
+        textlabel={textlabel} 
+      />
+
+      <ChartsDataPage 
+        pageType={roleKey} 
+        dashboardData={normalizedData} 
+      />
+
       <DetailedTable
         data={data}
         columns={tableColumns}
@@ -126,25 +151,27 @@ const RolePage = () => {
         statsPerRegion={data}
         //endpoint={endpoint ?? { create: "", update: "" }}
         source="users"
-        onAddClick={openModal}
+        onAddClick={openCreateModal}
+        onUpdateClick={openUpdateModal}
       />
-      {/* <UserFieldFormPage
-        operatorMap={operatorMap}
-        setOperatorMap={setOperatorMap}
-      /> */}
 
-      {/* // create modal only opens when called */}
       <AddUserModal
-        open={isModalOpen}
-        onClose={closeModal}
+        open={isCreateModalOpen}
+        onClose={closeCreateModal}
         onSubmit={handleAddUser}
         operatorMap={operatorMap}
         userTypeId={roleId}
       />
 
-     {/* view/update modal only opens when called */}
-
-     
+      <UpdateUserModal
+        open={isUpdateModalOpen}
+        onClose={closeUpdateModal}
+        onSubmit={handleAddUser} // not yet final
+        operatorMap={operatorMap}
+        userTypeId={roleId}
+        selectedUser={selectedUser}
+      />
+      
     </div>
   );
 };

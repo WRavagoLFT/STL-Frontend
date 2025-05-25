@@ -24,6 +24,8 @@ export interface User {
   email: string;
   suffix: string | null;
   operatorId: number;
+
+  OperatorId?: number;
   userTypeId: number;
 
   fullName?: string; // Consider making this a computed field on the frontend
@@ -37,6 +39,9 @@ export interface User {
   LastTokenRefresh?: string;
   IsActive?: number;
   Cities?: { CityId: number; CityName: string }[];
+  CreatedBy?: string;
+  LastUpdatedBy?: string;
+  LastUpdatedDate?: string;
 }
 
 // Define the Operator type
@@ -52,7 +57,7 @@ export interface Operator {
   cities: any;
 
   data?: any; // for operator update
-  OperatorId?: number;
+  OperatorId: number;
   OperatorName?: string;
   Executive?: string;
   OperatorEmail?: string | null;

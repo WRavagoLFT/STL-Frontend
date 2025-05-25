@@ -118,6 +118,7 @@ export interface DetailedTableProps<T> {
   shouldOpenAsPage?: boolean;
   source?: 'users' | 'operators';
   onAddClick: () => void;
+  onUpdateClick?: (row: T) => void; // for update modal
 }
 
 export interface ChartBarItem {
@@ -175,7 +176,7 @@ export interface ReusableModalPageProps {
   fields: Field[];
   onSuccess?: () => void;
   onSubmit?: (formData: Record<string, string>) => Promise<void>;
-  children: (props: { handleSubmit: () => void }) => React.ReactNode;
+  children?: (props: { handleSubmit: () => void }) => React.ReactNode;
   loading?: boolean;
   formData?: Record<string, string>;
   setFormData?: (data: Record<string, string>) => void;
@@ -184,7 +185,7 @@ export interface ReusableModalPageProps {
   operatorMap?: Record<number, Operator>;
   layout?: 'single' | 'double'; 
 
-  gameTypes?: FieldOption[];
+  gameTypes?: any[];
   provinces?: any[];
   regions?: any[];
   cities?: any[];

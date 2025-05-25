@@ -35,7 +35,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
   const [area, setArea] = useState<string | null>(null);
 
   // console.log("hihihh", areaofoperations);
-  console.log('provinces:', provinces);
+  console.log("provinces:", provinces);
   const handleDisable = () => {
     setIsDisabled(false);
     setShowEditButton(false);
@@ -84,7 +84,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             value: pv.CityName,
           })
         );
-        
+
         console.log("Mapped GameTypes for Select:", mappedGameTypes);
         console.log("cities", mappedCities);
         console.log(mappedGameTypes);
@@ -138,7 +138,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
           <div>
             <label
               htmlFor="createdBy"
-              className="block text-sm font-medium text-gray-700 mb-1" // #212121 to hindi gray 700 
+              className="block text-sm font-medium text-gray-700 mb-1" // #212121 to hindi gray 700
               // TINGNAN MO KASI YUNG UI!
             >
               Created By

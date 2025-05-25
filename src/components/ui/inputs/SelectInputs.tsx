@@ -8,11 +8,12 @@ export type OptionType = {
 
 type Props = {
   name: string;
-  value: OptionType | null;
-  options: OptionType[];
-  onChange: (e: { target: { name: string; value: string } }) => void;
+  value?: OptionType | null;
+  options?: OptionType[];
+  onChange?: (e: { target: { name: string; value: string } }) => void;
   placeholder?: string;
   error?: boolean;
+  disabled?: boolean;
 };
 
 const SelectInput: React.FC<Props> = ({
@@ -22,6 +23,7 @@ const SelectInput: React.FC<Props> = ({
   onChange,
   placeholder,
   error,
+  disabled = false,
 }) => {
   const handleChange = (
     selectedOption: SingleValue<OptionType>,
@@ -33,7 +35,7 @@ const SelectInput: React.FC<Props> = ({
         value: selectedOption?.value || "",
       },
     };
-    onChange(event);
+    onChange?.(event);
   };
 
   return (
@@ -44,6 +46,7 @@ const SelectInput: React.FC<Props> = ({
       value={value}
       onChange={handleChange}
       placeholder={placeholder}
+      isDisabled={disabled}
       classNamePrefix="react-select"
       styles={{
         control: (provided, state) => ({
