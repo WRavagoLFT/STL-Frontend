@@ -23,7 +23,6 @@ export interface OperatorViewPageProps {
 
 const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
   const { fields } = useOperatorsData();
-  //const { data, setData } = useOperatorsData();
 
   const {
     gameTypes,
@@ -110,7 +109,7 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
 
         {/* Right side - Retail Receipt */}
         <div className="flex flex-col w-full md:w-2/5 min-w-0">
-          <RetailReceiptOperatorsPage operatorId={operator?.OperatorId} />
+          <RetailReceiptOperatorsPage operatorId={operator?.data.OperatorId} />
         </div>
       </div>
     </div>

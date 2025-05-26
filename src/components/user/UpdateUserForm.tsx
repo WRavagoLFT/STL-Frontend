@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Operator, User } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
+import { getUserStatus } from "~/utils/dashboarddata";
+import dayjs from "dayjs";
 
 interface UpdateUserFormProps {
   title?: string;
@@ -18,14 +20,21 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   userTypeId,
   selectedUser,
 }) => {
-  const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
+  const title =
+    userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
 
-  // console.log("selectedUserrrr", selectedUser);
-  const operatorOptions: OptionType[] = Object.values(operatorMap).map(operator => ({
-    value: operator.OperatorId !== undefined ? operator.OperatorId.toString() : '0',
-    label: operator.OperatorName ?? 'Unknown',
-  }));
-  
+  console.log("selectedUserrrr", selectedUser);
+
+  const operatorOptions: OptionType[] = Object.values(operatorMap).map(
+    (operator) => ({
+      value:
+        operator.OperatorId !== undefined
+          ? operator.OperatorId.toString()
+          : "0",
+      label: operator.OperatorName ?? "Unknown",
+    })
+  );
+
   const suffixOptions: OptionType[] = [
     { label: "N/A", value: "" },
     { label: "Jr.", value: "Jr." },
@@ -36,25 +45,61 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
     { label: "V", value: "V" },
     { label: "PhD", value: "PhD" },
     { label: "MD", value: "MD" },
+    { label: "Mrs", value: "Mrs" },
+    { label: "Mr", value: "Mr" },
     { label: "Esq.", value: "Esq." },
   ];
+
+  const sevenDaysAgo = dayjs().subtract(7, "day");
 
   const mapSelectedUserToFormData = (user: any) => ({
     firstName: user?.FirstName || "",
     lastName: user?.LastName || "",
-    suffix: user?.Suffix || "",
+    suffix: user?.Suffix?.trim() || "",
     phoneNumber: user?.PhoneNumber || "",
     email: user?.Email || "",
     userTypeId: user?.UserTypeId || userTypeId,
+    DateOfRegistration: user?.DateOfRegistration || "",
     operatorId:
-    operatorOptions.find(
-      (opt) => opt.value === String(user?.OperatorId)
-    ) || null,
+      operatorOptions.find((opt) => opt.value === String(user?.OperatorId)) ||
+      null,
+    status: getUserStatus(user, sevenDaysAgo),
   });
 
-  const [formData, setFormData] = useState(mapSelectedUserToFormData(selectedUser));
+  const [formData, setFormData] = useState(
+    mapSelectedUserToFormData(selectedUser)
+  );
 
-  // console.log('hello usertypeid:', userTypeId);
+
+console.log("Suffix from formData:", formData.suffix);
+console.log(
+  "Matching option:",
+  suffixOptions.find(
+    (option) => option.value === formData.suffix?.trim()
+  )
+);
+
+
+
+  
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [showEditButton, setShowEditButton] = useState(true);
+
+  const handleDisable = () => {
+    setIsDisabled(false);
+    setShowEditButton(false);
+  };
+
+  const alwaysDisabledKeys = [
+    "name",
+    "LastName",
+    "OperatorName",
+    "CreatedBy",
+    "DateOfRegistration",
+    "DateOfOperation",
+    "LastUpdatedBy",
+    "LastUpdatedDate",
+  ];
 
   // Handle changes for normal inputs (text/select)
   const handleChange = (
@@ -71,7 +116,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
     event.preventDefault();
 
     // prepare data for submission
-    const submittedData: User = {
+    const submittedData: any = {
       ...formData,
       // convert operatorId if needed
     };
@@ -85,9 +130,9 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
     <>
       <form onSubmit={handleSubmit}>
         <h2 className="font-bold mb-1">{title} Information</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           {/* Column 1 */}
-          <div className="flex flex-col gap-x-6 gap-y-4">
+          <div className="flex flex-col gap-x-6 gap-y-2">
             <div>
               <label htmlFor="firstName" className="block text-sm">
                 Given Name
@@ -125,7 +170,11 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
                 </label>
                 <CustomSelect
                   name="suffix"
-                  value={suffixOptions.find(option => option.value === formData.suffix) || null}  // eto ay mali
+                  value={
+                    suffixOptions.find(
+                      (option) => option.value === formData.suffix?.trim()
+                    ) || { label: "N/A", value: "N/A" }
+                  }
                   error={false}
                   disabled={true}
                 />
@@ -143,13 +192,15 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
                 className="mt-1"
                 value={formData.phoneNumber}
                 onChange={handleChange}
-                disabled
+                disabled={
+                  alwaysDisabledKeys.includes("phoneNumber") || isDisabled
+                }
               />
             </div>
           </div>
 
           {/* Column 2 */}
-          <div className="flex flex-col gap-x-6 gap-y-4">
+          <div className="flex flex-col gap-x-6 gap-y-2">
             <div>
               <label htmlFor="operatorId" className="block text-sm mb-1">
                 Assigned PCSO Branch
@@ -174,31 +225,39 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
                 className="mt-1"
                 value={formData.email}
                 onChange={handleChange}
-                disabled
+                disabled={alwaysDisabledKeys.includes("email") || isDisabled}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm">
+              <label htmlFor="status" className="block text-sm mb-1">
                 Status
               </label>
-              <Input
-                type="status"
+              <CustomSelect
                 name="status"
-                id="status"
-                className="mt-1"
-                value={formData.password}
-                onChange={handleChange}
+                value={{ label: formData.status, value: formData.status }}
+                options={[
+                  { label: "Active", value: "Active" },
+                  { label: "Inactive", value: "Inactive" },
+                  { label: "Suspended", value: "Suspended" },
+                  { label: "New", value: "New" },
+                ]}
                 disabled
+                onChange={(selected) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    status: selected.value,
+                  }))
+                }
               />
             </div>
           </div>
         </div>
 
         <h2 className="font-bold mt-5 mb-1">Update History</h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-6">
           {/* Column 1 */}
-          <div className="flex flex-col gap-x-6 gap-y-4">
+          <div className="flex flex-col gap-x-6 gap-y-2">
             <div>
               <label htmlFor="CreatedBy" className="block text-sm">
                 Created By
@@ -223,7 +282,11 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
                 name="DateOfRegistration"
                 id="DateOfRegistration"
                 className="mt-1"
-                value={selectedUser?.DateOfRegistration || ""}
+                value={
+                  selectedUser?.DateOfRegistration
+                    ? selectedUser.DateOfRegistration.slice(0, 10)
+                    : ""
+                }
                 onChange={handleChange}
                 disabled
               />
@@ -231,7 +294,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
           </div>
 
           {/* Column 2 */}
-          <div className="flex flex-col gap-x-6 gap-y-4">
+          <div className="flex flex-col gap-x-6 gap-y-2">
             <div>
               <label htmlFor="LastUpdatedBy" className="block text-sm">
                 Last Updated By
@@ -241,7 +304,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
                 name="LastUpdatedBy"
                 id="LastUpdatedBy"
                 className="mt-1"
-                value={selectedUser?.LastUpdatedBy || ""}
+                value={selectedUser?.LastUpdatedBy || "N/A"}
                 onChange={handleChange}
                 disabled
               />
@@ -256,20 +319,56 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
                 name="LastUpdatedDate"
                 id="LastUpdatedDate"
                 className="mt-1"
-                value={selectedUser?.LastUpdatedDate || ""}
+                value={
+                  selectedUser?.LastUpdatedDate
+                    ? selectedUser.LastUpdatedDate.slice(0, 10)
+                    : "N/A"
+                }
                 onChange={handleChange}
                 disabled
               />
             </div>
           </div>
+        </div>
 
+        {!isDisabled && (
+          <div className="col-span-2 my-4">
+            <label htmlFor="remarks" className="block text-sm">
+              Remarks
+            </label>
+            <Input
+              type="text"
+              name="remarks"
+              id="remarks"
+              className="mt-1"
+              onChange={handleChange}
+            />
+          </div>
+        )}
+
+        {/* Show only when `showEditButton` is true */}
+        {showEditButton && (
+          <form onSubmit={handleSubmit}>
+            <div className="w-full flex justify-end items-center my-2">
+              <button
+                type={isDisabled ? "button" : "submit"}
+                onClick={isDisabled ? handleDisable : undefined} // Only handleDisable gets onClick
+                className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+              >
+                {isDisabled ? "Update" : "Save"}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {!isDisabled && (
           <button
             type="submit"
             className="col-span-2 mt-2 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
           >
-            Update
+            Save
           </button>
-        </div>
+        )}
       </form>
     </>
   );

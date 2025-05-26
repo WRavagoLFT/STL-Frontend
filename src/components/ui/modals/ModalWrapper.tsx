@@ -38,12 +38,12 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
         <div
           className="bg-[#F8F0E3] rounded-lg shadow-lg w-full 
              max-w-[90%] sm:max-w-[80%] md:max-w-[600px] 
-             lg:max-w-[650px] xl:max-w-[725px] 
-             max-h-[90vh] overflow-auto p-9"
+             lg:max-w-[650px] xl:max-w-[720px] 
+             max-h-[90vh] overflow-auto p-8"
           onClick={(e) => e.stopPropagation()}
         >
           {title && (
-            <div className="flex justify-between items-center pb-5">
+            <div className="flex justify-between items-center pb-4">
               <h3 className="text-2xl font-bold">{title}</h3>
               <button
                 onClick={onClose}

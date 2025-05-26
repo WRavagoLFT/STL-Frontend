@@ -11,8 +11,9 @@ type Props = {
   value?: OptionType | null;
   options?: OptionType[];
   onChange?: (e: {
-    value: any; target: { name: string; value: string } 
-}) => void;
+    value: any;
+    target: { name: string; value: string };
+  }) => void;
   placeholder?: string;
   error?: boolean;
   disabled?: boolean;
@@ -54,17 +55,24 @@ const SelectInput: React.FC<Props> = ({
       styles={{
         control: (provided, state) => ({
           ...provided,
-          borderColor: error ? "#EF4444 !important" : "#0038A8 !important",
+          borderColor: state.isDisabled
+            ? "#A1A1AA" // Gray border when disabled
+            : error
+              ? "#EF4444 !important" // Red border if error
+              : "#0038A8 !important", // Default blue border
           fontSize: "0.875rem",
           padding: "2px",
+          color: state.isDisabled ? "#6B7280" : "inherit", // Gray text when disabled
+          backgroundColor: state.isDisabled ? "#F3F4F6" : "white", // Optional: lighter background when disabled
+          cursor: state.isDisabled ? "not-allowed" : "default",
           "&:hover": {
-            borderColor: error ? "#EF4444" : "#0038A8",
+            borderColor: state.isDisabled
+              ? "#A1A1AA"
+              : error
+                ? "#EF4444"
+                : "#0038A8",
           },
-          boxShadow: state.isFocused
-            ? error
-              ? "none"
-              : "none"
-            : "none", // No glow unless focused
+          boxShadow: state.isFocused ? (error ? "none" : "none") : "none",
         }),
         menuPortal: (base) => ({
           ...base,

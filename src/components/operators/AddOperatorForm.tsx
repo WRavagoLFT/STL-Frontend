@@ -179,7 +179,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   return (
     <form
       onSubmit={formik.handleSubmit}
-      className="grid grid-cols-2 gap-x-6 gap-y-1"
+      className="grid grid-cols-2 gap-x-6 gap-y-2"
     >
       {/* Name */}
       <div>
@@ -193,7 +193,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           placeholder="Enter Operator Name"
           error={!!(formik.touched.name && formik.errors.name)}
         />
-        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
           {getError("name") || "\u00A0"}
         </p>
       </div>
@@ -212,7 +212,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             !!(formik.touched.contactNumber && formik.errors.contactNumber)
           }
         />
-        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
           {getError("contactNumber") || "\u00A0"}
         </p>
       </div>
@@ -230,7 +230,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             !!(formik.touched.dateOfOperation && formik.errors.dateOfOperation)
           }
         />
-        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
           {getError("dateOfOperation") || "\u00A0"}
         </p>
       </div>
@@ -247,7 +247,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           placeholder="Enter email"
           error={!!(formik.touched.email && formik.errors.email)}
         />
-        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
           {getError("email") || "\u00A0"}
         </p>
       </div>
@@ -264,7 +264,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           placeholder="Address"
           error={!!(formik.touched.address && formik.errors.address)}
         />
-        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
           {getError("address") || "\u00A0"}
         </p>
       </div>
@@ -295,7 +295,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
           }}
         />
-        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
           {getError("gameTypes") || "\u00A0"}
         </p>
       </div>
@@ -322,7 +322,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             Boolean(formik.errors.areaOfOperations)
           }
         />
-        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
           {getError("areaOfOperations") || "\u00A0"}
         </p>
       </div>
@@ -349,7 +349,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {getError("regions") || "\u00A0"}
           </p>
         </div>
@@ -377,7 +377,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {getError("provinces") || "\u00A0"}
           </p>
         </div>
@@ -407,7 +407,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                 }
                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
               />
-              <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+              <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
                 {getError("cities") || "\u00A0"}
               </p>
             </div>
@@ -451,7 +451,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {getError("cities") || "\u00A0"}
           </p>
         </div>

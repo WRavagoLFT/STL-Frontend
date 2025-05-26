@@ -460,17 +460,29 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
         </div>
       )}
 
-      {/* Show only when `showEditButton` is true */}
-      {showEditButton && (
-        <div className="w-full mt-5">
+        {/* Show only when `showEditButton` is true */}
+        {showEditButton && (
+          <form onSubmit={handleDisable}>
+            <div className="w-full flex justify-end items-center my-2">
+              <button
+                type={isDisabled ? "button" : "submit"}
+                onClick={isDisabled ? handleDisable : undefined} // Only handleDisable gets onClick
+                className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+              >
+                {isDisabled ? "Update" : "Save"}
+              </button>
+            </div>
+          </form>
+        )}
+      
+        {!isDisabled && (
           <button
-            onClick={isDisabled ? handleDisable : handleDisable}
-            className="w-full bg-[#F6BA12] hover:bg-[#FFD100] text-black font-base text-sm px-7 py-2 rounded mt-1"
+            type="submit"
+            className="col-span-2 mt-2 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
           >
-            {isDisabled ? "Update Operator" : "Save"}
+            Save
           </button>
-        </div>
-      )}
+        )}
     </div>
   );
 };

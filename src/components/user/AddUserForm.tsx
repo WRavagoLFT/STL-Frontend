@@ -113,7 +113,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       noValidate
     >
       {/* Column 1 */}
-      <div className="flex flex-col gap-x-6 gap-y-1.5">
+      <div className="flex flex-col gap-x-6 gap-y-2">
         <div>
           <label htmlFor="firstName" className="block text-sm">
             Given Name
@@ -126,7 +126,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
             {...formik.getFieldProps("firstName")}
             error={!!(formik.touched.firstName && formik.errors.firstName)}
           />
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {getError("firstName") || "\u00A0"}
           </p>
         </div>
@@ -144,7 +144,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
               {...formik.getFieldProps("lastName")}
               error={!!(formik.touched.lastName && formik.errors.lastName)}
             />
-            <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("lastName") || "\u00A0"}
             </p>
           </div>
@@ -167,7 +167,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
               placeholder="Suffix"
               error={!!getError("suffix")}
             />
-            <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("suffix") || "\u00A0"}
             </p>
           </div>
@@ -185,14 +185,14 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
             {...formik.getFieldProps("phoneNumber")}
             error={!!(formik.touched.phoneNumber && formik.errors.phoneNumber)}
           />
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {getError("phoneNumber") || "\u00A0"}
           </p>
         </div>
       </div>
 
       {/* Column 2 */}
-      <div className="flex flex-col gap-x-6 gap-y-1.5">
+      <div className="flex flex-col gap-x-6 gap-y-2">
         <div>
           <label htmlFor="operatorId" className="block text-sm mb-1">
             Assigned PCSO Branch
@@ -211,7 +211,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
             placeholder="Select Assigned PCSO Branch"
             error={!!getError("operatorId")}
           />
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {getError("operatorId") || "\u00A0"}
           </p>
         </div>
@@ -228,7 +228,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
             {...formik.getFieldProps("email")}
             error={!!(formik.touched.email && formik.errors.email)}
           />
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {getError("email") || "\u00A0"}
           </p>
         </div>
@@ -273,7 +273,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           </div>
 
           {/* Error Message */}
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {formik.touched.password && formik.errors.password
               ? formik.errors.password
               : "\u00A0"}
