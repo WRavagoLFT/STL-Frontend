@@ -5,7 +5,7 @@ import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import Select from "react-select";
 import { FormikProps, useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import ConfirmUserActionModalPage from "../shared/ConfirmUserActionModal";
+import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { operatorSchema } from "~/schemas/operatorSchema";
 import Swal from "sweetalert2";
 
@@ -63,7 +63,6 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
   const [filteredProvinces, setFilteredProvinces] = useState<OptionType[]>([]);
   const [filteredCities, setFilteredCities] = useState<OptionType[]>([]);
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const gameTypesOptions = gameTypes.map((cat) => ({
     value: cat.GameCategoryId.toString(),
@@ -477,22 +476,16 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         </button>
 
         <ConfirmUserActionModalPage
-          formData={formData}
-          setFormData={setFormData}
-          setErrors={setErrors}
-          actionType="create"
           open={isConfirmModalOpen}
           onClose={handleModalClose}
-          resourceType={"user"}
-          onConfirm={() => {
-            onSubmit(formData as unknown as Operator);
-            closeConfirmModal();
-            if (onClose) onClose();
-          }}
-          endpoints={{
-            user: {
-              add: "/operators/addOperator",
-            },
+          onConfirm={async () => {
+            try {
+              await onSubmit(formData as unknown as Operator); // submit from the parent component handled after password verification
+              closeConfirmModal();              // close confirm modal
+              if (onClose) onClose();           // optionally close the parent modal
+            } catch (err) {
+              console.error("Error during onSubmit:", err);
+            }
           }}
         />
         

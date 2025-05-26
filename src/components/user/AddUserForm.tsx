@@ -5,7 +5,7 @@ import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { userSchema } from "~/schemas/userSchema";
-import ConfirmUserActionModalPage from "../shared/ConfirmUserActionModal";
+import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { generateValidPassword } from "~/utils/passwordgenerate";
 import Swal from "sweetalert2";
@@ -36,7 +36,6 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
     })
   );
   const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
   const [showPassword, setShowPassword] = useState(false);
@@ -46,21 +45,10 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
 
   const handleModalClose = () => {
-    // Close the confirm modal and the parent AddUserModal
     closeConfirmModal();
     if (onClose) onClose();
   };
   
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   const suffixOptions: OptionType[] = [
     { label: "N/A", value: "" },
     { label: "Jr.", value: "Jr." },
@@ -306,22 +294,16 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         </button>
 
         <ConfirmUserActionModalPage
-          formData={formData}
-          setFormData={setFormData}
-          setErrors={setErrors}
-          actionType="create"
           open={isConfirmModalOpen}
           onClose={handleModalClose}
-          resourceType={"user"}
-          onConfirm={() => {
-            onSubmit(formData as unknown as User);
-            closeConfirmModal();
-            if (onClose) onClose();
-          }}
-          endpoints={{
-            user: {
-              add: "/users/addUser",
-            },
+          onConfirm={async () => {
+            try {
+              await onSubmit(formData as unknown as User); // submit from the parent component handled after password verification
+              closeConfirmModal();              // close confirm modal
+              if (onClose) onClose();           // optionally close the parent modal
+            } catch (err) {
+              console.error("Error during onSubmit:", err);
+            }
           }}
         />
       </div>

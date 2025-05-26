@@ -16,6 +16,7 @@ import {
   fetchRegions,
 } from "~/utils/api/location";
 import { fetchOperators } from "~/utils/api/operators";
+import Swal from "sweetalert2";
   
 const OperatorsPage = () => {
   const { data, setData } = useOperatorsData();
@@ -64,8 +65,9 @@ const OperatorsPage = () => {
         //console.log("Fetched and set game types:", gameTypes);
         //console.log("Fetched and set regions:", regions);
         //console.log("Fetched and set provinces:", provinces);
-        console.log("Fetched and set cities:", cities);
+        //console.log("Fetched and set cities:", cities);
         //console.log("Fetched and set area of operations:", areaOfOperations);
+        //console.log("Fetched and set operators:", operators);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -77,18 +79,41 @@ const OperatorsPage = () => {
   const handleAddOperator = async (data: Operator): Promise<void> => {
     try {
       console.log("Adding operator:", data);
+
       const result = await addOperator(data);
+
       if (result.success) {
-        console.log("Operator added successfully:", result.data);
-        fetchOperators();
+        const operatorsResult = await fetchOperators();
+        setData(operatorsResult?.data ?? []);
+
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "Operator added successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
         console.error("Failed to add operator:", result.message);
-        // Optionally show error to the user
+        Swal.fire({
+          icon: "error",
+          title: "Add Failed",
+          text:
+            result.message || "Something went wrong while adding the operator.",
+        });
       }
+
       setIsModalOpen(false);
     } catch (error) {
       console.error(
-        "Unexpected error in handleAddOperator:", (error as Error).message);
+        "Unexpected error in handleAddOperator:",
+        (error as Error).message
+      );
+      Swal.fire({
+        icon: "error",
+        title: "Unexpected Error",
+        text: (error as Error).message || "An unexpected error occurred.",
+      });
     }
   };
 
@@ -99,11 +124,13 @@ const OperatorsPage = () => {
         dashboardData={data} 
         textlabel={textlabel}
       />
+      
       <ChartsDataPage
         userType="operator"
         pageType="operator"
         dashboardData={dashboardData}
       />
+      
       <DetailedTable
         data={data}
         columns={tableColumns}
@@ -111,6 +138,7 @@ const OperatorsPage = () => {
         source="operators"
         onAddClick={openModal}
       />
+
       <AddOperatorModal
         open={isModalOpen}
         onClose={closeModal}

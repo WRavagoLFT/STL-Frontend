@@ -9,6 +9,7 @@ import { addUser, fetchUsers } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
 import { User } from "~/types/types";
 import UpdateUserModal from "~/components/user/UpdateUser";
+import Swal from "sweetalert2";
 
 const roleMap: Record<string, { label: string; textlabel: string; roleId: number }> = {
 managers: {
@@ -73,10 +74,22 @@ const RolePage = () => {
 
       if (result.success) {
         console.log("User added successfully:", result.data);
-        fetchUsers(roleConfig.roleId, setData);
+        await fetchUsers(roleConfig.roleId, setData);
+
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "User added successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
         console.error("Failed to add user:", result.message);
-        // Optionally show error to the user
+        Swal.fire({
+          icon: "error",
+          title: "Add Failed",
+          text: result.message || "Something went wrong while adding the user.",
+        });
       }
 
       setIsCreateModalOpen(false);
@@ -85,6 +98,11 @@ const RolePage = () => {
         "Unexpected error in handleAddUser:",
         (error as Error).message
       );
+      Swal.fire({
+        icon: "error",
+        title: "Unexpected Error",
+        text: (error as Error).message || "An unexpected error occurred.",
+      });
     }
   };
 
@@ -99,7 +117,7 @@ const RolePage = () => {
 
       <ChartsDataPage 
         pageType={roleKey} 
-        dashboardData={data} 
+        dashboardData={data}
       />
 
       <DetailedTable
@@ -130,7 +148,6 @@ const RolePage = () => {
         userTypeId={roleId}
         selectedUser={selectedUser}
       />
-            
     </div>
   );
 };

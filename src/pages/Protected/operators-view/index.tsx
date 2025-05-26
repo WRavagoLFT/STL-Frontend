@@ -94,7 +94,6 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
         <div className="flex flex-col w-full md:w-3/5">
           <OperatorViewPage
             fields={fields}
-            //endpoint={operatorConfig.endpoint}
             initialUserData={operator}
             gameTypes={gameTypes}
             provinces={provinces}
