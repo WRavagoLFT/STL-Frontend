@@ -8,6 +8,7 @@ import { userSchema } from "~/schemas/userSchema";
 import ConfirmUserActionModalPage from "../shared/ConfirmUserActionModal";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { generateValidPassword } from "~/utils/passwordgenerate";
+import Swal from "sweetalert2";
 
 interface AddUserFormProps {
   title?: string;
@@ -73,11 +74,10 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
     { label: "Esq.", value: "Esq." },
   ];
 
-  // Initialize formik
   const formik = useFormik({
     initialValues: {
       firstName: initialData.firstName || "",
-      lastName: initialData.lastName ||  "",
+      lastName: initialData.lastName || "",
       suffix: initialData.suffix || "",
       password: "",
       phoneNumber: initialData.phoneNumber || "",
@@ -89,13 +89,27 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           : "",
     },
     validationSchema: toFormikValidationSchema(userSchema),
-    onSubmit: (values) => {
-    const submittedData: { [key: string]: string | number | string[] } = {
-        ...values,
-        operatorId: parseInt(values.operatorId),
-      };
-      setFormData(submittedData);
-      openConfirmModal();
+    onSubmit: async (values) => {
+      const result = await Swal.fire({
+        title: "Add Confirmation",
+        text: "Did you enter the correct details?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, I did",
+        cancelButtonText: "No, let me check",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+      });
+
+      if (result.isConfirmed) {
+        const submittedData: { [key: string]: string | number | string[] } = {
+          ...values,
+          operatorId: parseInt(values.operatorId),
+        };
+        setFormData(submittedData);
+        openConfirmModal();
+      }
+      // Do nothing if user cancels
     },
   });
 
@@ -294,14 +308,20 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         <ConfirmUserActionModalPage
           formData={formData}
           setFormData={setFormData}
-          actionType="create"
           setErrors={setErrors}
+          actionType="create"
           open={isConfirmModalOpen}
           onClose={handleModalClose}
+          resourceType={"user"}
           onConfirm={() => {
             onSubmit(formData as unknown as User);
             closeConfirmModal();
             if (onClose) onClose();
+          }}
+          endpoints={{
+            user: {
+              add: "/users/addUser",
+            },
           }}
         />
       </div>

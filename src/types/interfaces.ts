@@ -248,18 +248,6 @@ export const defaultValues: UserFormData = {
   operatorId: 0,
 };
 
-export interface ConfirmUserActionModalProps {
-  formData: Record<string, any>;
-  setFormData: React.Dispatch<React.SetStateAction<Record<string, any>>>;
-  setErrors: React.Dispatch<React.SetStateAction<Record<string, any>>>;
-  actionType: "create" | "update" | "delete" | string;
-  open: boolean;
-  //endpoint: { update: string; [key: string]: string };
-  onClose: () => void;
-  onConfirm?: () => void; // optional, if needed
-}
-
-
 export interface ShareBreakdownPageProps {
   totalPercentage: number;
   totalShareAmount: number;

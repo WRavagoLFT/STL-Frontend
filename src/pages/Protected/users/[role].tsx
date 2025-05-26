@@ -8,7 +8,6 @@ import CardsPage from "~/components/user/CardsData";
 import { addUser, fetchUsers } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
 import { User } from "~/types/types";
-import { RegionUser } from "~/types/interfaces";
 import UpdateUserModal from "~/components/user/UpdateUser";
 
 const roleMap: Record<string, { label: string; textlabel: string; roleId: number }> = {

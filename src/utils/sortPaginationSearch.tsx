@@ -198,9 +198,6 @@ export const filterData = (
   return data.filter((item) => {
     const operatorName =
       operatorMap?.[item.OperatorId]?.OperatorName?.toLowerCase() || "no operator";
-      
-    console.log('OPERATORMAP IN THE SEARCH FUNCTION:',operatorMap);
-
 
     if (searchValue && !Object.values(item).some((val) => filterItem("", String(val)))) {
       const fullName = `${"FirstName" in item ? item.FirstName : ""} ${"LastName" in item ? item.LastName : ""}`.toLowerCase();

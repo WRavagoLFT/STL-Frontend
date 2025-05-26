@@ -5,25 +5,25 @@ import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import Select from "react-select";
 import { FormikProps, useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
-import { userSchema } from "~/schemas/userSchema";
 import ConfirmUserActionModalPage from "../shared/ConfirmUserActionModal";
 import { operatorSchema } from "~/schemas/operatorSchema";
+import Swal from "sweetalert2";
 
 interface AddOperatorFormProps {
   title?: string;
   onSubmit: (data: Operator) => void;
   initialData?: Partial<Operator>;
-  gameTypes: any[]; // <-- add this
+  gameTypes: any[];
   regions: any[];
   provinces: any[];
   cities: any[];
   areaOfOperations: any;
+  onClose?: () => void;
 }
 
 export interface AreaOfOperation {
   AreaOfOperationsOptionsId: number;
   AreaOfOperations: string;
-  // any other properties if needed
 }
 
 const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
@@ -34,23 +34,26 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   provinces,
   cities,
   areaOfOperations,
+  onClose,
 }) => {
-  const [formData, setFormData] = useState({
-    name: initialData.name || "",
-    contactNumber: initialData.contactNumber || "",
-    dateOfOperation: initialData.dateOfOperation || "",
-    email: initialData.email || "",
-    address: initialData.address || "",
-    cities: initialData.cities || "",
-    gameTypes: initialData.gameTypes || "",
-    areaOfOperations: initialData.areaOfOperations || "",
-  });
+  const [formData, setFormData] = useState<Record<string, any>>({});
 
   const [hasExcludedCity, setHasExcludedCity] = useState(false);
   const selectedAreaId = Number(formData.areaOfOperations); // ensure it's a number
   const showRegionsAndProvinces = selectedAreaId === 1 || selectedAreaId === 2;
   const showCities = selectedAreaId !== 1;
   const showExcluded = selectedAreaId !== 2;
+
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  // Open the confirm modal after submit
+  const openConfirmModal = () => setIsConfirmModalOpen(true);
+  const closeConfirmModal = () => setIsConfirmModalOpen(false);
+
+  const handleModalClose = () => {
+    // Close the confirm modal and the parent AddUserModal
+    closeConfirmModal();
+    if (onClose) onClose();
+  };
 
   //console.log("GAMETYPES:", gameTypes);
   //console.log("REGIONS", regions);
@@ -60,6 +63,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
   const [filteredProvinces, setFilteredProvinces] = useState<OptionType[]>([]);
   const [filteredCities, setFilteredCities] = useState<OptionType[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const gameTypesOptions = gameTypes.map((cat) => ({
     value: cat.GameCategoryId.toString(),
@@ -79,23 +83,11 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   );
 
   const provinceOptions = filteredProvinces;
-
   const cityOptions = filteredCities;
-
+  const selectedCities = Array.isArray(formData.cities) ? formData.cities : [];
   const availableExcludedCities = cityOptions.filter(
-    (opt) => !formData.cities.includes(opt.value)
+    (opt) => !selectedCities.includes(opt.value)
   );
-
-  // Handle changes for normal inputs (text/select)
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
 
   const handleSelectChange = (e: {
     target: { name: string; value: string };
@@ -164,8 +156,26 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       provinces: initialData.provinces || [],
     },
     validationSchema: toFormikValidationSchema(operatorSchema),
-    onSubmit: (values) => {
-      onSubmit(values as Operator);
+    onSubmit: async (values) => {
+      const result = await Swal.fire({
+        title: "Add Confirmation",
+        text: "Did you enter the correct details?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, I did",
+        cancelButtonText: "No, let me check",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+      });
+
+      if (result.isConfirmed) {
+        const submittedData: { [key: string]: string | number | string[] } = {
+          ...values,
+        };
+        setFormData(submittedData);
+        openConfirmModal();
+      }
+      // If canceled, do nothing
     },
   });
 
@@ -465,6 +475,27 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         >
           Add Operator
         </button>
+
+        <ConfirmUserActionModalPage
+          formData={formData}
+          setFormData={setFormData}
+          setErrors={setErrors}
+          actionType="create"
+          open={isConfirmModalOpen}
+          onClose={handleModalClose}
+          resourceType={"user"}
+          onConfirm={() => {
+            onSubmit(formData as unknown as Operator);
+            closeConfirmModal();
+            if (onClose) onClose();
+          }}
+          endpoints={{
+            user: {
+              add: "/operators/addOperator",
+            },
+          }}
+        />
+        
       </div>
     </form>
   );

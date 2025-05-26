@@ -33,6 +33,7 @@ export default function AddOperatorModal({
         provinces={provinces}
         cities={cities}
         areaOfOperations={areaOfOperations}
+        onClose={onClose}
       />
     </ModalWrapper>
   );
