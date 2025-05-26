@@ -6,6 +6,8 @@ import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { userSchema } from "~/schemas/userSchema";
 import ConfirmUserActionModalPage from "../shared/ConfirmUserActionModal";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { generateValidPassword } from "~/utils/passwordgenerate";
 
 interface AddUserFormProps {
   title?: string;
@@ -35,6 +37,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
   const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
+  const [showPassword, setShowPassword] = useState(false);
 
   // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
@@ -44,6 +48,16 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
     // Close the confirm modal and the parent AddUserModal
     closeConfirmModal();
     if (onClose) onClose();
+  };
+  
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const suffixOptions: OptionType[] = [
@@ -130,9 +144,9 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
               {...formik.getFieldProps("lastName")}
               error={!!(formik.touched.lastName && formik.errors.lastName)}
             />
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
-            {getError("lastName") || "\u00A0"}
-          </p>
+            <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+              {getError("lastName") || "\u00A0"}
+            </p>
           </div>
 
           <div>
@@ -153,9 +167,9 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
               placeholder="Suffix"
               error={!!getError("suffix")}
             />
-          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
-            {getError("suffix") || "\u00A0"}
-          </p>
+            <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+              {getError("suffix") || "\u00A0"}
+            </p>
           </div>
         </div>
 
@@ -220,19 +234,49 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm">
+          <label htmlFor="password" className="block text-sm mb-1">
             Password
           </label>
-          <Input
-            type="password"
-            id="password"
-            placeholder="Password"
-            className="mt-1"
-            {...formik.getFieldProps("password")}
-            error={!!(formik.touched.password && formik.errors.password)}
-          />
+
+          <div className="flex space-x-2">
+            {/* Password Input with Eye Toggle */}
+            <div className="relative flex-1">
+              <Input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                placeholder="Password"
+                className="pr-10" // padding for eye icon
+                {...formik.getFieldProps("password")}
+                error={!!(formik.touched.password && formik.errors.password)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+                tabIndex={-1}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
+            {/* Generate Button */}
+            <button
+              type="button"
+              onClick={() => {
+                const generatedPassword = generateValidPassword();
+                formik.setFieldValue("password", generatedPassword);
+              }}
+              className="bg-[#F6BA12] hover:bg-[#D1940F] text-[#181A1B] text-sm px-4 py-2 rounded-lg whitespace-nowrap"
+            >
+              Generate
+            </button>
+          </div>
+
+          {/* Error Message */}
           <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
-            {getError("password") || "\u00A0"}
+            {formik.touched.password && formik.errors.password
+              ? formik.errors.password
+              : "\u00A0"}
           </p>
         </div>
       </div>
@@ -241,10 +285,10 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       <div className="col-span-2">
         <button
           type="submit"
-          className="w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2 mt-2"
+          className="w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2 mt-1"
           disabled={formik.isSubmitting}
         >
-          Submit
+          Add {title}
         </button>
 
         <ConfirmUserActionModalPage
@@ -260,7 +304,6 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
             if (onClose) onClose();
           }}
         />
-        
       </div>
     </form>
   );

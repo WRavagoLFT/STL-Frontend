@@ -38,8 +38,8 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
         <div
           className="bg-[#F8F0E3] rounded-lg shadow-lg w-full 
              max-w-[90%] sm:max-w-[80%] md:max-w-[600px] 
-             lg:max-w-[650px] xl:max-w-[720px] 
-             max-h-[90vh] overflow-auto p-8"
+             lg:max-w-[650px] xl:max-w-[725px] 
+             max-h-[90vh] overflow-auto p-9"
           onClick={(e) => e.stopPropagation()}
         >
           {title && (

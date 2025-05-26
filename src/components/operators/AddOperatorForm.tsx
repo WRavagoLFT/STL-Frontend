@@ -3,7 +3,7 @@ import { Operator } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import Select from "react-select";
-import { FormikHelpers, FormikProps, useFormik } from "formik";
+import { FormikProps, useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { userSchema } from "~/schemas/userSchema";
 import ConfirmUserActionModalPage from "../shared/ConfirmUserActionModal";
@@ -177,7 +177,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       : null;
 
   return (
-    <form onSubmit={formik.handleSubmit} className="grid grid-cols-2 gap-4">
+    <form
+      onSubmit={formik.handleSubmit}
+      className="grid grid-cols-2 gap-x-6 gap-y-1"
+    >
       {/* Name */}
       <div>
         <label className="block text-sm">Operator Name</label>
@@ -190,9 +193,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           placeholder="Enter Operator Name"
           error={!!(formik.touched.name && formik.errors.name)}
         />
-        {formik.touched.name && formik.errors.name && (
-          <p className="text-red-500 text-xs">{formik.errors.name}</p>
-        )}
+        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          {getError("name") || "\u00A0"}
+        </p>
       </div>
 
       {/* Contact Number */}
@@ -209,9 +212,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             !!(formik.touched.contactNumber && formik.errors.contactNumber)
           }
         />
-        {formik.touched.contactNumber && formik.errors.contactNumber && (
-          <p className="text-red-500 text-xs">{formik.errors.contactNumber}</p>
-        )}
+        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          {getError("contactNumber") || "\u00A0"}
+        </p>
       </div>
 
       {/* Date of Operation */}
@@ -227,11 +230,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             !!(formik.touched.dateOfOperation && formik.errors.dateOfOperation)
           }
         />
-        {formik.touched.dateOfOperation && formik.errors.dateOfOperation && (
-          <p className="text-red-500 text-xs">
-            {formik.errors.dateOfOperation}
-          </p>
-        )}
+        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          {getError("dateOfOperation") || "\u00A0"}
+        </p>
       </div>
 
       {/* Email */}
@@ -246,9 +247,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           placeholder="Enter email"
           error={!!(formik.touched.email && formik.errors.email)}
         />
-        {formik.touched.email && formik.errors.email && (
-          <p className="text-red-500 text-xs">{formik.errors.email}</p>
-        )}
+        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          {getError("email") || "\u00A0"}
+        </p>
       </div>
 
       {/* Address */}
@@ -263,9 +264,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           placeholder="Address"
           error={!!(formik.touched.address && formik.errors.address)}
         />
-        {formik.touched.address && formik.errors.address && (
-          <p className="text-red-500 text-xs">{formik.errors.address}</p>
-        )}
+        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          {getError("address") || "\u00A0"}
+        </p>
       </div>
 
       <div>
@@ -294,9 +295,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
           }}
         />
-        {formik.touched.gameTypes && formik.errors.gameTypes && (
-          <p className="text-red-500 text-xs">{formik.errors.gameTypes}</p>
-        )}
+        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          {getError("gameTypes") || "\u00A0"}
+        </p>
       </div>
 
       {/* Area of Operations */}
@@ -321,11 +322,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             Boolean(formik.errors.areaOfOperations)
           }
         />
-        {formik.touched.areaOfOperations && formik.errors.areaOfOperations && (
-          <p className="text-red-500 text-xs mt-1">
-            {formik.errors.areaOfOperations as string}
-          </p>
-        )}
+        <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+          {getError("areaOfOperations") || "\u00A0"}
+        </p>
       </div>
 
       {/* Area of Regional Operations */}
@@ -350,11 +349,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
-          {formik.touched.regions && formik.errors.regions && (
-            <p className="text-red-500 text-xs mt-1">
-              {formik.errors.regions as string}
-            </p>
-          )}
+          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+            {getError("regions") || "\u00A0"}
+          </p>
         </div>
       )}
 
@@ -380,11 +377,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
-          {formik.touched.provinces && formik.errors.provinces && (
-            <p className="text-red-500 text-xs mt-1">
-              {formik.errors.provinces as string}
-            </p>
-          )}
+          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+            {getError("provinces") || "\u00A0"}
+          </p>
         </div>
       )}
 
@@ -412,11 +407,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                 }
                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
               />
-              {formik.touched.cities && formik.errors.cities && (
-                <p className="text-red-500 text-xs mt-1">
-                  {formik.errors.cities as string}
-                </p>
-              )}
+              <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+                {getError("cities") || "\u00A0"}
+              </p>
             </div>
           )}
 
@@ -458,11 +451,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
-          {formik.touched.cities && formik.errors.cities && (
-            <p className="text-red-500 text-xs mt-1">
-              {formik.errors.cities as string}
-            </p>
-          )}
+          <p className="text-[#CE1126] text-xs mt-1 min-h-[1rem]">
+            {getError("cities") || "\u00A0"}
+          </p>
         </div>
       )}
 
@@ -470,9 +461,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       <div className="col-span-2">
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+          className="w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2 mt-3"
         >
-          Submit
+          Add Operator
         </button>
       </div>
     </form>

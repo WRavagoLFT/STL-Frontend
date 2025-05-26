@@ -16,7 +16,6 @@ import {
   FaChevronRight,
   FaReceipt,
 } from "react-icons/fa";
-import Skeleton from "@mui/material/Skeleton";
 import clsx from "clsx";
 
 const BETTING_SUBMENUS = [
@@ -150,7 +149,7 @@ const Sidebar: React.FC = () => {
   };
 
   const renderMenuItem = (label: string) => {
-    const iconSize = 20;
+    const iconSize = 19;
 
     const iconMap: Record<string, React.ReactNode> = {
       Dashboard: <FaHome size={iconSize} />,
