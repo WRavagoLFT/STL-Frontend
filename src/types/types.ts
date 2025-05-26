@@ -34,7 +34,7 @@ export interface User {
     OperatorName?: string;
   };
   Region?: string; // Remove this if 'region' below is preferred
-  region?: string;
+  region: string;
   LastLogin?: string;
   LastTokenRefresh?: string;
   IsActive?: number;
@@ -57,16 +57,15 @@ export interface Operator {
   cities: any;
   regions: any[];
   provinces: any[];
+  OperatorId?: any[];
 
   data?: any; // for operator update
-  OperatorId?: number;
   OperatorName?: string;
   Executive?: string;
   OperatorEmail?: string | null;
   Status?: number; // Consider using enum if Status can be "Active" = 1, etc.
   CreatedAt?: string;
   DateOfOperation?: string;
-  Cities?: { CityId: number; CityName: string }[];
   OperatorAddress?: string;
   OperatorContactNos?: string;
   Email?: string | null;

@@ -61,49 +61,10 @@ const RolePage = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   // Handlers
-  const openCreateModal = () => {
-    setIsCreateModalOpen(true);
-  };
-
-  const closeCreateModal = () => {
-    setIsCreateModalOpen(false);
-  };
-
-  const openUpdateModal = (user: User) => {
-    setSelectedUser(user);
-    setIsUpdateModalOpen(true);
-  };
-
-  const closeUpdateModal = () => {
-    setSelectedUser(null);
-    setIsUpdateModalOpen(false);
-  };
-
-  // Helper function (can be extracted)
-  const toRegionUser = (
-    user: any
-  ): (RegionUser & { OperatorName?: string }) | null => {
-    const region =
-      typeof user.region === "string"
-        ? user.region
-        : typeof user.region === "object" && user.region?.RegionName
-          ? user.region.RegionName
-          : user.OperatorRegion?.RegionName;
-
-    if (typeof region === "string") {
-      return {
-        ...user,
-        region, // region is guaranteed string here
-        OperatorName: user.OperatorDetails?.OperatorName,
-      };
-    }
-    return null;
-  };
-
-  const normalizedData = data
-    .map(toRegionUser)
-    .filter((u): u is RegionUser & { OperatorName?: string } => u !== null);
-
+  const openCreateModal = () => {setIsCreateModalOpen(true);};
+  const closeCreateModal = () => {setIsCreateModalOpen(false);};
+  const openUpdateModal = (user: User) => {setSelectedUser(user);setIsUpdateModalOpen(true);};
+  const closeUpdateModal = () => {setSelectedUser(null);setIsUpdateModalOpen(false);};
 
   const handleAddUser = async (data: User): Promise<void> => {
     try {
@@ -139,7 +100,7 @@ const RolePage = () => {
 
       <ChartsDataPage 
         pageType={roleKey} 
-        dashboardData={normalizedData} 
+        dashboardData={data} 
       />
 
       <DetailedTable
@@ -170,7 +131,7 @@ const RolePage = () => {
         userTypeId={roleId}
         selectedUser={selectedUser}
       />
-      
+            
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -21,8 +21,6 @@ import {
 } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { User, Operator, SortConfig } from "~/types/types";
-import { getUserStatus } from "~/utils/dashboarddata";
-import dayjs from "dayjs";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
 
@@ -45,7 +43,6 @@ const ReadOnlyTablePage = <T extends Transactions>({
     handleChangeRowsPerPage,
     setSearchQuery,
   } = useDetailTableStore();
-  const sevenDaysAgo = useMemo(() => dayjs().subtract(7, "day"), []);
 
   // FILTER + SEARCH
   const filteredData = useMemo(() => {
@@ -54,24 +51,12 @@ const ReadOnlyTablePage = <T extends Transactions>({
       .map((col) => col.filterKey ?? col.key?.toString())
       .filter((key): key is string => !!key);
 
-    const enrichedData = data.map((item) => {
-      const operator = operatorMap?.[item.OperatorId];
-      return {
-        ...item,
-        OperatorDetails: {
-          OperatorName: operator?.OperatorName || "",
-        },
-        Status: getUserStatus(item, sevenDaysAgo),
-      };
-    });
+    const enrichedData = data.map((item) => ({
+      ...item,
+    }));
 
-    return filterData(
-      enrichedData,
-      filterKeys,
-      { ...filters, searchQuery },
-      operatorMap as Record<number, Operator>
-    );
-  }, [data, filters, searchQuery, columns, operatorMap, sevenDaysAgo]);
+    return filterData(enrichedData, filterKeys, { ...filters, searchQuery });
+  }, [data, filters, searchQuery, columns]);
 
   // SORTING
   const sortedData = useMemo(() => {
@@ -153,9 +138,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
                 >
                   <div className="flex flex-col items-center py-7 text-[#0038A8]">
                     <PersonOffIcon style={{ fontSize: 50 }} />
-                    <h6 className="mt-2 font-sm text-lg ">
-                      No data available
-                    </h6>
+                    <h6 className="mt-2 font-sm text-lg ">No data available</h6>
                   </div>
                 </TableCell>
               </TableRow>
@@ -166,12 +149,12 @@ const ReadOnlyTablePage = <T extends Transactions>({
                     const key = String(col.key);
                     const value = (row as any)[key];
                     return (
-                      <TableCell key={key} sx={{paddingY: 0.9}}>
+                      <TableCell key={key} sx={{ paddingY: 0.9 }}>
                         {col.render
-                          ? col.render(row as T)
+                          ? col.render(row as unknown as T)
                           : col.filterValue
                             ? typeof col.filterValue === "function"
-                              ? col.filterValue(row as T)
+                              ? col.filterValue(row as unknown as T)
                               : col.filterValue
                             : typeof value === "string" ||
                                 typeof value === "number"

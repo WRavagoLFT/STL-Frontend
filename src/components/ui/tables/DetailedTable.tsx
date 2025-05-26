@@ -49,7 +49,11 @@ const DetailedTable = <T extends User | Operator>({
       .filter((key): key is string => !!key);
 
     const enrichedData = data.map((item) => {
-      const operator = item.OperatorId ? operatorMap?.[item.OperatorId] : undefined;
+      const operatorId = item.OperatorId;
+
+      const operator =
+        typeof operatorId === "number" ? operatorMap?.[operatorId] : undefined;
+
       return {
         ...item,
         OperatorDetails: {
@@ -315,11 +319,11 @@ const DetailedTable = <T extends User | Operator>({
           <ConfirmSuspendModal
             formData={formData}
             setFormData={setFormData}
-            errors={errors}
+            //errors={errors}
             actionType='suspend'
             setErrors={setErrors}
             open={isVerifySuspendModalOpen}
-            endpoint={endpoint ?? { create: '', update: '' }}
+            //endpoint={endpoint ?? { create: '', update: '' }}
             onClose={handleClose}
           />
         )}

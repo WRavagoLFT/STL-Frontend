@@ -228,11 +228,6 @@ export interface UserFieldFormPageProps {
   setOperatorMap: (operatorMap: { [key: number]: Operator }) => void;
 }
 
-export interface EditModalPageProps {
-  userId: number;
-  onClose: () => void;
-}
-
 export interface CSVExportButtonProps {
   statsPerRegion: any[];
   pageType: string;
