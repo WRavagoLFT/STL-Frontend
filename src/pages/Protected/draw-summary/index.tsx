@@ -1,28 +1,14 @@
 import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-import { FormControl, InputLabel, MenuItem, styled } from "@mui/material";
-import { selectDrawStyles } from "~/styles/theme";
 import HotNumberPage from "~/components/draw-summary/HotNumbers";
 import DrawResultsSummaryPage from "~/components/draw-summary/DrawResultsSummary";
 import ColdNumberPage from "~/components/draw-summary/ColdNumbers";
 import DrawCounterTablePage from "~/components/draw-summary/DrawCounterTable";
 import { fetchProvinces, fetchRegions } from "~/utils/api/location";
-import { set } from "zod";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { fetchDrawSummary } from "~/utils/api/transactions";
 import Select from 'react-select';
 
-const DashboardSkeletonPage = dynamic(() =>
-  import("~/components/dashboard/DashboardSkeleton").then((mod) => ({
-    default: mod.DashboardSkeletonPage,
-  }))
-);
-
-const DrawListSummaryPage = React.lazy(
-  () => import("~/components/draw-summary/DrawListSummary")
-);
-
-
+const DrawListSummaryPage = React.lazy(() => import("~/components/draw-summary/DrawListSummary"));
 
 const DrawSelectedPage = () => {
 
@@ -304,22 +290,24 @@ const DrawSelectedPage = () => {
 
       <div className="flex flex-col items-center gap-4m mt-2">
         <div className="flex flex-col w-full gap-4">
-          <h1 className="text-3xl font-bold">
-            {
-              filteredProvinces.find(
-                (province) => province.value == selectedProvince.toString()
-              )?.label
-            }{" "}
-            -{" "}
-            {
-              gameCategories.find(
-                (gameCategory) =>
-                  gameCategory.value == selectedGameCategory.toString()
-              )?.label
-            }
-          </h1>
-          <div className="flex flex-col md:flex-row w-full gap-2">
+          <div className="flex flex-col md:flex-row w-full gap-10">
             <div className="flex flex-col w-full md:w-2/3">
+
+              <h1 className="text-3xl font-bold mb-3">
+                {
+                  filteredProvinces.find(
+                    (province) => province.value == selectedProvince.toString()
+                  )?.label
+                }{" "}
+                -{" "}
+                {
+                  gameCategories.find(
+                    (gameCategory) =>
+                      gameCategory.value == selectedGameCategory.toString()
+                  )?.label
+                }
+              </h1>
+
               <div>
                 <p className="text-md font-bold mb-1">Draw Results</p>
                 {data && (
@@ -329,7 +317,7 @@ const DrawSelectedPage = () => {
                     thirdDraw={getTodayResults(3) || []}
                   />
                 )}
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   {data?.HotNumbers && (
                     <HotNumberPage
                       number={data?.HotNumbers[0]?.number || "-"}

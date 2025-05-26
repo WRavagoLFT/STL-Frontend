@@ -10,7 +10,7 @@ const ColdNumberPage = (data: {number: string}) => {
           Cold Number
         </p>
         <div className="flex gap-2">
-          <div className="w-fi bg-[#0038A8] rounded-sm px-10 py-8 flex items-center justify-center" >
+          <div className="w-fi bg-[#0038A8] rounded-md px-10 py-8 flex items-center justify-center" >
             <p className="text-white font-bold text-3xl lg:text-5xl">{data.number}</p>
           </div>
         </div>
