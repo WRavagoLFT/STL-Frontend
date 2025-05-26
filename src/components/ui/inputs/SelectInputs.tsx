@@ -10,7 +10,9 @@ type Props = {
   name: string;
   value?: OptionType | null;
   options?: OptionType[];
-  onChange?: (e: { target: { name: string; value: string } }) => void;
+  onChange?: (e: {
+    value: any; target: { name: string; value: string } 
+}) => void;
   placeholder?: string;
   error?: boolean;
   disabled?: boolean;
@@ -30,6 +32,7 @@ const SelectInput: React.FC<Props> = ({
     _actionMeta: ActionMeta<OptionType>
   ) => {
     const event = {
+      value: selectedOption?.value || "",
       target: {
         name,
         value: selectedOption?.value || "",

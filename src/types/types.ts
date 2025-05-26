@@ -55,9 +55,11 @@ export interface Operator {
   gameTypes: string;
   areaOfOperations: string;
   cities: any;
+  regions: any[];
+  provinces: any[];
 
   data?: any; // for operator update
-  OperatorId: number;
+  OperatorId?: number;
   OperatorName?: string;
   Executive?: string;
   OperatorEmail?: string | null;

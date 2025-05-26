@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import { IconButton } from "@mui/material";
-import { Visibility, VisibilityOff, Close as CloseIcon } from "@mui/icons-material";
+import {
+  Visibility,
+  VisibilityOff,
+  Close as CloseIcon,
+} from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { verifyPass } from "~/utils/api/auth";
 import { ConfirmUserActionModalProps } from "~/types/interfaces";
 import axiosInstance from "~/utils/axiosInstance";
-import { fetchUsers } from "~/utils/api/users";
+import { addUser, fetchUsers } from "~/utils/api/users";
 import useUserRoleStore from "../../store/useUserStore";
 import { LoginSectionData } from "~/data/LoginSectionData";
 
@@ -15,8 +19,7 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
   setErrors,
   actionType,
   open,
-  endpoint,
-  onClose
+  onClose,
 }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,105 +27,128 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
   const handleTogglePasswordVisibility = () => setShowPassword((prev) => !prev);
   const { roleId, setData } = useUserRoleStore();
 
-const handleVerifyUserAction = async () => {
-  if (!password) {
-    setError("Password is required.");
-    return;
-  }
+  const handleVerifyUserAction = async () => {
+    console.log("Starting handleVerifyUserAction");
 
-  try {
-    const { success: isVerified } = await verifyPass(password);
-    if (!isVerified) {
-      setError("Invalid password. Please try again.");
+    if (!password) {
+      console.warn("Password is missing");
+      setError("Password is required.");
       return;
     }
 
-    setError("");
+    try {
+      console.log("Verifying password...");
+      const { success: isVerified } = await verifyPass(password);
+      console.log("Password verified:", isVerified);
 
-    const isDeleting = actionType === "update"; // <-- Renamed for clarity
-    const isCreating = actionType === "create";
+      if (!isVerified) {
+        setError("Invalid password. Please try again.");
+        console.warn("Invalid password attempt");
+        return;
+      }
 
-    const userId = formData.UserId;
+      setError("");
 
-    if (isDeleting && !userId) {
-      setError("User ID is required to delete a user.");
-      return;
-    }
+      const isUpdating = actionType === "update";
+      const isCreating = actionType === "create";
+      console.log(
+        `Action Type: ${actionType} (isCreating: ${isCreating}, isUpdating: ${isUpdating})`
+      );
 
-    const endpointUrl = isDeleting ? endpoint.update : endpoint.create;
+      const userId = formData.UserId;
+      if (isUpdating && !userId) {
+        console.error("User ID missing for update");
+        setError("User ID is required to update a user.");
+        return;
+      }
 
-    // Normalize data to use correct field names
-    const dataToSend = {
-      ...(userId && { userId }),
-      ...Object.entries(formData).reduce(
-        (acc, [key, val]) => {
-          if (val !== undefined && key !== "UserId") acc[key] = val;
-          return acc;
-        },
-        {} as Record<string, any>
-      ),
-      ...(roleId && { userTypeId: roleId }),
-      ...(isDeleting && { IsDeleted: 1 }), // <-- Changed from IsActive: false
-    };
+      // Construct user payload
+      const dataToSend = {
+        ...(userId && { userId }),
+        ...Object.entries(formData).reduce(
+          (acc, [key, val]) => {
+            if (val !== undefined && key !== "UserId") acc[key] = val;
+            return acc;
+          },
+          {} as Record<string, any>
+        ),
+        ...(roleId && { userTypeId: roleId }),
+        ...(isUpdating && { IsDeleted: 1 }),
+      };
 
-    const axiosCall = isDeleting ? axiosInstance.patch : axiosInstance.post;
+      console.log("📦 Payload to send:", dataToSend);
 
-    const response = await axiosCall(endpointUrl, dataToSend, {
-      withCredentials: true,
-    });
+      let result;
 
-    if (!response?.data?.success) {
-      const errMsg =
-        response?.data?.message || `Failed to ${actionType} user.`;
-      setError(errMsg);
+      if (isCreating) {
+        console.log("Sending request to addUser...");
+        result = await addUser(dataToSend);
+      } else {
+        console.log("Sending PATCH request to:", endpoint.update);
+        result = await axiosInstance.patch(endpoint.update, dataToSend, {
+          withCredentials: true,
+        });
+      }
+
+      console.log("Response received:", result);
+
+      const wasSuccessful = isCreating
+        ? result?.success // for addUser, success is at root
+        : result?.data?.success; // for axios calls, success inside data
+
+      if (!wasSuccessful) {
+        const errMsg = isCreating ? result?.message : result?.data?.message;
+        setError(errMsg || `Failed to ${actionType} user.`);
+        await Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: errMsg,
+          confirmButtonColor: "#D32F2F",
+        });
+        return;
+      }
+
+      console.log("Action successful:", actionType);
+
+      setFormData({});
+      setPassword("");
+      setErrors({});
+      onClose();
+
+      if (roleId) {
+        console.log("🔄 Refreshing user list...");
+        fetchUsers(roleId, setData);
+      }
+
+      await Swal.fire({
+        icon: "success",
+        title: isUpdating ? "User Deleted!" : "User Created!",
+        text: isUpdating
+          ? "The user has been marked as deleted."
+          : "The user has been created successfully.",
+        confirmButtonColor: "#67ABEB",
+      });
+    } catch (error: any) {
+      console.error("❌ Error during user action:", error);
+      console.log("🧱 Full error response:", error?.response?.data);
+      console.log("📍 Endpoint used:", endpoint?.update);
+
+      const backendMessage =
+        error?.response?.data?.message ||
+        error?.response?.data ||
+        error?.message ||
+        "An unexpected error occurred.";
+
+      setError(backendMessage);
+
       await Swal.fire({
         icon: "error",
-        title: "Error!",
-        text: errMsg,
+        title: "Unexpected Error!",
+        text: `Error while trying to ${actionType} user: ${backendMessage}`,
         confirmButtonColor: "#D32F2F",
       });
-      return;
     }
-
-    setFormData({});
-    setPassword("");
-    setErrors({});
-    onClose();
-
-    if (roleId) {
-      fetchUsers(roleId, setData);
-    }
-
-    await Swal.fire({
-      icon: "success",
-      title: isDeleting ? "User Deleted!" : "User Created!",
-      text: isDeleting
-        ? "The user has been marked as deleted."
-        : "The user has been created successfully.",
-      confirmButtonColor: "#67ABEB",
-    });
-  } catch (error: any) {
-    console.error("Error during user action:", error);
-    console.log("Full error response:", error?.response?.data);
-    console.log("Endpoint URL when failed:", endpoint?.update);
-
-    const backendMessage =
-      error?.response?.data?.message ||
-      error?.response?.data ||
-      error?.message ||
-      "An unexpected error occurred.";
-
-    setError(backendMessage);
-
-    await Swal.fire({
-      icon: "error",
-      title: "Unexpected Error!",
-      text: `Error while trying to ${actionType} user: ${backendMessage}`,
-      confirmButtonColor: "#D32F2F",
-    });
-  }
-};
-
+  };
 
   return (
     <>
@@ -131,34 +157,6 @@ const handleVerifyUserAction = async () => {
           <div className="relative z-20 flex w-full justify-center items-center">
             <div className="w-[60%] sm:w-[60%] md:w-[40%] max-w-[430px] py-11 px-6 bg-[#F8F0E3] rounded-lg relative">
               {/* Close Button */}
-              <IconButton
-                aria-label="close"
-                onClick={onClose}
-                sx={{
-                  position: 'absolute',
-                  top: 20,
-                  right: 20,
-                  backgroundColor: "#ACA993",
-                  padding: 0,
-                  minWidth: 0,
-                  width: 34,
-                  height: 34,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  '&:hover': {
-                    backgroundColor: "#928F7F",
-                  },
-                }}
-              >
-                <CloseIcon
-                  style={{
-                    fontWeight: 'bold',
-                    fontSize: 22,
-                    color: "#F8F0E3",
-                  }}
-                />
-              </IconButton>
 
               {/* Logo + Title */}
               <div className="text-center mb-4 mt-2">
@@ -194,7 +192,11 @@ const handleVerifyUserAction = async () => {
                     className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-gray-600"
                     tabIndex={-1}
                   >
-                    {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+                    {showPassword ? (
+                      <VisibilityOff fontSize="small" />
+                    ) : (
+                      <Visibility fontSize="small" />
+                    )}
                   </button>
                   {error && (
                     <p className="text-red-500 text-xs mt-1">{error}</p>

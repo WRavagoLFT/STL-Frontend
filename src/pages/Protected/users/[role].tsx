@@ -149,7 +149,6 @@ const RolePage = () => {
         operatorMap={operatorMap}
         roleId={roleId}
         statsPerRegion={data}
-        //endpoint={endpoint ?? { create: "", update: "" }}
         source="users"
         onAddClick={openCreateModal}
         onUpdateClick={openUpdateModal}
@@ -166,7 +165,7 @@ const RolePage = () => {
       <UpdateUserModal
         open={isUpdateModalOpen}
         onClose={closeUpdateModal}
-        onSubmit={handleAddUser} // not yet final
+        onSubmit={handleAddUser}
         operatorMap={operatorMap}
         userTypeId={roleId}
         selectedUser={selectedUser}

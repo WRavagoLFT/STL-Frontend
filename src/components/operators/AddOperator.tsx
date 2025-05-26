@@ -25,7 +25,7 @@ export default function AddOperatorModal({
   areaOfOperations,
 }: AddOperatorModalProps) {
   return (
-    <ModalWrapper isOpen={open} onClose={onClose} title="Create Operator">
+    <ModalWrapper isOpen={open} onClose={onClose} title="Add Operator">
       <AddOperatorForm 
         onSubmit={onSubmit}
         gameTypes={gameTypes}

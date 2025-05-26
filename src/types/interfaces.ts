@@ -117,7 +117,7 @@ export interface DetailedTableProps<T> {
   };
   shouldOpenAsPage?: boolean;
   source?: 'users' | 'operators';
-  onAddClick: () => void;
+  onAddClick?: () => void;
   onUpdateClick?: (row: T) => void; // for update modal
 }
 
@@ -254,22 +254,16 @@ export const defaultValues: UserFormData = {
 };
 
 export interface ConfirmUserActionModalProps {
+  formData: Record<string, any>;
+  setFormData: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  setErrors: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  actionType: "create" | "update" | "delete" | string;
   open: boolean;
+  //endpoint: { update: string; [key: string]: string };
   onClose: () => void;
-  onVerified?: () => void;
-  user?: any;
-  errors: any;
-  setErrors: React.Dispatch<React.SetStateAction<any>>;
-  selectedUser?: User | null;
-  setSelectedUser?: React.Dispatch<React.SetStateAction<User | null>>;
-  actionType: "create" | "update" | "suspend" | "delete";
-  formData: { [key: string]: string | number | string[] };
-  setFormData: (data: { [key: string]: string | number }) => void;
-  endpoint: {
-    create: string;
-    update: string;
-  };
+  onConfirm?: () => void; // optional, if needed
 }
+
 
 export interface ShareBreakdownPageProps {
   totalPercentage: number;

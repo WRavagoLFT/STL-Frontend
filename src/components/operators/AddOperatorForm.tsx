@@ -1,8 +1,13 @@
 import React, { useState } from "react";
-import { Operator, User } from "~/types/types";
+import { Operator } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import Select from "react-select";
+import { FormikHelpers, FormikProps, useFormik } from "formik";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import { userSchema } from "~/schemas/userSchema";
+import ConfirmUserActionModalPage from "../shared/ConfirmUserActionModal";
+import { operatorSchema } from "~/schemas/operatorSchema";
 
 interface AddOperatorFormProps {
   title?: string;
@@ -13,13 +18,6 @@ interface AddOperatorFormProps {
   provinces: any[];
   cities: any[];
   areaOfOperations: any;
-}
-
-interface City {
-  CityId: number;
-  CityName: string;
-  ProvinceId: number;
-  IsCity: boolean;
 }
 
 export interface AreaOfOperation {
@@ -53,7 +51,6 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   const showRegionsAndProvinces = selectedAreaId === 1 || selectedAreaId === 2;
   const showCities = selectedAreaId !== 1;
   const showExcluded = selectedAreaId !== 2;
-  const [excludedCities, setExcludedCities] = useState<number[]>([]);
 
   //console.log("GAMETYPES:", gameTypes);
   //console.log("REGIONS", regions);
@@ -111,9 +108,13 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
     }));
   };
 
-  const handleMultiSelect = (name: string, selectedOptions: OptionType[]) => {
+  const handleMultiSelect = (
+    name: string,
+    selectedOptions: OptionType[],
+    formik: FormikProps<any>
+  ) => {
     const selectedValues = selectedOptions.map((option) => option.value);
-    const selectedValuesNum = selectedValues.map((v) => Number(v)); // Convert all to numbers
+    const selectedValuesNum = selectedValues.map((v) => Number(v)); // Convert to numbers
 
     if (name === "regions") {
       const filteredProvinces = provinces
@@ -123,18 +124,13 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           label: province.ProvinceName,
         }));
 
-      console.log("Selected region IDs:", selectedValuesNum);
-      console.log("Filtered provinces:", filteredProvinces);
-
       setFilteredProvinces(filteredProvinces);
       setFilteredCities([]);
 
-      setFormData((prev) => ({
-        ...prev,
-        regions: selectedValues,
-        provinces: [],
-        cities: [],
-      }));
+      formik.setFieldValue("regions", selectedValues);
+      formik.setFieldTouched("regions", true, true);
+      formik.setFieldValue("provinces", []);
+      formik.setFieldValue("cities", []);
     } else if (name === "provinces") {
       const filteredCities = cities
         .filter((city) => selectedValuesNum.includes(city.ProvinceId))
@@ -143,114 +139,133 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           label: city.CityName.trim(),
         }));
 
-      console.log("Selected province IDs:", selectedValuesNum);
-      console.log("Filtered cities:", filteredCities);
-
       setFilteredCities(filteredCities);
 
-      setFormData((prev) => ({
-        ...prev,
-        provinces: selectedValues,
-        cities: [],
-      }));
+      formik.setFieldValue("provinces", selectedValues);
+      formik.setFieldTouched("provinces", true, true);
+      formik.setFieldValue("cities", []);
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: selectedValues,
-      }));
+      formik.setFieldValue(name, selectedValues);
+      formik.setFieldTouched(name, true, true);
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const formik = useFormik({
+    initialValues: {
+      name: initialData.name || "",
+      contactNumber: initialData.contactNumber || "",
+      dateOfOperation: initialData.dateOfOperation || "",
+      email: initialData.email || "",
+      address: initialData.address || "",
+      areaOfOperations: initialData.areaOfOperations || "",
+      gameTypes: initialData.gameTypes || [],
+      cities: initialData.cities || [],
+      regions: initialData.regions || [],
+      provinces: initialData.provinces || [],
+    },
+    validationSchema: toFormikValidationSchema(operatorSchema),
+    onSubmit: (values) => {
+      onSubmit(values as Operator);
+    },
+  });
 
-    // prepare data for submission
-    const submittedData: Operator = {
-      ...formData,
-    };
-
-    console.log("Submitted User Data:", submittedData);
-
-    onSubmit(submittedData);
-  };
+  // Helpers to display errors
+  const getError = (field: string) =>
+    formik.touched[field as keyof typeof formik.touched] &&
+    formik.errors[field as keyof typeof formik.errors]
+      ? (formik.errors[field as keyof typeof formik.errors] as string)
+      : null;
 
   return (
-    <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-      {/* Row 1 */}
+    <form onSubmit={formik.handleSubmit} className="grid grid-cols-2 gap-4">
+      {/* Name */}
       <div>
-        <label htmlFor="name" className="block text-sm">
-          Given Name
-        </label>
+        <label className="block text-sm">Operator Name</label>
         <Input
           type="text"
           name="name"
-          id="name"
-          placeholder="Operator Name"
-          className="mt-1"
-          value={formData.name}
-          onChange={handleChange}
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          placeholder="Enter Operator Name"
+          error={!!(formik.touched.name && formik.errors.name)}
         />
+        {formik.touched.name && formik.errors.name && (
+          <p className="text-red-500 text-xs">{formik.errors.name}</p>
+        )}
       </div>
 
+      {/* Contact Number */}
       <div>
-        <label htmlFor="contactNumber" className="block text-sm">
-          Phone Number
-        </label>
-        <Input
-          type="tel"
-          name="contactNumber"
-          id="contactNumber"
-          placeholder="Phone Number"
-          className="mt-1"
-          value={formData.contactNumber}
-          onChange={handleChange}
-        />
-      </div>
-
-      <div className="col-span-2">
-        <label htmlFor="email" className="block text-sm">
-          Address
-        </label>
-        <Input
-          type="address"
-          name="address"
-          id="address"
-          placeholder="Address"
-          className="mt-1"
-          value={formData.address}
-          onChange={handleChange}
-        />
-      </div>
-
-      {/* Row 3 */}
-      <div>
-        <label htmlFor="email" className="block text-sm">
-          Email
-        </label>
+        <label className="block text-sm">Contact Number</label>
         <Input
           type="text"
-          name="email"
-          id="email"
-          placeholder="Email"
-          className="mt-1"
-          value={formData.email}
-          onChange={handleChange}
+          name="contactNumber"
+          value={formik.values.contactNumber}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          placeholder="09XXXXXXXXX"
+          error={
+            !!(formik.touched.contactNumber && formik.errors.contactNumber)
+          }
         />
+        {formik.touched.contactNumber && formik.errors.contactNumber && (
+          <p className="text-red-500 text-xs">{formik.errors.contactNumber}</p>
+        )}
       </div>
 
+      {/* Date of Operation */}
       <div>
-        <label htmlFor="dateOfOperation" className="block text-sm">
-          Date of Operations
-        </label>
+        <label className="block text-sm">Date of Operation</label>
         <Input
           type="date"
           name="dateOfOperation"
-          id="dateOfOperation"
-          placeholder="Date of Operations"
-          className="mt-1"
-          value={formData.dateOfOperation}
-          onChange={handleChange}
+          value={formik.values.dateOfOperation}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={
+            !!(formik.touched.dateOfOperation && formik.errors.dateOfOperation)
+          }
         />
+        {formik.touched.dateOfOperation && formik.errors.dateOfOperation && (
+          <p className="text-red-500 text-xs">
+            {formik.errors.dateOfOperation}
+          </p>
+        )}
+      </div>
+
+      {/* Email */}
+      <div>
+        <label className="block text-sm">Email</label>
+        <Input
+          type="email"
+          name="email"
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          placeholder="Enter email"
+          error={!!(formik.touched.email && formik.errors.email)}
+        />
+        {formik.touched.email && formik.errors.email && (
+          <p className="text-red-500 text-xs">{formik.errors.email}</p>
+        )}
+      </div>
+
+      {/* Address */}
+      <div className="col-span-2">
+        <label className="block text-sm">Address</label>
+        <Input
+          type="text"
+          name="address"
+          value={formik.values.address}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          placeholder="Address"
+          error={!!(formik.touched.address && formik.errors.address)}
+        />
+        {formik.touched.address && formik.errors.address && (
+          <p className="text-red-500 text-xs">{formik.errors.address}</p>
+        )}
       </div>
 
       <div>
@@ -262,9 +277,13 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           name="gameTypes"
           options={gameTypesOptions}
           isMulti
-          onChange={(selectedOptions) =>
-            handleMultiSelect("gameTypes", [...selectedOptions])
-          }
+          onChange={(selectedOptions) => {
+            const values = selectedOptions
+              ? selectedOptions.map((opt) => opt.value)
+              : [];
+            formik.setFieldValue("gameTypes", values);
+          }}
+          onBlur={() => formik.setFieldTouched("gameTypes", true)}
           className="react-select-container"
           classNamePrefix="react-select"
           placeholder="Select GameTypes"
@@ -275,6 +294,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
           }}
         />
+        {formik.touched.gameTypes && formik.errors.gameTypes && (
+          <p className="text-red-500 text-xs">{formik.errors.gameTypes}</p>
+        )}
       </div>
 
       {/* Area of Operations */}
@@ -284,19 +306,26 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         </label>
         <CustomSelect
           name="areaOfOperations"
-          value={
-            areaOfOperationsOptions.find(
-              (opt: OptionType) => opt.value === formData.areaOfOperations
-            ) || null
-          }
           options={areaOfOperationsOptions}
           onChange={(selected) => {
+            formik.setFieldValue(
+              "areaOfOperations",
+              selected ? selected.value : ""
+            );
             handleSelectChange(selected);
-            setHasExcludedCity(false); // reset if city-wide is toggled
+            setHasExcludedCity(false);
           }}
           placeholder="Select Area of Operations"
-          error={false}
+          error={
+            formik.touched.areaOfOperations &&
+            Boolean(formik.errors.areaOfOperations)
+          }
         />
+        {formik.touched.areaOfOperations && formik.errors.areaOfOperations && (
+          <p className="text-red-500 text-xs mt-1">
+            {formik.errors.areaOfOperations as string}
+          </p>
+        )}
       </div>
 
       {/* Area of Regional Operations */}
@@ -311,7 +340,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             options={regionsOptions}
             isMulti
             onChange={(selected) =>
-              handleMultiSelect("regions", selected as OptionType[])
+              handleMultiSelect("regions", selected as OptionType[], formik)
             }
             className="react-select-container"
             classNamePrefix="react-select"
@@ -321,6 +350,11 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
+          {formik.touched.regions && formik.errors.regions && (
+            <p className="text-red-500 text-xs mt-1">
+              {formik.errors.regions as string}
+            </p>
+          )}
         </div>
       )}
 
@@ -336,7 +370,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             options={provinceOptions}
             isMulti
             onChange={(selected) =>
-              handleMultiSelect("provinces", selected as OptionType[])
+              handleMultiSelect("provinces", selected as OptionType[], formik)
             }
             className="react-select-container"
             classNamePrefix="react-select"
@@ -346,6 +380,11 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
+          {formik.touched.provinces && formik.errors.provinces && (
+            <p className="text-red-500 text-xs mt-1">
+              {formik.errors.provinces as string}
+            </p>
+          )}
         </div>
       )}
 
@@ -363,11 +402,8 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                 options={cityOptions}
                 isMulti
                 onChange={(selected) =>
-                  handleMultiSelect("cities", selected as OptionType[])
+                  handleMultiSelect("cities", selected as OptionType[], formik)
                 }
-                value={cityOptions.filter((opt) =>
-                  formData.cities.includes(opt.value)
-                )}
                 className="react-select-container"
                 classNamePrefix="react-select"
                 placeholder="Cities"
@@ -376,6 +412,11 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                 }
                 styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
               />
+              {formik.touched.cities && formik.errors.cities && (
+                <p className="text-red-500 text-xs mt-1">
+                  {formik.errors.cities as string}
+                </p>
+              )}
             </div>
           )}
 
@@ -407,8 +448,8 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             options={availableExcludedCities}
             isMulti
             onChange={(selected) =>
-                  handleMultiSelect("cities", selected as OptionType[])
-                }
+              handleMultiSelect("cities", selected as OptionType[], formik)
+            }
             className="react-select-container"
             classNamePrefix="react-select"
             placeholder="Select excluded cities"
@@ -417,15 +458,23 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
+          {formik.touched.cities && formik.errors.cities && (
+            <p className="text-red-500 text-xs mt-1">
+              {formik.errors.cities as string}
+            </p>
+          )}
         </div>
       )}
 
-      <button
-        type="submit"
-        className="col-span-2 mt-2 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
-      >
-        Submit
-      </button>
+      {/* Submit Button */}
+      <div className="col-span-2">
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+        >
+          Submit
+        </button>
+      </div>
     </form>
   );
 };

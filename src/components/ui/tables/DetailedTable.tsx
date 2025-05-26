@@ -230,7 +230,7 @@ const DetailedTable = <T extends User | Operator>({
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length + (actionsRender ? 1 : 1)} align="center">
+                <TableCell colSpan={columns.length + (actionsRender ? 1 : 1)} align="center" className="!p-2">
                   <div className="flex flex-col items-center py-7 text-[#0038A8]">
                     <PersonOffIcon style={{ fontSize: 50 }} />
                     <h6 className="mt-2 font-sm text-lg">
@@ -246,7 +246,7 @@ const DetailedTable = <T extends User | Operator>({
                     const key = String(col.key);
                     const value = (row as any)[key];
                     return (
-                      <TableCell key={key}>
+                      <TableCell key={key} style={{ padding: '0.5rem' }}>
                         {col.render
                           ? col.render(row as T)
                           : col.filterValue

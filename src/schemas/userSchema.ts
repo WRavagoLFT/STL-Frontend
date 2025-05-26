@@ -54,13 +54,13 @@ export const userSchema = z.object({
   street: z.string().optional(),
   CreatedBy: z.string().optional(),
 
-  operatorId: z
-    .number({
+  operatorId: z.preprocess(
+    (val) => (typeof val === "string" ? parseInt(val) : val),
+    z.number({
       required_error: "Operator Name is required",
+      invalid_type_error: "Operator ID must be a number",
     })
-    .refine((val) => !isNaN(val), {
-      message: "Operator Name is required",
-    }),
+  ),
 });
 
 export const updateSchema = z.object({

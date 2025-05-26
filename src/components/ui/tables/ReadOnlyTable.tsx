@@ -153,7 +153,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
                 >
                   <div className="flex flex-col items-center py-7 text-[#0038A8]">
                     <PersonOffIcon style={{ fontSize: 50 }} />
-                    <h6 className="mt-2 font-sm text-lg">
+                    <h6 className="mt-2 font-sm text-lg ">
                       No data available
                     </h6>
                   </div>
@@ -166,7 +166,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
                     const key = String(col.key);
                     const value = (row as any)[key];
                     return (
-                      <TableCell key={key}>
+                      <TableCell key={key} sx={{paddingY: 0.9}}>
                         {col.render
                           ? col.render(row as T)
                           : col.filterValue
