@@ -78,10 +78,9 @@ const OperatorsPage = () => {
 
   const handleAddOperator = async (data: Operator): Promise<void> => {
     try {
-      console.log("Adding operator:", data);
+      //console.log("Adding operator:", data);
 
       const result = await addOperator(data);
-
       if (result.success) {
         const operatorsResult = await fetchOperators();
         setData(operatorsResult?.data ?? []);

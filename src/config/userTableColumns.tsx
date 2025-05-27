@@ -5,7 +5,7 @@ import { getUserStatus } from "~/utils/dashboarddata";
 import { User } from "~/types/types";
 import { Column } from "~/types/interfaces";
 
-export const userTableColumns = (operatorMap: Record<string, any>): Column<User>[] => [
+export const userTableColumns = (): Column<User>[] => [
   {
     key: "fullName",
     label: "Name",

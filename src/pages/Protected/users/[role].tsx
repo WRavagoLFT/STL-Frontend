@@ -5,22 +5,24 @@ import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { userTableColumns } from "~/config/userTableColumns";
 import useUserRoleStore from "../../../store/useUserStore";
 import CardsPage from "~/components/user/CardsData";
-import { addUser, fetchUsers } from "~/utils/api/users";
+import { addUser, editLogUser, fetchUsers } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
 import { User } from "~/types/types";
 import UpdateUserModal from "~/components/user/UpdateUser";
 import Swal from "sweetalert2";
+import EditModalPage from "~/components/ui/modals/EditLogModal";
+import { userEditColumns } from "~/config/userEditLogTableColumns";
 
 const roleMap: Record<string, { label: string; textlabel: string; roleId: number }> = {
 managers: {
     label: "Small Town Lottery Manager",
     textlabel: "Managers",
-    roleId: 2,
+    roleId: 3,
   },
   executive: {
     label: "Small Town Lottery Executive",
     textlabel: "Executives",
-    roleId: 3,
+    roleId: 4,
   },
 };
 
@@ -53,7 +55,8 @@ const RolePage = () => {
   }
 
   const { roleId, label, textlabel } = roleConfig;
-  const tableColumns = userTableColumns(operatorMap);
+  const tableColumns = userTableColumns();
+  const editLogtableColumns = userEditColumns();
 
   // States
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -65,7 +68,15 @@ const RolePage = () => {
   const closeCreateModal = () => {setIsCreateModalOpen(false);};
   const openUpdateModal = (user: User) => {setSelectedUser(user);setIsUpdateModalOpen(true);};
   const closeUpdateModal = () => {setSelectedUser(null);setIsUpdateModalOpen(false);};
-  //
+  const [showEditLog, setShowEditLog] = useState(false);
+  const [loadingEditLog, setLoadingEditLog] = useState(false);
+  const [editLogData, setEditLogData] = useState(null);
+
+  const openEditLogModal = (user: User) => {
+    setSelectedUser(user);
+    setShowEditLog(true);
+  };
+
   // console.log("RolePage rendered with role:", role, "and roleKey:", roleKey);
   const handleAddUser = async (data: User): Promise<void> => {
     try {
@@ -107,6 +118,10 @@ const RolePage = () => {
     }
   };
 
+  function handleUpdateUser(data: User): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <div className="mx-auto px-0 py-1">
       <h1 className="text-3xl font-bold mb-3">{label}</h1>
@@ -144,11 +159,23 @@ const RolePage = () => {
       <UpdateUserModal
         open={isUpdateModalOpen}
         onClose={closeUpdateModal}
-        onSubmit={handleAddUser}
+        onSubmit={handleUpdateUser}
         operatorMap={operatorMap}
         userTypeId={roleId}
         selectedUser={selectedUser}
+        onViewEditLogs={() => openEditLogModal(selectedUser!)}
       />
+
+      {selectedUser && showEditLog && (
+        <EditModalPage
+          open={showEditLog}
+          id={selectedUser.UserId!}
+          fetchData={editLogUser}
+          columns={editLogtableColumns}
+          onClose={() => setShowEditLog(false)}
+        />
+      )}
+
     </div>
   );
 };

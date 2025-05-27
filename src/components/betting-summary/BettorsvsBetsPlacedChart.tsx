@@ -7,7 +7,6 @@ import {
   Button,
 } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import getTransactionsData from "~/utils/api/transactions/get.TransactionsData.service";
 import { addLabels } from "./tooltips/dataSet";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import { buttonStyles } from "~/styles/theme";

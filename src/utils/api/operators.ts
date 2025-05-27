@@ -7,7 +7,7 @@ const validateRelativeUrl = (url: string) => {
   return url;
 };
 
-export const fetchOperators = async () => {
+const fetchOperators = async () => {
   try {
     const url = validateRelativeUrl("/operators/getOperators");
     const response = await axiosInstance.get(url, {
@@ -21,13 +21,12 @@ export const fetchOperators = async () => {
   }
 };
 
-export const fetchOperator = async (operatorId: string | number) => {
+const fetchOperator = async (operatorId: string | number) => {
   try {
     // Ensure the URL is valid using the validateRelativeUrl function
     const url = validateRelativeUrl("/operators/getOperator");
     const response = await axiosInstance.get(url, {
       params: { operatorId },
-      withCredentials: true,
     });
 
     return response.data;
@@ -38,11 +37,10 @@ export const fetchOperator = async (operatorId: string | number) => {
   }
 };
 
-export const addOperator = async (userData: Record<string, any>) => {
+const addOperator = async (userData: Record<string, any>) => {
     try {
         const url = validateRelativeUrl("/operators/addOperator");
         const response = await axiosInstance.post(url, userData, {
-            withCredentials: true,
         });
 
         return response.data;
@@ -52,4 +50,21 @@ export const addOperator = async (userData: Record<string, any>) => {
     }
 };
 
-export default { fetchOperators, fetchOperator, addOperator };
+// Get user edit log function
+const editLogOperator = async (operatorId: number) => {
+    try {
+        const url = validateRelativeUrl("/users/getEditLog");
+        const response = await axiosInstance.get(url, {
+            params: { operatorId },
+        });
+
+        console.log("Edit log response:", response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching edit log:", (error as Error).message);
+        return { success: false, message: (error as Error).message, data: {} };
+    }
+};
+
+export { fetchOperators, fetchOperator, addOperator, editLogOperator };

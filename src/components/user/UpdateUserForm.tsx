@@ -12,6 +12,7 @@ interface UpdateUserFormProps {
   initialData?: Partial<User>;
   userTypeId: number;
   selectedUser?: User | null;
+  onViewEditLogs?: (userId: number) => void;
 }
 
 const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
@@ -19,11 +20,12 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   onSubmit,
   userTypeId,
   selectedUser,
+  onViewEditLogs = () => {},
 }) => {
   const title =
     userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
 
-  //console.log("selectedUserrrr", selectedUser);
+  console.log("selectedUserrrr", selectedUser);
 
   const operatorOptions: OptionType[] = Object.values(operatorMap).map(
     (operator) => ({
@@ -52,7 +54,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
 
   const sevenDaysAgo = dayjs().subtract(7, "day");
 
-  const mapSelectedUserToFormData = (user: any) => ({
+  const mapSelectedUserToFormData = (user: User) => ({
     firstName: user?.FirstName || "",
     lastName: user?.LastName || "",
     suffix: user?.Suffix?.trim() || "",
@@ -65,6 +67,8 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
       null,
     status: getUserStatus(user, sevenDaysAgo),
   });
+
+  if (!selectedUser) return null;
 
   const [formData, setFormData] = useState(
     mapSelectedUserToFormData(selectedUser)
@@ -317,11 +321,22 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
               />
             </div>
 
-            <div className="text-sm cursor-pointer hover:none flex justify-end">
-              View Update History
-            </div>
+            {typeof selectedUser?.UserId === "number" && (
+              <button
+                type="button"
+                onClick={() => {
+                  console.log("View Update History button clicked");
+                  console.log("selectedUser.UserId:", selectedUser.UserId);
+                  onViewEditLogs(selectedUser.UserId as number);
+                }}
+                className="text-sm cursor-pointer hover:none flex justify-end"
+              >
+                View Update History
+              </button>
+            )}
+
           </div>
-        </div>
+        </div>    
 
         {!isDisabled && (
           <div className="col-span-2 my-4">

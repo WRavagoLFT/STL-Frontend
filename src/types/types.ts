@@ -26,8 +26,12 @@ export interface User {
   operatorId: number;
   userTypeId: number;
 
+  UserId?: number;
   FirstName?: string;
   LastName?: string;
+  PhoneNumber?: string;
+  Email?: string;
+  Suffix?: string | null;
   OperatorId?: number;
   UserTypeId?: number;
 
@@ -94,7 +98,7 @@ export type EditLogFields = {
   OldValue: string;
   NewValue: string;
   Remarks: string;
-  
+  EditedByName?: string;  
   OperatorId?: number;
 }
 

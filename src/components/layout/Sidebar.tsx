@@ -37,15 +37,17 @@ const WINNING_SUBMENUS = [
 const getUserRole = (userTypeId: number) => {
   switch (userTypeId) {
     case 1:
-      return "Collector";
+      return "Kubrador";
     case 2:
-      return "Manager";
+      return "Kabo";
     case 3:
       return "Executive";
     case 4:
-      return "Admin";
+      return "Manager";
     case 5:
-      return "System Admin";
+      return "Provincial Admin";
+    case 6:
+      return "Administrator";
     default:
       return "Unknown Role";
   }

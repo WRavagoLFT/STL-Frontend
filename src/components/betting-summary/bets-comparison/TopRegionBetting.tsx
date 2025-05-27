@@ -12,7 +12,7 @@ import getCompareHistoricalDate from "~/utils/api/transactions/get.CompareHistor
 import getCompareHistoricalDuration from "~/utils/api/transactions/get.CompareHistoricalDuration.service";
 
 interface ChartData {
-  region: string;
+  region: string; 
   firstValue: number;
   secondValue: number;
 }

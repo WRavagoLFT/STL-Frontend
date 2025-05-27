@@ -10,6 +10,7 @@ type UpdateUserModalProps = {
   operatorMap: Record<number, Operator>;
   userTypeId: number;
   selectedUser?: User | null;
+  onViewEditLogs?: (userId: number) => void;
 };
 
 export default function UpdateUserModal({
@@ -19,6 +20,7 @@ export default function UpdateUserModal({
   onSubmit,
   userTypeId,
   selectedUser,
+  onViewEditLogs,
 }: UpdateUserModalProps) {
   
   const title = userTypeId === 2 ? "Update Manager" : userTypeId === 3 ? "Update Executive" : "Update User";
@@ -30,6 +32,7 @@ export default function UpdateUserModal({
         onSubmit={onSubmit}
         userTypeId={userTypeId}
         selectedUser={selectedUser}
+        onViewEditLogs={onViewEditLogs}
       />
     </ModalWrapper>
   );
