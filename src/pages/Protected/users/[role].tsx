@@ -69,8 +69,6 @@ const RolePage = () => {
   const openUpdateModal = (user: User) => {setSelectedUser(user);setIsUpdateModalOpen(true);};
   const closeUpdateModal = () => {setSelectedUser(null);setIsUpdateModalOpen(false);};
   const [showEditLog, setShowEditLog] = useState(false);
-  const [loadingEditLog, setLoadingEditLog] = useState(false);
-  const [editLogData, setEditLogData] = useState(null);
 
   const openEditLogModal = (user: User) => {
     setSelectedUser(user);

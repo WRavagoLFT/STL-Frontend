@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import OperatorViewPage from "~/components/operators/OperatorView";
 import { useOperatorFormStore } from "../../../store/useOperatorFormStore";
 import { useOperatorsData } from "../../../store/useOperatorStore";
@@ -14,7 +14,10 @@ import {
   fetchProvinces,
   fetchRegions,
 } from "~/utils/api/location";
-import { fetchOperators } from "~/utils/api/operators";
+import { editLogOperator } from "~/utils/api/operators";
+import EditModalPage from "~/components/ui/modals/EditLogModal";
+import { operatorEditColumns } from "~/config/operatorEditLogTableColumns";
+
 
 export interface OperatorViewPageProps {
   slug: string;
@@ -22,8 +25,11 @@ export interface OperatorViewPageProps {
 }
 
 const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
-  const { fields } = useOperatorsData();
+const [showEditLog, setShowEditLog] = useState(false);
+const editLogtableColumns = operatorEditColumns();
+const selectedUser = operator?.data;
 
+console.log('selectedUser', selectedUser);
   const {
     gameTypes,
     regions,
@@ -93,7 +99,6 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
         {/* Left side - Operator View */}
         <div className="flex flex-col w-full md:w-3/5">
           <OperatorViewPage
-            fields={fields}
             initialUserData={operator}
             gameTypes={gameTypes}
             provinces={provinces}
@@ -103,7 +108,20 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
             schema={operatorSchema}
             isOpen={true}
             onClose={() => router.push("/operators")}
+            onViewEditLogs={() => setShowEditLog(true)}
+            selectedUser={selectedUser}
           />
+
+        {selectedUser && showEditLog && (
+          <EditModalPage
+            open={showEditLog}
+            id={selectedUser.UserId!}
+            fetchData={editLogOperator}
+            columns={editLogtableColumns}
+            onClose={() => setShowEditLog(false)}
+          />
+        )}
+
         </div>
 
         {/* Right side - Retail Receipt */}

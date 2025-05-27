@@ -22,6 +22,8 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
   provinces,
   cities,
   areaofoperations,
+  onViewEditLogs,
+  selectedUser,
 }) => {
   const { user, setUser, errors, setErrors, handleManagerChange } =
     useUpdateModalState();
@@ -35,6 +37,8 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
   const [area, setArea] = useState<string | null>(null);
 
   // console.log("hihihh", areaofoperations);
+  console.log("SELECTED USERRR:", selectedUser);
+  console.log("initialUserData:", initialUserData);
   console.log("provinces:", provinces);
   const handleDisable = () => {
     setIsDisabled(false);
@@ -202,6 +206,31 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
               disabled
             />
           </div>
+        </div>
+        <div className="w-full flex justify-end items-center mt-3">
+          {typeof selectedUser?.OperatorId === "number" && (
+            <button
+              type="button"
+              onClick={() => {
+              
+                const operatorId = selectedUser.OperatorId;
+
+                if (
+                  typeof operatorId === "number" &&
+                  typeof onViewEditLogs === "function"
+                ) {
+                  onViewEditLogs(operatorId);
+                } else {
+                  console.warn(
+                    "Invalid OperatorId or onViewEditLogs is not defined."
+                  );
+                }
+              }}
+              className="bg-[#0038A8] py-2.5 px-4 text-white rounded-lg text-xs cursor-pointer hover:none"
+            >
+              View Update History
+            </button>
+          )}
         </div>
       </div>
 
@@ -460,29 +489,29 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
         </div>
       )}
 
-        {/* Show only when `showEditButton` is true */}
-        {showEditButton && (
-          <form onSubmit={handleDisable}>
-            <div className="w-full flex justify-end items-center my-2">
-              <button
-                type={isDisabled ? "button" : "submit"}
-                onClick={isDisabled ? handleDisable : undefined} // Only handleDisable gets onClick
-                className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-              >
-                {isDisabled ? "Update" : "Save"}
-              </button>
-            </div>
-          </form>
-        )}
-      
-        {!isDisabled && (
-          <button
-            type="submit"
-            className="col-span-2 mt-2 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
-          >
-            Save
-          </button>
-        )}
+      {/* Show only when `showEditButton` is true */}
+      {showEditButton && (
+        <form onSubmit={handleDisable}>
+          <div className="w-full flex justify-end items-center my-2">
+            <button
+              type={isDisabled ? "button" : "submit"}
+              onClick={isDisabled ? handleDisable : undefined} // Only handleDisable gets onClick
+              className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+            >
+              {isDisabled ? "Update" : "Save"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {!isDisabled && (
+        <button
+          type="submit"
+          className="col-span-2 mt-2 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
+        >
+          Save
+        </button>
+      )}
     </div>
   );
 };

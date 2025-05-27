@@ -160,6 +160,8 @@ export interface ReusableModalPageProps {
   setSelectedRegion?: (regionId: string) => void;
   setSelectedProvince?: (provinceId?: string) => void;
   schema?: ZodSchema<any>;
+  onViewEditLogs?: (operatorId: number) => void;
+  selectedUser?: Operator | null;
 }
 
 export interface ModalPageProps {
