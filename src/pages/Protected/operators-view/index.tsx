@@ -18,18 +18,24 @@ import { editLogOperator } from "~/utils/api/operators";
 import EditModalPage from "~/components/ui/modals/EditLogModal";
 import { operatorEditColumns } from "~/config/operatorEditLogTableColumns";
 
-
 export interface OperatorViewPageProps {
   slug: string;
   operator: Operator;
 }
 
 const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
-const [showEditLog, setShowEditLog] = useState(false);
-const editLogtableColumns = operatorEditColumns();
-const selectedUser = operator?.data;
+  const [showEditLog, setShowEditLog] = useState(false);
+  const editLogtableColumns = operatorEditColumns();
+  const initialUserOperatorData = operator?.data;
+  const [selectedOperatorId, setSelectedOperatorId] = useState<number | null>(
+    null
+  );
 
-console.log('selectedUser', selectedUser);
+  const handleViewEditLogs = (operatorId: number) => {
+    setSelectedOperatorId(operatorId); // save the operatorId you want to view
+    setShowEditLog(true); // then open modal
+  };
+
   const {
     gameTypes,
     regions,
@@ -71,11 +77,11 @@ console.log('selectedUser', selectedUser);
         console.error("Error fetching data:", error);
       }
     };
-    
+
     fetchData();
   }, []);
 
-  console.log('operatorrr console', operator);
+  console.log("operatorrr console", operator);
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -99,7 +105,7 @@ console.log('selectedUser', selectedUser);
         {/* Left side - Operator View */}
         <div className="flex flex-col w-full md:w-3/5">
           <OperatorViewPage
-            initialUserData={operator}
+            initialUserOperatorData={operator}
             gameTypes={gameTypes}
             provinces={provinces}
             regions={regions}
@@ -108,20 +114,25 @@ console.log('selectedUser', selectedUser);
             schema={operatorSchema}
             isOpen={true}
             onClose={() => router.push("/operators")}
-            onViewEditLogs={() => setShowEditLog(true)}
-            selectedUser={selectedUser}
+            onViewEditLogs={(operatorId) => handleViewEditLogs(operatorId)}
           />
 
-        {selectedUser && showEditLog && (
-          <EditModalPage
-            open={showEditLog}
-            id={selectedUser.UserId!}
-            fetchData={editLogOperator}
-            columns={editLogtableColumns}
-            onClose={() => setShowEditLog(false)}
-          />
-        )}
+          {selectedOperatorId !== null && showEditLog && (
+            <>
+              {console.log(
+                "Opening EditModalPage with OperatorId:",
+                selectedOperatorId
+              )}
 
+              <EditModalPage
+                open={showEditLog}
+                id={selectedOperatorId}
+                fetchData={editLogOperator}
+                columns={editLogtableColumns}
+                onClose={() => setShowEditLog(false)}
+              />
+            </>
+          )}
         </div>
 
         {/* Right side - Retail Receipt */}

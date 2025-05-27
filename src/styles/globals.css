@@ -107,6 +107,35 @@ select option:disabled {
   color: #2F2F2F !important;
 }
 
+/* Small thin scrollbar */
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(200, 200, 200, 0.4); /* slightly darker */
+  border-radius: 10px;
+}
+
+.sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(200, 200, 200, 0.7); /* more visible on hover */
+}
+
+/* Firefox */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(200, 200, 200, 0.4) transparent;
+}
+
+.sidebar-scrollbar:hover {
+  scrollbar-color: rgba(200, 200, 200, 0.7) transparent;
+}
+
+
 
 
 

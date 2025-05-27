@@ -5,7 +5,7 @@ import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { userTableColumns } from "~/config/userTableColumns";
 import useUserRoleStore from "../../../store/useUserStore";
 import CardsPage from "~/components/user/CardsData";
-import { addUser, editLogUser, fetchUsers } from "~/utils/api/users";
+import { addUser, editLogUser, fetchUsers, updateUser } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
 import { User } from "~/types/types";
 import UpdateUserModal from "~/components/user/UpdateUser";
@@ -116,9 +116,45 @@ const RolePage = () => {
     }
   };
 
-  function handleUpdateUser(data: User): void {
-    throw new Error("Function not implemented.");
-  }
+  const handleUpdateUser = async (data: User): Promise<void> => {
+    try {
+      console.log("Updating user:", data);
+
+      const result = await updateUser(data);
+
+      if (result.success) {
+        console.log("User updated successfully:", result.data);
+        await fetchUsers(roleConfig.roleId, setData);
+
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "User updated successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        console.error("Failed to add user:", result.message);
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          //text: result.message || "Something went wrong while adding the user.",
+        });
+      }
+
+      setIsCreateModalOpen(false);
+    } catch (error) {
+      console.error(
+        "Unexpected error in handleUpdateUser:",
+        (error as Error).message
+      );
+      Swal.fire({
+        icon: "error",
+        title: "Unexpected Error",
+        text: (error as Error).message || "An unexpected error occurred.",
+      });
+    }
+  };
 
   return (
     <div className="mx-auto px-0 py-1">

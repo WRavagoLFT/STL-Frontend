@@ -63,26 +63,24 @@ export const userSchema = z.object({
   ),
 });
 
-export const updateSchema = z.object({
-  PhoneNumber: z
+export const updateUserSchema = z.object({
+  phoneNumber: z
     .string({ required_error: "Phone Number is required" })
     .min(1, "Phone Number is required")
     .refine((val) => /^09\d{9}$/.test(val), {
       message:
         "Please enter a valid phone number starting with 09 and 11 digits long (e.g. 09XXXXXXXXX).",
     }),
-
-  remarks: z
-    .string({ required_error: "Remarks is required" })
-    .min(1, "Remarks is required")
-    .max(500, "Remarks must not exceed 500 characters"),
-
-  Email: z
+  email: z
     .string({ required_error: "Email is required" })
     .min(1, "Email is required")
     .refine((val) => /\S+@\S+\.\S+/.test(val), {
       message: "Please enter a valid email address e.g. xxx@email.com",
     }),
+  remarks: z
+    .string({ required_error: "Remarks is required." })
+    .min(1, "Remarks is required.")
+    .max(100, "Remarks cannot exceed 100 characters."),
 });
 
 export const getInputClassName = (hasError: boolean) => {

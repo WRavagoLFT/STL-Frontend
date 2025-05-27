@@ -222,7 +222,10 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className={`p-3 bg-blue-800 text-white flex flex-col transition-all duration-200 ${ collapsed ? "w-20" : "w-60" }`}>
+    <div
+      className={`p-3 bg-blue-800 text-white flex flex-col transition-all duration-200 
+    ${collapsed ? "w-20" : "w-60"} sticky top-0 h-screen z-50 overflow-y-auto sidebar-scrollbar`}
+    >
       <div
         className={`flex items-center ${
           collapsed ? "flex-col justify-center" : "flex-row justify-center"

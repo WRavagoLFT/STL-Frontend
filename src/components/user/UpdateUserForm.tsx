@@ -4,15 +4,20 @@ import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { getUserStatus } from "~/utils/dashboarddata";
 import dayjs from "dayjs";
+import { useFormik } from "formik";
+import { toFormikValidationSchema } from "zod-formik-adapter";
+import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
+import { updateUserSchema } from "~/schemas/userSchema";
 
 interface UpdateUserFormProps {
   title?: string;
   operatorMap: Record<number, Operator>;
-  onSubmit: (data: User) => void;
+  onSubmit: (data: User & { remarks?: string }) => void;
   initialData?: Partial<User>;
   userTypeId: number;
   selectedUser?: User | null;
   onViewEditLogs?: (userId: number) => void;
+  onClose?: () => void;
 }
 
 const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
@@ -21,11 +26,12 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   userTypeId,
   selectedUser,
   onViewEditLogs = () => {},
+  onClose,
 }) => {
   const title =
     userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
 
-  console.log("selectedUserrrr", selectedUser);
+  if (!selectedUser) return null;
 
   const operatorOptions: OptionType[] = Object.values(operatorMap).map(
     (operator) => ({
@@ -53,8 +59,26 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   ];
 
   const sevenDaysAgo = dayjs().subtract(7, "day");
+  const [formData, setFormData] = useState<{
+    [key: string]: string | number | string[];
+  }>({});
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
+  // Open the confirm modal after submit
+  const openConfirmModal = () => setIsConfirmModalOpen(true);
+  const closeConfirmModal = () => setIsConfirmModalOpen(false);
+
+  const handleModalClose = () => {
+    closeConfirmModal();
+    if (onClose) onClose();
+  };
+  const handleDisable = () => setIsDisabled(false);
+
+  const alwaysDisabledKeys = ["name", "LastName"];
 
   const mapSelectedUserToFormData = (user: User) => ({
+    userId: user?.userId || 0,
     firstName: user?.FirstName || "",
     lastName: user?.LastName || "",
     suffix: user?.Suffix?.trim() || "",
@@ -66,319 +90,323 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
       operatorOptions.find((opt) => opt.value === String(user?.OperatorId)) ||
       null,
     status: getUserStatus(user, sevenDaysAgo),
+    remarks: "", // initialize remarks as empty string
   });
 
-  if (!selectedUser) return null;
+  const formik = useFormik({
+    initialValues: mapSelectedUserToFormData(selectedUser),
+    validationSchema: toFormikValidationSchema(updateUserSchema),
+    onSubmit: (values) => {
+      const submittedData: any = {
+        userId: values.userId,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        suffix: values.suffix,
+        phoneNumber: values.phoneNumber,
+        email: values.email,
+        userTypeId: values.userTypeId,
+        DateOfRegistration: values.DateOfRegistration,
+        OperatorId: values.operatorId?.value
+          ? Number(values.operatorId.value)
+          : null,
+        remarks: values.remarks,
+      };
 
-  const [formData, setFormData] = useState(
-    mapSelectedUserToFormData(selectedUser)
-  );
+      setFormData(submittedData);
+      openConfirmModal();
+    },
+  });
 
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [showEditButton, setShowEditButton] = useState(true);
-
-  const handleDisable = () => {
-    setIsDisabled(false);
-    setShowEditButton(false);
-  };
-
-  const alwaysDisabledKeys = [
-    "name",
-    "LastName",
-    "OperatorName",
-    "CreatedBy",
-    "DateOfRegistration",
-    "DateOfOperation",
-    "LastUpdatedBy",
-    "LastUpdatedDate",
-  ];
-
-  // Handle changes for normal inputs (text/select)
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    // prepare data for submission
-    const submittedData: any = {
-      ...formData,
-      // convert operatorId if needed
-    };
-
-    console.log("Submitted User Data:", submittedData);
-
-    onSubmit(submittedData);
-  };
+  const getError = (field: string) =>
+    formik.touched[field as keyof typeof formik.touched] &&
+    formik.errors[field as keyof typeof formik.errors]
+      ? (formik.errors[field as keyof typeof formik.errors] as string)
+      : null;
 
   return (
-    <React.Fragment>
-      <form onSubmit={handleSubmit}>
-        <h2 className="font-bold mb-1">{title} Information</h2>
-        <div className="grid grid-cols-2 gap-6">
-          {/* Column 1 */}
-          <div className="flex flex-col gap-x-6 gap-y-3">
-            <div>
-              <label htmlFor="firstName" className="block text-sm">
-                Given Name
-              </label>
-              <Input
-                type="text"
-                name="firstName"
-                id="firstName"
-                className="mt-1"
-                value={formData.firstName}
-                onChange={handleChange}
-                disabled
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-2">
-                <label htmlFor="lastName" className="block text-sm">
-                  Last Name
-                </label>
-                <Input
-                  type="text"
-                  name="lastName"
-                  id="lastName"
-                  className="mt-1"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  disabled
-                />
-              </div>
-
-              <div className="col-span-">
-                <label htmlFor="suffix" className="block text-sm mb-1">
-                  Suffix
-                </label>
-                <CustomSelect
-                  name="suffix"
-                  value={
-                    suffixOptions.find(
-                      (option) => option.value === formData.suffix?.trim()
-                    ) || { label: "N/A", value: "N/A" }
-                  }
-                  error={false}
-                  disabled={true}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="phoneNumber" className="block text-sm">
-                Phone Number
-              </label>
-              <Input
-                type="tel"
-                name="phoneNumber"
-                id="phoneNumber"
-                className="mt-1"
-                value={formData.phoneNumber}
-                onChange={handleChange}
-                disabled={
-                  alwaysDisabledKeys.includes("phoneNumber") || isDisabled
-                }
-              />
-            </div>
-          </div>
-
-          {/* Column 2 */}
-          <div className="flex flex-col gap-x-6 gap-y-3">
-            <div>
-              <label htmlFor="operatorId" className="block text-sm mb-1">
-                Assigned PCSO Branch
-              </label>
-              <CustomSelect
-                name="operatorId"
-                value={formData.operatorId}
-                options={operatorOptions}
-                error={false}
-                disabled={true}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="email" className="block text-sm">
-                Email Address
-              </label>
-              <Input
-                type="email"
-                name="email"
-                id="email"
-                className="mt-1"
-                value={formData.email}
-                onChange={handleChange}
-                disabled={alwaysDisabledKeys.includes("email") || isDisabled}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="status" className="block text-sm mb-1">
-                Status
-              </label>
-              <CustomSelect
-                name="status"
-                value={{ label: formData.status, value: formData.status }}
-                options={[
-                  { label: "Active", value: "Active" },
-                  { label: "Inactive", value: "Inactive" },
-                  { label: "Suspended", value: "Suspended" },
-                  { label: "New", value: "New" },
-                ]}
-                disabled
-                onChange={(selected) =>
-                  setFormData((prev) => ({
-                    ...prev,
-                    status: selected.value,
-                  }))
-                }
-              />
-            </div>
-          </div>
-        </div>
-
-        <h2 className="font-bold mt-5 mb-1">Update History</h2>
-        <div className="grid grid-cols-2 gap-6">
-          {/* Column 1 */}
-          <div className="flex flex-col gap-x-6 gap-y-3">
-            <div>
-              <label htmlFor="CreatedBy" className="block text-sm">
-                Created By
-              </label>
-              <Input
-                type="text"
-                name="CreatedBy"
-                id="CreatedBy"
-                className="mt-1"
-                value={selectedUser?.CreatedBy || ""}
-                onChange={handleChange}
-                disabled
-              />
-            </div>
-
-            <div>
-              <label htmlFor="DateOfRegistration" className="block text-sm">
-                Creation Date
-              </label>
-              <Input
-                type="date"
-                name="DateOfRegistration"
-                id="DateOfRegistration"
-                className="mt-1"
-                value={
-                  selectedUser?.DateOfRegistration
-                    ? selectedUser.DateOfRegistration.slice(0, 10)
-                    : ""
-                }
-                onChange={handleChange}
-                disabled
-              />
-            </div>
-          </div>
-
-          {/* Column 2 */}
-          <div className="flex flex-col gap-x-6 gap-y-3">
-            <div>
-              <label htmlFor="LastUpdatedBy" className="block text-sm">
-                Last Updated By
-              </label>
-              <Input
-                type="text"
-                name="LastUpdatedBy"
-                id="LastUpdatedBy"
-                className="mt-1"
-                value={selectedUser?.LastUpdatedBy || "N/A"}
-                onChange={handleChange}
-                disabled
-              />
-            </div>
-
-            <div>
-              <label htmlFor="LastUpdatedDate" className="block text-sm">
-                Last Updated Date
-              </label>
-              <Input
-                type="date"
-                name="LastUpdatedDate"
-                id="LastUpdatedDate"
-                className="mt-1"
-                value={
-                  selectedUser?.LastUpdatedDate
-                    ? selectedUser.LastUpdatedDate.slice(0, 10)
-                    : "N/A"
-                }
-                onChange={handleChange}
-                disabled
-              />
-            </div>
-
-            {typeof selectedUser?.UserId === "number" && (
-              <button
-                type="button"
-                onClick={() => {
-                  console.log("View Update History button clicked");
-                  console.log("selectedUser.UserId:", selectedUser.UserId);
-                  onViewEditLogs(selectedUser.UserId as number);
-                }}
-                className="text-sm cursor-pointer hover:none flex justify-end"
-              >
-                View Update History
-              </button>
-            )}
-
-          </div>
-        </div>    
-
-        {!isDisabled && (
-          <div className="col-span-2 my-4">
-            <label htmlFor="remarks" className="block text-sm">
-              Remarks
+    <form onSubmit={formik.handleSubmit}>
+      <h2 className="font-bold mb-1">{title} Information</h2>
+      <div className="grid grid-cols-2 gap-6">
+        {/* Column 1 */}
+        <div className="flex flex-col gap-x-6 gap-y-3">
+          <div>
+            <label htmlFor="firstName" className="block text-sm">
+              Given Name
             </label>
             <Input
               type="text"
-              name="remarks"
-              id="remarks"
+              name="firstName"
+              id="firstName"
               className="mt-1"
-              onChange={handleChange}
+              value={formik.values.firstName}
+              onChange={formik.handleChange}
+              disabled
             />
           </div>
-        )}
 
-        {/* Show only when `showEditButton` is true */}
-        {showEditButton && (
-          <form onSubmit={handleSubmit}>
-            <div className="w-full flex justify-end items-center my-2">
-              <button
-                type={isDisabled ? "button" : "submit"}
-                onClick={isDisabled ? handleDisable : undefined} // Only handleDisable gets onClick
-                className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-              >
-                {isDisabled ? "Update" : "Save"}
-              </button>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-2">
+              <label htmlFor="lastName" className="block text-sm">
+                Last Name
+              </label>
+              <Input
+                type="text"
+                name="lastName"
+                id="lastName"
+                className="mt-1"
+                value={formik.values.lastName}
+                onChange={formik.handleChange}
+                disabled
+              />
             </div>
-          </form>
-        )}
 
-        {!isDisabled && (
+            <div className="col-span-1">
+              <label htmlFor="suffix" className="block text-sm mb-1">
+                Suffix
+              </label>
+              <CustomSelect
+                name="suffix"
+                value={
+                  suffixOptions.find(
+                    (option) => option.value === formik.values.suffix?.trim()
+                  ) || { label: "N/A", value: "N/A" }
+                }
+                error={false}
+                disabled={true}
+                onChange={() => {}}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="phoneNumber" className="block text-sm">
+              Phone Number
+            </label>
+            <Input
+              type="tel"
+              name="phoneNumber"
+              id="phoneNumber"
+              className="mt-1"
+              value={formik.values.phoneNumber}
+              onChange={formik.handleChange}
+              disabled={
+                alwaysDisabledKeys.includes("phoneNumber") || isDisabled
+              }
+              onBlur={formik.handleBlur}
+              error={
+                !!(formik.touched.phoneNumber && formik.errors.phoneNumber)
+              }
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("phoneNumber") || "\u00A0"}
+            </p>
+          </div>
+        </div>
+
+        {/* Column 2 */}
+        <div className="flex flex-col gap-x-6 gap-y-3">
+          <div>
+            <label htmlFor="operatorId" className="block text-sm mb-1">
+              Assigned PCSO Branch
+            </label>
+            <CustomSelect
+              name="operatorId"
+              value={formik.values.operatorId}
+              options={operatorOptions}
+              error={false}
+              disabled={true}
+              onChange={() => {}}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="email" className="block text-sm">
+              Email Address
+            </label>
+            <Input
+              type="email"
+              name="email"
+              id="email"
+              className="mt-1"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              disabled={alwaysDisabledKeys.includes("email") || isDisabled}
+              onBlur={formik.handleBlur}
+              error={!!(formik.touched.email && formik.errors.email)}
+            />
+            {formik.touched.email && formik.errors.email && (
+              <p className="text-[#CE1126] text-xs mt-1">
+                {formik.errors.email}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="status" className="block text-sm mb-1">
+              Status
+            </label>
+            <CustomSelect
+              name="status"
+              value={{
+                label: formik.values.status,
+                value: formik.values.status,
+              }}
+              options={[
+                { label: "Active", value: "Active" },
+                { label: "Inactive", value: "Inactive" },
+                { label: "Suspended", value: "Suspended" },
+                { label: "New", value: "New" },
+              ]}
+              error={false}
+              disabled
+              onChange={() => {}}
+            />
+          </div>
+        </div>
+      </div>
+
+      <h2 className="font-bold mt-5 mb-1">Update History</h2>
+      <div className="grid grid-cols-2 gap-6">
+        {/* Column 1 */}
+        <div className="flex flex-col gap-x-6 gap-y-3">
+          <div>
+            <label htmlFor="CreatedBy" className="block text-sm">
+              Created By
+            </label>
+            <Input
+              type="text"
+              name="CreatedBy"
+              id="CreatedBy"
+              className="mt-1"
+              value={selectedUser?.CreatedBy || ""}
+              disabled
+            />
+          </div>
+
+          <div>
+            <label htmlFor="DateOfRegistration" className="block text-sm">
+              Creation Date
+            </label>
+            <Input
+              type="date"
+              name="DateOfRegistration"
+              id="DateOfRegistration"
+              className="mt-1"
+              value={
+                selectedUser?.DateOfRegistration
+                  ? selectedUser.DateOfRegistration.slice(0, 10)
+                  : ""
+              }
+              disabled
+            />
+          </div>
+        </div>
+
+        {/* Column 2 */}
+        <div className="flex flex-col gap-x-6 gap-y-3">
+          <div>
+            <label htmlFor="LastUpdatedBy" className="block text-sm">
+              Last Updated By
+            </label>
+            <Input
+              type="text"
+              name="LastUpdatedBy"
+              id="LastUpdatedBy"
+              className="mt-1"
+              value={selectedUser?.LastUpdatedBy || "N/A"}
+              disabled
+            />
+          </div>
+
+          <div>
+            <label htmlFor="LastUpdatedDate" className="block text-sm">
+              Last Updated Date
+            </label>
+            <Input
+              type="date"
+              name="LastUpdatedDate"
+              id="LastUpdatedDate"
+              className="mt-1"
+              value={
+                selectedUser?.LastUpdatedDate
+                  ? selectedUser.LastUpdatedDate.slice(0, 10)
+                  : "N/A"
+              }
+              disabled
+            />
+          </div>
+          {/* View Edit Logs button */}
+          {selectedUser && (
+            <button
+              type="button"
+              className="text-sm cursor-pointer hover:none flex justify-end leading-none"
+              onClick={() => onViewEditLogs(selectedUser.UserId as number)}
+            >
+              View Update History
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Remarks input shown only when editing */}
+      {!isDisabled && (
+        <div className="col-span-2 my-1">
+          <label htmlFor="remarks" className="block text-sm">
+            Remarks
+          </label>
+          <Input
+            type="text"
+            name="remarks"
+            id="remarks"
+            className="mt-1"
+            value={formik.values.remarks}
+            onChange={formik.handleChange}
+            error={!!(formik.touched.remarks && formik.errors.remarks)}
+          />
+          {formik.touched.remarks && formik.errors.remarks && (
+            <p className="text-[#CE1126] text-xs mt-1">
+              {formik.errors.remarks}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Buttons */}
+      <div className="flex justify-end gap-3 mt-2">
+        {isDisabled ? (
           <button
-            type="submit"
-            className="col-span-2 mt-2 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
+            type="button"
+            className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+            onClick={handleDisable}
           >
-            Save
+            Update
           </button>
+        ) : (
+          <>
+            <button
+              type="submit"
+              className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+              disabled={!formik.isValid}
+            >
+              Save
+            </button>
+          </>
         )}
-      </form>
-
-    </React.Fragment>
+      </div>
+      <ConfirmUserActionModalPage
+        open={isConfirmModalOpen}
+        onClose={handleModalClose}
+        onConfirm={async () => {
+          try {
+            await onSubmit(formData as unknown as User); // submit from the parent component handled after password verification
+            closeConfirmModal(); // close confirm modal
+            if (onClose) onClose(); // optionally close the parent modal
+          } catch (err) {
+            console.error("Error during onSubmit:", err);
+          }
+        }}
+      />
+    </form>
   );
 };
 

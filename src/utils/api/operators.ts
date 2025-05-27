@@ -1,4 +1,17 @@
 import axiosInstance from "../axiosInstance";
+interface EditLog {
+  id: number;
+  User: string;
+  Action: string;
+  Timestamp: string;
+  Details?: string;
+}
+
+interface EditLogResponse {
+  success: boolean;
+  message?: string;
+  data: EditLog[];
+}
 
 const validateRelativeUrl = (url: string) => {
   if (url.startsWith("http://") || url.startsWith("https://")) {
@@ -51,20 +64,29 @@ const addOperator = async (userData: Record<string, any>) => {
 };
 
 // Get user edit log function
-const editLogOperator = async (operatorId: number) => {
-    try {
-        const url = validateRelativeUrl("/users/getEditLog");
-        const response = await axiosInstance.get(url, {
-            params: { operatorId },
-        });
+const editLogOperator = async (
+  operatorId: number
+): Promise<EditLogResponse> => {
+  try {
+    const url = validateRelativeUrl(`/operators/getOperatorEdits/${operatorId}`);
+    console.log(`[editLogOperator] Fetching logs for OperatorId: ${operatorId} from URL: ${url}`);
 
-        console.log("Edit log response:", response.data);
+    const response = await axiosInstance.get<EditLogResponse>(url);
 
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching edit log:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: {} };
-    }
+    console.log("[editLogOperator] Response received:", response.data);
+
+    return response.data;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error(`[editLogOperator] Error fetching edit logs for OperatorId ${operatorId}:`, message);
+    
+    return {
+      success: false,
+      message,
+      data: []
+    };
+  }
 };
+
 
 export { fetchOperators, fetchOperator, addOperator, editLogOperator };

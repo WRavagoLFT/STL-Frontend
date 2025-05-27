@@ -16,7 +16,7 @@ type ProvinceTypeOptions = {
 };
 
 const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
-  initialUserData,
+  initialUserOperatorData,
   gameTypes,
   regions,
   provinces,
@@ -38,7 +38,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
 
   // console.log("hihihh", areaofoperations);
   console.log("SELECTED USERRR:", selectedUser);
-  console.log("initialUserData:", initialUserData);
+  console.log("initialUserData:", initialUserOperatorData);
   console.log("provinces:", provinces);
   const handleDisable = () => {
     setIsDisabled(false);
@@ -68,10 +68,10 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
   }));
 
   useEffect(() => {
-    console.log("initialUserDatass:", initialUserData);
+    console.log("initialUserDatass:", initialUserOperatorData);
 
-    if (initialUserData && Object.keys(initialUserData).length > 0) {
-      const operatorData = initialUserData.data;
+    if (initialUserOperatorData && Object.keys(initialUserOperatorData).length > 0) {
+      const operatorData = initialUserOperatorData.data;
 
       if (operatorData && operatorData.GameTypes && operatorData.Cities) {
         const mappedGameTypes = operatorData.GameTypes.map(
@@ -105,7 +105,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
       setSelectedGameTypes([]);
       console.log("No initialUserData found. Resetting form and game types.");
     }
-  }, [initialUserData]);
+  }, [initialUserOperatorData]);
 
   const operator = formData?.data || {};
 
@@ -150,7 +150,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             <Input
               id="createdBy"
               name="createdBy"
-              value={formData.CreatedBy || ""}
+              value={formData.CreatedBy || "N/A"}
               onChange={handleChange}
               disabled
             />
@@ -166,7 +166,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             <Input
               id="lastUpdatedBy"
               name="lastUpdatedBy"
-              value={formData.CreatedBy || ""}
+              value={formData.CreatedBy || "N/A"}
               onChange={handleChange}
               disabled
             />
@@ -184,7 +184,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
               value={
                 formData.CreatedAt
                   ? dayjs(formData.CreatedAt).format("YYYY-MM-DD")
-                  : ""
+                  : "N/A"
               }
               onChange={handleChange}
               disabled
@@ -201,32 +201,20 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             <Input
               id="lastUpdatedDate"
               name="lastUpdatedDate"
-              value={formData.lastUpdatedDate || ""}
+              value={formData.lastUpdatedDate || "N/A"}
               onChange={handleChange}
               disabled
             />
           </div>
         </div>
+        
+        {/* Edit log modal */}
         <div className="w-full flex justify-end items-center mt-3">
-          {typeof selectedUser?.OperatorId === "number" && (
+          {initialUserOperatorData?.data?.OperatorId && typeof onViewEditLogs === "function" && (
             <button
               type="button"
-              onClick={() => {
-              
-                const operatorId = selectedUser.OperatorId;
-
-                if (
-                  typeof operatorId === "number" &&
-                  typeof onViewEditLogs === "function"
-                ) {
-                  onViewEditLogs(operatorId);
-                } else {
-                  console.warn(
-                    "Invalid OperatorId or onViewEditLogs is not defined."
-                  );
-                }
-              }}
-              className="bg-[#0038A8] py-2.5 px-4 text-white rounded-lg text-xs cursor-pointer hover:none"
+              onClick={() => onViewEditLogs(initialUserOperatorData.data.OperatorId)}
+              className="bg-[#0038A8] py-2.5 px-4 text-white rounded-lg text-xs cursor-pointer hover:bg-[#004ccf]"
             >
               View Update History
             </button>

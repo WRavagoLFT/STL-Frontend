@@ -110,7 +110,7 @@ const EditLogsTablePage = <T extends Transactions>({
 
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow sx={{ "&:hover": { backgroundColor: "#F08060" } }}>
               {columns.map((col) =>
                 col.sortable || col.filterable ? (
                   <SortableTableCell
@@ -144,7 +144,7 @@ const EditLogsTablePage = <T extends Transactions>({
                     const value = (row as any)[key];
 
                     return (
-                      <TableCell key={key} sx={{ paddingY: 0.2 }}>
+                      <TableCell key={key} sx={{ paddingY: 0.3 }}>
                         {col.render
                           ? col.render(row as unknown as T)
                           : col.filterValue
@@ -165,7 +165,7 @@ const EditLogsTablePage = <T extends Transactions>({
           </TableBody>
         </Table>
 
-        <div className="p-3">
+        <div className="p-0 pt-2">
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}
             component="div"
@@ -178,14 +178,14 @@ const EditLogsTablePage = <T extends Transactions>({
         </div>
       </TableContainer>
 
-      <div className="flex justify-end pt-2">
+      {/* <div className="flex justify-end pt-2">
         <CSVExportButtonTable
           pageType={pageType ?? "unknown"}
           columns={columns}
           statsPerRegion={data}
           operatorMap={operatorMap ? Object.values(operatorMap) : []}
         />
-      </div>
+      </div> */}
     </>
   );
 };

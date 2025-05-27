@@ -33,6 +33,7 @@ export default function UpdateUserModal({
         userTypeId={userTypeId}
         selectedUser={selectedUser}
         onViewEditLogs={onViewEditLogs}
+        onClose={onClose}
       />
     </ModalWrapper>
   );

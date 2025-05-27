@@ -36,13 +36,6 @@ export const userEditColumns = (): Column<EditLogFields>[] => [
     filterable: true,
   },
   {
-    key: "Field",
-    label: "Field Edited",
-    sortable: true,
-    filterable: true,
-    filterKey: "Field",
-  },
-  {
     key: "Remarks",
     label: "Remarks",
     sortable: true,

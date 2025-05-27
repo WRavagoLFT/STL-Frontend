@@ -148,7 +148,7 @@ export interface ReusableModalPageProps {
   formData?: Record<string, string>;
   setFormData?: (data: Record<string, string>) => void;
   additionalPayload?: Record<string, any>;
-  initialUserData?: any;
+  initialUserOperatorData?: any;
   operatorMap?: Record<number, Operator>;
   layout?: 'single' | 'double'; 
 

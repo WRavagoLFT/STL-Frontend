@@ -128,21 +128,52 @@ const fetchUserById = async (userId: string | number, ) => {
 };
 
 // Update user function
-const updateUser = async (userId: number, userData: Record<string, any>) => {
-    try {
-        const url = validateRelativeUrl("/users/edituser");
-        const response = await axiosInstance.patch(
-            url,
-            { userId, ...userData },
-            { withCredentials: true }
-        );
+const updateUser = async (userData: Record<string, any>) => {
+  try {
+    const url = validateRelativeUrl("/users/edituser");
 
-        return response.data;
-    } catch (error) {
-        console.error("Error updating user:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: {} };
+    console.log("Sending PATCH request to:", url);
+    console.log("Payload:", JSON.stringify(userData, null, 2));
+
+    const response = await axiosInstance.patch(
+      url,
+      userData  // <-- send userData directly, NOT wrapped inside { userData }
+    );
+
+    console.log("Response data:", response.data);
+
+    return response.data;
+  } catch (error: any) {
+    // More detailed error logging
+    if (error.response) {
+      // Server responded with status code outside 2xx
+      console.error("Error response status:", error.response.status);
+      console.error("Error response data:", error.response.data);
+      return {
+        success: false,
+        message: error.response.data?.message || "Server returned an error",
+        data: error.response.data || {},
+      };
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error("No response received:", error.request);
+      return {
+        success: false,
+        message: "No response received from server",
+        data: {},
+      };
+    } else {
+      // Something else happened while setting up the request
+      console.error("Error setting up request:", error.message);
+      return {
+        success: false,
+        message: error.message,
+        data: {},
+      };
     }
+  }
 };
+
 
 // Get user edit log function
 const editLogUser = async (userId: number) => {
