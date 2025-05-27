@@ -123,7 +123,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           <Input
             type="text"
             id="firstName"
-            placeholder="Given Name"
+            placeholder="Enter Given Name"
             className="mt-1"
             {...formik.getFieldProps("firstName")}
             error={!!(formik.touched.firstName && formik.errors.firstName)}
@@ -141,7 +141,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
             <Input
               type="text"
               id="lastName"
-              placeholder="Last Name"
+              placeholder="Enter Last Name"
               className="mt-1"
               {...formik.getFieldProps("lastName")}
               error={!!(formik.touched.lastName && formik.errors.lastName)}
@@ -166,7 +166,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
               onChange={(e) => {
                 formik.setFieldValue("suffix", e.target.value);
               }}
-              placeholder="Suffix"
+              placeholder="Enter Suffix"
               error={!!getError("suffix")}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
@@ -182,7 +182,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           <Input
             type="tel"
             id="phoneNumber"
-            placeholder="Phone Number"
+            placeholder="Enter Phone Number"
             className="mt-1"
             {...formik.getFieldProps("phoneNumber")}
             error={!!(formik.touched.phoneNumber && formik.errors.phoneNumber)}
@@ -225,7 +225,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           <Input
             type="email"
             id="email"
-            placeholder="Email Address"
+            placeholder="Enter Email Address"
             className="mt-1"
             {...formik.getFieldProps("email")}
             error={!!(formik.touched.email && formik.errors.email)}
@@ -246,7 +246,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
               <Input
                 type={showPassword ? "text" : "password"}
                 id="password"
-                placeholder="Password"
+                placeholder="Generate Password"
                 className="pr-10" // padding for eye icon
                 {...formik.getFieldProps("password")}
                 error={!!(formik.touched.password && formik.errors.password)}

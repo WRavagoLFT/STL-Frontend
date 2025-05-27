@@ -209,14 +209,14 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
       {/* Contact Number */}
       <div>
-        <label className="block text-sm">Contact Number</label>
+        <label className="block text-sm">Phone Number</label>
         <Input
           type="text"
           name="contactNumber"
           value={formik.values.contactNumber}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          placeholder="09XXXXXXXXX"
+          placeholder="Enter Phone Number"
           error={
             !!(formik.touched.contactNumber && formik.errors.contactNumber)
           }
@@ -270,7 +270,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           value={formik.values.address}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          placeholder="Address"
+          placeholder="Enter Address"
           error={!!(formik.touched.address && formik.errors.address)}
         />
         <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
@@ -296,7 +296,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           onBlur={() => formik.setFieldTouched("gameTypes", true)}
           className="react-select-container"
           classNamePrefix="react-select"
-          placeholder="Select GameTypes"
+          placeholder="STL Games Provided"
           menuPortalTarget={
             typeof window !== "undefined" ? document.body : null
           }
@@ -325,7 +325,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             handleSelectChange(selected);
             setHasExcludedCity(false);
           }}
-          placeholder="Select Area of Operations"
+          placeholder="STL Area of Operations"
           error={
             formik.touched.areaOfOperations &&
             Boolean(formik.errors.areaOfOperations)
@@ -352,7 +352,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             className="react-select-container"
             classNamePrefix="react-select"
-            placeholder="Regions"
+            placeholder="Area of Regional Operations"
             menuPortalTarget={
               typeof window !== "undefined" ? document.body : null
             }
@@ -380,7 +380,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             className="react-select-container"
             classNamePrefix="react-select"
-            placeholder="Provinces"
+            placeholder="Area of Provincial Operations"
             menuPortalTarget={
               typeof window !== "undefined" ? document.body : null
             }
@@ -410,7 +410,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                 }
                 className="react-select-container"
                 classNamePrefix="react-select"
-                placeholder="Cities"
+                placeholder="Area of City Operations"
                 menuPortalTarget={
                   typeof window !== "undefined" ? document.body : null
                 }
@@ -454,7 +454,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             }
             className="react-select-container"
             classNamePrefix="react-select"
-            placeholder="Select excluded cities"
+            placeholder="Excluded cities"
             menuPortalTarget={
               typeof window !== "undefined" ? document.body : null
             }

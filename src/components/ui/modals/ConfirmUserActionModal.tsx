@@ -56,8 +56,6 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-75">
       <div className="relative z-20 flex w-full justify-center items-center">
         <div className="w-[60%] sm:w-[60%] md:w-[40%] max-w-[430px] py-8 px-6 bg-[#F8F0E3] rounded-lg relative">
-          {/* Close Button */}
-
           {/* Logo + Title */}
           <div className="text-center mb-4 mt-2">
             <img

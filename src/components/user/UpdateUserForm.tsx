@@ -23,7 +23,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   const title =
     userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
 
-  console.log("selectedUserrrr", selectedUser);
+  //console.log("selectedUserrrr", selectedUser);
 
   const operatorOptions: OptionType[] = Object.values(operatorMap).map(
     (operator) => ({
@@ -70,18 +70,6 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
     mapSelectedUserToFormData(selectedUser)
   );
 
-
-console.log("Suffix from formData:", formData.suffix);
-console.log(
-  "Matching option:",
-  suffixOptions.find(
-    (option) => option.value === formData.suffix?.trim()
-  )
-);
-
-
-
-  
   const [isDisabled, setIsDisabled] = useState(true);
   const [showEditButton, setShowEditButton] = useState(true);
 
@@ -127,12 +115,12 @@ console.log(
   };
 
   return (
-    <>
+    <React.Fragment>
       <form onSubmit={handleSubmit}>
         <h2 className="font-bold mb-1">{title} Information</h2>
         <div className="grid grid-cols-2 gap-6">
           {/* Column 1 */}
-          <div className="flex flex-col gap-x-6 gap-y-2">
+          <div className="flex flex-col gap-x-6 gap-y-3">
             <div>
               <label htmlFor="firstName" className="block text-sm">
                 Given Name
@@ -200,7 +188,7 @@ console.log(
           </div>
 
           {/* Column 2 */}
-          <div className="flex flex-col gap-x-6 gap-y-2">
+          <div className="flex flex-col gap-x-6 gap-y-3">
             <div>
               <label htmlFor="operatorId" className="block text-sm mb-1">
                 Assigned PCSO Branch
@@ -257,7 +245,7 @@ console.log(
         <h2 className="font-bold mt-5 mb-1">Update History</h2>
         <div className="grid grid-cols-2 gap-6">
           {/* Column 1 */}
-          <div className="flex flex-col gap-x-6 gap-y-2">
+          <div className="flex flex-col gap-x-6 gap-y-3">
             <div>
               <label htmlFor="CreatedBy" className="block text-sm">
                 Created By
@@ -294,7 +282,7 @@ console.log(
           </div>
 
           {/* Column 2 */}
-          <div className="flex flex-col gap-x-6 gap-y-2">
+          <div className="flex flex-col gap-x-6 gap-y-3">
             <div>
               <label htmlFor="LastUpdatedBy" className="block text-sm">
                 Last Updated By
@@ -327,6 +315,10 @@ console.log(
                 onChange={handleChange}
                 disabled
               />
+            </div>
+
+            <div className="text-sm cursor-pointer hover:none flex justify-end">
+              View Update History
             </div>
           </div>
         </div>
@@ -370,7 +362,8 @@ console.log(
           </button>
         )}
       </form>
-    </>
+
+    </React.Fragment>
   );
 };
 

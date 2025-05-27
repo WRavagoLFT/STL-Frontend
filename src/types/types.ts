@@ -24,15 +24,17 @@ export interface User {
   email: string;
   suffix: string | null;
   operatorId: number;
-
-  OperatorId?: number;
   userTypeId: number;
+
+  FirstName?: string;
+  LastName?: string;
+  OperatorId?: number;
+  UserTypeId?: number;
 
   fullName?: string; // Consider making this a computed field on the frontend
   DateOfRegistration?: string;
-  OperatorDetails?: {
-    OperatorName?: string;
-  };
+  OperatorDetails?: { OperatorName?: string } | null;
+
   Region?: string; // Remove this if 'region' below is preferred
   region: string;
   LastLogin?: string;
@@ -44,7 +46,6 @@ export interface User {
   LastUpdatedDate?: string;
 }
 
-// Define the Operator type
 export interface Operator {
   operatorId?: number;
   name: string;
@@ -59,6 +60,7 @@ export interface Operator {
   provinces: any[];
   OperatorId?: any[];
 
+  Cities?: { CityId: number; CityName: string }[]; // Optional, if not always present
   data?: any; // for operator update
   OperatorName?: string;
   Executive?: string;
@@ -94,40 +96,6 @@ export type EditLogFields = {
   Remarks: string;
   
   OperatorId?: number;
-}
-
-export interface RoleConfig {
-  userTypeId: number;
-  endpoint: {
-    create: string;
-    update: string;
-  };
-  fields: {
-    name: string;
-    label: string;
-    type: string;
-    placeholder: string;
-    value: string;
-    gridSpan: number;
-    options?: { value: string; label: string }[];
-  }[];
-}
-
-export interface operatorConfig {
-  userTypeId: number;
-  endpoint: {
-    create: string;
-    update: string;
-  };
-  fields: {
-    name: string;
-    label: string;
-    type: string;
-    placeholder: string;
-    value: string;
-    gridSpan: number;
-    options?: { value: string; label: string }[];
-  }[];
 }
 
 export type SortConfig<T> = {

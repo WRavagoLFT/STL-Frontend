@@ -25,7 +25,7 @@ export const userTableColumns = (operatorMap: Record<string, any>): Column<User>
     label: "Creation Date",
     sortable: true,
     filterable: true,
-    render: (user: any) =>
+    render: (user: User) =>
       user.DateOfRegistration
         ? dayjs(user.DateOfRegistration).format("YYYY/MM/DD HH:mm:ss")
         : "",
@@ -41,7 +41,7 @@ export const userTableColumns = (operatorMap: Record<string, any>): Column<User>
     label: "Status",
     sortable: true,
     filterable: true,
-    render: (user: any) => {
+    render: (user: User) => {
       const sevenDaysAgo = dayjs().subtract(7, "days");
       const status = getUserStatus(user, sevenDaysAgo);
       return (

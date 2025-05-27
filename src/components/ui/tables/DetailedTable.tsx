@@ -138,7 +138,6 @@ const DetailedTable = <T extends User | Operator>({
     onClose?.();
   };
 
-
   const handleSuspend = async (row: T) => {
     console.log('handleSuspend called with row:', row);
 

@@ -121,7 +121,7 @@ const OperatorsPage = () => {
     <div className="mx-auto px-0 py-1">
       <h1 className="text-3xl font-bold mb-3">Small Town Lottery Operators</h1>
       <CardsPage 
-        dashboardData={data} 
+        dashboardData={data}
         textlabel={textlabel}
       />
       

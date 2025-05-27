@@ -16,7 +16,7 @@ export const winningTableColumns = (): Column<Transactions>[] => [
     sortable: true,
     filterable: true,
     filterKey: "DateOfTransaction",
-    render: (row: any) => dayjs(row.DateOfTransaction).format("YYYY/MM/DD HH:mm:ss"),
+    render: (row: Transactions) => dayjs(row.DateOfTransaction).format("YYYY/MM/DD HH:mm:ss"),
   },
   {
     key: "drawTime",
@@ -29,7 +29,7 @@ export const winningTableColumns = (): Column<Transactions>[] => [
     label: "Bet Amount",
     sortable: true,
     filterable: false,
-    render: (row: any) => `₱${row.betAmount.toLocaleString()}`,
+    render: (row: Transactions) => `₱${row.betAmount.toLocaleString()}`,
   },
   {
     key: "gameType",
@@ -42,7 +42,7 @@ export const winningTableColumns = (): Column<Transactions>[] => [
     label: "Bet Type",
     sortable: true,
     filterable: true,
-    render: (row: any) => {
+    render: (row: Transactions) => {
       const types = [];
 
       if (row.tumbok) types.push("Tumbok");
@@ -60,7 +60,7 @@ export const winningTableColumns = (): Column<Transactions>[] => [
     label: "Bet Pattern",
     sortable: true,
     filterable: false,
-    render: (row: any) => row.selectedPair,
+    render: (row: Transactions) => row.selectedPair,
   },
   {
     key: "status",

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const operatorSchema = z.object({
   name: z
@@ -23,57 +23,65 @@ export const operatorSchema = z.object({
   gameTypes: z.preprocess(
     (val) => {
       if (Array.isArray(val)) {
-        return val.map((v) => typeof v === "string" ? parseInt(v, 10) : v);
+        return val.map((v) => (typeof v === "string" ? parseInt(v, 10) : v));
       }
       return val;
     },
     z
-      .array(z.number({
-        required_error: "Game Type are required",
-        invalid_type_error: "Each Game Type must be a number",
-      }))
+      .array(
+        z.number({
+          required_error: "Game Type are required",
+          invalid_type_error: "Each Game Type must be a number",
+        })
+      )
       .min(1, { message: "At least one Game Type is required" })
   ),
   regions: z.preprocess(
     (val) => {
       if (Array.isArray(val)) {
-        return val.map((v) => typeof v === "string" ? parseInt(v, 10) : v);
+        return val.map((v) => (typeof v === "string" ? parseInt(v, 10) : v));
       }
       return val;
     },
     z
-      .array(z.number({
-        required_error: "Regions are required",
-        invalid_type_error: "Each Region must be a number",
-      }))
+      .array(
+        z.number({
+          required_error: "Regions are required",
+          invalid_type_error: "Each Region must be a number",
+        })
+      )
       .min(1, { message: "At least one Region is required" })
   ),
   provinces: z.preprocess(
     (val) => {
       if (Array.isArray(val)) {
-        return val.map((v) => typeof v === "string" ? parseInt(v, 10) : v);
+        return val.map((v) => (typeof v === "string" ? parseInt(v, 10) : v));
       }
       return val;
     },
     z
-      .array(z.number({
-        required_error: "Provinces are required",
-        invalid_type_error: "Each Province must be a number",
-      }))
+      .array(
+        z.number({
+          required_error: "Provinces are required",
+          invalid_type_error: "Each Province must be a number",
+        })
+      )
       .min(1, { message: "At least one Province is required" })
   ),
   cities: z.preprocess(
     (val) => {
       if (Array.isArray(val)) {
-        return val.map((v) => typeof v === "string" ? parseInt(v, 10) : v);
+        return val.map((v) => (typeof v === "string" ? parseInt(v, 10) : v));
       }
       return val;
     },
     z
-      .array(z.number({
-        required_error: "Cities are required",
-        invalid_type_error: "Each City must be a number",
-      }))
+      .array(
+        z.number({
+          required_error: "Cities are required",
+          invalid_type_error: "Each City must be a number",
+        })
+      )
       .min(1, { message: "At least one City is required" })
   ),
   dateOfOperation: z

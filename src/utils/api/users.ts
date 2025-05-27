@@ -41,7 +41,12 @@ const fetchUsers = async (
 
     // Create operator map
     const operatorMap = operators.reduce<Record<number, Operator>>((map, operator) => {
-      map[operator.OperatorId] = operator;
+      const id = operator.OperatorId;
+
+      if (typeof id === 'number') {
+        map[id] = operator;
+      }
+
       return map;
     }, {});
 
@@ -52,13 +57,18 @@ const fetchUsers = async (
     // Filter and enrich users
     const filteredUsers = users
       .filter(user => user.UserTypeId === roleId)
-      .map(user => ({
-        ...user,
-        fullName: buildFullName(user),
-        OperatorDetails: operatorMap[user.OperatorId] ?? null,
-      }));
+        .map(user => {
+          const operatorId = user.OperatorId;
+          const operatorDetails = typeof operatorId === 'number' ? operatorMap[operatorId] ?? null : null;
 
-    setData(filteredUsers);
+          return {
+            ...user,
+            fullName: buildFullName(user),
+            OperatorDetails: operatorDetails,
+          };
+        });
+
+    setData(filteredUsers); // 
     return operatorMap;
   } catch (error) {
     console.error("Error fetching users or operators:", (error as Error).message);
@@ -142,6 +152,8 @@ const editLogUser = async (userId: number, p0: {}) => {
             params: { userId },
             withCredentials: true,
         });
+
+        console.log("Edit log response:", response.data);
 
         return response.data;
     } catch (error) {

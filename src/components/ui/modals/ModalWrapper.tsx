@@ -43,7 +43,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
           onClick={(e) => e.stopPropagation()}
         >
           {title && (
-            <div className="flex justify-between items-center pb-4">
+            <div className="flex justify-between items-center pb-5 pt-2">
               <h3 className="text-2xl font-bold">{title}</h3>
               <button
                 onClick={onClose}

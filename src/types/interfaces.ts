@@ -9,27 +9,6 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export type GetUsersResponse = ApiResponse<User[]>;
-export type GetOperatorsResponse = ApiResponse<Operator[]>;
-export type GetGameCategoriesResponse = ApiResponse<{
-  data: {
-    id: number;
-    name: string;
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-  }[];
-}>;
-export type GetLocationResponse = ApiResponse<{
-  data: {
-    id: number;
-    name: string;
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-  }[];
-}>;
-
 export interface Column<T> {
   key: keyof T | string;
   label: string;
@@ -61,7 +40,6 @@ export interface CardsPageProps<T> {
   roleLabel?: string;
   textlabel?: string;
 }
-
 
 export interface ChartDataItem<T = unknown> {
   label: string;
@@ -154,17 +132,6 @@ export interface FieldOption {
   GameCategory?: string;
 }
 
-export interface Field {
-  name: string;
-  label: string;
-  type: string;
-  placeholder?: string;
-  options?: FieldOption[]; 
-  value: string | number | boolean | string[]; 
-  gridSpan?: 1 | 2 | 'full'; 
-  required?: boolean; 
-}
-
 export interface ReusableModalPageProps {
   title?: string;
   endpoint?: {
@@ -173,7 +140,7 @@ export interface ReusableModalPageProps {
   };
   isOpen: boolean;
   onClose: () => void;
-  fields: Field[];
+  //fields: Field[];
   onSuccess?: () => void;
   onSubmit?: (formData: Record<string, string>) => Promise<void>;
   children?: (props: { handleSubmit: () => void }) => React.ReactNode;
@@ -198,12 +165,8 @@ export interface ReusableModalPageProps {
 export interface ModalPageProps {
   open?: boolean;
   onClose?: () => void;
-  fields?: Field[];
-  endpoint?: {
-    create: string;
-    update: string;
-  };
-  pageType?: "manager" | "executive" | "operator";
+  //fields?: Field[];
+  //pageType?: "manager" | "executive" | "operator";
   additionalPayload?: Record<string, any>;
   onFieldChange?: (name: string, value: string) => void;
   initialUserData?: any;
@@ -252,6 +215,6 @@ export interface ShareBreakdownPageProps {
   totalPercentage: number;
   totalShareAmount: number;
   breakdown: Share[];
-  defaultBreakdown?: Share[]; // optional fallback if breakdown is empty
-  title?: string; // optional header title
+  defaultBreakdown?: Share[];
+  title?: string;
 }

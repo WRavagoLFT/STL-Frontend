@@ -65,7 +65,8 @@ const RolePage = () => {
   const closeCreateModal = () => {setIsCreateModalOpen(false);};
   const openUpdateModal = (user: User) => {setSelectedUser(user);setIsUpdateModalOpen(true);};
   const closeUpdateModal = () => {setSelectedUser(null);setIsUpdateModalOpen(false);};
-
+  //
+  // console.log("RolePage rendered with role:", role, "and roleKey:", roleKey);
   const handleAddUser = async (data: User): Promise<void> => {
     try {
       console.log("Adding user:", data);
@@ -112,7 +113,7 @@ const RolePage = () => {
       <CardsPage 
         dashboardData={data} 
         roleLabel={label} 
-        textlabel={textlabel} 
+        textlabel={textlabel}
       />
 
       <ChartsDataPage 
