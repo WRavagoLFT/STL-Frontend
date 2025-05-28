@@ -5,7 +5,7 @@ import { getUserStatus } from "~/utils/dashboarddata";
 import { User } from "~/types/types";
 import { Column } from "~/types/interfaces";
 
-export const userTableColumns = (operatorMap: Record<string, any>): Column<User>[] => [
+export const userTableColumns = (): Column<User>[] => [
   {
     key: "fullName",
     label: "Name",
@@ -25,7 +25,7 @@ export const userTableColumns = (operatorMap: Record<string, any>): Column<User>
     label: "Creation Date",
     sortable: true,
     filterable: true,
-    render: (user: any) =>
+    render: (user: User) =>
       user.DateOfRegistration
         ? dayjs(user.DateOfRegistration).format("YYYY/MM/DD HH:mm:ss")
         : "",
@@ -41,7 +41,7 @@ export const userTableColumns = (operatorMap: Record<string, any>): Column<User>
     label: "Status",
     sortable: true,
     filterable: true,
-    render: (user: any) => {
+    render: (user: User) => {
       const sevenDaysAgo = dayjs().subtract(7, "days");
       const status = getUserStatus(user, sevenDaysAgo);
       return (

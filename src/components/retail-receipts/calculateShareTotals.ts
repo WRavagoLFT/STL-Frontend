@@ -15,14 +15,14 @@ export function processShares(
   month: number,
   shareType: number // no default, must be provided
 ): { totalPercentage: number; totalShareAmount: number; breakdown: Share[] } {
-  console.log("processShares called with:", { year, month, shareType });
-  console.log("Titles:", titles);
-  console.log("Data keys:", data ? Object.keys(data) : "No data");
+  // console.log("processShares called with:", { year, month, shareType });
+  // console.log("Titles:", titles);
+  // console.log("Data keys:", data ? Object.keys(data) : "No data");
 
   const result: Share[] = titles
     .map((title) => {
       const share = data?.[title];
-      console.log(`Processing title: ${title}`, share);
+      // console.log(`Processing title: ${title}`, share);
 
       if (share && share.ShareType === shareType) {
         const processedShare = {
@@ -33,7 +33,7 @@ export function processShares(
           OperationDate: new Date(year, month - 1, 1).getTime(),
           OperatorBreakdown: share.OperatorBreakdown ?? {},
         };
-        console.log("Accepted share:", processedShare);
+        // console.log("Accepted share:", processedShare);
         return processedShare;
       } else {
         if (share) {
@@ -52,9 +52,9 @@ export function processShares(
   const totalPercentage = result.reduce((sum, item) => sum + item.Percentage, 0);
   const totalShareAmount = result.reduce((sum, item) => sum + item.ShareAmount, 0);
 
-  console.log("Final breakdown:", result);
-  console.log("Total Percentage:", totalPercentage);
-  console.log("Total Share Amount:", totalShareAmount);
+  // console.log("Final breakdown:", result);
+  // console.log("Total Percentage:", totalPercentage);
+  // console.log("Total Share Amount:", totalShareAmount);
 
   return {
     totalPercentage,
@@ -65,14 +65,14 @@ export function processShares(
 
 // function in calculating net income ================
 export function calculateNetIncome(
-    grossAmount: number,
-    grossPercentage: number,
-    taxAmount: number,
-    taxPercentage: number
-  ) {
-    return {
-      netAmount: grossAmount - taxAmount,
-      netPercentage: grossPercentage - taxPercentage,
-    };
-  }
+  grossAmount: number,
+  grossPercentage: number,
+  taxAmount: number,
+  taxPercentage: number
+) {
+  return {
+    netAmount: grossAmount - taxAmount,
+    netPercentage: grossPercentage - taxPercentage,
+  };
+}
 

@@ -5,14 +5,14 @@ import {
   BettorsandBetsSummaryProps,
   getLegendItemsMap_Specific,
   getLegendItemsMap_Duration,
-} from "../../../../store/useBettingStore";
+} from "../../../store/useBettingStore";
 
 // API Endpoints
 import getCompareHistoricalDate from "~/utils/api/transactions/get.CompareHistoricalDate.service";
 import getCompareHistoricalDuration from "~/utils/api/transactions/get.CompareHistoricalDuration.service";
 
 interface ChartData {
-  region: string;
+  region: string; 
   firstValue: number;
   secondValue: number;
 }

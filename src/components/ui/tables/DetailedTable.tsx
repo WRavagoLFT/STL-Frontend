@@ -5,18 +5,18 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterListOffIcon from "@mui/icons-material/FilterListOff";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import useDetailTableStore from "../../../../store/useTableStore";
 import { SortableTableCell, filterData, sortData } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { buttonStyles } from "~/styles/theme";
 import { User, Operator, SortConfig } from "~/types/types";
-import { useModalStore } from "../../../../store/useModalStore";
 import { getUserStatus } from "~/utils/dashboarddata";
 import dayjs from "dayjs";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import Swal from 'sweetalert2';
 import router from "next/router";
 import ConfirmSuspendModal from "~/components/shared/ConfirmSuspendModal";
+import { useModalStore } from "~/store/useModalStore";
+import useDetailTableStore from "~/store/useTableStore";
 
 const DetailedTable = <T extends User | Operator>({
   data,
@@ -27,6 +27,8 @@ const DetailedTable = <T extends User | Operator>({
   onClose,
   endpoint,
   source,
+  onAddClick,
+  onUpdateClick,
 }: DetailedTableProps<T>) => {
   const { searchQuery, setIsFilterActive, isFilterActive, page, rowsPerPage, sortConfig, filters, handleChangePage, handleChangeRowsPerPage, setSearchQuery, anchorEl, selectedRow, setAnchorEl, setSelectedRow, resetMenu } = useDetailTableStore();
   const [openEditLogModal, setOpenEditLogModal] = useState(false);
@@ -47,7 +49,11 @@ const DetailedTable = <T extends User | Operator>({
       .filter((key): key is string => !!key);
 
     const enrichedData = data.map((item) => {
-      const operator = operatorMap?.[item.OperatorId];
+      const operatorId = item.OperatorId;
+
+      const operator =
+        typeof operatorId === "number" ? operatorMap?.[operatorId] : undefined;
+
       return {
         ...item,
         OperatorDetails: {
@@ -87,6 +93,7 @@ const DetailedTable = <T extends User | Operator>({
     return sortedData.slice(start, end);
   }, [sortedData, page, rowsPerPage]);
 
+
   const generateSlug = (operatorName: string, operatorId: number) =>
     `${operatorId}-${operatorName
       .toLowerCase()
@@ -103,13 +110,10 @@ const DetailedTable = <T extends User | Operator>({
 
     if (source === "operators") {
       if (!OperatorName || !OperatorId) {
-        console.warn(
-          "[handleOpenViewModal] Missing OperatorName or OperatorId."
-        );
+        console.warn("[handleOpenViewModal] Missing OperatorName or OperatorId.");
         return;
       }
-      
-      // Include OperatorId in the slug to ensure correct fetch on refresh
+
       const slug = generateSlug(OperatorName, OperatorId);
 
       modalStore.setSelectedData(selectedRow);
@@ -117,12 +121,18 @@ const DetailedTable = <T extends User | Operator>({
 
       router.push(`/operators/${slug}`);
     } else {
-      modalStore.openModal("view", selectedRow);
+      // If you're opening a modal for update instead of view
+      if (onUpdateClick) {
+        onUpdateClick(selectedRow); // e.g., for users // 
+      } else {
+        modalStore.openModal("view", selectedRow); // fallback
+      }
     }
 
     setOpenEditLogModal(false);
-  }, [selectedRow, source, router, setOpenEditLogModal]);
+  }, [selectedRow, source, router, onUpdateClick, setOpenEditLogModal]);
 
+  
   const handleClose = () => {
     setIsVerifyModalOpen(false); // Close the verification modal
     onClose?.();
@@ -194,7 +204,7 @@ const DetailedTable = <T extends User | Operator>({
               )}
             </IconButton>
           </div>
-          <Button variant="contained" onClick={() => useModalStore.getState().openModal("create")} sx={buttonStyles}>
+          <Button variant="contained" onClick={onAddClick} sx={buttonStyles}>
             {pageType === "manager"
               ? "Add Manager"
               : pageType === "executive"
@@ -223,7 +233,7 @@ const DetailedTable = <T extends User | Operator>({
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length + (actionsRender ? 1 : 1)} align="center">
+                <TableCell colSpan={columns.length + (actionsRender ? 1 : 1)} align="center" className="!p-2">
                   <div className="flex flex-col items-center py-7 text-[#0038A8]">
                     <PersonOffIcon style={{ fontSize: 50 }} />
                     <h6 className="mt-2 font-sm text-lg">
@@ -239,7 +249,7 @@ const DetailedTable = <T extends User | Operator>({
                     const key = String(col.key);
                     const value = (row as any)[key];
                     return (
-                      <TableCell key={key}>
+                      <TableCell key={key} style={{ padding: '0.5rem' }}>
                         {col.render
                           ? col.render(row as T)
                           : col.filterValue
@@ -308,11 +318,11 @@ const DetailedTable = <T extends User | Operator>({
           <ConfirmSuspendModal
             formData={formData}
             setFormData={setFormData}
-            errors={errors}
+            //errors={errors}
             actionType='suspend'
             setErrors={setErrors}
             open={isVerifySuspendModalOpen}
-            endpoint={endpoint ?? { create: '', update: '' }}
+            //endpoint={endpoint ?? { create: '', update: '' }}
             onClose={handleClose}
           />
         )}

@@ -44,7 +44,10 @@ const AACTaxesPage: React.FC<ShareBreakdownPageProps> = ({
             <span className="text-sm font-bold">{title} Details</span>
 
             {/* Breakdown List */}
-            {breakdownToShow.map((item, index) => (
+            
+            
+            {breakdownToShow.length > 0 ? (
+              breakdownToShow.map((item, index) => (
               <div
                 key={index}
                 className="mt-2 grid grid-cols-1 md:grid-cols-2 items-center gap-2"
@@ -60,7 +63,12 @@ const AACTaxesPage: React.FC<ShareBreakdownPageProps> = ({
                   })}
                 </div>
               </div>
-            ))}
+              ))
+            ) : (
+              <div className="mt-2 text-sm italic text-gray-500">
+                No share breakdown available.
+              </div>
+            )}
           </div>
         )}
       </div>

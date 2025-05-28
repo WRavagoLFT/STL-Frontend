@@ -225,7 +225,7 @@ const DrawResultsPage = () => {
               }),
               menu: (provided) => ({
                 ...provided,
-                backgroundColor: "#F8C73F", // add this if you want menu background
+                backgroundColor: "#F8C73F",
                 zIndex: 10,
               }),
             }}
@@ -258,7 +258,7 @@ const DrawResultsPage = () => {
               }),
               menu: (provided) => ({
                 ...provided,
-                backgroundColor: "#F8C73F", // add this if you want menu background
+                backgroundColor: "#F8C73F",
                 zIndex: 10,
               }),
             }}
@@ -286,7 +286,7 @@ const DrawResultsPage = () => {
               }),
               menu: (provided) => ({
                 ...provided,
-                backgroundColor: "#F8C73F", // add this if you want menu background
+                backgroundColor: "#F8C73F",
                 zIndex: 10,
               }),
             }}

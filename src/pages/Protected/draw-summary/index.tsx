@@ -1,28 +1,14 @@
 import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-import { FormControl, InputLabel, MenuItem, styled } from "@mui/material";
-import { selectDrawStyles } from "~/styles/theme";
 import HotNumberPage from "~/components/draw-summary/HotNumbers";
 import DrawResultsSummaryPage from "~/components/draw-summary/DrawResultsSummary";
 import ColdNumberPage from "~/components/draw-summary/ColdNumbers";
 import DrawCounterTablePage from "~/components/draw-summary/DrawCounterTable";
 import { fetchProvinces, fetchRegions } from "~/utils/api/location";
-import { set } from "zod";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { fetchDrawSummary } from "~/utils/api/transactions";
 import Select from 'react-select';
 
-const DashboardSkeletonPage = dynamic(() =>
-  import("~/components/dashboard/DashboardSkeleton").then((mod) => ({
-    default: mod.DashboardSkeletonPage,
-  }))
-);
-
-const DrawListSummaryPage = React.lazy(
-  () => import("~/components/draw-summary/DrawListSummary")
-);
-
-
+const DrawListSummaryPage = React.lazy(() => import("~/components/draw-summary/DrawListSummary"));
 
 const DrawSelectedPage = () => {
 
@@ -213,7 +199,11 @@ const DrawSelectedPage = () => {
               Select Region
             </option>
             {regions.map((region) => (
-              <option key={region.value} value={region.value} className="bg-white text-black" >
+              <option
+                key={region.value}
+                value={region.value}
+                className="bg-white text-black"
+              >
                 {region.label}
               </option>
             ))}
@@ -222,7 +212,10 @@ const DrawSelectedPage = () => {
 
         {/* Second Select */}
         <div className="flex flex-col w-full">
-          <label htmlFor="province" className="font-medium text-sm text-gray-700 mb-1">
+          <label
+            htmlFor="province"
+            className="font-medium text-sm text-gray-700 mb-1"
+          >
             Province
           </label>
           <select
@@ -236,7 +229,11 @@ const DrawSelectedPage = () => {
             className="w-full border rounded px-3 py-3 text-sm !bg-[#F6BA12] text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {filteredProvinces.map((province) => (
-              <option key={province.value} value={province.value} className="bg-white text-black">
+              <option
+                key={province.value}
+                value={province.value}
+                className="bg-white text-black"
+              >
                 {province.label}
               </option>
             ))}
@@ -245,7 +242,10 @@ const DrawSelectedPage = () => {
 
         {/* Third Select */}
         <div className="flex flex-col w-full">
-          <label htmlFor="gameCategory" className="font-medium text-sm text-gray-700 mb-1">
+          <label
+            htmlFor="gameCategory"
+            className="font-medium text-sm text-gray-700 mb-1"
+          >
             Game Category
           </label>
           <select
@@ -269,10 +269,12 @@ const DrawSelectedPage = () => {
           </select>
         </div>
 
-
         {/* Fourth Select */}
         <div className="flex flex-col w-full">
-          <label htmlFor="month" className="font-medium text-sm text-gray-700 mb-1">
+          <label
+            htmlFor="month"
+            className="font-medium text-sm text-gray-700 mb-1"
+          >
             Month
           </label>
           <select
@@ -284,89 +286,110 @@ const DrawSelectedPage = () => {
             }}
             className="w-full border rounded px-3 py-3 text-sm !bg-[#F6BA12] text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="" className="bg-white text-black">Select Month</option>
-            <option value="1" className="bg-white text-black">January</option>
-            <option value="2" className="bg-white text-black">February</option>
-            <option value="3" className="bg-white text-black">March</option>
-            <option value="4" className="bg-white text-black">April</option>
-            <option value="5" className="bg-white text-black">May</option>
-            <option value="6" className="bg-white text-black">June</option>
-            <option value="7" className="bg-white text-black">July</option>
-            <option value="8" className="bg-white text-black">August</option>
-            <option value="9" className="bg-white text-black">September</option>
-            <option value="10" className="bg-white text-black">October</option>
-            <option value="11" className="bg-white text-black">November</option>
-            <option value="12" className="bg-white text-black">December</option>
+            <option value="" className="bg-white text-black">
+              Select Month
+            </option>
+            <option value="1" className="bg-white text-black">
+              January
+            </option>
+            <option value="2" className="bg-white text-black">
+              February
+            </option>
+            <option value="3" className="bg-white text-black">
+              March
+            </option>
+            <option value="4" className="bg-white text-black">
+              April
+            </option>
+            <option value="5" className="bg-white text-black">
+              May
+            </option>
+            <option value="6" className="bg-white text-black">
+              June
+            </option>
+            <option value="7" className="bg-white text-black">
+              July
+            </option>
+            <option value="8" className="bg-white text-black">
+              August
+            </option>
+            <option value="9" className="bg-white text-black">
+              September
+            </option>
+            <option value="10" className="bg-white text-black">
+              October
+            </option>
+            <option value="11" className="bg-white text-black">
+              November
+            </option>
+            <option value="12" className="bg-white text-black">
+              December
+            </option>
           </select>
         </div>
-
       </div>
 
       <div className="flex flex-col items-center gap-4m mt-2">
-        <div className="flex flex-col w-full gap-4">
-          <h1 className="text-3xl font-bold">
-            {
-              filteredProvinces.find(
-                (province) => province.value == selectedProvince.toString()
-              )?.label
-            }{" "}
-            -{" "}
-            {
-              gameCategories.find(
-                (gameCategory) =>
-                  gameCategory.value == selectedGameCategory.toString()
-              )?.label
-            }
-          </h1>
-          <div className="flex flex-col md:flex-row w-full gap-2">
-            <div className="flex flex-col w-full md:w-2/3">
-              <div>
-                <p className="text-md font-bold mb-1">Draw Results</p>
-                {data && (
-                  <DrawResultsSummaryPage
-                    firstDraw={getTodayResults(1) || []}
-                    secondDraw={getTodayResults(2) || []}
-                    thirdDraw={getTodayResults(3) || []}
-                  />
-                )}
-                <div className="flex gap-2">
-                  {data?.HotNumbers && (
-                    <HotNumberPage
-                      number={data?.HotNumbers[0]?.number || "-"}
-                    />
-                  )}
-                  {data?.ColdNumbers && (
-                    <ColdNumberPage
-                      number={data?.ColdNumbers[0]?.number || "-"}
-                    />
-                  )}
-                </div>
+        <div className="flex flex-col md:flex-row w-full gap-12">
+          <div className="flex flex-col w-full md:w-2/3">
+            <h1 className="text-3xl font-bold mb-3">
+              {
+                filteredProvinces.find(
+                  (province) => province.value == selectedProvince.toString()
+                )?.label
+              }{" "}
+              -{" "}
+              {
+                gameCategories.find(
+                  (gameCategory) =>
+                    gameCategory.value == selectedGameCategory.toString()
+                )?.label
+              }
+            </h1>
 
-                <div className="flex gap-2 mt-5">
-                  {data && (
-                    <DrawCounterTablePage
-                      numberArr={data?.FrequencyMap || []}
-                      gameCategory={Number(selectedGameCategory)}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-            {/* Right Column */}
-            <div className="flex flex-col gap-4 w-full md:w-1/3">
+            <div>
+              <p className="text-md font-bold mb-1">Draw Results</p>
               {data && (
-                <DrawListSummaryPage
-                  location={
-                    filteredProvinces.find(
-                      (province) =>
-                        province.value == selectedProvince.toString()
-                    )?.label || ""
-                  }
-                  month={selectedMonth}
-                  values={transformResultSummary(Number(selectedGameCategory))}
+                <DrawResultsSummaryPage
+                  firstDraw={getTodayResults(1) || []}
+                  secondDraw={getTodayResults(2) || []}
+                  thirdDraw={getTodayResults(3) || []}
                 />
               )}
+              <div className="flex gap-3">
+                {data?.HotNumbers && (
+                  <HotNumberPage number={data?.HotNumbers[0]?.number || "-"} />
+                )}
+                {data?.ColdNumbers && (
+                  <ColdNumberPage
+                    number={data?.ColdNumbers[0]?.number || "-"}
+                  />
+                )}
+              </div>
+
+              <div className="flex gap-2 mt-5">
+                {data && (
+                  <DrawCounterTablePage
+                    numberArr={data?.FrequencyMap || []}
+                    gameCategory={Number(selectedGameCategory)}
+                  />
+                )}
+              </div>
             </div>
+          </div>
+          {/* Right Column */}
+          <div className="flex flex-col gap-4 w-full md:w-1/3">
+            {data && (
+              <DrawListSummaryPage
+                location={
+                  filteredProvinces.find(
+                    (province) => province.value == selectedProvince.toString()
+                  )?.label || ""
+                }
+                month={selectedMonth}
+                values={transformResultSummary(Number(selectedGameCategory))}
+              />
+            )}
           </div>
         </div>
       </div>

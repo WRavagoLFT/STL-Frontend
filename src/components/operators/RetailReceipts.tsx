@@ -21,17 +21,18 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
   useEffect(() => {
     const [year, month] = operationDate.split("-");
 
-    fetchRetailReceipts(Number(year), Number(month), operatorId).then((data) => {
-      if (data?.success) {
-        setReceiptData(data.data);
+    fetchRetailReceipts(Number(year), Number(month), operatorId).then(
+      (data) => {
+        if (data?.success) {
+          setReceiptData(data.data);
+        }
       }
-    });
+    );
   }, [operationDate, operatorId]);
 
   // console.log('OPERATOR ID IN THE COMPONENT:', operatorId);
   // console.log("Operator ID passed to useRetailReceiptProcessor:", operatorId);
 
-  // for calculations
   const {
     aacBreakdown,
     aacTotalPercentage,
@@ -99,18 +100,15 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
             breakdown={aacTaxBreakdown}
           />
         </div>
-
         <div className="w-full">
           <NetAACIncomePage
             netAmount={netAacTotalAmount}
             netPercentage={netAacTotalPercentage}
           />
         </div>
-
         <div className="w-full mt-2">
           <h1 className="font-bold"> PCSO</h1>
         </div>
-
         <div className="w-full">
           <GrossPSCOSharePage
             totalPercentage={pcsoTotalPercentage}
@@ -118,7 +116,6 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
             breakdown={pcsoBreakdown}
           />
         </div>
-
         <div className="w-full">
           <PCSOTaxesPage
             totalPercentage={pcsoTaxTotalPercentage}
@@ -126,7 +123,6 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
             breakdown={pcsoTaxBreakdown}
           />
         </div>
-
         <div className="w-full">
           <NetPSCOIncomePage
             netAmount={netPcsoTotalAmount}

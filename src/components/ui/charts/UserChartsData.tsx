@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ChartBarItem, ChartsDataPageProps, RegionUser } from "~/types/interfaces";
-import useDashboardStore from "../../../../store/useDashboardStore";
+import useDashboardStore from "../../../store/useDashboardStore";
 import ChartCard from "./UserCharts";
 import { getUserStatus } from "~/utils/dashboarddata";
 

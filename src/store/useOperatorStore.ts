@@ -1,59 +1,47 @@
 import { create } from "zustand";
-import { Operator } from "../src/types/types";
+import { Operator } from "../types/types";
 import { Column, Field } from "~/types/interfaces";
 
 export interface OperatorsState {
   data: Operator[];
-  setData: (data: Operator[]) => void;
-
   columns: Column<Operator>[];
-  setColumns: (columns: Column<Operator>[]) => void;
-
   operators: Operator[];
   operatorMap: Record<number, Operator>;
-  
   loading: boolean;
   error: string | null;
+  modalOpen: boolean;
+  fields: Field[];
+  selectedData: Operator | null;
 
+  setData: (data: Operator[]) => void;
+  setColumns: (columns: Column<Operator>[]) => void;
   setOperators: (operators: Operator[]) => void;
   setOperatorMap: (operatorMap: Record<number, Operator>) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
-
-  modalOpen: boolean;
   setModalOpen: (open: boolean) => void;
-
-  fields: Field[];
   setFields: (fields: Field[]) => void;
-
-
-  selectedData: Operator | null;
   setSelectedData: (data: Operator | null) => void;
 }
 
 export const useOperatorsData = create<OperatorsState>((set) => ({
   data: [],
-  setData: (data) => set({ data }),
-
   columns: [],
-  setColumns: (columns) => set({ columns }),
-
   operators: [],
   operatorMap: {}, // Ensures type safety
   loading: false,
   error: null,
+  modalOpen: false,
+  fields: [],
+  selectedData: null,
 
+  setData: (data) => set({ data }),
+  setColumns: (columns) => set({ columns }),
   setOperators: (operators) => set({ operators }),
   setOperatorMap: (operatorMap) => set({ operatorMap }),
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
-
-  modalOpen: false,
   setModalOpen: (open) => set({ modalOpen: open }),
-
-  fields: [],
   setFields: (fields) => set({ fields }),
-
-  selectedData: null,
   setSelectedData: (data) => set({ selectedData: data }),
 }));

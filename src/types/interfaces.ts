@@ -9,27 +9,6 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export type GetUsersResponse = ApiResponse<User[]>;
-export type GetOperatorsResponse = ApiResponse<Operator[]>;
-export type GetGameCategoriesResponse = ApiResponse<{
-  data: {
-    id: number;
-    name: string;
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-  }[];
-}>;
-export type GetLocationResponse = ApiResponse<{
-  data: {
-    id: number;
-    name: string;
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-  }[];
-}>;
-
 export interface Column<T> {
   key: keyof T | string;
   label: string;
@@ -61,7 +40,6 @@ export interface CardsPageProps<T> {
   roleLabel?: string;
   textlabel?: string;
 }
-
 
 export interface ChartDataItem<T = unknown> {
   label: string;
@@ -117,6 +95,8 @@ export interface DetailedTableProps<T> {
   };
   shouldOpenAsPage?: boolean;
   source?: 'users' | 'operators';
+  onAddClick?: () => void;
+  onUpdateClick?: (row: T) => void; // for update modal
 }
 
 export interface ChartBarItem {
@@ -152,17 +132,6 @@ export interface FieldOption {
   GameCategory?: string;
 }
 
-export interface Field {
-  name: string;
-  label: string;
-  type: string;
-  placeholder?: string;
-  options?: FieldOption[]; 
-  value: string | number | boolean | string[]; 
-  gridSpan?: 1 | 2 | 'full'; 
-  required?: boolean; 
-}
-
 export interface ReusableModalPageProps {
   title?: string;
   endpoint?: {
@@ -171,19 +140,19 @@ export interface ReusableModalPageProps {
   };
   isOpen: boolean;
   onClose: () => void;
-  fields: Field[];
+  //fields: Field[];
   onSuccess?: () => void;
   onSubmit?: (formData: Record<string, string>) => Promise<void>;
-  children: (props: { handleSubmit: () => void }) => React.ReactNode;
+  children?: (props: { handleSubmit: () => void }) => React.ReactNode;
   loading?: boolean;
   formData?: Record<string, string>;
   setFormData?: (data: Record<string, string>) => void;
   additionalPayload?: Record<string, any>;
-  initialUserData?: any;
+  initialUserOperatorData?: any;
   operatorMap?: Record<number, Operator>;
   layout?: 'single' | 'double'; 
 
-  gameTypes?: FieldOption[];
+  gameTypes?: any[];
   provinces?: any[];
   regions?: any[];
   cities?: any[];
@@ -191,17 +160,15 @@ export interface ReusableModalPageProps {
   setSelectedRegion?: (regionId: string) => void;
   setSelectedProvince?: (provinceId?: string) => void;
   schema?: ZodSchema<any>;
+  onViewEditLogs?: (operatorId: number) => void;
+  selectedUser?: Operator | null;
 }
 
 export interface ModalPageProps {
   open?: boolean;
   onClose?: () => void;
-  fields?: Field[];
-  endpoint?: {
-    create: string;
-    update: string;
-  };
-  pageType?: "manager" | "executive" | "operator";
+  //fields?: Field[];
+  //pageType?: "manager" | "executive" | "operator";
   additionalPayload?: Record<string, any>;
   onFieldChange?: (name: string, value: string) => void;
   initialUserData?: any;
@@ -226,11 +193,6 @@ export interface UserFieldFormPageProps {
   setOperatorMap: (operatorMap: { [key: number]: Operator }) => void;
 }
 
-export interface EditModalPageProps {
-  userId: number;
-  onClose: () => void;
-}
-
 export interface CSVExportButtonProps {
   statsPerRegion: any[];
   pageType: string;
@@ -251,28 +213,10 @@ export const defaultValues: UserFormData = {
   operatorId: 0,
 };
 
-export interface ConfirmUserActionModalProps {
-  open: boolean;
-  onClose: () => void;
-  onVerified?: () => void;
-  user?: any;
-  errors: any;
-  setErrors: React.Dispatch<React.SetStateAction<any>>;
-  selectedUser?: User | null;
-  setSelectedUser?: React.Dispatch<React.SetStateAction<User | null>>;
-  actionType: "create" | "update" | "suspend" | "delete";
-  formData: { [key: string]: string | number | string[] };
-  setFormData: (data: { [key: string]: string | number }) => void;
-  endpoint: {
-    create: string;
-    update: string;
-  };
-}
-
 export interface ShareBreakdownPageProps {
   totalPercentage: number;
   totalShareAmount: number;
   breakdown: Share[];
-  defaultBreakdown?: Share[]; // optional fallback if breakdown is empty
-  title?: string; // optional header title
+  defaultBreakdown?: Share[];
+  title?: string;
 }

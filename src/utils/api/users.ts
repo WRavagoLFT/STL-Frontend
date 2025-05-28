@@ -41,7 +41,12 @@ const fetchUsers = async (
 
     // Create operator map
     const operatorMap = operators.reduce<Record<number, Operator>>((map, operator) => {
-      map[operator.OperatorId] = operator;
+      const id = operator.OperatorId;
+
+      if (typeof id === 'number') {
+        map[id] = operator;
+      }
+
       return map;
     }, {});
 
@@ -52,13 +57,18 @@ const fetchUsers = async (
     // Filter and enrich users
     const filteredUsers = users
       .filter(user => user.UserTypeId === roleId)
-      .map(user => ({
-        ...user,
-        fullName: buildFullName(user),
-        OperatorDetails: operatorMap[user.OperatorId] ?? null,
-      }));
+        .map(user => {
+          const operatorId = user.OperatorId;
+          const operatorDetails = typeof operatorId === 'number' ? operatorMap[operatorId] ?? null : null;
 
-    setData(filteredUsers);
+          return {
+            ...user,
+            fullName: buildFullName(user),
+            OperatorDetails: operatorDetails,
+          };
+        });
+
+    setData(filteredUsers); // 
     return operatorMap;
   } catch (error) {
     console.error("Error fetching users or operators:", (error as Error).message);
@@ -118,30 +128,62 @@ const fetchUserById = async (userId: string | number, ) => {
 };
 
 // Update user function
-const updateUser = async (userId: number, userData: Record<string, any>) => {
-    try {
-        const url = validateRelativeUrl("/users/edituser");
-        const response = await axiosInstance.patch(
-            url,
-            { userId, ...userData },
-            { withCredentials: true }
-        );
+const updateUser = async (userData: Record<string, any>) => {
+  try {
+    const url = validateRelativeUrl("/users/edituser");
 
-        return response.data;
-    } catch (error) {
-        console.error("Error updating user:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: {} };
+    console.log("Sending PATCH request to:", url);
+    console.log("Payload:", JSON.stringify(userData, null, 2));
+
+    const response = await axiosInstance.patch(
+      url,
+      userData  // <-- send userData directly, NOT wrapped inside { userData }
+    );
+
+    console.log("Response data:", response.data);
+
+    return response.data;
+  } catch (error: any) {
+    // More detailed error logging
+    if (error.response) {
+      // Server responded with status code outside 2xx
+      console.error("Error response status:", error.response.status);
+      console.error("Error response data:", error.response.data);
+      return {
+        success: false,
+        message: error.response.data?.message || "Server returned an error",
+        data: error.response.data || {},
+      };
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error("No response received:", error.request);
+      return {
+        success: false,
+        message: "No response received from server",
+        data: {},
+      };
+    } else {
+      // Something else happened while setting up the request
+      console.error("Error setting up request:", error.message);
+      return {
+        success: false,
+        message: error.message,
+        data: {},
+      };
     }
+  }
 };
 
+
 // Get user edit log function
-const editLogUser = async (userId: number, p0: {}) => {
+const editLogUser = async (userId: number) => {
     try {
         const url = validateRelativeUrl("/users/getEditLog");
         const response = await axiosInstance.get(url, {
             params: { userId },
-            withCredentials: true,
         });
+
+        console.log("Edit log response:", response.data);
 
         return response.data;
     } catch (error) {
@@ -149,21 +191,5 @@ const editLogUser = async (userId: number, p0: {}) => {
         return { success: false, message: (error as Error).message, data: {} };
     }
 };
-
-// hindi na valid. gamitin nalang yung editUser for user suspension
-// const suspendUser = async (userId: number, userData: Record<string, any>) => {
-//     try {
-//         const url = validateRelativeUrl("/auth/disableUser");
-//         const payload = { userId, ...userData };
-//         const response = await axiosInstance.post(url, payload, {
-//             withCredentials: true,
-//         });
-
-//         return response.data;
-//     } catch (error) {
-//         console.error("Error updating user:", error);
-//         return { success: false, message: (error as Error).message, data: {} };
-//     }
-// };
 
 export { fetchUsers, addUser, updateUser, fetchUserById, editLogUser };

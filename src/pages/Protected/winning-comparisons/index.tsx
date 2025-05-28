@@ -17,8 +17,8 @@ import dayjs from "dayjs";
 import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinners&Winnings";
 import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinners&Winnings";
 
-import { useWinningStore, categoryType } from "../../../../store/useWinningStore";
-import { useSideBarStore } from "../../../../store/useSideBarStore";
+import { useWinningStore, categoryType } from "../../../store/useWinningStore";
+import { useSideBarStore } from "../../../store/useSideBarStore";
 
 import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
 

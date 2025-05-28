@@ -69,7 +69,7 @@ const LoginPage = () => {
   const handleTogglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   return (
-     <div className="w-full min-h-screen flex flex-col items-center justify-center lg:items-stretch lg:flex-row bg-[#F8F0E3]">
+    <div className="bg-[#F8F0E3] container-2xl w-full min-h-screen flex flex-col items-center justify-center lg:items-stretch lg:flex-row">
       {/* Left Section (Logo & Title) */}
       <div className="w-full lg:flex-1 flex flex-col justify-center items-center py-8 px-4 lg:py-0">
         <div className="text-center w-full max-w-md">

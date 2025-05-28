@@ -3,7 +3,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoginSectionData } from "../../data/LoginSectionData";
 import { useRouter } from "next/router";
 import Swal from "sweetalert2";
-import { useAuthStore } from "../../../store/useForgetAuthStore";
+import { useAuthStore } from "../../store/useForgetAuthStore";
 import { updateForgottenPassword } from "~/utils/api/auth";
 import ActivityIndicator from "./ActivityIndicator";
 

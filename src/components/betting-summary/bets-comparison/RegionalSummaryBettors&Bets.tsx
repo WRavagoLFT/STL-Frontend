@@ -10,11 +10,11 @@ import {
   BettorsandBetsSummaryProps,
   getLegendItemsMap_Specific,
   getLegendItemsMap_Duration,
-  } from "../../../../store/useBettingStore";
+  } from "../../../store/useBettingStore";
 
 // API Endpoints
-import getCompareHistoricalDate from '~/utils/api/transactions/get.CompareHistoricalDate.service';
-import getCompareHistoricalDuration from '~/utils/api/transactions/get.CompareHistoricalDuration.service';
+//import getCompareHistoricalDate from '~/utils/api/transactions/get.CompareHistoricalDate.service';
+//import getCompareHistoricalDuration from '~/utils/api/transactions/get.CompareHistoricalDuration.service';
 
 // interface SpecificDatePayload {
 //       TransactionDate: string;
@@ -25,7 +25,7 @@ import getCompareHistoricalDuration from '~/utils/api/transactions/get.CompareHi
 //       TotalBettors: number;
 //       TotalTumbok?: number;
 //       TotalSahod?: number;
-//       TotalRamble?: number;
+//       TotalRamble?: number;  
 //       BetTypes?: {
 //         Tumbok: number;
 //         Sahod: number;

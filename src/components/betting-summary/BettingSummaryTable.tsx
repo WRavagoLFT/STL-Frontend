@@ -14,6 +14,10 @@ export interface Transactions {
   gameType: string;
   selectedPair: string;
   status: string;
+  DateOfTransaction?: string;
+  saisCasas?: number;
+  tresCasas?: number;
+  dyisCasas?: number;
 }
 
 const TableBettingSummary = (params: { gameCategoryId?: number }) => {

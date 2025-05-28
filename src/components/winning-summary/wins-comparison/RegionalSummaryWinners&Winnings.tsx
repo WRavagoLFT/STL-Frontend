@@ -10,7 +10,7 @@ import {
   WinnersandWinningsSummaryProps,
   getLegendItemsMap_Specific,
   getLegendItemsMap_Duration,
-} from "../../../../store/useWinningStore";
+} from "../../../store/useWinningStore";
 
 // Api Endpoints
 import getCompareHistoricalWinners from "~/utils/api/winners/get.CompareHistoricalWinners.service";

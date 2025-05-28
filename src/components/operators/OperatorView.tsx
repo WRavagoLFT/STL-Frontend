@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ReusableModalPageProps } from "~/types/interfaces";
 import Select from "react-select";
-import useUpdateModalState from "../../../store/useUpdateModalStore";
+import useUpdateModalState from "../../store/useUpdateModalStore";
 import Input from "../ui/inputs/TextInputs";
 import dayjs from "dayjs";
 
@@ -16,12 +16,14 @@ type ProvinceTypeOptions = {
 };
 
 const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
-  initialUserData,
+  initialUserOperatorData,
   gameTypes,
   regions,
   provinces,
   cities,
   areaofoperations,
+  onViewEditLogs,
+  selectedUser,
 }) => {
   const { user, setUser, errors, setErrors, handleManagerChange } =
     useUpdateModalState();
@@ -35,7 +37,9 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
   const [area, setArea] = useState<string | null>(null);
 
   // console.log("hihihh", areaofoperations);
-  console.log('provinces:', provinces);
+  console.log("SELECTED USERRR:", selectedUser);
+  console.log("initialUserData:", initialUserOperatorData);
+  console.log("provinces:", provinces);
   const handleDisable = () => {
     setIsDisabled(false);
     setShowEditButton(false);
@@ -64,10 +68,10 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
   }));
 
   useEffect(() => {
-    console.log("initialUserDatass:", initialUserData);
+    console.log("initialUserDatass:", initialUserOperatorData);
 
-    if (initialUserData && Object.keys(initialUserData).length > 0) {
-      const operatorData = initialUserData.data;
+    if (initialUserOperatorData && Object.keys(initialUserOperatorData).length > 0) {
+      const operatorData = initialUserOperatorData.data;
 
       if (operatorData && operatorData.GameTypes && operatorData.Cities) {
         const mappedGameTypes = operatorData.GameTypes.map(
@@ -84,7 +88,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             value: pv.CityName,
           })
         );
-        
+
         console.log("Mapped GameTypes for Select:", mappedGameTypes);
         console.log("cities", mappedCities);
         console.log(mappedGameTypes);
@@ -101,7 +105,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
       setSelectedGameTypes([]);
       console.log("No initialUserData found. Resetting form and game types.");
     }
-  }, [initialUserData]);
+  }, [initialUserOperatorData]);
 
   const operator = formData?.data || {};
 
@@ -138,7 +142,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
           <div>
             <label
               htmlFor="createdBy"
-              className="block text-sm font-medium text-gray-700 mb-1" // #212121 to hindi gray 700 
+              className="block text-sm font-medium text-gray-700 mb-1" // #212121 to hindi gray 700
               // TINGNAN MO KASI YUNG UI!
             >
               Created By
@@ -146,7 +150,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             <Input
               id="createdBy"
               name="createdBy"
-              value={formData.CreatedBy || ""}
+              value={formData.CreatedBy || "N/A"}
               onChange={handleChange}
               disabled
             />
@@ -162,7 +166,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             <Input
               id="lastUpdatedBy"
               name="lastUpdatedBy"
-              value={formData.CreatedBy || ""}
+              value={formData.CreatedBy || "N/A"}
               onChange={handleChange}
               disabled
             />
@@ -180,7 +184,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
               value={
                 formData.CreatedAt
                   ? dayjs(formData.CreatedAt).format("YYYY-MM-DD")
-                  : ""
+                  : "N/A"
               }
               onChange={handleChange}
               disabled
@@ -197,11 +201,24 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             <Input
               id="lastUpdatedDate"
               name="lastUpdatedDate"
-              value={formData.lastUpdatedDate || ""}
+              value={formData.lastUpdatedDate || "N/A"}
               onChange={handleChange}
               disabled
             />
           </div>
+        </div>
+        
+        {/* Edit log modal */}
+        <div className="w-full flex justify-end items-center mt-3">
+          {initialUserOperatorData?.data?.OperatorId && typeof onViewEditLogs === "function" && (
+            <button
+              type="button"
+              onClick={() => onViewEditLogs(initialUserOperatorData.data.OperatorId)}
+              className="bg-[#0038A8] py-2.5 px-4 text-white rounded-lg text-xs cursor-pointer hover:bg-[#004ccf]"
+            >
+              View Update History
+            </button>
+          )}
         </div>
       </div>
 
@@ -301,7 +318,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             >
               Games Provided
             </label>
-            <Select<GameTypeOption, true> // true = isMulti
+            <Select<GameTypeOption, true> // true = isMulti 
               id="gameTypes"
               name="gameTypes"
               isMulti
@@ -462,14 +479,26 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
 
       {/* Show only when `showEditButton` is true */}
       {showEditButton && (
-        <div className="w-full mt-5">
-          <button
-            onClick={isDisabled ? handleDisable : handleDisable}
-            className="w-full bg-[#F6BA12] hover:bg-[#FFD100] text-black font-base text-sm px-7 py-2 rounded mt-1"
-          >
-            {isDisabled ? "Update Operator" : "Save"}
-          </button>
-        </div>
+        <form onSubmit={handleDisable}>
+          <div className="w-full flex justify-end items-center my-2">
+            <button
+              type={isDisabled ? "button" : "submit"}
+              onClick={isDisabled ? handleDisable : undefined} // Only handleDisable gets onClick
+              className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+            >
+              {isDisabled ? "Update" : "Save"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {!isDisabled && (
+        <button
+          type="submit"
+          className="col-span-2 mt-2 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
+        >
+          Save
+        </button>
       )}
     </div>
   );

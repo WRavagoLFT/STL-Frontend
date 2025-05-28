@@ -8,7 +8,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import useDetailTableStore from '../../store/useTableStore';
+import useDetailTableStore from '../store/useTableStore';
 import { SortableTableCellProps } from '../types/interfaces';
 import { User, Operator, SortConfig, EditLogFields } from '~/types/types';
 import { filterStyles } from '~/styles/theme';
@@ -131,8 +131,8 @@ export function sortData<T extends User | Operator>(
 
     // Custom logic for fullName
     if (sortConfig.key === "fullName") {
-      valueA = `${(a as User).FirstName} ${(a as User).LastName} ${(a as User).Suffix || ""}`.trim().toLowerCase();
-      valueB = `${(b as User).FirstName} ${(b as User).LastName} ${(b as User).Suffix || ""}`.trim().toLowerCase();
+      valueA = `${(a as User).firstName} ${(a as User).lastName} ${(a as User).suffix || ""}`.trim().toLowerCase();
+      valueB = `${(b as User).firstName} ${(b as User).lastName} ${(b as User).suffix || ""}`.trim().toLowerCase();
     } else {
       valueA = getNestedValue(a, sortConfig.key as string);
       valueB = getNestedValue(b, sortConfig.key as string);
@@ -183,10 +183,11 @@ const getNestedValue = (obj: any, path: string) => {
 
 // FILTERING + SEARCHING FUNCTION
 export const filterData = (
-  data: (User | Operator)[],
+  data: (any)[],
   filterKeys: string[],
   filters: { [key: string]: string },
-  operatorMap: { [key: number]: Operator }
+  operatorMap?: { [key: number]: Operator }
+
 ): (User | Operator)[] => {
   const searchValue = filters.searchQuery?.toLowerCase() || "";
 
@@ -195,13 +196,11 @@ export const filterData = (
   };
 
   return data.filter((item) => {
-    const operatorName = operatorMap?.[item.OperatorId]?.OperatorName
-      ? operatorMap[item.OperatorId].OperatorName.toLowerCase()
-      : "no operator";
+    const operatorName =
+      operatorMap?.[item.OperatorId]?.OperatorName?.toLowerCase() || "no operator";
 
     if (searchValue && !Object.values(item).some((val) => filterItem("", String(val)))) {
       const fullName = `${"FirstName" in item ? item.FirstName : ""} ${"LastName" in item ? item.LastName : ""}`.toLowerCase();
-      // const createdByFullName = `${"CreatedByFirstName" in item ? item.CreatedByFirstName : ""} ${"CreatedByLastName" in item ? item.CreatedByLastName : ""}`.toLowerCase();
       const cities = (getNestedValue(item, "Cities") || []) as { CityName: string }[];
       const cityNames = cities.map(city => city.CityName.toLowerCase()).join(", ");
 

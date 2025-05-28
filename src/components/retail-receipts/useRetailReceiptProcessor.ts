@@ -60,15 +60,15 @@ export const useRetailReceiptProcessor = (
   ];
 
 useEffect(() => {
-  console.log("useRetailReceiptProcessor useEffect triggered");
-  console.log("operationDate:", operationDate);
-console.log("Retail receipts for operator", JSON.stringify(operatorId));
+  // console.log("useRetailReceiptProcessor useEffect triggered");
+  // console.log("operationDate:", operationDate);
+  // console.log("Retail receipts for operator", JSON.stringify(operatorId));
 
   const [year, month] = operationDate.split("-").map(Number);
-  console.log("Parsed year and month:", year, month);
+ // console.log("Parsed year and month:", year, month);
 
   fetchRetailReceipts(year, month, operatorId).then((response) => {
-    console.log("fetchRetailReceipts response:", response);
+    // console.log("fetchRetailReceipts response:", response);
 
     if (!response?.success) {
       console.warn("Failed to fetch retail receipts");
@@ -82,7 +82,7 @@ console.log("Retail receipts for operator", JSON.stringify(operatorId));
       month,
       1
     );
-    console.log("AAC processed shares:", aac);
+    // console.log("AAC processed shares:", aac);
     setAacBreakdown(aac.breakdown);
     setAacTotalPercentage(aac.totalPercentage);
     setAacTotalShareAmount(aac.totalShareAmount);
@@ -94,7 +94,7 @@ console.log("Retail receipts for operator", JSON.stringify(operatorId));
       month,
       1
     );
-    console.log("PCSO processed shares:", pcso);
+    // console.log("PCSO processed shares:", pcso);
     setPcsoBreakdown(pcso.breakdown);
     setPcsoTotalPercentage(pcso.totalPercentage);
     setPcsoTotalShareAmount(pcso.totalShareAmount);
@@ -106,7 +106,7 @@ console.log("Retail receipts for operator", JSON.stringify(operatorId));
       month,
       2
     );
-    console.log("AAC Tax processed shares:", aacTax);
+    // console.log("AAC Tax processed shares:", aacTax);
     setAacTaxBreakdown(aacTax.breakdown);
     setAacTaxTotalPercentage(aacTax.totalPercentage);
     setAacTaxTotalShareAmount(aacTax.totalShareAmount);
@@ -118,7 +118,7 @@ console.log("Retail receipts for operator", JSON.stringify(operatorId));
       month,
       2
     );
-    console.log("PCSO Tax processed shares:", pcsoTax);
+    // console.log("PCSO Tax processed shares:", pcsoTax);
     setPcsoTaxBreakdown(pcsoTax.breakdown);
     setPcsoTaxTotalPercentage(pcsoTax.totalPercentage);
     setPcsoTaxTotalShareAmount(pcsoTax.totalShareAmount);
@@ -130,7 +130,7 @@ console.log("Retail receipts for operator", JSON.stringify(operatorId));
         aacTax.totalShareAmount,
         aacTax.totalPercentage
       );
-    console.log("Net AAC totals:", netAacAmount, netAacPercentage);
+    // console.log("Net AAC totals:", netAacAmount, netAacPercentage);
     setNetAacTotalAmount(netAacAmount);
     setNetAacTotalPercentage(netAacPercentage);
 
@@ -141,12 +141,11 @@ console.log("Retail receipts for operator", JSON.stringify(operatorId));
         pcsoTax.totalShareAmount,
         pcsoTax.totalPercentage
       );
-    console.log("Net PCSO totals:", netPcsoAmount, netPcsoPercentage);
+    // console.log("Net PCSO totals:", netPcsoAmount, netPcsoPercentage);
     setNetPcsoTotalAmount(netPcsoAmount);
     setNetPcsoTotalPercentage(netPcsoPercentage);
   });
 }, [operationDate, operatorId]);
-
 
   return {
     aacBreakdown,

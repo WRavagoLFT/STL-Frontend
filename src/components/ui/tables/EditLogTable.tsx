@@ -1,4 +1,8 @@
-import React, { useMemo } from "react";
+// they have separate functions for filtering and sorting to the other table 
+// components as they have different data structures and requirements.
+// they are not meant to be used interchangeably or be reusable, hence the separation.
+
+import React, { useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -7,84 +11,85 @@ import {
   TableHead,
   TableRow,
   TablePagination,
-  IconButton,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import FilterListOffIcon from "@mui/icons-material/FilterListOff";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
-import useDetailTableStore from "../../../store/useTableStore";
-import {
-  SortableTableCell,
-  filterData,
-  sortData,
-} from "../../../utils/sortPaginationSearch";
+import { SortableTableCell } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
-import { User, Operator, SortConfig } from "~/types/types";
-import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
+import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
+import {
+  filterDataEditLog,
+  sortDataEditLog,
+} from "~/utils/sortPaginationSearch";
 
-const ReadOnlyTablePage = <T extends Transactions>({
+const EditLogsTablePage = <T extends Transactions>({
   data,
   columns,
-  actionsRender,
   pageType,
   operatorMap,
 }: DetailedTableProps<T>) => {
-  const {
-    searchQuery,
-    setIsFilterActive,
-    isFilterActive,
-    page,
-    rowsPerPage,
-    sortConfig,
-    filters,
-    handleChangePage,
-    handleChangeRowsPerPage,
-    setSearchQuery,
-  } = useDetailTableStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFilterActive, setIsFilterActive] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [filters, setFilters] = useState<Record<string, string>>({});
 
-  // FILTER + SEARCH
-  const filteredData = useMemo(() => {
+  const [sortConfig, setSortConfig] = useState<{
+    key: string;
+    direction: "asc" | "desc";
+  } | null>(null);
+
+  // Filter + Sort
+  const sortedAndFilteredData = useMemo(() => {
+    //console.log("Data length before filtering:", data.length);
+    //console.log("Current search query:", searchQuery);
+    //console.log("Current filters:", filters);
+
     const filterKeys = columns
       .filter((col) => col.filterable)
-      .map((col) => col.filterKey ?? col.key?.toString())
-      .filter((key): key is string => !!key);
+      .map((col) => (col.filterKey ?? col.key).toString()) as string[];
 
-    const enrichedData = data.map((item) => ({
-      ...item,
-    }));
+    //console.log("Filter keys used:", filterKeys);
 
-    return filterData(enrichedData, filterKeys, { ...filters, searchQuery });
-  }, [data, filters, searchQuery, columns]);
-
-  // SORTING
-  const sortedData = useMemo(() => {
-    if (!filteredData || !sortConfig) {
-      return [];
-    }
-    // console.log('Filtered Data before Sorting:', filteredData);
-    // console.log('Sort Config:', sortConfig);
-
-    // Perform sorting operation
-    const result = sortData(
-      filteredData,
-      sortConfig as SortConfig<User | Operator>
+    const filtered = filterDataEditLog(
+      data as any[],
+      filterKeys,
+      filters,
+      searchQuery
     );
-    // console.log('Sorted Data:', result);
 
-    return result;
-  }, [filteredData, sortConfig]);
+    //console.log("Data length after filtering:", filtered.length);
 
-  // PAGINATION
+    const sorted = sortDataEditLog(
+      filtered,
+      sortConfig ?? { key: "defaultKey", direction: "asc" }
+    );
+
+    //console.log("Data length after sorting:", sorted.length);
+    return sorted;
+  }, [data, filters, columns, searchQuery, sortConfig]);
+
+  const handleChangePage = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // optionally reset to first page
+  };
+
+  // Pagination
   const paginatedData = useMemo(() => {
     const start = page * rowsPerPage;
     const end = start + rowsPerPage;
-    return sortedData.slice(start, end);
-  }, [sortedData, page, rowsPerPage]);
+    return sortedAndFilteredData.slice(start, end);
+  }, [sortedAndFilteredData, page, rowsPerPage]);
 
   return (
-    <React.Fragment>
+    <>
       <TableContainer>
         <div className="flex justify-between items-center py-3 px-1">
           <div className="flex items-center">
@@ -94,24 +99,15 @@ const ReadOnlyTablePage = <T extends Transactions>({
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-[10px] bg-transparent border border-[#0038A8] rounded-md text-sm focus:outline-none"
+                className="w-full pl-9 pr-3 py-[8px] bg-transparent border border-[#0038A8] rounded-md text-sm focus:outline-none"
               />
               <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400">
                 <SearchIcon style={{ fontSize: 20 }} />
               </div>
             </div>
-            <IconButton
-              onClick={() => setIsFilterActive(!isFilterActive)}
-              className="ml-2"
-            >
-              {isFilterActive ? (
-                <FilterListOffIcon sx={{ color: "#ACA993" }} />
-              ) : (
-                <FilterListIcon sx={{ color: "#ACA993" }} />
-              )}
-            </IconButton>
           </div>
         </div>
+
         <Table>
           <TableHead>
             <TableRow sx={{ "&:hover": { backgroundColor: "#F08060" } }}>
@@ -129,16 +125,14 @@ const ReadOnlyTablePage = <T extends Transactions>({
               )}
             </TableRow>
           </TableHead>
+
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length + (actionsRender ? 1 : 1)}
-                  align="center"
-                >
+                <TableCell colSpan={columns.length + 1} align="center">
                   <div className="flex flex-col items-center py-7 text-[#0038A8]">
                     <PersonOffIcon style={{ fontSize: 50 }} />
-                    <h6 className="mt-2 font-sm text-lg ">No data available</h6>
+                    <h6 className="mt-2 font-sm text-lg">No data available</h6>
                   </div>
                 </TableCell>
               </TableRow>
@@ -148,24 +142,20 @@ const ReadOnlyTablePage = <T extends Transactions>({
                   {columns.map((col) => {
                     const key = String(col.key);
                     const value = (row as any)[key];
+
                     return (
-                      <TableCell key={key} sx={{ paddingY: 0.9 }}>
+                      <TableCell key={key} sx={{ paddingY: 0.5 }}>
                         {col.render
                           ? col.render(row as unknown as T)
                           : col.filterValue
                             ? typeof col.filterValue === "function"
                               ? col.filterValue(row as unknown as T)
                               : col.filterValue
-                            : typeof value === "string" ||
-                                typeof value === "number"
-                              ? value.toString()
-                              : Array.isArray(value)
-                                ? value
-                                    .map(
-                                      (v: any) => v?.CityName ?? v?.toString()
-                                    )
-                                    .join(", ")
-                                : ""}
+                            : Array.isArray(value)
+                              ? value
+                                  .map((v) => v?.CityName ?? v?.toString())
+                                  .join(", ")
+                              : (value?.toString() ?? "")}
                       </TableCell>
                     );
                   })}
@@ -174,28 +164,30 @@ const ReadOnlyTablePage = <T extends Transactions>({
             )}
           </TableBody>
         </Table>
-        <div className="p-3">
+
+        <div className="p-0 pt-2">
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}
             component="div"
-            count={filteredData.length}
+            count={sortedAndFilteredData.length}
             rowsPerPage={rowsPerPage}
             page={page}
-            onPageChange={handleChangePage}
+            onPageChange={(_, newPage) => handleChangePage(newPage)}
             onRowsPerPageChange={handleChangeRowsPerPage}
           />
         </div>
       </TableContainer>
-      <div className="flex justify-end pt-2">
+
+      {/* <div className="flex justify-end pt-2">
         <CSVExportButtonTable
           pageType={pageType ?? "unknown"}
           columns={columns}
           statsPerRegion={data}
           operatorMap={operatorMap ? Object.values(operatorMap) : []}
         />
-      </div>
-    </React.Fragment>
+      </div> */}
+    </>
   );
 };
 
-export default ReadOnlyTablePage;
+export default EditLogsTablePage;

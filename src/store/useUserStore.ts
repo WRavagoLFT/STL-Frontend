@@ -5,7 +5,7 @@ import { User, Operator } from '~/types/types';
 interface UserRoleStore {
   roleId: number | null;
   setRoleId: (roleId: number | null) => void;
-  setData: (data: User[]) => void;
+  setData: (data: User[] | ((prev: User[]) => User[])) => void;
   columns: Column<User>[];
   setColumns: (columns: Column<User>[]) => void;
   setEditLogColumns: (columns: Column<User>[]) => void;
@@ -52,7 +52,12 @@ const useUserRoleStore = create<UserRoleStore>((set) => ({
   // Setters for columns
   setModalData: (data) => set({ modalData: data }),
   setRoleId: (roleId) => set({ roleId }),
-  setData: (data) => set({ data }),
+  setData: (dataOrUpdater: User[] | ((prev: User[]) => User[])) =>
+  set((state) => ({
+    data: typeof dataOrUpdater === 'function'
+      ? dataOrUpdater(state.data)
+      : dataOrUpdater,
+  })),
   setEditLogColumns: (columns: Column<User>[]) => set({ editLogColumns: columns }),
   setColumns: (columns) => set({ columns }),
   setModalOpen: (modalOpen) => set({ modalOpen }),

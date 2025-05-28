@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const operatorSchema = z.object({
   name: z
@@ -20,27 +20,77 @@ export const operatorSchema = z.object({
     .refine((val) => /\S+@\S+\.\S+/.test(val), {
       message: "Please enter a valid email address e.g. xxx@email.com",
     }),
-  // RegionId: z
-  //   .array(z.string({ required_error: "Area of regional operations is required" }))
-  //   .min(1, "At least one regional operation area is required"),
-  // ProvinceId: z
-  //   .array(z.string({ required_error: "Area of provincial operations is required" }))
-  //   .min(1, "At least one provincial operation area is required"),
-  // CityId: z
-  //   .array(z.string({ required_error: "Area of city operations is required" }))
-  //   .min(1, "At least one city operation area is required"),
+  gameTypes: z.preprocess(
+    (val) => {
+      if (Array.isArray(val)) {
+        return val.map((v) => (typeof v === "string" ? parseInt(v, 10) : v));
+      }
+      return val;
+    },
+    z
+      .array(
+        z.number({
+          required_error: "Game Type are required",
+          invalid_type_error: "Each Game Type must be a number",
+        })
+      )
+      .min(1, { message: "At least one Game Type is required" })
+  ),
+  regions: z.preprocess(
+    (val) => {
+      if (Array.isArray(val)) {
+        return val.map((v) => (typeof v === "string" ? parseInt(v, 10) : v));
+      }
+      return val;
+    },
+    z
+      .array(
+        z.number({
+          required_error: "Regions are required",
+          invalid_type_error: "Each Region must be a number",
+        })
+      )
+      .min(1, { message: "At least one Region is required" })
+  ),
+  provinces: z.preprocess(
+    (val) => {
+      if (Array.isArray(val)) {
+        return val.map((v) => (typeof v === "string" ? parseInt(v, 10) : v));
+      }
+      return val;
+    },
+    z
+      .array(
+        z.number({
+          required_error: "Provinces are required",
+          invalid_type_error: "Each Province must be a number",
+        })
+      )
+      .min(1, { message: "At least one Province is required" })
+  ),
+  cities: z.preprocess(
+    (val) => {
+      if (Array.isArray(val)) {
+        return val.map((v) => (typeof v === "string" ? parseInt(v, 10) : v));
+      }
+      return val;
+    },
+    z
+      .array(
+        z.number({
+          required_error: "Cities are required",
+          invalid_type_error: "Each City must be a number",
+        })
+      )
+      .min(1, { message: "At least one City is required" })
+  ),
   dateOfOperation: z
     .string({ required_error: "Date of operations is required" })
     .min(1, "Date of operations is required"),
   address: z
     .string({ required_error: "Operator address is required" })
     .min(1, "Operator address is required"),
-  // GameCategoryId: z
-  //   .array(z.string({ required_error: "Games Provided is required" }))
-  //   .min(1, "At least one game type is required"),
-  STLAreaOfOperations: z
+  areaOfOperations: z
     .string({ required_error: "Area of operations is required" })
     .min(1, "At least one area of operation is required"),
-  // isExcludedCITY: z
-  //   .boolean({ required_error: "Is Excluded City is required" }),
 });
