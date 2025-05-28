@@ -8,9 +8,8 @@ export const userEditColumns = (): Column<EditLogFields>[] => [
     label: "Edited By",
     sortable: true,
     filterable: true,
-    filterKey: "EditedByName",
-    render: (log: EditLogFields) =>
-      log.EditedByName ? log.EditedByName : "Unknown Editor",
+    filterKey: "EditedBy",
+    render: (log: EditLogFields) => log.EditedBy ? log.EditedBy : "N/A",
   },
   {
     key: "CreatedAt",
@@ -18,8 +17,7 @@ export const userEditColumns = (): Column<EditLogFields>[] => [
     sortable: true,
     filterable: true,
     filterKey: "CreatedAt",
-    render: (log: EditLogFields) =>
-      log.CreatedAt
+    render: (log: EditLogFields) => log.CreatedAt
         ? dayjs(log.CreatedAt).format("YYYY/MM/DD HH:mm:ss")
         : "",
   },

@@ -1,20 +1,5 @@
 import { ZodSchema } from "zod";
 
-// for dashboard cards
-export type DashboardData = {
-  totalUsers: number;
-  activeUsers: number;
-  suspendedUsers: number;
-  inactiveUsers: number;
-  newUsers: number;
-};
-
-// for dashboard charts
-export interface LegendItem {
-  color: string;
-  label: string;
-}
-
 export interface User {
   userId?: number;
   firstName: string;
@@ -35,11 +20,11 @@ export interface User {
   OperatorId?: number;
   UserTypeId?: number;
 
-  fullName?: string; // Consider making this a computed field on the frontend
+  fullName?: string;
   DateOfRegistration?: string;
   OperatorDetails?: { OperatorName?: string } | null;
 
-  Region?: string; // Remove this if 'region' below is preferred
+  Region?: string;
   region: string;
   LastLogin?: string;
   LastTokenRefresh?: string;
@@ -89,17 +74,32 @@ export interface Operator {
   IsActive?: number;
 }
 
+// for dashboard cards
+export type DashboardData = {
+  totalUsers: number;
+  activeUsers: number;
+  suspendedUsers: number;
+  inactiveUsers: number;
+  newUsers: number;
+};
+
+// for dashboard charts
+export interface LegendItem {
+  color: string;
+  label: string;
+}
+
 export type EditLogFields = {
   logField: string;
   EditLogDetailsId: number;
   User: string;
-  EditedBy: string;
+  EditedBy?: string;
   CreatedAt: string;
   OldValue: string;
   NewValue: string;
   Remarks: string;
-  EditedByName?: string;  
   OperatorId?: number;
+  EditedByName?: string;
 }
 
 export type SortConfig<T> = {

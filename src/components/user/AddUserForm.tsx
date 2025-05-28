@@ -35,20 +35,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       label: operator.OperatorName ?? "Unknown",
     })
   );
-  const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
-  const [showPassword, setShowPassword] = useState(false);
 
-  // Open the confirm modal after submit
-  const openConfirmModal = () => setIsConfirmModalOpen(true);
-  const closeConfirmModal = () => setIsConfirmModalOpen(false);
-
-  const handleModalClose = () => {
-    closeConfirmModal();
-    if (onClose) onClose();
-  };
-  
   const suffixOptions: OptionType[] = [
     { label: "N/A", value: "" },
     { label: "Jr.", value: "Jr." },
@@ -62,6 +49,16 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
     { label: "Esq.", value: "Esq." },
   ];
 
+  const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Open the confirm modal after submit
+  const openConfirmModal = () => setIsConfirmModalOpen(true);
+  const closeConfirmModal = () => setIsConfirmModalOpen(false);
+  const handleModalClose = () => { closeConfirmModal(); if (onClose) onClose();};
+  
   const formik = useFormik({
     initialValues: {
       firstName: initialData.firstName || "",

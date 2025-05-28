@@ -8,7 +8,7 @@ export const operatorEditColumns = (): Column<EditLogFields>[] => [
     label: "Edited By",
     sortable: true,
     filterable: true,
-    filterKey: "EditedByName",
+    filterKey: "EditedBy",
     render: (log: EditLogFields) =>
       log.EditedByName ? log.EditedByName : "Unknown Editor",
   },

@@ -28,9 +28,20 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   onViewEditLogs = () => {},
   onClose,
 }) => {
-  const title =
-    userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
+  const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
 
+  const sevenDaysAgo = dayjs().subtract(7, "day");
+  const [formData, setFormData] = useState<{[key: string]: string | number | string[];}>({});
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
+  // Open the confirm modal after submit
+  const openConfirmModal = () => setIsConfirmModalOpen(true);
+  const closeConfirmModal = () => setIsConfirmModalOpen(false);
+  const handleModalClose = () => { closeConfirmModal(); if (onClose) onClose();};
+  const handleDisable = () => setIsDisabled(false);
+
+  const alwaysDisabledKeys = ["name", "LastName"];
   if (!selectedUser) return null;
 
   const operatorOptions: OptionType[] = Object.values(operatorMap).map(
@@ -57,25 +68,6 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
     { label: "Mr", value: "Mr" },
     { label: "Esq.", value: "Esq." },
   ];
-
-  const sevenDaysAgo = dayjs().subtract(7, "day");
-  const [formData, setFormData] = useState<{
-    [key: string]: string | number | string[];
-  }>({});
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-
-  // Open the confirm modal after submit
-  const openConfirmModal = () => setIsConfirmModalOpen(true);
-  const closeConfirmModal = () => setIsConfirmModalOpen(false);
-
-  const handleModalClose = () => {
-    closeConfirmModal();
-    if (onClose) onClose();
-  };
-  const handleDisable = () => setIsDisabled(false);
-
-  const alwaysDisabledKeys = ["name", "LastName"];
 
   const mapSelectedUserToFormData = (user: User) => ({
     userId: user?.UserId || 0,
@@ -125,7 +117,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
 
   return (
     <form onSubmit={formik.handleSubmit}>
-      <h2 className="font-bold mb-1">{title} Information</h2>
+      <div className="text-base font-bold mb-1">{title} Information</div>
       <div className="grid grid-cols-2 gap-6">
         {/* Column 1 */}
         <div className="flex flex-col gap-x-6 gap-y-3">
@@ -265,7 +257,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
         </div>
       </div>
 
-      <h2 className="font-bold mt-5 mb-1">Update History</h2>
+      <h2 className="font-bold mt-3 mb-1">Update History</h2>
       <div className="grid grid-cols-2 gap-6">
         {/* Column 1 */}
         <div className="flex flex-col gap-x-6 gap-y-3">

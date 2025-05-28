@@ -54,7 +54,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
             />
           </div>
           {title && (
-            <h3 className="text-2xl font-bold pb-5 leading-none">{title}</h3>
+            <h3 className="text-2xl font-bold pb-4 leading-none">{title}</h3>
           )}
           <div>{children}</div>
         </div>
