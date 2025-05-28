@@ -318,7 +318,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             >
               Games Provided
             </label>
-            <Select<GameTypeOption, true> // true = isMulti
+            <Select<GameTypeOption, true> // true = isMulti 
               id="gameTypes"
               name="gameTypes"
               isMulti

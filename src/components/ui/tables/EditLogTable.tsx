@@ -144,7 +144,7 @@ const EditLogsTablePage = <T extends Transactions>({
                     const value = (row as any)[key];
 
                     return (
-                      <TableCell key={key} sx={{ paddingY: 0.3 }}>
+                      <TableCell key={key} sx={{ paddingY: 0.5 }}>
                         {col.render
                           ? col.render(row as unknown as T)
                           : col.filterValue

@@ -78,7 +78,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   const alwaysDisabledKeys = ["name", "LastName"];
 
   const mapSelectedUserToFormData = (user: User) => ({
-    userId: user?.userId || 0,
+    userId: user?.UserId || 0,
     firstName: user?.FirstName || "",
     lastName: user?.LastName || "",
     suffix: user?.Suffix?.trim() || "",
@@ -337,13 +337,12 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
           </div>
           {/* View Edit Logs button */}
           {selectedUser && (
-            <button
-              type="button"
+            <div
               className="text-sm cursor-pointer hover:none flex justify-end leading-none"
               onClick={() => onViewEditLogs(selectedUser.UserId as number)}
             >
               View Update History
-            </button>
+            </div>
           )}
         </div>
       </div>

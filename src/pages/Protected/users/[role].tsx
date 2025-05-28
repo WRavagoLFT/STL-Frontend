@@ -10,7 +10,7 @@ import AddUserModal from "~/components/user/AddUser";
 import { User } from "~/types/types";
 import UpdateUserModal from "~/components/user/UpdateUser";
 import Swal from "sweetalert2";
-import EditModalPage from "~/components/ui/modals/EditLogModal";
+import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
 
 const roleMap: Record<string, { label: string; textlabel: string; roleId: number }> = {
@@ -35,6 +35,22 @@ const RolePage = () => {
   const setOperatorMap = useUserRoleStore((state) => state.setOperatorMap);
   const { data, setData } = useUserRoleStore();
 
+  const { roleId, label, textlabel } = roleConfig;
+  const tableColumns = userTableColumns();
+  const editLogtableColumns = userEditColumns();
+
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  
+  const openCreateModal = () => {setIsCreateModalOpen(true);};
+  const closeCreateModal = () => {setIsCreateModalOpen(false);};
+  const openUpdateModal = (user: User) => {setSelectedUser(user);setIsUpdateModalOpen(true);};
+  const closeUpdateModal = () => {setSelectedUser(null);setIsUpdateModalOpen(false);};
+  const [showEditLog, setShowEditLog] = useState(false);
+
+  const openEditLogModal = (user: User) => {setSelectedUser(user);setShowEditLog(true);};
+
   useEffect(() => {
     if (roleConfig?.roleId) {
       fetchUsers(roleConfig.roleId, setData).then((map) => {
@@ -54,28 +70,6 @@ const RolePage = () => {
     );
   }
 
-  const { roleId, label, textlabel } = roleConfig;
-  const tableColumns = userTableColumns();
-  const editLogtableColumns = userEditColumns();
-
-  // States
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-
-  // Handlers
-  const openCreateModal = () => {setIsCreateModalOpen(true);};
-  const closeCreateModal = () => {setIsCreateModalOpen(false);};
-  const openUpdateModal = (user: User) => {setSelectedUser(user);setIsUpdateModalOpen(true);};
-  const closeUpdateModal = () => {setSelectedUser(null);setIsUpdateModalOpen(false);};
-  const [showEditLog, setShowEditLog] = useState(false);
-
-  const openEditLogModal = (user: User) => {
-    setSelectedUser(user);
-    setShowEditLog(true);
-  };
-
-  // console.log("RolePage rendered with role:", role, "and roleKey:", roleKey);
   const handleAddUser = async (data: User): Promise<void> => {
     try {
       console.log("Adding user:", data);
@@ -207,6 +201,7 @@ const RolePage = () => {
           fetchData={editLogUser}
           columns={editLogtableColumns}
           onClose={() => setShowEditLog(false)}
+          userTypeId={roleId}
         />
       )}
 

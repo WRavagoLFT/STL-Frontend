@@ -15,7 +15,7 @@ import {
   fetchRegions,
 } from "~/utils/api/location";
 import { editLogOperator } from "~/utils/api/operators";
-import EditModalPage from "~/components/ui/modals/EditLogModal";
+import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { operatorEditColumns } from "~/config/operatorEditLogTableColumns";
 
 export interface OperatorViewPageProps {

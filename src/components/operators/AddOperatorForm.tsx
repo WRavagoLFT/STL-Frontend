@@ -186,216 +186,217 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       : null;
 
   return (
-    <form
-      onSubmit={formik.handleSubmit}
-      className="grid grid-cols-2 gap-x-6 gap-y-2"
-    >
-      {/* Name */}
-      <div>
-        <label className="block text-sm">Operator Name</label>
-        <Input
-          type="text"
-          name="name"
-          value={formik.values.name}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          placeholder="Enter Operator Name"
-          error={!!(formik.touched.name && formik.errors.name)}
-        />
-        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-          {getError("name") || "\u00A0"}
-        </p>
-      </div>
-
-      {/* Contact Number */}
-      <div>
-        <label className="block text-sm">Phone Number</label>
-        <Input
-          type="text"
-          name="contactNumber"
-          value={formik.values.contactNumber}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          placeholder="Enter Phone Number"
-          error={
-            !!(formik.touched.contactNumber && formik.errors.contactNumber)
-          }
-        />
-        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-          {getError("contactNumber") || "\u00A0"}
-        </p>
-      </div>
-
-      {/* Date of Operation */}
-      <div>
-        <label className="block text-sm">Date of Operation</label>
-        <Input
-          type="date"
-          name="dateOfOperation"
-          value={formik.values.dateOfOperation}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          error={
-            !!(formik.touched.dateOfOperation && formik.errors.dateOfOperation)
-          }
-        />
-        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-          {getError("dateOfOperation") || "\u00A0"}
-        </p>
-      </div>
-
-      {/* Email */}
-      <div>
-        <label className="block text-sm">Email</label>
-        <Input
-          type="email"
-          name="email"
-          value={formik.values.email}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          placeholder="Enter email"
-          error={!!(formik.touched.email && formik.errors.email)}
-        />
-        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-          {getError("email") || "\u00A0"}
-        </p>
-      </div>
-
-      {/* Address */}
-      <div className="col-span-2">
-        <label className="block text-sm">Address</label>
-        <Input
-          type="text"
-          name="address"
-          value={formik.values.address}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          placeholder="Enter Address"
-          error={!!(formik.touched.address && formik.errors.address)}
-        />
-        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-          {getError("address") || "\u00A0"}
-        </p>
-      </div>
-
-      <div>
-        <label htmlFor="gameTypes" className="block text-sm mb-1">
-          STL Games Provided
-        </label>
-        <Select
-          id="gameTypes"
-          name="gameTypes"
-          options={gameTypesOptions}
-          isMulti
-          onChange={(selectedOptions) => {
-            const values = selectedOptions
-              ? selectedOptions.map((opt) => opt.value)
-              : [];
-            formik.setFieldValue("gameTypes", values);
-          }}
-          onBlur={() => formik.setFieldTouched("gameTypes", true)}
-          className="react-select-container"
-          classNamePrefix="react-select"
-          placeholder="STL Games Provided"
-          menuPortalTarget={
-            typeof window !== "undefined" ? document.body : null
-          }
-          styles={{
-            menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-          }}
-        />
-        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-          {getError("gameTypes") || "\u00A0"}
-        </p>
-      </div>
-
-      {/* Area of Operations */}
-      <div>
-        <label htmlFor="areaOfOperations" className="block text-sm mb-1">
-          Area of Operations
-        </label>
-        <CustomSelect
-          name="areaOfOperations"
-          options={areaOfOperationsOptions}
-          onChange={(selected) => {
-            formik.setFieldValue(
-              "areaOfOperations",
-              selected ? selected.value : ""
-            );
-            handleSelectChange(selected);
-            setHasExcludedCity(false);
-          }}
-          placeholder="STL Area of Operations"
-          error={
-            formik.touched.areaOfOperations &&
-            Boolean(formik.errors.areaOfOperations)
-          }
-        />
-        <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-          {getError("areaOfOperations") || "\u00A0"}
-        </p>
-      </div>
-
-      {/* Area of Regional Operations */}
-      {showRegionsAndProvinces && (
+    <form onSubmit={formik.handleSubmit}>
+      <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+        {/* Name */}
         <div>
-          <label htmlFor="regions" className="block text-sm mb-1">
-            Area of Regional Operations
+          <label className="block text-sm">Operator Name</label>
+          <Input
+            type="text"
+            name="name"
+            value={formik.values.name}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Enter Operator Name"
+            error={!!(formik.touched.name && formik.errors.name)}
+          />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("name") || "\u00A0"}
+          </p>
+        </div>
+
+        {/* Contact Number */}
+        <div>
+          <label className="block text-sm">Phone Number</label>
+          <Input
+            type="text"
+            name="contactNumber"
+            value={formik.values.contactNumber}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Enter Phone Number"
+            error={
+              !!(formik.touched.contactNumber && formik.errors.contactNumber)
+            }
+          />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("contactNumber") || "\u00A0"}
+          </p>
+        </div>
+
+        {/* Date of Operation */}
+        <div>
+          <label className="block text-sm">Date of Operation</label>
+          <Input
+            type="date"
+            name="dateOfOperation"
+            value={formik.values.dateOfOperation}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              !!(
+                formik.touched.dateOfOperation && formik.errors.dateOfOperation
+              )
+            }
+          />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("dateOfOperation") || "\u00A0"}
+          </p>
+        </div>
+
+        {/* Email */}
+        <div>
+          <label className="block text-sm">Email</label>
+          <Input
+            type="email"
+            name="email"
+            value={formik.values.email}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Enter email"
+            error={!!(formik.touched.email && formik.errors.email)}
+          />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("email") || "\u00A0"}
+          </p>
+        </div>
+
+        {/* Address */}
+        <div className="col-span-2">
+          <label className="block text-sm">Address</label>
+          <Input
+            type="text"
+            name="address"
+            value={formik.values.address}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Enter Address"
+            error={!!(formik.touched.address && formik.errors.address)}
+          />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("address") || "\u00A0"}
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="gameTypes" className="block text-sm mb-1">
+            STL Games Provided
           </label>
           <Select
-            id="regions"
-            name="regions"
-            options={regionsOptions}
+            id="gameTypes"
+            name="gameTypes"
+            options={gameTypesOptions}
             isMulti
-            onChange={(selected) =>
-              handleMultiSelect("regions", selected as OptionType[], formik)
-            }
+            onChange={(selectedOptions) => {
+              const values = selectedOptions
+                ? selectedOptions.map((opt) => opt.value)
+                : [];
+              formik.setFieldValue("gameTypes", values);
+            }}
+            onBlur={() => formik.setFieldTouched("gameTypes", true)}
             className="react-select-container"
             classNamePrefix="react-select"
-            placeholder="Area of Regional Operations"
+            placeholder="STL Games Provided"
             menuPortalTarget={
               typeof window !== "undefined" ? document.body : null
             }
-            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+            styles={{
+              menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
+            }}
           />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-            {getError("regions") || "\u00A0"}
+            {getError("gameTypes") || "\u00A0"}
           </p>
         </div>
-      )}
 
-      {/* Area of Provincial Operations */}
-      {showRegionsAndProvinces && (
+        {/* Area of Operations */}
         <div>
-          <label htmlFor="provinces" className="block text-sm mb-1">
-            Area of Provincial Operations
+          <label htmlFor="areaOfOperations" className="block text-sm mb-1">
+            Area of Operations
           </label>
-          <Select
-            id="provinces"
-            name="provinces"
-            options={provinceOptions}
-            isMulti
-            onChange={(selected) =>
-              handleMultiSelect("provinces", selected as OptionType[], formik)
+          <CustomSelect
+            name="areaOfOperations"
+            options={areaOfOperationsOptions}
+            onChange={(selected) => {
+              formik.setFieldValue(
+                "areaOfOperations",
+                selected ? selected.value : ""
+              );
+              handleSelectChange(selected);
+              setHasExcludedCity(false);
+            }}
+            placeholder="STL Area of Operations"
+            error={
+              formik.touched.areaOfOperations &&
+              Boolean(formik.errors.areaOfOperations)
             }
-            className="react-select-container"
-            classNamePrefix="react-select"
-            placeholder="Area of Provincial Operations"
-            menuPortalTarget={
-              typeof window !== "undefined" ? document.body : null
-            }
-            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
           />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-            {getError("provinces") || "\u00A0"}
+            {getError("areaOfOperations") || "\u00A0"}
           </p>
         </div>
-      )}
 
-      {formData.areaOfOperations && (
-        <>
-          {/* Area of City Operations */}
-          {showCities && (
+        {/* Area of Regional Operations */}
+        {showRegionsAndProvinces && (
+          <div>
+            <label htmlFor="regions" className="block text-sm mb-1">
+              Area of Regional Operations
+            </label>
+            <Select
+              id="regions"
+              name="regions"
+              options={regionsOptions}
+              isMulti
+              onChange={(selected) =>
+                handleMultiSelect("regions", selected as OptionType[], formik)
+              }
+              className="react-select-container"
+              classNamePrefix="react-select"
+              placeholder="Area of Regional Operations"
+              menuPortalTarget={
+                typeof window !== "undefined" ? document.body : null
+              }
+              styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("regions") || "\u00A0"}
+            </p>
+          </div>
+        )}
+
+        {/* Area of Provincial Operations */}
+        {showRegionsAndProvinces && (
+          <div>
+            <label htmlFor="provinces" className="block text-sm mb-1">
+              Area of Provincial Operations
+            </label>
+            <Select
+              id="provinces"
+              name="provinces"
+              options={provinceOptions}
+              isMulti
+              onChange={(selected) =>
+                handleMultiSelect("provinces", selected as OptionType[], formik)
+              }
+              className="react-select-container"
+              classNamePrefix="react-select"
+              placeholder="Area of Provincial Operations"
+              menuPortalTarget={
+                typeof window !== "undefined" ? document.body : null
+              }
+              styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("provinces") || "\u00A0"}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        {/* Left Column: Area of City Operations and Excluded Cities */}
+        <div className="space-y-4">
+          {formData.areaOfOperations && showCities && (
             <div>
               <label htmlFor="cities" className="block text-sm mb-1">
                 Area of City Operations
@@ -422,55 +423,59 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             </div>
           )}
 
-          {/* Hide Checkbox + Excluded City if Area is City Wide (value 2) */}
-          {showExcluded && (
+          {formData.areaOfOperations && showExcluded && hasExcludedCity && (
             <div>
-              <label className="inline-flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="form-checkbox h-5 w-5 text-[#0038A8] transition duration-150 ease-in-out"
-                  checked={hasExcludedCity}
-                  onChange={(e) => setHasExcludedCity(e.target.checked)}
-                />
-                <span className="text-gray-700">Is there excluded City?</span>
+              <label htmlFor="excludedCities" className="block text-sm mb-1">
+                Excluded Cities
               </label>
+              <Select
+                id="excludedCities"
+                name="excludedCities"
+                options={availableExcludedCities}
+                isMulti
+                onChange={(selected) =>
+                  handleMultiSelect(
+                    "excludedCities",
+                    selected as OptionType[],
+                    formik
+                  )
+                }
+                className="react-select-container"
+                classNamePrefix="react-select"
+                placeholder="Excluded cities"
+                menuPortalTarget={
+                  typeof window !== "undefined" ? document.body : null
+                }
+                styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+              />
+              <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+                {getError("excludedCities") || "\u00A0"}
+              </p>
             </div>
           )}
-        </>
-      )}
-
-      {formData.areaOfOperations && showExcluded && hasExcludedCity && (
-        <div>
-          <label htmlFor="cities" className="block text-sm mb-1">
-            Excluded Cities
-          </label>
-          <Select
-            id="cities"
-            name="cities"
-            options={availableExcludedCities}
-            isMulti
-            onChange={(selected) =>
-              handleMultiSelect("cities", selected as OptionType[], formik)
-            }
-            className="react-select-container"
-            classNamePrefix="react-select"
-            placeholder="Excluded cities"
-            menuPortalTarget={
-              typeof window !== "undefined" ? document.body : null
-            }
-            styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
-          />
-          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-            {getError("cities") || "\u00A0"}
-          </p>
         </div>
-      )}
+
+        {/* Right Column: Checkbox */}
+        {formData.areaOfOperations && showExcluded && (
+          <div className="flex items-center ml-2 my-4">
+            <label className="inline-flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                className="form-checkbox h-5 w-5 text-[#0038A8] transition duration-150 ease-in-out"
+                checked={hasExcludedCity}
+                onChange={(e) => setHasExcludedCity(e.target.checked)}
+              />
+              <span className="text-gray-700">Is there excluded City?</span>
+            </label>
+          </div>
+        )}
+      </div>
 
       {/* Submit Button */}
       <div className="col-span-2">
         <button
           type="submit"
-          className="w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2 mt-3"
+          className="w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2 mt-4"
         >
           Add Operator
         </button>
@@ -481,14 +486,13 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           onConfirm={async () => {
             try {
               await onSubmit(formData as unknown as Operator); // submit from the parent component handled after password verification
-              closeConfirmModal();              // close confirm modal
-              if (onClose) onClose();           // optionally close the parent modal
+              closeConfirmModal(); // close confirm modal
+              if (onClose) onClose(); // optionally close the parent modal
             } catch (err) {
               console.error("Error during onSubmit:", err);
             }
           }}
         />
-        
       </div>
     </form>
   );

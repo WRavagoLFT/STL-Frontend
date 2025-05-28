@@ -147,7 +147,6 @@ useEffect(() => {
   });
 }, [operationDate, operatorId]);
 
-
   return {
     aacBreakdown,
     aacTotalPercentage,

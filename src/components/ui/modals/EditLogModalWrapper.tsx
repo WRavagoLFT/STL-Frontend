@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import EditLogsTablePage from "../tables/EditLogsTable";
+import EditLogsTablePage from "../tables/EditLogTable";
 import BackIconButton from "../icons/BackButton";
 
 export interface EditModalPageProps {
@@ -8,6 +8,7 @@ export interface EditModalPageProps {
   fetchData: (id: number) => Promise<any>;
   columns: any[];
   onClose: () => void;
+  userTypeId: number;
 }
 
 const EditModalPage: React.FC<EditModalPageProps> = ({
@@ -16,9 +17,11 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
   fetchData,
   columns,
   onClose,
+  userTypeId,
 }) => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const title = userTypeId === 3 ? "Manager" : userTypeId === 4 ? "Executive" : "Operator";
 
   useEffect(() => {
     if (!open) return; // only fetch when modal is open
@@ -60,8 +63,8 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
       onClick={onClose}
     >
       <div
-        className="rounded-lg px-3 py-5 max-w-[90%] sm:max-w-[80%] md:max-w-[800px] 
-             lg:max-w-[650px] xl:max-w-[930px] 
+        className="rounded-lg px-4 pt-5 pb-10 max-w-[90%] sm:max-w-[80%] md:max-w-[800px] 
+             lg:max-w-[650px] xl:max-w-[940px] 
              max-h-[90vh] w-full shadow-lg relative bg-[#F8F0E3]"
         onClick={(e) => e.stopPropagation()}
       >
@@ -74,12 +77,11 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
         />
         <div className="mt-3">
           <div className="text-2xl font-bold leading-none">
-            {data.length > 0 ? data[0].User : ""}
+            {data.length > 0 ? data[0].User || data[0].Operator : ""}
           </div>
-          <div className="text-sm mb-3">{data.length > 0 ? data[0].User : ""}</div>
+          <div className="text-sm mb-3">{title}</div>
           <EditLogsTablePage data={data} columns={columns} />
         </div>
-
       </div>
     </div>
   );
