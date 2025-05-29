@@ -1,11 +1,7 @@
-import {useState, useEffect, useCallback} from 'react';
-import {Box,Typography,Stack, CircularProgress } from "@mui/material";
+import { useState, useEffect, useCallback} from 'react';
+import { CircularProgress } from "@mui/material";
 import { BarChart } from '@mui/x-charts/BarChart';
-import { 
-    BettorsandBetsSummaryProps,
-    getLegendItemsMap_Specific,
-    getLegendItemsMap_Duration
-  } from "../../../store/useBettingStore";
+import { BettorsandBetsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from "../../../store/useBettingStore";
 import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from '~/utils/api/transactions';
 
 // interfaces
@@ -28,6 +24,7 @@ interface SpecificDatePayload {
   }>;
   Region: Array<any>; // Not used in these calculations
 }
+
 interface chartOne_Specific {
   TransactionDate: string;
   DrawOrder: number;
@@ -39,33 +36,7 @@ interface chartOne_Specific {
   TotalSahod: number;
   TotalRamble: number;
 }
-interface chartTwoFive_Specific{
-  TransactionDate: string;
-  DrawOrder: number;
-  Region: null;
-  GameCategory: null;
-  TotalBets: number;
-  TotalBettors: number;
-  TotalTumbok: number;
-  TotalSahod: number;
-  TotalRamble: number;
-  BetTypes: {
-    Tumbok: number;
-    Sahod: number;
-    Ramble: number;
-  }
-}
-interface chartThreeSix_Specific{
-  TransactionDate: string;
-  DrawOrder: number;
-  Region: null;
-  GameCategory: string;
-  TotalBets: number;
-  TotalBettors: number;
-  TotalTumbok: number;
-  TotalSahod: number;
-  TotalRamble: number;
-}
+
 type Chart1Data = {
   // Specific Date
   firstDateBettors?: number;
@@ -78,6 +49,7 @@ type Chart1Data = {
   firstRangeBets?: number;
   secondRangeBets?: number;
 };
+
 type Chart25Data = {
   // Specific Date
   drawOrder?: number;
@@ -91,6 +63,7 @@ type Chart25Data = {
   firstRangeBetsSahod?: number;
   secondRangeBetsSahod?: number;
 }
+
 type Chart36Data = {
   drawOrder: number;
   firstDateSTLPares: number;
@@ -164,7 +137,8 @@ interface chartThreeSix_Range{
 
 // Date Formatter
 const formatDate = (date: string | null): string => {
-  const d = new Date(date);
+  if (!date) return '';
+  const d = new Date(date); // 
   const year = d.getFullYear();
   const month = `${d.getMonth() + 1}`.padStart(2, '0');
   const day = `${d.getDate()}`.padStart(2, '0');
@@ -266,7 +240,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     "STL Swer4": 4,
   };
   const gameCategoryParam = gameCategoryMap[activeGameType];
-  //console.log('Game Category Param:', gameCategoryParam)
+  console.log('Game Category Param:', gameCategoryParam)
 
   // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
@@ -282,7 +256,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   };
 
   // For Specific Date
-  // Process Chart 1 Data
+  // Process Chart 1 Data - Bet and Bettors
   const processChart1Data = (
     payload: any,
     firstDate: string,
@@ -290,8 +264,15 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   ) => {
     const drawOrders = [1, 2, 3];
 
+    // Normalize DrawOrder to always be an array
+    const drawOrderData = Array.isArray(payload?.DrawOrder)
+      ? payload.DrawOrder
+      : payload?.DrawOrder
+      ? [payload.DrawOrder]
+      : [];
+
     return drawOrders.map((drawOrder) => {
-      const allDrawItems = payload.DrawOrder.filter(
+      const allDrawItems = drawOrderData.filter(
         (item: chartOne_Specific) => item.DrawOrder === drawOrder
       );
 
@@ -723,20 +704,15 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     }
   };
 
-  //Date Payload Data
+  // Date Payload Data
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const gameCategoryParam = getGameCategoryParam();
-      console.log("Inside Fetch Game Category Param:", gameCategoryParam);
 
-      if (
-        dateFilter === "Specific Date" &&
-        firstDateSpecific &&
-        secondDateSpecific
-      ) {
+      if (dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific) {
         console.log(
-          "Fetching Date by Specific Date:",
+          "Fetching for Specific Date:",
           formatDate(firstDateSpecific),
           formatDate(secondDateSpecific)
         );
@@ -750,20 +726,22 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
             ...gameCategoryParam,
           }
         );
+        //console.log('GAME CATEG', gameCategoryParam);
+        //console.log("Response payload:", resp);
 
-        console.log("Payload (Specific Date)", resp);
-
-        if (resp && resp.DrawOrder) {
+        // Use resp.data to get the actual payload
+        if (resp?.data?.DrawOrder) {
           const processedData = processSpecificDatePayload(
             urlParam,
-            resp,
+            resp.data,
             firstDateSpecific,
             secondDateSpecific
           );
-          console.log("Processed Data:", processedData);
+          //console.log("Processed Data:", processedData);
           setChartData(processedData);
         } else {
-          console.warn("Unexpected payload:", resp);
+          console.warn("Unexpected payload for Specific Date:", resp);
+          setChartData([]);  // clear data on bad response
         }
       } else if (
         dateFilter === "Date Duration" &&
@@ -772,8 +750,6 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
         firstDateDuration &&
         secondDateDuration
       ) {
-        console.log("Fetching Date by Date Duration");
-
         const resp = await fetchCompareHistoricalRange(
           "/transactions/compareHistoricalRange/chartType/",
           urlParam,
@@ -785,21 +761,31 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
             ...gameCategoryParam,
           }
         );
+        //console.log("Response payload:", resp);
 
-        console.log("Payload (Date Duration)", resp);
-
-        if (resp && resp.DrawOrder) {
-          const processedData = processDurationPayload(urlParam, resp);
-          console.log("Processed Data:", processedData);
+        if (resp?.data?.DrawOrder) {
+          const processedData = processSpecificDatePayload(
+            urlParam,
+            resp.data,
+            firstDateSpecific,
+            secondDateSpecific
+          );
+          //console.log("Processed Data:", processedData);
           setChartData(processedData);
         } else {
-          console.warn("Unexpected payload:", resp);
+          console.warn("Unexpected payload for Date Duration:", resp);
+          setChartData([]);
         }
+      } else {
+        console.log("No matching condition for fetching data.");
+        setChartData([]);
       }
     } catch (err) {
       console.error("Error fetching data:", err);
+      setChartData([]);
     } finally {
       setLoading(false);
+      console.log("fetchData finished, loading set to false");
     }
   }, [
     dateFilter,
@@ -930,7 +916,6 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
         {`Summary ${categoryFilter}`}
       </p>
-
       <CustomLegend
         activeGameType={activeGameType}
         categoryFilter={categoryFilter}
@@ -948,7 +933,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       ) : (
         <div className="h-full flex flex-col flex-grow">
           <BarChart
-            height={400}
+            height={350}
             grid={{ vertical: true }}
             layout="horizontal"
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
@@ -961,7 +946,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
             xAxis={[
               { label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100,
+                //max: 10,
               },
             ]}
             slotProps={{ legend: { hidden: true } }}

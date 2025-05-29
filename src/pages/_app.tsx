@@ -54,7 +54,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       try {
         await waitUntilNotRefreshing();
         const data = await getCurrentUser({});
-        console.log('getCurrentUser', data);
+        //console.log('getCurrentUser', data);
         if (data?.success) {
           setLoading(false);
           return;

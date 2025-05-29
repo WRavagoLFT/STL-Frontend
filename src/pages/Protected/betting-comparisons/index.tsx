@@ -1,26 +1,19 @@
 import React, { useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
+import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+
 // Components
 import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-comparison/SummaryBettors&Bets";
 import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettors&Bets";
 import ChartTopRegionByBetsandBettors from "~/components/betting-summary/bets-comparison/TopRegionBetting";
-
 import { useBettingStore, categoryType } from "../../../store/useBettingStore";
 import { useSideBarStore } from "../../../store/useSideBarStore";
-
 import dayjs from "dayjs";
+import BackIconButton from "~/components/ui/icons/BackButton";
+import router from "next/router";
 
 type dateType = "Specific Date" | "Date Duration";
 
@@ -79,13 +72,13 @@ const BettingComparison = () => {
 
   // Debugging: Log all states whenever they change
   useEffect(() => {
-    console.log("Active Sidebar State:", activeGameType);
-    console.log("categoryFilter:", categoryFilter);
-    console.log("dateFilter:", dateFilter);
-    console.log("firstDateSpecific:", firstDateSpecific);
-    console.log("secondDateSpecific:", secondDateSpecific);
-    console.log("firstDateDuration:", firstDateDuration);
-    console.log("secondDateDuration:", secondDateDuration);
+    //console.log("Active Sidebar State:", activeGameType);
+    //console.log("categoryFilter:", categoryFilter);
+    //console.log("dateFilter:", dateFilter);
+    //console.log("firstDateSpecific:", firstDateSpecific);
+    //console.log("secondDateSpecific:", secondDateSpecific);
+    //console.log("firstDateDuration:", firstDateDuration);
+    //console.log("secondDateDuration:", secondDateDuration);
   }, [
     activeGameType,
     categoryFilter,
@@ -98,7 +91,21 @@ const BettingComparison = () => {
 
   return (
     <div className="w-full">
-      <h1 className="text-3xl font-bold">STL Betting Summary Overview</h1>
+      <div className="flex flex-row items-center">
+        <BackIconButton
+          bgColor="#0038A8"
+          hoverColor="#004ccf"
+          iconColor="#fff"
+          size={30}
+          onClick={() => {
+            router.push("/betting-summary/dashboard");
+          }} // this should be dynamic
+        />
+        {/* this should be dynamic */}
+        <div className="text-3xl ml-3 font-bold"> 
+          STL Betting Summary Overview
+        </div>
+      </div>
       <div className="flex flex-col gap-4 w-full h-full mt-8">
         <div className="grid grid-cols-12 gap-4">
           {dateFilter === "Specific Date" && (
@@ -124,7 +131,7 @@ const BettingComparison = () => {
                       <FilterListIcon style={{ pointerEvents: "none" }} />
                     )}
                     sx={{ pr: 2 }}
-                   // size="small"
+                    // size="small"
                   >
                     {categoryTypes.map((gameType) => (
                       <MenuItem key={gameType} value={gameType}>
@@ -295,7 +302,7 @@ const BettingComparison = () => {
         {/* Conditional MUI Chart Rendering */}
         {categoryFilter === "Top Betting Region by Total Bets" ||
         categoryFilter === "Top Betting Region by Total Bettors" ? (
-          <ChartTopRegionByBetsandBettors
+          <ChartTopRegionByBetsandBettors // if the condition is true
             activeGameType={activeGameType}
             categoryFilter={categoryFilter}
             dateFilter={dateFilter}
@@ -305,8 +312,8 @@ const BettingComparison = () => {
             secondDateDuration={formattedSecondDateDuration}
           />
         ) : (
-          <> 
-            <ChartBettorsAndBetsSummary  // if the condition is true
+          <>
+            <ChartBettorsAndBetsSummary // if false
               activeGameType={activeGameType}
               categoryFilter={categoryFilter}
               dateFilter={dateFilter}
@@ -315,7 +322,7 @@ const BettingComparison = () => {
               firstDateDuration={formattedFirstDateDuration}
               secondDateDuration={formattedSecondDateDuration}
             />
-            <ChartBettorsAndBetsRegionalSummary // id false
+            <ChartBettorsAndBetsRegionalSummary // if false
               activeGameType={activeGameType}
               categoryFilter={categoryFilter}
               dateFilter={dateFilter}

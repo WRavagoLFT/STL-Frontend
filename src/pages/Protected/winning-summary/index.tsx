@@ -12,7 +12,6 @@ import ChartWinnersBetTypeSummary from "~/components/winning-summary/WinnerCount
 import { buttonStyles } from "~/styles/theme";
 
 const WinningSummaryPage = (params: {gameCategoryId?: number}) => {
-
   const router = useRouter();
 
   const handleViewComparisonClick = () => {

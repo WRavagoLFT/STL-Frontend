@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { fetchHistoricalRegion } from '~/utils/api/transactions';
 
 // For Dashboard Cards
 //import getTransactionsData from '~/utils/api/transactions/get.TransactionsData.service';
@@ -93,30 +94,17 @@ export const useBettingStore = create<BettingStore>((set) => ({
     setSecondDateDuration: (date) => set({ secondDateDuration: date }),
 
     // Dashboard Cards Component
-    // 
+    //
+
     fetchAndAggregateData: async () => {
       try {
-        // Fetch the data using the getTransactionsData function
-        const data = await getTransactionsData<{
-          TransactionDate: string;
-          RegionId: number;
-          Region: string;
-          RegionFull: string;
-          TotalBets: number;
-          TotalBettors: number;
-          TotalWinners: number;
-          TotalBetAmount: number;
-          TotalPayout: number;
-          TotalEarnings: number;
-        }[]>("/transactions/getHistoricalRegion", '');
-        
-        
-        console.log(`Betting Dashboard Cards Data:`, JSON.stringify(data, null, 2))
-        // Check if data is valid and is an array
-        if (data && Array.isArray(data)) {
-          // Aggregate the totals
-          const totals = data.reduce(
-            (acc, item) => {
+        // Fetch the data using the correct fetchHistoricalRegion call
+        const response = await fetchHistoricalRegion();
+
+        // Ensure response format is valid and contains a data array
+        if (response && Array.isArray(response.data)) {
+          const totals = response.data.reduce(
+            (acc:any, item:any) => {
               acc.totalBettors += item.TotalBettors;
               acc.totalWinners += item.TotalWinners;
               acc.totalBets += item.TotalBets;
@@ -132,19 +120,17 @@ export const useBettingStore = create<BettingStore>((set) => ({
               totalRevenue: 0,
             }
           );
-    
-          // Update the store with the aggregated data
+
+          // Update your store
           set({ cardsAggregatedData: totals });
         } else {
-          console.error("Unexpected data format or no data returned:", data);
+          console.error("Unexpected data format or no data returned:", response);
         }
       } catch (error) {
         console.error("Error fetching and aggregating data:", error);
       }
     },
-
-    
-
+  
     resetFilters: () =>
       set({
         categoryFilter: 'Total Bets and Bettors',
@@ -162,7 +148,7 @@ export const getLegendItemsMap_Specific = (
   firstDateSpecific: string | null,
   secondDateSpecific: string | null
 ): { label: string; color: string }[] => {
-  console.log("categoryFilter:", categoryFilter);
+  //console.log("categoryFilter:", categoryFilter);
 
   const legendItemsMap: Record<categoryType, { label: string; color: string }[]> = {
     "Total Bets and Bettors": [
@@ -320,7 +306,7 @@ export const getLegendItemsMap_Duration = (
   firstDateDuration: string | null,
   secondDateDuration: string | null
 ): { label: string; color: string }[] => {
-  console.log("categoryFilter:", categoryFilter);
+  //console.log("categoryFilter:", categoryFilter);
   const legendItemsMap: Record<categoryType, { label: string; color: string }[]> = {
   "Total Bets and Bettors": [
     {

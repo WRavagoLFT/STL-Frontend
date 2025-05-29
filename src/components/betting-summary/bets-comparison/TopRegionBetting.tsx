@@ -1,22 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Typography, Stack, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
-import {
-  BettorsandBetsSummaryProps,
-  getLegendItemsMap_Specific,
-  getLegendItemsMap_Duration,
-} from "../../../store/useBettingStore";
-import {
-  fetchCompareHistoricalDate,
-  fetchCompareHistoricalRange,
-} from "~/utils/api/transactions";
-
-// API Endpoints
+import { BettorsandBetsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration, } from "../../../store/useBettingStore";
+import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from "~/utils/api/transactions";
 
 interface ChartData {
   region: string;
-  firstValue: number;
-  secondValue: number;
+  firstValue: number | null;
+  secondValue: number | null;
 }
 
 interface Region {
@@ -107,10 +98,7 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
             className="w-[14px] h-[14px] rounded-full mr-1.5"
             style={{ backgroundColor: item.color }}
           />
-          <span
-            className="text-[12px] font-normal leading-[14px]"
-            style={{ color: "#5050A5" }}
-          >
+          <span className="text-[12px] font-normal leading-[14px]">
             {item.label}
           </span>
         </div>
@@ -169,7 +157,6 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
   };
 
   const urlParam = chartMap[categoryFilter];
-
   //console.log('URL Param', urlParam)
 
   const gameCategoryMap: Record<string, number> = {
@@ -195,21 +182,40 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
     FirstDate: DateSpecific[];
     SecondDate: DateSpecific[];
   }) => {
+    console.log("SPECIFIC DATE: Raw Payload:", payload);
+
     const data: ChartData[] = philippineRegions.map((region) => {
       const apiLabel = apiRegionLabel(region);
-      const firstItem = payload.FirstDate.find((r) => r.Region === apiLabel);
-      const secondItem = payload.SecondDate.find((r) => r.Region === apiLabel);
+
+      const firstItem = payload.FirstDate.find(
+        (r) => r.Region.toLowerCase() === apiLabel.toLowerCase()
+      );
+      const secondItem = payload.SecondDate.find(
+        (r) => r.Region.toLowerCase() === apiLabel.toLowerCase()
+      );
+
+      const firstRank = firstItem && firstItem.TotalBets > 0 ? firstItem.Rank : null;
+      const secondRank = secondItem && secondItem.TotalBets > 0 ? secondItem.Rank : null;
 
       return {
         region,
-        firstValue: firstItem?.Rank ?? 0,
-        secondValue: secondItem?.Rank ?? 0,
+        firstValue: firstRank,
+        secondValue: secondRank,
       };
     });
+
+    console.table(
+      data.map((d) => ({
+        Region: d.region,
+        FirstRank: d.firstValue ?? "N/A",
+        SecondRank: d.secondValue ?? "N/A",
+      }))
+    );
+
     setChartData(data);
   };
 
-  // SpecificDate
+  // Range Date
   const processRangePayloadData = (payload: {
     FirstRange: DateRange[];
     SecondRange: DateRange[];
@@ -228,59 +234,76 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
     setChartData(data);
   };
 
+  // fetching the data
   const fetchData = useCallback(async () => {
     setLoading(true);
+
     try {
       const gameCategoryParam = getGameCategoryParam();
-      if (
-        dateFilter === "Specific Date" &&
-        firstDateSpecific &&
-        secondDateSpecific
-      ) {
-        //console.log("Fetching Specific Date:", formatDate(firstDateSpecific), formatDate(secondDateSpecific));
+
+      // Check if required date values are available
+      if (!firstDateSpecific || !secondDateSpecific) {
+        console.warn("Missing required specific dates.");
+        setLoading(false);
+        return;
+      }
+
+      if (dateFilter === "Specific Date") {
+        const formattedFirst = formatDate(firstDateSpecific);
+        const formattedSecond = formatDate(secondDateSpecific);
+
+        console.log("Fetching Specific Date with:", {
+          first: formattedFirst,
+          second: formattedSecond,
+          ...gameCategoryParam,
+        });
+
         const resp = await fetchCompareHistoricalDate(
           "/transactions/compareHistoricalDate/chartType/",
           urlParam,
           {
-            first: formatDate(firstDateSpecific),
-            second: formatDate(secondDateSpecific),
+            first: formattedFirst,
+            second: formattedSecond,
             ...gameCategoryParam,
           }
         );
-        //console.log("Payload (Specific Date):", resp);
-        // resp now has { FirstDate: [...], SecondDate: [...] }
-        if (resp && resp.FirstDate && resp.SecondDate) {
-          processSpecificPayloadData(resp);
+
+        if (resp?.data?.FirstDate && resp?.data?.SecondDate) {
+          processSpecificPayloadData(resp.data);
         } else {
-          console.warn("Unexpected payload:", resp);
+          console.warn("No data received for Specific Date", resp);
         }
+
       } else if (
         dateFilter === "Date Duration" &&
-        firstDateSpecific &&
-        secondDateSpecific &&
         firstDateDuration &&
         secondDateDuration
       ) {
-        //console.log("Fetching Date Duration ranges");
+        const formatted = {
+          firstStart: formatDate(firstDateSpecific),
+          firstEnd: formatDate(secondDateSpecific),
+          secondStart: formatDate(firstDateDuration),
+          secondEnd: formatDate(secondDateDuration),
+          ...gameCategoryParam,
+        };
+
+        console.log("Fetching Date Duration with:", formatted);
+
         const resp = await fetchCompareHistoricalRange(
           "/transactions/compareHistoricalRange/chartType/",
           urlParam,
-          {
-            firstStart: formatDate(firstDateSpecific),
-            firstEnd: formatDate(secondDateSpecific),
-            secondStart: formatDate(firstDateDuration),
-            secondEnd: formatDate(secondDateDuration),
-            ...gameCategoryParam,
-          }
+          formatted
         );
-        //console.log("Payload (Date Duration):", resp);
-        // resp now has { FirstDate: [...], SecondDate: [...] }
-        if (resp && resp.FirstRange && resp.SecondRange) {
-          processRangePayloadData(resp);
+
+        if (resp?.data?.FirstRange && resp?.data?.SecondRange) {
+          processRangePayloadData(resp.data);
         } else {
-          console.warn("Unexpected payload:", resp);
+          console.warn("No data received for Date Duration", resp);
         }
+      } else {
+        console.warn("Missing date ranges for Date Duration");
       }
+
     } catch (err) {
       console.error("Error fetching chart data:", err);
     } finally {
@@ -294,16 +317,24 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
     secondDateDuration,
     urlParam,
     aggregateField,
-    gameCategoryParam,
   ]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  const interpolateMissing = (arr: (number | null)[]) => {
+    let lastValid = 0;
+    return arr.map((val) => {
+      if (val == null) return lastValid;
+      lastValid = val;
+      return val;
+    });
+  };
+
   return (
     <div className="bg-[#F8F0E3] p-4 rounded-lg pb-8 w-full h-[685px] border border-[#0038A8]">
-      <p className="text-[#212121] text-[16px] font-normal leading-[18px] mb-[10px]">
+      <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
         {`${categoryFilter}`}
       </p>
 
@@ -324,14 +355,14 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
           </div>
         ) : (
           <LineChart
-            height={600}
-            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+            height={500}
+            margin={{ left: 50, right: 20, top: 20, bottom: 40 }}
             xAxis={[{ scaleType: "band", data: philippineRegions }]}
             slotProps={{ legend: { hidden: true } }}
             yAxis={[{ label: "Ranking", min: 0, max: 18 }]}
             series={[
               {
-                data: chartData.map((item) => item.firstValue),
+                data: interpolateMissing(chartData.map((item) => item.firstValue)),
                 label:
                   dateFilter === "Specific Date"
                     ? `Ranking\n${firstDateSpecific}`
@@ -340,7 +371,8 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
                 curve: "linear",
               },
               {
-                data: chartData.map((item) => item.secondValue),
+                //data: chartData.map((item) => item.secondValue),
+                data: interpolateMissing(chartData.map((item) => item.secondValue)),
                 label:
                   dateFilter === "Specific Date"
                     ? `Ranking\n${secondDateSpecific}`

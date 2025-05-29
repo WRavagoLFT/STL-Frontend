@@ -70,7 +70,7 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
         //console.log("Fetched and set game types:", gameTypes);
         //console.log("Fetched and set regions:", regions);
         //console.log("Fetched and set provinces:", provinces);
-        console.log("Fetched and set cities:", cities);
+        //console.log("Fetched and set cities:", cities);
         //console.log("Fetched and set area of operations:", areaOfOperations);
         //console.log('fetched operators:', operators)
       } catch (error) {

@@ -1,18 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Box,
-  Typography,
-  Stack,
-  CircularProgress
-} from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { BarChart } from '@mui/x-charts/BarChart';
-import { 
-  BettorsandBetsSummaryProps,
-  getLegendItemsMap_Specific,
-  getLegendItemsMap_Duration,
-  } from "../../../store/useBettingStore";
-
-// API Endpoints
+import { BettorsandBetsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from "../../../store/useBettingStore";
 import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from "~/utils/api/transactions";
 
 type Chart1Data = {
@@ -104,7 +93,9 @@ interface RangePayload {
 }
 
 type ChartData = Chart1Data | Chart25Data | Chart36Data;
+
 const formatDate = (date: string | null): string => {
+  if (!date) return '';
   const d = new Date(date);
   const year = d.getFullYear();
   const month = `${d.getMonth() + 1}`.padStart(2, '0');
@@ -174,7 +165,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
   secondDateDuration,
   activeGameType
 }) => {
-  console.log('Active Game Category:', activeGameType)
+  //console.log('Active Game Category:', activeGameType)
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] =  useState<ChartData[]>([]);
   const philippineRegions = [
@@ -204,7 +195,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
     "STL Swer4": 4,
   }
   const gameCategoryParam = gameCategoryMap[activeGameType];
-  console.log('Game Category Param:', gameCategoryParam)
+  //console.log('Game Category Param:', gameCategoryParam)
 
   // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
@@ -391,7 +382,6 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
     }
   };
 
-
   //  For Date Duration Date.
   const processDurationChart1Data = (
     payload: RangePayload
@@ -534,73 +524,75 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
     }
   };
   
+  // fetching of data
   const fetchData = useCallback(async () => {
     setLoading(true);
-      try {
-          const gameCategoryParam = getGameCategoryParam();
-          if (
-            dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific
-          ) {
-              //console.log("Fetching Date by Specific Date:", formatDate(firstDateSpecific), formatDate(secondDateSpecific));
+    try {
+      const gameCategoryParam = getGameCategoryParam();
 
-              const resp = await fetchCompareHistoricalDate(
-                "/transactions/compareHistoricalDate/chartType/",
-                urlParam,
-                { 
-                  first: formatDate(firstDateSpecific), 
-                  second: formatDate(secondDateSpecific),
-                  ...gameCategoryParam
-                }
-              );
-              //console.log("Payload (Specific Date)", resp)
-
-              if (resp && resp.Region) {
-                const processedData = processSpecificDatePayload(
-                  urlParam,
-                  resp,
-                  firstDateSpecific,
-                  secondDateSpecific
-                );
-                console.log("Processed Data:", processedData);
-                setChartData(processedData);
-              } else {
-                console.warn("Unexpexted payload:", resp);
-              }
+      if (
+        dateFilter === "Specific Date" &&
+        firstDateSpecific &&
+        secondDateSpecific
+      ) {
+        const resp = await fetchCompareHistoricalDate(
+          "/transactions/compareHistoricalDate/chartType/",
+          urlParam,
+          {
+            first: formatDate(firstDateSpecific),
+            second: formatDate(secondDateSpecific),
+            ...gameCategoryParam,
           }
-          else if (
-            dateFilter === "Date Duration" &&
-            firstDateSpecific && secondDateSpecific &&
-            firstDateDuration && secondDateDuration
-          ){
-              //console.log("Fetching Date by Date Duration");
+        );
 
-              const resp = await fetchCompareHistoricalRange(
-              "/transactions/compareHistoricalRange/chartType/",
-              urlParam,
-              {
-                firstStart: formatDate(firstDateSpecific),
-                firstEnd: formatDate(secondDateSpecific),
-                secondStart: formatDate(firstDateDuration),
-                secondEnd: formatDate(secondDateDuration),
-                ...gameCategoryParam
-              }
-            );
-            //console.log("Payload (Date Duration)", resp)
-
-            if (resp && resp.Region) {
-              const processedData = processDurationPayload(urlParam, resp);
-              setChartData(processedData);
-              //console.log("Processed Data:", processedData);
-              setChartData(processedData);
-            } else {
-              console.warn("Unexpected payload:", resp);
-            }
+        if (resp?.data?.Region) {
+          const processedData = processSpecificDatePayload(
+            urlParam,
+            resp.data,
+            firstDateSpecific,
+            secondDateSpecific
+          );
+          setChartData(processedData);
+        } else {
+          console.warn("Unexpected payload (Specific Date):", resp);
+          setChartData([]);
+        }
+      } else if (
+        dateFilter === "Date Duration" &&
+        firstDateSpecific &&
+        secondDateSpecific &&
+        firstDateDuration &&
+        secondDateDuration
+      ) {
+        const resp = await fetchCompareHistoricalRange(
+          "/transactions/compareHistoricalRange/chartType/",
+          urlParam,
+          {
+            firstStart: formatDate(firstDateSpecific),
+            firstEnd: formatDate(secondDateSpecific),
+            secondStart: formatDate(firstDateDuration),
+            secondEnd: formatDate(secondDateDuration),
+            ...gameCategoryParam,
           }
-        } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoading(false);
+        );
+
+        if (resp?.data?.Region) {
+          const processedData = processDurationPayload(urlParam, resp.data);
+          setChartData(processedData);
+        } else {
+          console.warn("Unexpected payload (Date Duration):", resp);
+          setChartData([]);
+        }
+      } else {
+        console.log("No valid condition met for data fetching.");
+        setChartData([]);
       }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setChartData([]);
+    } finally {
+      setLoading(false);
+    }
   }, [
     dateFilter,
     firstDateSpecific,
@@ -608,9 +600,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
     firstDateDuration,
     secondDateDuration,
     urlParam,
-    gameCategoryParam,
-    ]
-  )
+  ]);
 
   useEffect(()=> {
     fetchData();
@@ -727,7 +717,6 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
     return colorMap[category] || "#CCCCCC";
   };
 
-
   return (
     <div className="bg-transparent p-4 rounded-lg pb-8 w-full h-[585px] border border-[#0038A8]">
       <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
@@ -750,8 +739,8 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
           </div>
         ) : (
           <BarChart
-            height={500}
-            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+            height={400}
+            margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
@@ -761,9 +750,9 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
             ]}
             yAxis={[
               {
-                label: "Amount (in 100,000 units)",
+                //label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100,
+                max: 10,
               },
             ]}
             series={generateSeries(chartData, urlParam)}
