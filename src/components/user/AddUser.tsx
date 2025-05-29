@@ -12,7 +12,7 @@ type AddUserModalProps = {
 };
 
 export default function AddUserModal({ open, onClose, operatorMap, onSubmit, userTypeId }: AddUserModalProps) {
-  const title = userTypeId === 2 ? "Add Manager" : userTypeId === 3 ? "Add Executive" : "Add User";
+  const title = userTypeId === 4 ? "Add Manager" : userTypeId === 3 ? "Add Executive" : "Add User";
 
   return (
     <ModalWrapper isOpen={open} onClose={onClose} title={title}>

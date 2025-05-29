@@ -13,70 +13,8 @@ import {
   } from "../../../store/useBettingStore";
 
 // API Endpoints
-//import getCompareHistoricalDate from '~/utils/api/transactions/get.CompareHistoricalDate.service';
-//import getCompareHistoricalDuration from '~/utils/api/transactions/get.CompareHistoricalDuration.service';
+import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from "~/utils/api/transactions";
 
-// interface SpecificDatePayload {
-//       TransactionDate: string;
-//       DrawOrder?: null;
-//       Region: string;
-//       GameCategory?: string | null;
-//       TotalBets: number;
-//       TotalBettors: number;
-//       TotalTumbok?: number;
-//       TotalSahod?: number;
-//       TotalRamble?: number;  
-//       BetTypes?: {
-//         Tumbok: number;
-//         Sahod: number;
-//         Ramble: number;
-//       };
-// }
-// interface chartOne_Specific {
-//     TransactionDate: string;
-//     DrawOrder: null;
-//     Region: string;
-//     GameCategory?: string | null;
-//     TotalBets: number;
-//     TotalBettors: number;
-//     TotalTumbok?: number;
-//     TotalSahod?: number;
-//     TotalRamble?: number;
-// }
-// interface processedChartOneData_Specific {
-//   region: string;
-//   firstDateBettors: number;
-//   secondDateBettors: number;
-//   firstDateBets: number;
-//   secondDateBets: number;
-// }
-// interface chartTwoFive_Specific {
-//     TransactionDate: string;
-//     DrawOrder?: null;
-//     Region: string;
-//     GameCategory?: string | null;
-//     TotalBets: number;
-//     TotalBettors: number;
-//     TotalTumbok?: number;
-//     TotalSahod?: number;
-//     TotalRamble?: number;
-//     BetTypes?: {
-//       Tumbok: number;
-//       Sahod: number;
-//       Ramble: number;
-//     };
-// }
-// interface chartThreeSix_Specific {
-//     TransactionDate: string;
-//     DrawOrder?: null;
-//     Region: string;
-//     GameCategory: string;
-//     TotalBets: number;
-//     TotalBettors: number;
-//     TotalTumbok?: number;
-//     TotalSahod?: number;
-//     TotalRamble?: number;
-// }
 type Chart1Data = {
   // Specific Date
   firstDateBettors?: number;
@@ -178,7 +116,6 @@ const formatDate = (date: string | null): string => {
 // const apiRegionLabel = (r: string) =>
 //   ["NCR", "CAR", "BARMM"].includes(r) ? r : `Region ${r}`;
 
-
 const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
     categoryFilter,
     dateFilter,
@@ -208,35 +145,23 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   );
 
   return (
-    <Stack direction="column" spacing={1} sx={{ mt: 0.5, mr: 4 }}>
+    <div className="flex flex-col space-y-1 mt-1 mr-4">
       {chunkedLegendItems.map((chunk, rowIndex) => (
-        <Stack key={rowIndex} direction="row" spacing={2} justifyContent="left">
+        <div key={rowIndex} className="flex flex-row space-x-2 justify-start">
           {chunk.map((item, index) => (
-            <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
-              <Box
-                sx={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  backgroundColor: item.color,
-                  mr: 1.5,
-                }}
+            <div key={index} className="flex items-center">
+              <div
+                className="w-[14px] h-[14px] rounded-full mr-1.5"
+                style={{ backgroundColor: item.color }}
               />
-              <Typography
-                color="#212121"
-                sx={{
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  lineHeight: "14px",
-                }}
-              >
+              <p className="text-[12px] font-normal leading-[14px]">
                 {item.label}
-              </Typography>
-            </Box>
+              </p>
+            </div>
           ))}
-        </Stack>
+        </div>
       ))}
-    </Stack>
+    </div>
   );
 };
 
@@ -322,6 +247,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       };
     });
   };
+
   const processChart2Data = (
     payload: { Region: Array<RegionSpecificData[]> },
     firstDate: string,
@@ -348,6 +274,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       };
     });
   };
+
   const processChart3Data = (
     payload: { Region: Array<RegionSpecificData[]> },
     firstDate: string,
@@ -380,6 +307,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       return result;
     });
   };
+
   const processChart5Data = (
     payload: { Region: Array<RegionSpecificData[]> },
     firstDate: string,
@@ -406,6 +334,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       };
     });
   };
+
   const processChart6Data = (
     payload: { Region: Array<RegionSpecificData[]> },
     firstDate: string,
@@ -484,6 +413,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       };
     });
   };
+
   const processDurationChart2Data = (
     payload: RangePayload
   ) => {
@@ -504,6 +434,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       };
     });
   };
+
   const processDurationChart3Data = (
     payload: RangePayload
   ) => {
@@ -531,6 +462,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       return result;
     });
   };
+
   const processDurationChart5Data = (
     payload: RangePayload
   ) => {
@@ -551,6 +483,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       };
     });
   };
+
   const processDurationChart6Data = (
     payload: RangePayload
   ) => {
@@ -578,7 +511,8 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       return result;
     });
   };
-    // Main processor for Date Duration
+
+  // Main processor for Date Duration
   const processDurationPayload = (
     urlParam: string,
     payload: any
@@ -599,6 +533,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
         return [];
     }
   };
+  
   const fetchData = useCallback(async () => {
     setLoading(true);
       try {
@@ -606,9 +541,9 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
           if (
             dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific
           ) {
-              console.log("Fetching Date by Specific Date:", formatDate(firstDateSpecific), formatDate(secondDateSpecific));
+              //console.log("Fetching Date by Specific Date:", formatDate(firstDateSpecific), formatDate(secondDateSpecific));
 
-              const resp = await getCompareHistoricalDate(
+              const resp = await fetchCompareHistoricalDate(
                 "/transactions/compareHistoricalDate/chartType/",
                 urlParam,
                 { 
@@ -617,7 +552,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
                   ...gameCategoryParam
                 }
               );
-              console.log("Payload (Specific Date)", resp)
+              //console.log("Payload (Specific Date)", resp)
 
               if (resp && resp.Region) {
                 const processedData = processSpecificDatePayload(
@@ -628,7 +563,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
                 );
                 console.log("Processed Data:", processedData);
                 setChartData(processedData);
-              }else {
+              } else {
                 console.warn("Unexpexted payload:", resp);
               }
           }
@@ -637,9 +572,9 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
             firstDateSpecific && secondDateSpecific &&
             firstDateDuration && secondDateDuration
           ){
-              console.log("Fetching Date by Date Duration");
+              //console.log("Fetching Date by Date Duration");
 
-              const resp = await getCompareHistoricalDuration(
+              const resp = await fetchCompareHistoricalRange(
               "/transactions/compareHistoricalRange/chartType/",
               urlParam,
               {
@@ -650,12 +585,12 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
                 ...gameCategoryParam
               }
             );
-            console.log("Payload (Date Duration)", resp)
+            //console.log("Payload (Date Duration)", resp)
 
             if (resp && resp.Region) {
               const processedData = processDurationPayload(urlParam, resp);
               setChartData(processedData);
-              console.log("Processed Data:", processedData);
+              //console.log("Processed Data:", processedData);
               setChartData(processedData);
             } else {
               console.warn("Unexpected payload:", resp);
@@ -680,7 +615,6 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
   useEffect(()=> {
     fetchData();
   }, [fetchData]);
-
 
   const generateSeries = (chartData: ChartData[], urlParam: string) => {
     const isDuration = dateFilter === "Date Duration";
@@ -795,82 +729,49 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
 
 
   return (
-      <Box
-      sx={{
-          backgroundColor: "transparent",
-          padding: "1rem",
-          borderRadius: "8px",
-          paddingBottom: "2rem",
-          width: "100%",
-          height: "585px",
-          border: "1px solid #0038A8"
-      }}
-      >
-          <Typography color="" 
-          sx={{ 
-              fontSize: "16px",
-              fontWeight: 400,
-              lineHeight: "18px",
-              mb: "10px"
-          }}>
-              { `Regional Summary of ${categoryFilter}`}
-          </Typography>
-          <CustomLegend
-              activeGameType={activeGameType}
-              categoryFilter={categoryFilter}
-              dateFilter={dateFilter}
-              firstDateSpecific={firstDateSpecific}
-              secondDateSpecific={secondDateSpecific}
-              firstDateDuration={firstDateDuration}
-              secondDateDuration={secondDateDuration}
-          />
-          <Box
-              sx={{
-              height: "100%",
-              // width: "100%",
-              display: "flex",
-              flexDirection: "column",
-              flexGrow: 1,
-              backgroundColor: "transparent"
-          }}
-          >
-            { loading ? (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                height="100vh"
-              >
-                <CircularProgress />
-              </Box>
-            ):(
-              <BarChart
-                  height={500} 
-                  margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+    <div className="bg-transparent p-4 rounded-lg pb-8 w-full h-[585px] border border-[#0038A8]">
+      <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
+        {`Regional Summary of ${categoryFilter}`}
+      </p>
+      <CustomLegend
+        activeGameType={activeGameType}
+        categoryFilter={categoryFilter}
+        dateFilter={dateFilter}
+        firstDateSpecific={firstDateSpecific}
+        secondDateSpecific={secondDateSpecific}
+        firstDateDuration={firstDateDuration}
+        secondDateDuration={secondDateDuration}
+      />
 
-                  xAxis={[
-                    {
-                      label: "Amount (in 100,000 units)",
-                      scaleType: "band",
-                      data: philippineRegions, // Ensure this matches the number of data points
-                    },
-                  ]}
-                  yAxis={[
-                    {
-                      label: "Amount (in 100,000 units)",
-                      min: 0,
-                      max: 100, // Adjust max to fit your data range
-                      // tickValues: yAxisTicks, // Ensure all ticks are displayed
-                      // tickSpacing: 5, // Optional: Adjust spacing between ticks
-                    },
-                  ]}
-                  series={generateSeries(chartData, urlParam)}
-                  slotProps={{legend: {hidden: true}}}
-                  // Optional: Increase width for better x-axis spacing
-                />
-            )}
-          </Box>
-      </Box>
-    )
+      <div className="h-full flex flex-col flex-grow bg-transparent">
+        {loading ? (
+          <div className="flex justify-center items-center h-screen">
+            <CircularProgress />
+          </div>
+        ) : (
+          <BarChart
+            height={500}
+            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+            xAxis={[
+              {
+                label: "Amount (in 100,000 units)",
+                scaleType: "band",
+                data: philippineRegions,
+              },
+            ]}
+            yAxis={[
+              {
+                label: "Amount (in 100,000 units)",
+                min: 0,
+                max: 100,
+              },
+            ]}
+            series={generateSeries(chartData, urlParam)}
+            slotProps={{ legend: { hidden: true } }}
+          />
+        )}
+      </div>
+    </div>
+  );
 };
 export default ChartBettorsAndBetsRegionalSummary;

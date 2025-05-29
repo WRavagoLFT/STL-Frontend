@@ -23,7 +23,7 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
     setIsLoading(true);
     const today = new Date().toISOString().split("T")[0];
 
-    console.log("Date Today, TopBettingRegion: ", today);
+    //console.log("Date Today, TopBettingRegion: ", today);
 
     // Assuming fetchHistoricalRegion accepts a date parameter
     const response = await fetchHistoricalRegion({ date: today });

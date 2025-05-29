@@ -6,10 +6,7 @@ import {
     getLegendItemsMap_Specific,
     getLegendItemsMap_Duration
   } from "../../../store/useBettingStore";
-
-// API Endpoints
-import getCompareHistoricalDate from '~/utils/api/transactions/get.CompareHistoricalDate.service';
-import getCompareHistoricalDuration from '~/utils/api/transactions/get.CompareHistoricalDuration.service';
+import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from '~/utils/api/transactions';
 
 // interfaces
 // Chart Data for Specific Date
@@ -174,6 +171,7 @@ const formatDate = (date: string | null): string => {
   return `${year}-${month}-${day}`;
 };
 
+// custom legend
 const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   categoryFilter,
   dateFilter,
@@ -185,8 +183,18 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   // Determine which legend items map to use based on the dateFilter
   const legendItems =
     dateFilter === "Specific Date"
-      ? getLegendItemsMap_Specific(categoryFilter, firstDateSpecific, secondDateSpecific)
-      : getLegendItemsMap_Duration(categoryFilter, firstDateSpecific, secondDateSpecific, firstDateDuration, secondDateDuration);
+      ? getLegendItemsMap_Specific(
+          categoryFilter,
+          firstDateSpecific,
+          secondDateSpecific
+        )
+      : getLegendItemsMap_Duration(
+          categoryFilter,
+          firstDateSpecific,
+          secondDateSpecific,
+          firstDateDuration,
+          secondDateDuration
+        );
 
   // Group legend items into rows of 4 for a 4x2 grid layout
   const chunkedLegendItems = legendItems.reduce(
@@ -202,35 +210,23 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   );
 
   return (
-    <Stack direction="column" spacing={1} sx={{ mt: 0.5, mr: 4 }}>
+    <div className="flex flex-col space-y-1 mt-1 mr-4">
       {chunkedLegendItems.map((chunk, rowIndex) => (
-        <Stack key={rowIndex} direction="row" spacing={2} justifyContent="left">
+        <div key={rowIndex} className="flex flex-row space-x-2 justify-start">
           {chunk.map((item, index) => (
-            <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
-              <Box
-                sx={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  backgroundColor: item.color,
-                  mr: 1.5,
-                }}
+            <div key={index} className="flex items-center">
+              <div
+                className="w-[14px] h-[14px] rounded-full mr-1.5"
+                style={{ backgroundColor: item.color }}
               />
-              <Typography
-                color="#212121"
-                sx={{
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  lineHeight: "14px",
-                }}
-              >
+              <span className="text-[12px] font-normal leading-[14px]">
                 {item.label}
-              </Typography>
-            </Box>
+              </span>
+            </div>
           ))}
-        </Stack>
+        </div>
       ))}
-    </Stack>
+    </div>
   );
 };
 
@@ -243,17 +239,14 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   secondDateDuration,
   activeGameType,
 }) => {
-  // gameCategory 
-  console.log('Active Game Category:', activeGameType)
+  
+  // gameCategory
+  //console.log('Active Game Category:', activeGameType)
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<ChartData[]>([]);
 
-  // which field to aggregate based on categoryFilter
-  // const aggregateField = categoryFilter.includes(
-  //   "Bets") ? "TotalBets" : "TotalBettors";
-  
   // Determine chart number based on categoryFilter
-    const chartMap: Record<string, string> = {
+  const chartMap: Record<string, string> = {
     "Total Bets and Bettors": "1",
     "Total Bets by Bet Type": "2",
     "Total Bets by Game Type": "3",
@@ -266,27 +259,27 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
 
   // Determine gameCategory number based on activeGameType
   const gameCategoryMap: Record<string, number> = {
-    "Dashboard": 0,
+    Dashboard: 0,
     "STL Pares": 1,
     "STL Swer2": 2,
     "STL Swer3": 3,
     "STL Swer4": 4,
-  }
+  };
   const gameCategoryParam = gameCategoryMap[activeGameType];
-  console.log('Game Category Param:', gameCategoryParam)
+  //console.log('Game Category Param:', gameCategoryParam)
 
   // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
-    if(gameCategoryParam && gameCategoryParam >=1 && gameCategoryParam <= 4) {
+    if (gameCategoryParam && gameCategoryParam >= 1 && gameCategoryParam <= 4) {
       return { gameCategory: gameCategoryParam };
     }
     return {};
-  }
+  };
 
   // Helper function to check if dates match (ignoring time)
   const datesMatch = (dateString1: string, dateString2: string): boolean => {
     return formatDate(dateString1) === formatDate(dateString2);
-  }
+  };
 
   // For Specific Date
   // Process Chart 1 Data
@@ -296,28 +289,41 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     secondDate: string
   ) => {
     const drawOrders = [1, 2, 3];
-    
-    return drawOrders.map(drawOrder => {
+
+    return drawOrders.map((drawOrder) => {
       const allDrawItems = payload.DrawOrder.filter(
         (item: chartOne_Specific) => item.DrawOrder === drawOrder
       );
 
-      const firstDateItems = allDrawItems.filter((item: chartOne_Specific) => 
+      const firstDateItems = allDrawItems.filter((item: chartOne_Specific) =>
         datesMatch(item.TransactionDate, firstDate)
       );
-      const secondDateItems = allDrawItems.filter((item: chartOne_Specific) => 
+      const secondDateItems = allDrawItems.filter((item: chartOne_Specific) =>
         datesMatch(item.TransactionDate, secondDate)
       );
 
       return {
         drawOrder,
-        firstDateBettors: firstDateItems.reduce((sum: number, item: chartOne_Specific) => sum + item.TotalBettors, 0),
-        secondDateBettors: secondDateItems.reduce((sum: number, item: chartOne_Specific) => sum + item.TotalBettors, 0),
-        firstDateBets: firstDateItems.reduce((sum: number, item: chartOne_Specific) => sum + item.TotalBets, 0),
-        secondDateBets: secondDateItems.reduce((sum: number, item: chartOne_Specific) => sum + item.TotalBets, 0)
+        firstDateBettors: firstDateItems.reduce(
+          (sum: number, item: chartOne_Specific) => sum + item.TotalBettors,
+          0
+        ),
+        secondDateBettors: secondDateItems.reduce(
+          (sum: number, item: chartOne_Specific) => sum + item.TotalBettors,
+          0
+        ),
+        firstDateBets: firstDateItems.reduce(
+          (sum: number, item: chartOne_Specific) => sum + item.TotalBets,
+          0
+        ),
+        secondDateBets: secondDateItems.reduce(
+          (sum: number, item: chartOne_Specific) => sum + item.TotalBets,
+          0
+        ),
       };
     });
   };
+
   // Process Chart 2 Data
   const processChart2Data = (
     payload: any,
@@ -325,28 +331,41 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     secondDate: string
   ) => {
     const drawOrders = [1, 2, 3];
-    
-    return drawOrders.map(drawOrder => {
+
+    return drawOrders.map((drawOrder) => {
       const allDrawItems = payload.DrawOrder.filter(
         (item: any) => item.DrawOrder === drawOrder
       );
 
-      const firstDateItems = allDrawItems.filter((item: any) => 
+      const firstDateItems = allDrawItems.filter((item: any) =>
         datesMatch(item.TransactionDate, firstDate)
       );
-      const secondDateItems = allDrawItems.filter((item: any) => 
+      const secondDateItems = allDrawItems.filter((item: any) =>
         datesMatch(item.TransactionDate, secondDate)
       );
 
       return {
         drawOrder,
-        firstDateTumbok: firstDateItems.reduce((sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        secondDateTumbok: secondDateItems.reduce((sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        firstDateSahod: firstDateItems.reduce((sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0), 0),
-        secondDateSahod: secondDateItems.reduce((sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0), 0)
+        firstDateTumbok: firstDateItems.reduce(
+          (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        secondDateTumbok: secondDateItems.reduce(
+          (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        firstDateSahod: firstDateItems.reduce(
+          (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
+        secondDateSahod: secondDateItems.reduce(
+          (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
       };
     });
   };
+
   // Process Chart 3 Data
   const processChart3Data = (
     payload: any,
@@ -356,30 +375,38 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     const drawOrders = [1, 2, 3];
     const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-    return drawOrders.map(drawOrder => {
+    return drawOrders.map((drawOrder) => {
       const result: any = { drawOrder };
-      
-      gameCategories.forEach(category => {
+
+      gameCategories.forEach((category) => {
         const allItems = payload.DrawOrder.filter(
-          (item: any) => item.DrawOrder === drawOrder && item.GameCategory === category
+          (item: any) =>
+            item.DrawOrder === drawOrder && item.GameCategory === category
         );
-        
-        const firstDateItems = allItems.filter((item: any) => 
+
+        const firstDateItems = allItems.filter((item: any) =>
           datesMatch(item.TransactionDate, firstDate)
         );
-        const secondDateItems = allItems.filter((item: any) => 
+        const secondDateItems = allItems.filter((item: any) =>
           datesMatch(item.TransactionDate, secondDate)
         );
 
-        result[`firstDate${category.replace(/\s+/g, '')}`] = 
-          firstDateItems.reduce((sum: number, item: any) => sum + item.TotalBets, 0);
-        result[`secondDate${category.replace(/\s+/g, '')}`] = 
-          secondDateItems.reduce((sum: number, item: any) => sum + item.TotalBets, 0);
+        result[`firstDate${category.replace(/\s+/g, "")}`] =
+          firstDateItems.reduce(
+            (sum: number, item: any) => sum + item.TotalBets,
+            0
+          );
+        result[`secondDate${category.replace(/\s+/g, "")}`] =
+          secondDateItems.reduce(
+            (sum: number, item: any) => sum + item.TotalBets,
+            0
+          );
       });
 
       return result;
     });
   };
+
   // Chart 5: Total Bettors by Bet Type
   const processChart5Data = (
     payload: any,
@@ -387,28 +414,41 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     secondDate: string
   ) => {
     const drawOrders = [1, 2, 3];
-    
-    return drawOrders.map(drawOrder => {
+
+    return drawOrders.map((drawOrder) => {
       const allDrawItems = payload.DrawOrder.filter(
         (item: any) => item.DrawOrder === drawOrder
       );
 
-      const firstDateItems = allDrawItems.filter((item: any) => 
+      const firstDateItems = allDrawItems.filter((item: any) =>
         datesMatch(item.TransactionDate, firstDate)
       );
-      const secondDateItems = allDrawItems.filter((item: any) => 
+      const secondDateItems = allDrawItems.filter((item: any) =>
         datesMatch(item.TransactionDate, secondDate)
       );
 
       return {
         drawOrder,
-        firstDateTumbok: firstDateItems.reduce((sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        secondDateTumbok: secondDateItems.reduce((sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        firstDateSahod: firstDateItems.reduce((sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0), 0),
-        secondDateSahod: secondDateItems.reduce((sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0), 0)
+        firstDateTumbok: firstDateItems.reduce(
+          (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        secondDateTumbok: secondDateItems.reduce(
+          (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        firstDateSahod: firstDateItems.reduce(
+          (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
+        secondDateSahod: secondDateItems.reduce(
+          (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
       };
     });
   };
+
   // Chart 6: Total Bettors by Game Type
   const processChart6Data = (
     payload: any,
@@ -418,30 +458,38 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     const drawOrders = [1, 2, 3];
     const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-    return drawOrders.map(drawOrder => {
+    return drawOrders.map((drawOrder) => {
       const result: any = { drawOrder };
-      
-      gameCategories.forEach(category => {
+
+      gameCategories.forEach((category) => {
         const allItems = payload.DrawOrder.filter(
-          (item: any) => item.DrawOrder === drawOrder && item.GameCategory === category
+          (item: any) =>
+            item.DrawOrder === drawOrder && item.GameCategory === category
         );
-        
-        const firstDateItems = allItems.filter((item: any) => 
+
+        const firstDateItems = allItems.filter((item: any) =>
           datesMatch(item.TransactionDate, firstDate)
         );
-        const secondDateItems = allItems.filter((item: any) => 
+        const secondDateItems = allItems.filter((item: any) =>
           datesMatch(item.TransactionDate, secondDate)
         );
 
-        result[`firstDate${category.replace(/\s+/g, '')}`] = 
-          firstDateItems.reduce((sum: number, item: any) => sum + item.TotalBettors, 0);
-        result[`secondDate${category.replace(/\s+/g, '')}`] = 
-          secondDateItems.reduce((sum: number, item: any) => sum + item.TotalBettors, 0);
+        result[`firstDate${category.replace(/\s+/g, "")}`] =
+          firstDateItems.reduce(
+            (sum: number, item: any) => sum + item.TotalBettors,
+            0
+          );
+        result[`secondDate${category.replace(/\s+/g, "")}`] =
+          secondDateItems.reduce(
+            (sum: number, item: any) => sum + item.TotalBettors,
+            0
+          );
       });
 
       return result;
     });
   };
+
   // Main processor function
   const processSpecificDatePayload = (
     urlParam: string,
@@ -455,11 +503,16 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     }
 
     switch (urlParam) {
-      case "1": return processChart1Data(payload, firstDate, secondDate);
-      case "2": return processChart2Data(payload, firstDate, secondDate);
-      case "3": return processChart3Data(payload, firstDate, secondDate);
-      case "5": return processChart5Data(payload, firstDate, secondDate);
-      case "6": return processChart6Data(payload, firstDate, secondDate);
+      case "1":
+        return processChart1Data(payload, firstDate, secondDate);
+      case "2":
+        return processChart2Data(payload, firstDate, secondDate);
+      case "3":
+        return processChart3Data(payload, firstDate, secondDate);
+      case "5":
+        return processChart5Data(payload, firstDate, secondDate);
+      case "6":
+        return processChart6Data(payload, firstDate, secondDate);
       default:
         console.warn("Unknown urlParam:", urlParam);
         return [];
@@ -470,8 +523,8 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   // Helper functions for Date Duration payload processing
   const processDurationChart1Data = (payload: any) => {
     const drawOrders = [1, 2, 3];
-    
-    return drawOrders.map(drawOrder => {
+
+    return drawOrders.map((drawOrder) => {
       const firstRangeItems = payload.DrawOrder.FirstRange.filter(
         (item: chartOne_Range) => item.DrawOrder === drawOrder
       );
@@ -481,17 +534,30 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
 
       return {
         drawOrder,
-        firstRangeBettors: firstRangeItems.reduce((sum: number, item: chartOne_Range) => sum + item.TotalBettors, 0),
-        secondRangeBettors: secondRangeItems.reduce((sum: number, item: chartOne_Range) => sum + item.TotalBettors, 0),
-        firstRangeBets: firstRangeItems.reduce((sum: number, item: chartOne_Range) => sum + item.TotalBets, 0),
-        secondRangeBets: secondRangeItems.reduce((sum: number, item: chartOne_Range) => sum + item.TotalBets, 0)
+        firstRangeBettors: firstRangeItems.reduce(
+          (sum: number, item: chartOne_Range) => sum + item.TotalBettors,
+          0
+        ),
+        secondRangeBettors: secondRangeItems.reduce(
+          (sum: number, item: chartOne_Range) => sum + item.TotalBettors,
+          0
+        ),
+        firstRangeBets: firstRangeItems.reduce(
+          (sum: number, item: chartOne_Range) => sum + item.TotalBets,
+          0
+        ),
+        secondRangeBets: secondRangeItems.reduce(
+          (sum: number, item: chartOne_Range) => sum + item.TotalBets,
+          0
+        ),
       };
     });
   };
+
   const processDurationChart2Data = (payload: any) => {
     const drawOrders = [1, 2, 3];
-    
-    return drawOrders.map(drawOrder => {
+
+    return drawOrders.map((drawOrder) => {
       const firstRangeItems = payload.DrawOrder.FirstRange.filter(
         (item: chartTwoFive_Range) => item.DrawOrder === drawOrder
       );
@@ -501,41 +567,67 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
 
       return {
         drawOrder,
-        firstRangeTumbok: firstRangeItems.reduce((sum: number, item: chartTwoFive_Range) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        secondRangeTumbok: secondRangeItems.reduce((sum: number, item: chartTwoFive_Range) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        firstRangeSahod: firstRangeItems.reduce((sum: number, item: chartTwoFive_Range) => sum + (item.BetTypes?.Sahod || 0), 0),
-        secondRangeSahod: secondRangeItems.reduce((sum: number, item: chartTwoFive_Range) => sum + (item.BetTypes?.Sahod || 0), 0)
+        firstRangeTumbok: firstRangeItems.reduce(
+          (sum: number, item: chartTwoFive_Range) =>
+            sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        secondRangeTumbok: secondRangeItems.reduce(
+          (sum: number, item: chartTwoFive_Range) =>
+            sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        firstRangeSahod: firstRangeItems.reduce(
+          (sum: number, item: chartTwoFive_Range) =>
+            sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
+        secondRangeSahod: secondRangeItems.reduce(
+          (sum: number, item: chartTwoFive_Range) =>
+            sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
       };
     });
   };
+
   const processDurationChart3Data = (payload: any) => {
     const drawOrders = [1, 2, 3];
     const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-    return drawOrders.map(drawOrder => {
+    return drawOrders.map((drawOrder) => {
       const result: any = { drawOrder };
-      
-      gameCategories.forEach(category => {
+
+      gameCategories.forEach((category) => {
         const firstRangeItems = payload.DrawOrder.FirstRange.filter(
-          (item: chartThreeSix_Range) => item.DrawOrder === drawOrder && item.GameCategory === category
+          (item: chartThreeSix_Range) =>
+            item.DrawOrder === drawOrder && item.GameCategory === category
         );
         const secondRangeItems = payload.DrawOrder.SecondRange.filter(
-          (item: chartThreeSix_Range) => item.DrawOrder === drawOrder && item.GameCategory === category
+          (item: chartThreeSix_Range) =>
+            item.DrawOrder === drawOrder && item.GameCategory === category
         );
 
-        result[`firstRange${category.replace(/\s+/g, '')}`] = 
-          firstRangeItems.reduce((sum: number, item: chartThreeSix_Range) => sum + item.TotalBets, 0);
-        result[`secondRange${category.replace(/\s+/g, '')}`] = 
-          secondRangeItems.reduce((sum: number, item: chartThreeSix_Range) => sum + item.TotalBets, 0);
+        result[`firstRange${category.replace(/\s+/g, "")}`] =
+          firstRangeItems.reduce(
+            (sum: number, item: chartThreeSix_Range) => sum + item.TotalBets,
+            0
+          );
+        result[`secondRange${category.replace(/\s+/g, "")}`] =
+          secondRangeItems.reduce(
+            (sum: number, item: chartThreeSix_Range) => sum + item.TotalBets,
+            0
+          );
       });
 
       return result;
     });
   };
+
   const processDurationChart5Data = (payload: any) => {
     const drawOrders = [1, 2, 3];
-    
-    return drawOrders.map(drawOrder => {
+
+    return drawOrders.map((drawOrder) => {
       const firstRangeItems = payload.DrawOrder.FirstRange.filter(
         (item: chartTwoFive_Range) => item.DrawOrder === drawOrder
       );
@@ -545,32 +637,57 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
 
       return {
         drawOrder,
-        firstRangeTumbok: firstRangeItems.reduce((sum: number, item: chartTwoFive_Range) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        secondRangeTumbok: secondRangeItems.reduce((sum: number, item: chartTwoFive_Range) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        firstRangeSahod: firstRangeItems.reduce((sum: number, item: chartTwoFive_Range) => sum + (item.BetTypes?.Sahod || 0), 0),
-        secondRangeSahod: secondRangeItems.reduce((sum: number, item: chartTwoFive_Range) => sum + (item.BetTypes?.Sahod || 0), 0)
+        firstRangeTumbok: firstRangeItems.reduce(
+          (sum: number, item: chartTwoFive_Range) =>
+            sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        secondRangeTumbok: secondRangeItems.reduce(
+          (sum: number, item: chartTwoFive_Range) =>
+            sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        firstRangeSahod: firstRangeItems.reduce(
+          (sum: number, item: chartTwoFive_Range) =>
+            sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
+        secondRangeSahod: secondRangeItems.reduce(
+          (sum: number, item: chartTwoFive_Range) =>
+            sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
       };
     });
   };
+
   const processDurationChart6Data = (payload: any) => {
     const drawOrders = [1, 2, 3];
     const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-    return drawOrders.map(drawOrder => {
+    return drawOrders.map((drawOrder) => {
       const result: any = { drawOrder };
-      
-      gameCategories.forEach(category => {
+
+      gameCategories.forEach((category) => {
         const firstRangeItems = payload.DrawOrder.FirstRange.filter(
-          (item: chartThreeSix_Range) => item.DrawOrder === drawOrder && item.GameCategory === category
+          (item: chartThreeSix_Range) =>
+            item.DrawOrder === drawOrder && item.GameCategory === category
         );
         const secondRangeItems = payload.DrawOrder.SecondRange.filter(
-          (item: chartThreeSix_Range) => item.DrawOrder === drawOrder && item.GameCategory === category
+          (item: chartThreeSix_Range) =>
+            item.DrawOrder === drawOrder && item.GameCategory === category
         );
 
-        result[`firstRange${category.replace(/\s+/g, '')}`] = 
-          firstRangeItems.reduce((sum: number, item: chartThreeSix_Range) => sum + item.TotalBettors, 0);
-        result[`secondRange${category.replace(/\s+/g, '')}`] = 
-          secondRangeItems.reduce((sum: number, item: chartThreeSix_Range) => sum + item.TotalBettors, 0);
+        result[`firstRange${category.replace(/\s+/g, "")}`] =
+          firstRangeItems.reduce(
+            (sum: number, item: chartThreeSix_Range) => sum + item.TotalBettors,
+            0
+          );
+        result[`secondRange${category.replace(/\s+/g, "")}`] =
+          secondRangeItems.reduce(
+            (sum: number, item: chartThreeSix_Range) => sum + item.TotalBettors,
+            0
+          );
       });
 
       return result;
@@ -578,95 +695,112 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   };
 
   // Main processor for Date Duration
-  const processDurationPayload = (
-    urlParam: string,
-    payload: any
-  ) => {
-    if (!payload || !payload.DrawOrder || !payload.DrawOrder.FirstRange || !payload.DrawOrder.SecondRange) {
+  const processDurationPayload = (urlParam: string, payload: any) => {
+    if (
+      !payload ||
+      !payload.DrawOrder ||
+      !payload.DrawOrder.FirstRange ||
+      !payload.DrawOrder.SecondRange
+    ) {
       console.warn("Invalid duration payload structure", payload);
       return [];
     }
 
     switch (urlParam) {
-      case "1": return processDurationChart1Data(payload);
-      case "2": return processDurationChart2Data(payload);
-      case "3": return processDurationChart3Data(payload);
-      case "5": return processDurationChart5Data(payload);
-      case "6": return processDurationChart6Data(payload);
+      case "1":
+        return processDurationChart1Data(payload);
+      case "2":
+        return processDurationChart2Data(payload);
+      case "3":
+        return processDurationChart3Data(payload);
+      case "5":
+        return processDurationChart5Data(payload);
+      case "6":
+        return processDurationChart6Data(payload);
       default:
         console.warn("Unknown urlParam:", urlParam);
         return [];
     }
   };
-  //  Date Payload Data.
+
+  //Date Payload Data
   const fetchData = useCallback(async () => {
     setLoading(true);
-      try {
-          const gameCategoryParam = getGameCategoryParam();
-          console.log("Inside Fetch Game Category Param:", gameCategoryParam);
-          if (
-            dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific
-          ) {
-              console.log("Fetching Date by Specific Date:", formatDate(firstDateSpecific), formatDate(secondDateSpecific));
+    try {
+      const gameCategoryParam = getGameCategoryParam();
+      console.log("Inside Fetch Game Category Param:", gameCategoryParam);
 
-              const resp = await getCompareHistoricalDate(
-                "/transactions/compareHistoricalDate/chartType/",
-                urlParam,
-                { 
-                  first: formatDate(firstDateSpecific), 
-                  second: formatDate(secondDateSpecific),
-                  ...gameCategoryParam
-                }
-              );
-              console.log("Payload (Specific Date)", resp)
+      if (
+        dateFilter === "Specific Date" &&
+        firstDateSpecific &&
+        secondDateSpecific
+      ) {
+        console.log(
+          "Fetching Date by Specific Date:",
+          formatDate(firstDateSpecific),
+          formatDate(secondDateSpecific)
+        );
 
-              if (resp && resp.DrawOrder) {
-                const processedData = processSpecificDatePayload(
-                  urlParam,
-                  resp,
-                  firstDateSpecific,
-                  secondDateSpecific
-                );
-                console.log("Processed Data:", processedData);
-                setChartData(processedData);
-              }else {
-                console.warn("Unexpexted payload:", resp);
-              }
+        const resp = await fetchCompareHistoricalDate(
+          "/transactions/compareHistoricalDate/chartType/",
+          urlParam,
+          {
+            first: formatDate(firstDateSpecific),
+            second: formatDate(secondDateSpecific),
+            ...gameCategoryParam,
           }
-          else if (
-            dateFilter === "Date Duration" &&
-            firstDateSpecific && secondDateSpecific &&
-            firstDateDuration && secondDateDuration
-          ){
-              console.log("Fetching Date by Date Duration");
+        );
 
-              const resp = await getCompareHistoricalDuration(
-              "/transactions/compareHistoricalRange/chartType/",
-              urlParam,
-              {
-                firstStart: formatDate(firstDateSpecific),
-                firstEnd: formatDate(secondDateSpecific),
-                secondStart: formatDate(firstDateDuration),
-                secondEnd: formatDate(secondDateDuration),
-                ...gameCategoryParam
-              }
-            );
-            console.log("Payload (Date Duration)", resp)
+        console.log("Payload (Specific Date)", resp);
 
-            if (resp && resp.DrawOrder) {
-              const processedData = processDurationPayload(urlParam, resp);
-              setChartData(processedData);
-              console.log("Processed Data:", processedData);
-              setChartData(processedData);
-            } else {
-              console.warn("Unexpected payload:", resp);
-            }
+        if (resp && resp.DrawOrder) {
+          const processedData = processSpecificDatePayload(
+            urlParam,
+            resp,
+            firstDateSpecific,
+            secondDateSpecific
+          );
+          console.log("Processed Data:", processedData);
+          setChartData(processedData);
+        } else {
+          console.warn("Unexpected payload:", resp);
+        }
+      } else if (
+        dateFilter === "Date Duration" &&
+        firstDateSpecific &&
+        secondDateSpecific &&
+        firstDateDuration &&
+        secondDateDuration
+      ) {
+        console.log("Fetching Date by Date Duration");
+
+        const resp = await fetchCompareHistoricalRange(
+          "/transactions/compareHistoricalRange/chartType/",
+          urlParam,
+          {
+            firstStart: formatDate(firstDateSpecific),
+            firstEnd: formatDate(secondDateSpecific),
+            secondStart: formatDate(firstDateDuration),
+            secondEnd: formatDate(secondDateDuration),
+            ...gameCategoryParam,
           }
-        } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoading(false);
+        );
+
+        console.log("Payload (Date Duration)", resp);
+
+        if (resp && resp.DrawOrder) {
+          const processedData = processDurationPayload(urlParam, resp);
+          console.log("Processed Data:", processedData);
+          setChartData(processedData);
+        } else {
+          console.warn("Unexpected payload:", resp);
+        }
       }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [
     dateFilter,
     firstDateSpecific,
@@ -674,23 +808,20 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     firstDateDuration,
     secondDateDuration,
     urlParam,
-    gameCategoryParam,
-    ]
-  )
+  ]);
 
-  useEffect(()=> {
+  useEffect(() => {
     fetchData();
   }, [fetchData]);
 
-
   const generateSeries = (chartData: ChartData[], urlParam: string) => {
     const isDuration = dateFilter === "Date Duration";
-    
+
     // Labels for the legend
-    const firstLabel = isDuration 
+    const firstLabel = isDuration
       ? `${formatDate(firstDateSpecific)} - ${formatDate(secondDateSpecific)}`
       : formatDate(firstDateSpecific);
-      
+
     const secondLabel = isDuration
       ? `${formatDate(firstDateDuration)} - ${formatDate(secondDateDuration)}`
       : formatDate(secondDateSpecific);
@@ -698,86 +829,86 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     if (urlParam === "1") {
       return [
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.firstRangeBettors : item.firstDateBettors
           ),
           label: `Bettors ${firstLabel}`,
           color: "#E5C7FF",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.secondRangeBettors : item.secondDateBettors
           ),
           label: `Bettors ${secondLabel}`,
           color: "#5050A5",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.firstRangeBets : item.firstDateBets
           ),
           label: `Bets ${firstLabel}`,
           color: "#7266C9",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.secondRangeBets : item.secondDateBets
           ),
           label: `Bets ${secondLabel}`,
           color: "#3B3B81",
-        }
+        },
       ];
     } else if (urlParam === "2" || urlParam === "5") {
       return [
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.firstRangeTumbok : item.firstDateTumbok
           ),
           label: `Tumbok ${firstLabel}`,
           color: "#E5C7FF",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.secondRangeTumbok : item.secondDateTumbok
           ),
           label: `Tumbok ${secondLabel}`,
           color: "#5050A5",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.firstRangeSahod : item.firstDateSahod
           ),
           label: `Sahod ${firstLabel}`,
           color: "#7266C9",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.secondRangeSahod : item.secondDateSahod
           ),
           label: `Sahod ${secondLabel}`,
           color: "#3B3B81",
-        }
+        },
       ];
     } else if (urlParam === "3" || urlParam === "6") {
       const gameCategories = ["STLPares", "STLSwer2", "STLSwer3", "STLSwer4"];
-      return gameCategories.flatMap(category => [
+      return gameCategories.flatMap((category) => [
         {
-          data: chartData.map((item: any) => 
-            isDuration 
-              ? item[`firstRange${category}`] 
+          data: chartData.map((item: any) =>
+            isDuration
+              ? item[`firstRange${category}`]
               : item[`firstDate${category}`]
           ),
           label: `${category.replace("STL", "STL ")} ${firstLabel}`,
           color: getCategoryColor(category, true),
         },
         {
-          data: chartData.map((item: any) => 
-            isDuration 
-              ? item[`secondRange${category}`] 
+          data: chartData.map((item: any) =>
+            isDuration
+              ? item[`secondRange${category}`]
               : item[`secondDate${category}`]
           ),
           label: `${category.replace("STL", "STL ")} ${secondLabel}`,
           color: getCategoryColor(category, false),
-        }
+        },
       ]);
     }
     return [];
@@ -789,84 +920,56 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       STLPares: isFirstDate ? "#E5C7FF" : "#5050A5",
       STLSwer2: isFirstDate ? "#7266C9" : "#3B3B81",
       STLSwer3: isFirstDate ? "#875AC4" : "#6F58C9",
-      STLSwer4: isFirstDate ? "#563D99" : "#3E2466"
+      STLSwer4: isFirstDate ? "#563D99" : "#3E2466",
     };
     return colorMap[category] || "#CCCCCC";
   };
+
   return (
-      <Box
-        sx={{
-          backgroundColor: "transparent",
-          padding: "1rem",
-          borderRadius: "8px",
-          paddingBottom: "2rem",
-          width: "100%",
-          height: "511px",
-          border: "1px solid #7266C9"
-        }}
-      >
-          <Typography color="#FFFFFF" 
-            sx={{ 
-              fontSize: "16px",
-              fontWeight: 400,
-              lineHeight: "18px",
-              mb: "10px",
-              color: "#212121"
-            }}>
-              {`Summary ${categoryFilter}`}
-          </Typography>
-          <CustomLegend
-            activeGameType={activeGameType}
-            categoryFilter={categoryFilter}
-            dateFilter={dateFilter}
-            firstDateSpecific={firstDateSpecific}
-            secondDateSpecific={secondDateSpecific}
-            firstDateDuration={firstDateDuration}
-            secondDateDuration={secondDateDuration}
+    <div className="bg-transparent p-4 rounded-lg pb-8 w-full h-[511px] border border-[#7266C9]">
+      <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
+        {`Summary ${categoryFilter}`}
+      </p>
+
+      <CustomLegend
+        activeGameType={activeGameType}
+        categoryFilter={categoryFilter}
+        dateFilter={dateFilter}
+        firstDateSpecific={firstDateSpecific}
+        secondDateSpecific={secondDateSpecific}
+        firstDateDuration={firstDateDuration}
+        secondDateDuration={secondDateDuration}
+      />
+
+      {loading ? (
+        <div className="flex justify-center items-center h-full">
+          <CircularProgress />
+        </div>
+      ) : (
+        <div className="h-full flex flex-col flex-grow">
+          <BarChart
+            height={400}
+            grid={{ vertical: true }}
+            layout="horizontal"
+            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+            series={generateSeries(chartData, urlParam)}
+            yAxis={[
+              { scaleType: "band", 
+                data: ["First Draw", "Second Draw", "Third Draw"],
+              },
+            ]}
+            xAxis={[
+              { label: "Amount (in 100,000 units)",
+                min: 0,
+                max: 100,
+              },
+            ]}
+            slotProps={{ legend: { hidden: true } }}
           />
-          { loading ? (
-            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-                <CircularProgress />
-            </Box>
-          ) : (
-            <Box
-              sx={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              flexGrow: 1,
-            }}
-            >
-            <BarChart
-              height={400}
-              // width={{100%}}
-              grid={{ vertical: true }}
-              layout="horizontal"
-              margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-              series={generateSeries(chartData, urlParam)}
-              yAxis={[
-                {
-                  scaleType: "band",
-                  data: ["First Draw", "Second Draw", "Third Draw"], 
-                  // series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }]},
-                },
-              ]}
-              xAxis={[
-                {
-                  label: "Amount (in 100,000 units)",
-                  // scaleType: "linear",
-                  min: 0, 
-                  max: 100,
-                  // tickValues: xAxisTicks,
-                  // tickSpacing:1,
-                } ,
-              ]}
-              slotProps={{legend: {hidden: true}}}
-            />
-          </Box>
-          )}
-      </Box>
-    );
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default ChartBettorsAndBetsSummary;
