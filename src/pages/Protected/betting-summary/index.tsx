@@ -13,7 +13,7 @@ import { buttonStyles } from "~/styles/theme";
 
 const BettingSummaryPage = (params: { gameCategoryId?: number }) => {
   const router = useRouter();
-  console.log("Game Category: ", params.gameCategoryId);
+  //console.log("Game Category: ", params.gameCategoryId);
 
    const [ title, setTitle ] = useState('STL')
 
@@ -58,7 +58,7 @@ const BettingSummaryPage = (params: { gameCategoryId?: number }) => {
             </div>
             {/* Right Column */}
             <div className="w-full lg:w-2/3 h-full flex flex-col">
-              <div className="flex-1 flex flex-col space-y-6">
+              <div className="flex-1 flex flex-col space-y-5">
                 <ChartBettorsvsBetsPlacedSummary
                   gameCategoryId={params.gameCategoryId}
                 />
@@ -70,7 +70,7 @@ const BettingSummaryPage = (params: { gameCategoryId?: number }) => {
                   <ChartBettorsSummary />
                 )}
               </div>
-              <div className="self-end my-4">
+              <div className="self-end my-3">
                 <Button
                   variant="contained"
                   sx={buttonStyles}

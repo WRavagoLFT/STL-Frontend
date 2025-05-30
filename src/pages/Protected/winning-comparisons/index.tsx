@@ -4,7 +4,6 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import dayjs from "dayjs";
 
 import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinners&Winnings";
 import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinners&Winnings";
@@ -13,8 +12,9 @@ import { useSideBarStore } from "../../../store/useSideBarStore";
 import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import router from "next/router";
+import dayjs from "dayjs";
 
-type dateType = 'Specific Date' | 'Date Duration';
+type dateType = "Specific Date" | "Date Duration";
 
 const WinningComparison = () => {
   const {
@@ -33,29 +33,27 @@ const WinningComparison = () => {
     setFirstDateSpecific,
     setSecondDateSpecific,
     setFirstDateDuration,
-    setSecondDateDuration
+    setSecondDateDuration,
   } = useWinningStore();
 
   // Format dates to MM/DD/YYYY
   const formattedFirstDateSpecific = firstDateSpecific
-  ? dayjs(firstDateSpecific).format("MM/DD/YYYY")
-  : null;
+    ? dayjs(firstDateSpecific).format("MM/DD/YYYY")
+    : null;
 
-const formattedSecondDateSpecific = secondDateSpecific
-  ? dayjs(secondDateSpecific).format("MM/DD/YYYY")
-  : null;
+  const formattedSecondDateSpecific = secondDateSpecific
+    ? dayjs(secondDateSpecific).format("MM/DD/YYYY")
+    : null;
 
-const formattedFirstDateDuration = firstDateDuration
-  ? dayjs(firstDateDuration).format("MM/DD/YYYY")
-  : null;
+  const formattedFirstDateDuration = firstDateDuration
+    ? dayjs(firstDateDuration).format("MM/DD/YYYY")
+    : null;
 
-const formattedSecondDateDuration = secondDateDuration
-  ? dayjs(secondDateDuration).format("MM/DD/YYYY")
-  : null;
+  const formattedSecondDateDuration = secondDateDuration
+    ? dayjs(secondDateDuration).format("MM/DD/YYYY")
+    : null;
 
-  const { 
-    SideBarActiveGameType,
-  } = useSideBarStore();
+  const { SideBarActiveGameType } = useSideBarStore();
 
   useEffect(() => {
     if (SideBarActiveGameType !== activeGameType) {
@@ -73,25 +71,25 @@ const formattedSecondDateDuration = secondDateDuration
     "Total Winners by Game Type",
   ];
 
-    // Debugging: Log all states whenever they change
-    useEffect(() => {
-      //console.log("Active Sidebar State:", activeGameType)
-      //console.log("State values:");
-      //console.log("categoryFilter:", categoryFilter);
-      //console.log("dateFilter:", dateFilter);
-      //console.log("firstDateSpecific:", firstDateSpecific);
-      //console.log("secondDateSpecific:", secondDateSpecific);
-      //console.log("firstDateDuration:", firstDateDuration);
-      //console.log("secondDateDuration:", secondDateDuration);
-    }, [
-      activeGameType,
-      categoryFilter,
-      dateFilter,
-      firstDateSpecific,
-      secondDateSpecific,
-      firstDateDuration,
-      secondDateDuration,
-    ]);
+  // Debugging: Log all states whenever they change
+  useEffect(() => {
+    //console.log("Active Sidebar State:", activeGameType)
+    //console.log("State values:");
+    //console.log("categoryFilter:", categoryFilter);
+    //console.log("dateFilter:", dateFilter);
+    //console.log("firstDateSpecific:", firstDateSpecific);
+    //console.log("secondDateSpecific:", secondDateSpecific);
+    //console.log("firstDateDuration:", firstDateDuration);
+    //console.log("secondDateDuration:", secondDateDuration);
+  }, [
+    activeGameType,
+    categoryFilter,
+    dateFilter,
+    firstDateSpecific,
+    secondDateSpecific,
+    firstDateDuration,
+    secondDateDuration,
+  ]);
 
   return (
     <div className="w-full">
@@ -102,12 +100,11 @@ const formattedSecondDateDuration = secondDateDuration
           iconColor="#fff"
           size={30}
           onClick={() => {
-            router.push("/betting-summary/dashboard");
+            router.push("/winning-summary/dashboard");
           }} // this should be dynamic
         />
-        {/* this should be dynamic */}
         <div className="text-3xl ml-3 font-bold">
-          STL Winnning Summary Overview
+           {(activeGameType === "Dashboard" ? "STL" : activeGameType)} Winnning Summary Overview
         </div>
       </div>
       <div className="flex flex-col gap-4 w-full h-full mt-8">

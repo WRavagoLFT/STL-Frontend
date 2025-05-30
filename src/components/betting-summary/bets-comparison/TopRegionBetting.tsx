@@ -118,7 +118,7 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<ChartData[]>([]);
-
+  
   const philippineRegions = [
     "NCR",
     "CAR",
@@ -166,8 +166,8 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
     "STL Swer3": 3,
     "STL Swer4": 4,
   };
+
   const gameCategoryParam = gameCategoryMap[activeGameType];
-  //console.log('Game Category Param:', gameCategoryParam)
 
   // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
@@ -337,7 +337,6 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
       <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
         {`${categoryFilter}`}
       </p>
-
       <CustomLegend
         activeGameType={activeGameType}
         categoryFilter={categoryFilter}
@@ -347,7 +346,6 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
         firstDateDuration={firstDateDuration}
         secondDateDuration={secondDateDuration}
       />
-
       <div className="h-full flex flex-col flex-grow">
         {loading ? (
           <div className="flex justify-center items-center h-full">

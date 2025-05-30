@@ -75,7 +75,7 @@ const TableWinningActivityToday = (params: {gameCategoryId?: number}) => {
       }, []);
 
   return (
-    <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
+    <div className="w-full flex-1 h-[53.5rem] bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
       <div className="flex mb-2 items-center w-full">
         <div className="bg-[#0038A8] rounded-lg p-1">
           <FaDiceSix size={24} color={"#F6BA12"} />

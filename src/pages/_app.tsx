@@ -1,20 +1,13 @@
 import { AppProps } from "next/app";
-import {
-  ThemeProvider,
-  CssBaseline,
-  CircularProgress,
-  Box,
-} from "@mui/material";
+import { ThemeProvider, CssBaseline, CircularProgress, } from "@mui/material";
 import Layout from "../layout";
 import darkTheme from "../styles/theme";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "../utils/api/auth";
 import "../styles/globals.css";
-import axiosInstance, {
-  isRefreshing,
-  refreshSubscribers,
-} from "../utils/axiosInstance";
+import axiosInstance, { isRefreshing, refreshSubscribers, } from "../utils/axiosInstance";
+import { useAuthStore } from "~/store/useAuthStore";
 
 const excludedPaths = [
   "/",
@@ -28,13 +21,14 @@ const excludedPaths = [
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
   const isExcludedPath = excludedPaths.includes(router.pathname);
-  console.log(router.pathname)
   const [loading, setLoading] = useState(true);
+  
+  const { userTypeId, setUserTypeId } = useAuthStore.getState(); // set directly (outside React)
+  //console.log("UserTypeId from store:", userTypeId);
 
-  // Helper function: Wait until token refresh is done
   const waitUntilNotRefreshing = async () => {
     while (isRefreshing) {
-      await new Promise((r) => requestAnimationFrame(r)); // Lighter than setInterval
+      await new Promise((r) => requestAnimationFrame(r));
     }
   };
 
@@ -45,25 +39,30 @@ const App = ({ Component, pageProps }: AppProps) => {
     }
 
     const handleAuthFailure = () => {
-      console.log(router.pathname)
-      console.log("No valid auth found! Redirecting to login...");
-      router.replace("/Auth/login");
+      console.warn("No valid auth found! Redirecting to login...");
+      router.replace("/auth/login");
     };
 
     const checkAuth = async () => {
       try {
         await waitUntilNotRefreshing();
         const data = await getCurrentUser({});
-        //console.log('getCurrentUser', data);
+        console.log("getCurrentUser response:", data);
         if (data?.success) {
+          const roleId = data.data?.UserTypeId;
+          console.log("", roleId)
+          setUserTypeId(roleId); // update roleId
+
           setLoading(false);
           return;
         }
+
         throw new Error("No valid auth found!");
       } catch (error: any) {
         const isTokenExpired =
           error?.response?.status === 403 &&
           error.response?.data?.message === "Token expired.";
+
         if (isTokenExpired) {
           await new Promise<void>((resolve) =>
             refreshSubscribers.push(() => resolve())
@@ -72,6 +71,11 @@ const App = ({ Component, pageProps }: AppProps) => {
           try {
             const data = await getCurrentUser({});
             if (data?.success) {
+              const roleId = data.user?.UserTypeId;
+              setUserTypeId(roleId);
+              console.log('CURRENT USER', data);
+              console.log("UserTypeId:", roleId);
+
               setLoading(false);
               return;
             }
@@ -86,7 +90,6 @@ const App = ({ Component, pageProps }: AppProps) => {
 
     checkAuth();
 
-    // refreshing every 1 minute
     const refreshInterval = setInterval(() => {
       console.log("Refreshing token...");
       axiosInstance.post("/auth/tokenRefresh", {}, { withCredentials: true });
@@ -99,14 +102,9 @@ const App = ({ Component, pageProps }: AppProps) => {
     return (
       <ThemeProvider theme={darkTheme}>
         <CssBaseline />
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          height="100vh"
-        >
+        <div className="flex justify-center items-center h-screen">
           <CircularProgress />
-        </Box>
+        </div>
       </ThemeProvider>
     );
   }
@@ -118,7 +116,7 @@ const App = ({ Component, pageProps }: AppProps) => {
         <Component {...pageProps} />
       ) : (
         <Layout>
-          <Component {...pageProps} />
+          <Component {...pageProps} userTypeId={userTypeId} />
         </Layout>
       )}
     </ThemeProvider>

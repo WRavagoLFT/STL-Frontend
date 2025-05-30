@@ -240,7 +240,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     "STL Swer4": 4,
   };
   const gameCategoryParam = gameCategoryMap[activeGameType];
-  console.log('Game Category Param:', gameCategoryParam)
+  //console.log('Game Category Param:', gameCategoryParam)
 
   // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {

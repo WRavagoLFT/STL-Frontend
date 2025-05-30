@@ -1,9 +1,6 @@
 import { create } from 'zustand';
 import { fetchHistoricalRegion } from '~/utils/api/transactions';
 
-// For Dashboard Cards
-//import getTransactionsData from '~/utils/api/transactions/get.TransactionsData.service';
-
 const getTodayDate = () => new Date().toISOString().slice(0, 10);
 const getYesterdayDate = () => {
   const date = new Date();
@@ -52,7 +49,6 @@ interface BettingStore {
     totalRevenue: number;
   };
   
-
   // For Submenus, Date type extracted from URL params
   setGameType: (gameType: string) => void;
   setCategoryFilter: (category: categoryType) => void;
@@ -94,8 +90,6 @@ export const useBettingStore = create<BettingStore>((set) => ({
     setSecondDateDuration: (date) => set({ secondDateDuration: date }),
 
     // Dashboard Cards Component
-    //
-
     fetchAndAggregateData: async () => {
       try {
         // Fetch the data using the correct fetchHistoricalRegion call

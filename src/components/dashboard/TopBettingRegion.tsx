@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaDiceSix } from "react-icons/fa";
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { fetchHistoricalRegion } from "~/utils/api/transactions";
+import router from "next/router";
 
 interface RegionData {
   RegionId: number;
@@ -79,7 +80,9 @@ const TopBettingRegionPage = () => {
         </div>
         <div className="flex items-center justify-between flex-1 ml-3">
           <p className="text-base">Top Betting Regions Today</p>
-          <button className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
+          <button
+            onClick={() => { router.push("/betting-summary/dashboard");}} 
+            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
             View Bettors
           </button>
         </div>

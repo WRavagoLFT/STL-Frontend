@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -13,7 +13,7 @@ import { useBettingStore, categoryType } from "../../../store/useBettingStore";
 import { useSideBarStore } from "../../../store/useSideBarStore";
 import dayjs from "dayjs";
 import BackIconButton from "~/components/ui/icons/BackButton";
-import router from "next/router";
+import router, { useRouter } from "next/router";
 
 type dateType = "Specific Date" | "Date Duration";
 
@@ -101,9 +101,8 @@ const BettingComparison = () => {
             router.push("/betting-summary/dashboard");
           }} // this should be dynamic
         />
-        {/* this should be dynamic */}
         <div className="text-3xl ml-3 font-bold"> 
-          STL Betting Summary Overview
+           {(activeGameType === "Dashboard" ? "STL" : activeGameType)} Betting Summary Overview
         </div>
       </div>
       <div className="flex flex-col gap-4 w-full h-full mt-8">

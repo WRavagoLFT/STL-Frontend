@@ -752,7 +752,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
               {
                 //label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 10,
+                //max: 10,
               },
             ]}
             series={generateSeries(chartData, urlParam)}

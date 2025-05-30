@@ -3,6 +3,7 @@ import { fetchHistoricalRegion } from "~/utils/api/transactions";
 import { FaMoneyBillAlt } from "react-icons/fa";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import router from "next/router";
 
 interface RegionData {
   RegionId: number;
@@ -62,7 +63,9 @@ const TopWinningRegionPage = () => {
         </div>
         <div className="flex items-center justify-between flex-1 ml-3">
           <p className="text-base">Top Betting Regions Today</p>
-          <button className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
+          <button
+            onClick={() => { router.push("/winning-summary/dashboard");}}
+            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
             View Winners
           </button>
         </div>

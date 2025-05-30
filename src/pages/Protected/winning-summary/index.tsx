@@ -37,10 +37,12 @@ const WinningSummaryPage = (params: {gameCategoryId?: number}) => {
               <div className="flex-1 flex flex-col space-y-6">
                 <ChartWinnersvsWinningsSummary gameCategoryId={params.gameCategoryId}/>
                 {
-                params.gameCategoryId && params.gameCategoryId > 0 ? <ChartWinnersBetTypeSummary gameCategoryId={params.gameCategoryId}/> : <ChartWinnersSummary />
+                params.gameCategoryId && params.gameCategoryId > 0 ? 
+                <ChartWinnersBetTypeSummary gameCategoryId={params.gameCategoryId}/> : 
+                  <ChartWinnersSummary />
               }
               </div>
-              <div className="self-end my-4">
+              <div className="self-end my-3">
                 <Button
                   variant="contained"
                   sx={buttonStyles}
