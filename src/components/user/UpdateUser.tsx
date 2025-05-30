@@ -23,7 +23,7 @@ export default function UpdateUserModal({
   onViewEditLogs,
 }: UpdateUserModalProps) {
   
-  const title = userTypeId === 2 ? "Update Manager" : userTypeId === 3 ? "Update Executive" : "Update User";
+  const title = userTypeId === 4 ? "Update Manager" : userTypeId === 3 ? "Update Executive" : "Update User";
 
   return (
     <ModalWrapper isOpen={open} onClose={onClose} title={title}>

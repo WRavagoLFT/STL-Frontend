@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import getTransactionsData from '~/utils/api/transactions/get.TransactionsData.service';
+import { fetchHistoricalRegion } from '~/utils/api/transactions';
+//import getTransactionsData from '~/utils/api/transactions/get.TransactionsData.service';
 
 const getTodayDate = () => new Date().toISOString().slice(0, 10);
 
@@ -88,25 +89,22 @@ export const useWinningStore = create<WinningStore>((set) => ({
 
   fetchAndAggregateDate: async () => {
     try {
-      // Fetch the data using the getTransactionsData function
-      const data = await getTransactionsData<{
+      const data = await fetchHistoricalRegion<{
         TransactionDate: string;
+        TotalBettors: number;
         RegionId: number;
         Region: string;
         RegionFull: string;
         TotalBets: number;
-        TotalBettors: number;
         TotalWinners: number;
         TotalBetAmount: number;
         TotalPayout: number;
         TotalEarnings: number;
-      }[]>("/transactions/getHistoricalRegion", '');
+      }[]>();
 
-      console.log(`Winning Dashboard Cards Data:`, JSON.stringify(data, null, 2));
+      console.log("Winning Dashboard Cards Data:", JSON.stringify(data, null, 2));
 
-      // Check if data is valid and is an array
       if (data && Array.isArray(data)) {
-        // Aggregate the totals
         const totals = data.reduce(
           (acc, item) => {
             acc.totalBettors += item.TotalBettors;
@@ -125,7 +123,6 @@ export const useWinningStore = create<WinningStore>((set) => ({
           }
         );
 
-        // Update the store with the aggregated data
         set({ cardsAggregatedData: totals });
       } else {
         console.error("Unexpected data format or no data returned:", data);

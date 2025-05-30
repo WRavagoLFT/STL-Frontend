@@ -17,12 +17,12 @@ const roleMap: Record<string, { label: string; textlabel: string; roleId: number
 managers: {
     label: "Small Town Lottery Manager",
     textlabel: "Managers",
-    roleId: 3,
+    roleId: 4,
   },
   executive: {
     label: "Small Town Lottery Executive",
     textlabel: "Executives",
-    roleId: 4,
+    roleId: 3,
   },
 };
 

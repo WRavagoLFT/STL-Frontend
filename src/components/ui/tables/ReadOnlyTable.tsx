@@ -149,7 +149,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
                     const key = String(col.key);
                     const value = (row as any)[key];
                     return (
-                      <TableCell key={key} sx={{ paddingY: 0.9 }}>
+                      <TableCell key={key} sx={{ paddingY: 0.6 }}>
                         {col.render
                           ? col.render(row as unknown as T)
                           : col.filterValue

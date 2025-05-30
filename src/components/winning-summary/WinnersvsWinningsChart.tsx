@@ -24,10 +24,9 @@ const CustomLegend = () => (
 
 const ChartWinnersvsWinningsSummary = (params: { gameCategoryId?: number }) => {
   const [loading, setLoading] = useState(true);
-  // const [data, setData] = useState<
-  //   { draw: string; winners: number; winnings: number }[]
-  // >([]);
-  // const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<
+   { draw: string; winners: number; winnings: number }[]
+  >([]);
 
   // useEffect(() => {
   //   const fetchData = async () => {

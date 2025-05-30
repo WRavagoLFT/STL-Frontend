@@ -1,15 +1,15 @@
-import React, {useState, useEffect, useCallback} from "react";
-import { Box, Typography, Stack} from "@mui/material";
+import React, { useState, useEffect, useCallback } from "react";
+import { Box, Typography, Stack, CircularProgress } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import {
   WinnersandWinningsSummaryProps,
   getLegendItemsMap_Specific,
   getLegendItemsMap_Duration,
 } from "../../../store/useWinningStore";
-
-// API Endpoints
-import getCompareHistoricalWinners from "~/utils/api/winners/get.CompareHistoricalWinners.service";
-import getCompareHistoricalWinnersRange from "~/utils/api/winners/get.CompareHistoricalWinnersRange.service";
+import {
+  fetchCompareHistoricalWinnersDate,
+  fetchCompareHistoricalWinnersRange,
+} from "~/utils/api/winners";
 
 interface ChartData {
   region: string;
@@ -27,7 +27,7 @@ interface Region {
   TotalSahod: number;
   TotalRamble: number;
 }
-interface DateSpecific{
+interface DateSpecific {
   DateOfWinningCombination: string;
   Region: string;
   TotalWinners: number;
@@ -40,7 +40,7 @@ interface DateSpecific{
   TotalRamblePayouts: number;
   Rank: number;
 }
-interface DateRange{
+interface DateRange {
   Region: string;
   TotalWinners: number;
   TotalPayoutAmount: number;
@@ -48,10 +48,11 @@ interface DateRange{
   DateOfWinningCombination: string;
 }
 const formatDate = (date: string | null): string => {
+  if (!date) return "";
   const d = new Date(date);
   const year = d.getFullYear();
-  const month = `${d.getMonth() + 1}`.padStart(2, '0');
-  const day = `${d.getDate()}`.padStart(2, '0');
+  const month = `${d.getMonth() + 1}`.padStart(2, "0");
+  const day = `${d.getDate()}`.padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
@@ -70,7 +71,11 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
   // Determine which legend items map to use based on the dateFilter
   const legendItems =
     dateFilter === "Specific Date"
-      ? getLegendItemsMap_Specific(categoryFilter, firstDateSpecific, secondDateSpecific)
+      ? getLegendItemsMap_Specific(
+          categoryFilter,
+          firstDateSpecific,
+          secondDateSpecific
+        )
       : getLegendItemsMap_Duration(
           categoryFilter,
           firstDateSpecific,
@@ -108,27 +113,46 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
   );
 };
 
-const ChartTopRegionByWinsandWinners
-: React.FC<WinnersandWinningsSummaryProps> = ({
+const ChartTopRegionByWinsandWinners: React.FC<
+  WinnersandWinningsSummaryProps
+> = ({
   categoryFilter,
   dateFilter,
   firstDateSpecific,
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
-  activeGameType
+  activeGameType,
 }) => {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<ChartData[]>([]);
 
   const philippineRegions = [
-  "NCR", "CAR", "I", "II", "III", "IV-A", "IV-B",
-  "V", "VI", "VII", "VIII", "IX", "X", "XI",
-  "XII", "XIII", "BARMM"
-];
-console.log('Active Game Category:', activeGameType)
+    "NCR",
+    "CAR",
+    "I",
+    "II",
+    "III",
+    "IV-A",
+    "IV-B",
+    "V",
+    "VI",
+    "VII",
+    "VIII",
+    "IX",
+    "X",
+    "XI",
+    "XII",
+    "XIII",
+    "BARMM",
+  ];
+  //console.log("Active Game Category:", activeGameType);
+
   // Determine which field to aggregated based on categoryFilter
-  const aggregateField = categoryFilter.includes("Winnings") ? "TotalPayoutAmount" : "TotalWinners";
+  const aggregateField = categoryFilter.includes("Winnings")
+    ? "TotalPayoutAmount"
+    : "TotalWinners";
+
   // Determine chart number based on category
   const chartMap: Record<string, string> = {
     "Total Winnings and Winners": "1",
@@ -139,35 +163,37 @@ console.log('Active Game Category:', activeGameType)
     "Top Winning Region by Total Winning": "4",
     "Top Winner Region by Total Winners": "4",
   };
+
   const urlParam = chartMap[categoryFilter];
   const gameCategoryMap: Record<string, number> = {
-    "Dashboard": 0,
+    Dashboard: 0,
     "STL Pares": 1,
     "STL Swer2": 2,
     "STL Swer3": 3,
     "STL Swer4": 4,
-  }
+  };
+
   const gameCategoryParam = gameCategoryMap[activeGameType];
-  console.log('Game Category Param:', gameCategoryParam);
-  console.log('URL Param:', urlParam);
+  //console.log('Game Category Param:', gameCategoryParam);
+  //console.log('URL Param:', urlParam);
 
   // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
-    if(gameCategoryParam && gameCategoryParam >=1 && gameCategoryParam <= 4) {
+    if (gameCategoryParam && gameCategoryParam >= 1 && gameCategoryParam <= 4) {
       return { gameType: gameCategoryParam };
     }
     return {};
-  }
+  };
 
-    // SpecificDate
+  // SpecificDate
   const processSpecificPayloadData = (payload: {
     FirstDate: DateSpecific[];
     SecondDate: DateSpecific[];
   }) => {
-    const data: ChartData[] = philippineRegions.map(region => {
+    const data: ChartData[] = philippineRegions.map((region) => {
       const apiLabel = apiRegionLabel(region);
-      const firstItem  = payload.FirstDate.find(r => r.Region === apiLabel);
-      const secondItem = payload.SecondDate.find(r => r.Region === apiLabel);
+      const firstItem = payload.FirstDate.find((r) => r.Region === apiLabel);
+      const secondItem = payload.SecondDate.find((r) => r.Region === apiLabel);
 
       return {
         region,
@@ -177,15 +203,16 @@ console.log('Active Game Category:', activeGameType)
     });
     setChartData(data);
   };
+
   // SpecificDate
   const processRangePayloadData = (payload: {
     FirstRange: DateRange[];
     SecondRange: DateRange[];
   }) => {
-    const data: ChartData[] = philippineRegions.map(region => {
+    const data: ChartData[] = philippineRegions.map((region) => {
       const apiLabel = apiRegionLabel(region);
-      const firstItem  = payload.FirstRange.find(r => r.Region === apiLabel);
-      const secondItem = payload.SecondRange.find(r => r.Region === apiLabel);
+      const firstItem = payload.FirstRange.find((r) => r.Region === apiLabel);
+      const secondItem = payload.SecondRange.find((r) => r.Region === apiLabel);
 
       return {
         region,
@@ -195,118 +222,110 @@ console.log('Active Game Category:', activeGameType)
     });
     setChartData(data);
   };
-  
 
-    const fetchData = useCallback(async () => {
-      setLoading(true);
-      try {
-        const gameCategoryParam = getGameCategoryParam();
-        if (dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific) {
-          console.log("Fetching Specific Date:", formatDate(firstDateSpecific), formatDate(secondDateSpecific));
-          const resp = await getCompareHistoricalWinners(
-            "/winners/compareHistoricalWinners/chartType/",
-            urlParam,
-            { 
-              first: formatDate(firstDateSpecific), 
-              second: formatDate(secondDateSpecific),
-              ...gameCategoryParam
-            }
-          );
-          console.log("Payload (Specific Date):", resp);
-          // resp now has { FirstDate: [...], SecondDate: [...] }
-          if (resp && resp.FirstDate && resp.SecondDate) {
-            processSpecificPayloadData(resp);
-          } else {
-            console.warn("Unexpected payload:", resp);
+  // fetching the data
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const gameCategoryParam = getGameCategoryParam();
+      if (
+        dateFilter === "Specific Date" &&
+        firstDateSpecific &&
+        secondDateSpecific
+      ) {
+        console.log(
+          "Fetching Specific Date:",
+          formatDate(firstDateSpecific),
+          formatDate(secondDateSpecific)
+        );
+        const resp = await fetchCompareHistoricalWinnersDate(
+          "/winners/compareHistoricalWinners/chartType/",
+          urlParam,
+          {
+            first: formatDate(firstDateSpecific),
+            second: formatDate(secondDateSpecific),
+            ...gameCategoryParam,
           }
-  
-        } else if (
-          dateFilter === "Date Duration" &&
-          firstDateSpecific && secondDateSpecific &&
-          firstDateDuration && secondDateDuration
-        ) {
-          console.log("Fetching Date Duration ranges");
-          const resp = await getCompareHistoricalWinnersRange(
-            "/winners/compareHistoricalWinnersRange/chartType/",
-            urlParam,
-            {
-              firstStart: formatDate(firstDateSpecific),
-              firstEnd: formatDate(secondDateSpecific),
-              secondStart: formatDate(firstDateDuration),
-              secondEnd: formatDate(secondDateDuration),
-              ...gameCategoryParam
-            }
-          );
-          console.log("Payload (Date Duration):", resp);
-          // resp now has { FirstDate: [...], SecondDate: [...] }
-          if (resp && resp.FirstRange && resp.SecondRange) {
-            processRangePayloadData(resp);
-          } else {
-            console.warn("Unexpected payload:", resp);
-          }
+        );
+        console.log("Payload (Specific Date):", resp);
+        // resp now has { FirstDate: [...], SecondDate: [...] }
+        if (resp && resp.FirstDate && resp.SecondDate) {
+          processSpecificPayloadData(resp);
+        } else {
+          console.warn("Unexpected payload:", resp);
         }
-      } catch (err) {
-        console.error("Error fetching chart data:", err);
-      } finally {
-        setLoading(false);
+      } else if (
+        dateFilter === "Date Duration" &&
+        firstDateSpecific &&
+        secondDateSpecific &&
+        firstDateDuration &&
+        secondDateDuration
+      ) {
+        console.log("Fetching Date Duration ranges");
+        const resp = await fetchCompareHistoricalWinnersRange(
+          "/winners/compareHistoricalWinnersRange/chartType/",
+          urlParam,
+          {
+            firstStart: formatDate(firstDateSpecific),
+            firstEnd: formatDate(secondDateSpecific),
+            secondStart: formatDate(firstDateDuration),
+            secondEnd: formatDate(secondDateDuration),
+            ...gameCategoryParam,
+          }
+        );
+        console.log("Payload (Date Duration):", resp);
+        // resp now has { FirstDate: [...], SecondDate: [...] }
+        if (resp && resp.FirstRange && resp.SecondRange) {
+          processRangePayloadData(resp);
+        } else {
+          console.warn("Unexpected payload:", resp);
+        }
       }
-    }, [
-      dateFilter,
-      firstDateSpecific,
-      secondDateSpecific,
-      firstDateDuration,
-      secondDateDuration,
-      urlParam,
-      aggregateField,
-      gameCategoryParam,
-    ]);
-    
-    useEffect(() => {
-      fetchData();
-    }, [fetchData]);
+    } catch (err) {
+      console.error("Error fetching chart data:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    dateFilter,
+    firstDateSpecific,
+    secondDateSpecific,
+    firstDateDuration,
+    secondDateDuration,
+    urlParam,
+    aggregateField,
+    gameCategoryParam,
+  ]);
 
-  console.log('Chart Data:', chartData);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  //console.log('Chart Data:', chartData);
+
   return (
-    <Box
-      sx={{
-        backgroundColor: "#F8F0E3",
-        border: "1px solid #0038A8",
-        padding: "1rem",
-        borderRadius: "8px",
-        paddingBottom: "2rem",
-        width: "100%",
-        height: "585px",
-      }}
-    >
-      <Typography
-        color="#212121"
-        sx={{
-          fontSize: "16px",
-          fontWeight: 400,
-          lineHeight: "18px",
-          mb: "10px",
-        }}
-      >
+    <div className="bg-[#F8F0E3] p-4 rounded-lg pb-8 w-full h-[685px] border border-[#0038A8]">
+      <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
         {`${categoryFilter}`}
-      </Typography>
+      </p>
+
       <CustomLegend
-              activeGameType={activeGameType}
-              categoryFilter={categoryFilter}
-              dateFilter={dateFilter}
-              firstDateSpecific={firstDateSpecific}
-              secondDateSpecific={secondDateSpecific}
-              firstDateDuration={firstDateDuration}
-              secondDateDuration={secondDateDuration}
+        activeGameType={activeGameType}
+        categoryFilter={categoryFilter}
+        dateFilter={dateFilter}
+        firstDateSpecific={firstDateSpecific}
+        secondDateSpecific={secondDateSpecific}
+        firstDateDuration={firstDateDuration}
+        secondDateDuration={secondDateDuration}
       />
-      <Box
-        sx={{
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          flexGrow: 1,
-        }}
-      >
-        <LineChart
+
+      <div className="h-full flex flex-col flex-grow">
+        {loading ? (
+          <div className="flex justify-center items-center h-full">
+            <CircularProgress />
+          </div>
+        ) : (
+          <LineChart
           height={500}
           margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
           slotProps={{ legend: { hidden: true } }}
@@ -320,29 +339,35 @@ console.log('Active Game Category:', activeGameType)
             {
               label: "Amount (in 100,000 units)",
               min: 0,
-              max: 18, 
+              max: 18,
             },
           ]}
           series={[
-              {
-                data: chartData.map(item => item.firstValue),
-                label: dateFilter === "Specific Date" ? `Ranking\n${firstDateSpecific}`: `${firstDateSpecific} to ${secondDateSpecific}`,
-                color: "#E5C7FF",
-                curve: "linear"
-              },
-              {
-                data: chartData.map(item => item.secondValue),
-                label: dateFilter === "Specific Date" ? `Ranking\n${secondDateSpecific}` : `${firstDateDuration} to ${secondDateDuration}`,
-                color: "#3E2466",
-                curve: "linear"
-              }
-            ]}
+            {
+              data: chartData.map((item) => item.firstValue),
+              label:
+                dateFilter === "Specific Date"
+                  ? `Ranking\n${firstDateSpecific}`
+                  : `${firstDateSpecific} to ${secondDateSpecific}`,
+              color: "#E5C7FF",
+              curve: "linear",
+            },
+            {
+              data: chartData.map((item) => item.secondValue),
+              label:
+                dateFilter === "Specific Date"
+                  ? `Ranking\n${secondDateSpecific}`
+                  : `${firstDateDuration} to ${secondDateDuration}`,
+              color: "#3E2466",
+              curve: "linear",
+            },
+          ]}
           grid={{ horizontal: true }}
         />
-      </Box>
-    </Box>
+        )}
+      </div>
+    </div>
   );
 };
 
-export default ChartTopRegionByWinsandWinners
-;
+export default ChartTopRegionByWinsandWinners;

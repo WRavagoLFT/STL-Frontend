@@ -25,15 +25,15 @@ export const fetchHistoricalSummary = async (filters?: {
   }
 };
 
-export const fetchHistoricalRegion = async (p0?: { date: string }) => {
+export const fetchHistoricalRegion = async <T = any>(p0?: { date: string }): Promise<T> => {
   try {
     const url = validateRelativeUrl("/transactions/getHistoricalRegion");
     const response = await axiosInstance.get(url, {});
 
     return response.data;
   } catch (error) {
-    console.error("Error fetching users:", (error as Error).message);
-    return { success: false, message: (error as Error).message, data: [] };
+    console.error("Error fetching historical region data:", (error as Error).message);
+    throw error; // optionally throw or handle differently
   }
 };
 
@@ -120,4 +120,54 @@ export const fetchRetailReceipts = async (
     };
   }
 };
+
+interface CompareHistoricalDateParams {
+  chartType: string;
+  query: {
+    first: string;
+    second: string;
+    [key: string]: any; // for dynamic gameCategoryParam
+  };
+}
+
+export const fetchCompareHistoricalDate = async (
+  urlPath: string,
+  chartType: string,
+  query: Record<string, any>
+) => {
+  try {
+    const url = validateRelativeUrl(`${urlPath}${chartType}`);
+    const response = await axiosInstance.get(url, {
+      params: query,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching historical date comparison:", (error as Error).message);
+    return { success: false, message: (error as Error).message, data: [] };
+  }
+};
+
+export const fetchCompareHistoricalRange = async (
+  urlPath: string,
+  chartType: string,
+  query: Record<string, any>
+) => {
+  try {
+    const url = validateRelativeUrl(`${urlPath}${chartType}`);
+    const response = await axiosInstance.get(url, {
+      params: query,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching historical data:", (error as Error).message);
+    return { success: false, message: (error as Error).message, data: [] };
+  }
+};
+
+
+
+
+
+
+
   

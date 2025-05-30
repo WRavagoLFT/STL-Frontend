@@ -52,32 +52,15 @@ interface TransactionData {
 const ChartBettorsvsBetsPlacedSummary = (params: {
   gameCategoryId?: number;
 }) => {
-  console.log("BettersvsBetsPlacedChart Params:", params);
+  //console.log("BettersvsBetsPlacedChart Params:", params);
   const [loading, setLoading] = useState(true);
-  const [chartData, setChartData] = useState<
-    { draw: string; bettors: number; bets: number }[]
-  >([]);
+  const [chartData, setChartData] = useState<{ draw: string; bettors: number; bets: number }[]>([]);
+  //console.log("Chart Data: BETTING SUMMARY", chartData);
 
-  console.log("Chart Data", chartData);
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // const res = await getTransactionsData("/transactions/getHistorical", '') as TransactionData[];
-        // console.log('BettorsvsBetsPlaceChart', res)
-        // const drawMap = {
-        //   1: { draw: "First Draw", bettors: 0, bets: 0 },
-        //   2: { draw: "Second Draw", bettors: 0, bets: 0 },
-        //   3: { draw: "Third Draw", bettors: 0, bets: 0 },
-        // };
-
-        // res.forEach((item) => {
-        //   const drawOrder = item.DrawOrder as 1 | 2 | 3;
-        //   if (drawMap[drawOrder]) {
-        //     drawMap[drawOrder].bettors += item.TotalBettors ?? 0;
-        //     drawMap[drawOrder].bets += item.TotalBetAmount ?? 0;
-        //   }
-        // });
 
         // setChartData(Object.values(drawMap));
         const today = new Date().toISOString().split("T")[0];
@@ -116,12 +99,12 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
         setChartData(
           Object.values(drawMap).map((item) => ({
             draw: item.draw,
-            bettors: item.bettors / 100000,
-            bets: item.bets / 100000,
+            bettors: item.bettors / 10000,
+            bets: item.bets / 10000,
           }))
         );
 
-        console.log("BettorsvsBetsPlacedSummary chart: ", data);
+        //console.log("BettorsvsBetsPlacedSummary chart: ", data);
       } catch (error) {
         console.error(
           "Error loading BettorsvsBetsPlacedSummary:",
@@ -134,8 +117,6 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
 
     fetchData();
   }, [params.gameCategoryId]);
-
-  // const xAxisTicks = Array.from({ length: 21 }, (_, i) => i * 5); // 0 to 100
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
@@ -176,7 +157,6 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
                 label: "Amount (in 100,000 units)",
                 min: 0,
                 max: 100,
-                // tickValues: xAxisTicks,
               },
             ]}
             series={addLabels([

@@ -21,5 +21,36 @@ export const fetchWinners = async (p0?: { date: string; }) => {
     }
 };
 
+export const fetchCompareHistoricalWinnersDate = async (
+  urlPath: string,
+  chartType: string,
+  query: Record<string, any>
+) => {
+  try {
+    const url = validateRelativeUrl(`${urlPath}${chartType}`);
+    const response = await axiosInstance.get(url, {
+      params: query,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching historical date comparison:", (error as Error).message);
+    return { success: false, message: (error as Error).message, data: [] };
+  }
+};
 
-export default { fetchWinners };
+export const fetchCompareHistoricalWinnersRange = async (
+  urlPath: string,
+  chartType: string,
+  query: Record<string, any>
+) => {
+  try {
+    const url = validateRelativeUrl(`${urlPath}${chartType}`);
+    const response = await axiosInstance.get(url, {
+      params: query,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching historical data:", (error as Error).message);
+    return { success: false, message: (error as Error).message, data: [] };
+  }
+};

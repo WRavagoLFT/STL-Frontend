@@ -11,10 +11,7 @@ import {
   getLegendItemsMap_Specific,
   getLegendItemsMap_Duration,
 } from "../../../store/useWinningStore";
-
-// Api Endpoints
-import getCompareHistoricalWinners from "~/utils/api/winners/get.CompareHistoricalWinners.service";
-import getCompareHistoricalWinnersRange from "~/utils/api/winners/get.CompareHistoricalWinnersRange.service";
+import { fetchCompareHistoricalWinnersDate, fetchCompareHistoricalWinnersRange } from "~/utils/api/winners";
 
 type Chart1Data = {
   // Specific Date
@@ -111,6 +108,7 @@ interface RangePayload {
   }
 }
 const formatDate = (date: string | null): string => {
+  if (!date) return "";
   const d = new Date(date);
   const year = d.getFullYear();
   const month = `${d.getMonth() + 1}`.padStart(2, '0');
@@ -146,35 +144,23 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
   );
 
   return (
-    <Stack direction="column" spacing={1} sx={{ mt: 0.5, mr: 4 }}>
+    <div className="flex flex-col space-y-1 mt-1 mr-4">
       {chunkedLegendItems.map((chunk, rowIndex) => (
-        <Stack key={rowIndex} direction="row" spacing={2} justifyContent="left">
+        <div key={rowIndex} className="flex flex-row space-x-2 justify-start">
           {chunk.map((item, index) => (
-            <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
-              <Box
-                sx={{
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  backgroundColor: item.color,
-                  mr: 1.5,
-                }}
+            <div key={index} className="flex items-center">
+              <div
+                className="w-[14px] h-[14px] rounded-full mr-1.5"
+                style={{ backgroundColor: item.color }}
               />
-              <Typography
-                color="#212121"
-                sx={{
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  lineHeight: "14px",
-                }}
-              >
+              <p className="text-[12px] font-normal leading-[14px]">
                 {item.label}
-              </Typography>
-            </Box>
+              </p>
+            </div>
           ))}
-        </Stack>
+        </div>
       ))}
-    </Stack>
+    </div>
   );
 };
 
@@ -260,6 +246,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       };
     });
   };
+
   const processChart2Data = (
     payload: { Region: Array<RegionSpecificData[]> },
     firstDate: string,
@@ -286,6 +273,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       };
     });
   };
+
   const processChart3Data = (
     payload: { Region: Array<RegionSpecificData[]> },
     firstDate: string,
@@ -318,6 +306,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       return result;
     });
   };
+
   const processChart5Data = (
     payload: { Region: Array<RegionSpecificData[]> },
     firstDate: string,
@@ -344,6 +333,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       };
     });
   };
+
   const processChart6Data = (
     payload: { Region: Array<RegionSpecificData[]> },
     firstDate: string,
@@ -400,9 +390,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     }
   };
 
-
-  // For Date Duration Date.
-    //  For Date Duration Date.
+  //  For Date Duration Date.
   const processDurationChart1Data = (
     payload: RangePayload
   ) => {
@@ -423,6 +411,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       };
     });
   };
+
   const processDurationChart2Data = (
     payload: RangePayload
   ) => {
@@ -443,6 +432,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       };
     });
   };
+
   const processDurationChart3Data = (
     payload: RangePayload
   ) => {
@@ -470,6 +460,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       return result;
     });
   };
+
   const processDurationChart5Data = (
     payload: RangePayload
   ) => {
@@ -490,6 +481,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       };
     });
   };
+
   const processDurationChart6Data = (
     payload: RangePayload
   ) => {
@@ -517,7 +509,8 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       return result;
     });
   };
-    // Main processor for Date Duration
+
+  // Main processor for Date Duration
   const processDurationPayload = (
     urlParam: string,
     payload: any
@@ -539,73 +532,74 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     }
   };
 
-    const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
-      try {
-          const gameTypeParam = getGameCategoryParam();
-          if (
-            dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific
-          ) {
-              console.log("Fetching Date by Specific Date:", formatDate(firstDateSpecific), formatDate(secondDateSpecific));
+    try {
+      const gameCategoryParam = getGameCategoryParam();
 
-              const resp = await getCompareHistoricalWinners(
-                "/winners/compareHistoricalWinners/chartType/",
-                urlParam,
-                { 
-                  first: formatDate(firstDateSpecific), 
-                  second: formatDate(secondDateSpecific),
-                  ...gameTypeParam
-                }
-              );
-              console.log("Payload (Specific Date)", resp)
-
-              if (resp && resp.Region) {
-                const processedData = processSpecificDatePayload(
-                  urlParam,
-                  resp,
-                  firstDateSpecific,
-                  secondDateSpecific
-                );
-                console.log("Processed Data:", processedData);
-                setChartData(processedData);
-              }else {
-                console.warn("Unexpexted payload:", resp);
-              }
+      if (
+        dateFilter === "Specific Date" &&
+        firstDateSpecific &&
+        secondDateSpecific
+      ) {
+        const resp = await fetchCompareHistoricalWinnersDate(
+          "/transactions/compareHistoricalDate/chartType/",
+          urlParam,
+          {
+            first: formatDate(firstDateSpecific),
+            second: formatDate(secondDateSpecific),
+            ...gameCategoryParam,
           }
-          else if (
-            dateFilter === "Date Duration" &&
-            firstDateSpecific && secondDateSpecific &&
-            firstDateDuration && secondDateDuration
-          ){
-              console.log("Fetching Date by Date Duration");
+        );
 
-              const resp = await getCompareHistoricalWinnersRange(
-              "/winners/compareHistoricalWinnersRange/chartType/",
-              urlParam,
-              {
-                firstStart: formatDate(firstDateSpecific),
-                firstEnd: formatDate(secondDateSpecific),
-                secondStart: formatDate(firstDateDuration),
-                secondEnd: formatDate(secondDateDuration),
-                ...gameTypeParam
-              }
-            );
-            console.log("Payload (Date Duration)", resp)
-
-            if (resp && resp.Region) {
-              const processedData = processDurationPayload(urlParam, resp);
-              setChartData(processedData);
-              console.log("Processed Data:", processedData);
-              setChartData(processedData);
-            } else {
-              console.warn("Unexpected payload:", resp);
-            }
+        if (resp?.data?.Region) {
+          const processedData = processSpecificDatePayload(
+            urlParam,
+            resp.data,
+            firstDateSpecific,
+            secondDateSpecific
+          );
+          setChartData(processedData);
+        } else {
+          console.warn("Unexpected payload (Specific Date):", resp);
+          setChartData([]);
+        }
+      } else if (
+        dateFilter === "Date Duration" &&
+        firstDateSpecific &&
+        secondDateSpecific &&
+        firstDateDuration &&
+        secondDateDuration
+      ) {
+        const resp = await fetchCompareHistoricalWinnersRange(
+          "/transactions/compareHistoricalRange/chartType/",
+          urlParam,
+          {
+            firstStart: formatDate(firstDateSpecific),
+            firstEnd: formatDate(secondDateSpecific),
+            secondStart: formatDate(firstDateDuration),
+            secondEnd: formatDate(secondDateDuration),
+            ...gameCategoryParam,
           }
-        } catch (err) {
-        console.error("Error fetching data:", err);
-      } finally {
-        setLoading(false);
+        );
+
+        if (resp?.data?.Region) {
+          const processedData = processDurationPayload(urlParam, resp.data);
+          setChartData(processedData);
+        } else {
+          console.warn("Unexpected payload (Date Duration):", resp);
+          setChartData([]);
+        }
+      } else {
+        console.log("No valid condition met for data fetching.");
+        setChartData([]);
       }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setChartData([]);
+    } finally {
+      setLoading(false);
+    }
   }, [
     dateFilter,
     firstDateSpecific,
@@ -613,14 +607,11 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     firstDateDuration,
     secondDateDuration,
     urlParam,
-    gameTypeParam,
-    ]
-  )
+  ]);
 
   useEffect(()=> {
     fetchData();
   }, [fetchData]);
-
 
   const generateSeries = (chartData: ChartData[], urlParam: string) => {
     const isDuration = dateFilter === "Date Duration";
@@ -734,80 +725,49 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
   };
 
 return (
-    <Box
-    sx={{
-        backgroundColor: "#F8F0E3",
-        padding: "1rem",
-        borderRadius: "8px",
-        paddingBottom: "2rem",
-        width: "100%",
-        height: "610px",
-        border: "1px solid #0038A8",
-    }}
-    >
-        <Typography color="#212121" 
-        sx={{ 
-            fontSize: "16px",
-            fontWeight: 400,
-            lineHeight: "18px",
-            mb: "10px"
-        }}>
-            { `Regional Summary of ${categoryFilter}`}
-        </Typography>
-        <CustomLegend 
-          activeGameType={activeGameType}
-          categoryFilter={categoryFilter}
-          dateFilter={dateFilter}
-          firstDateSpecific={firstDateSpecific}
-          secondDateSpecific={secondDateSpecific}
-          firstDateDuration={firstDateDuration}
-          secondDateDuration={secondDateDuration}
-        />
-        <Box
-            sx={{
-            height: "100%",
-            // width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            flexGrow: 1,
-            backgroundColor: "#F8F0E3"
-        }}
-        >
-        { loading ? (
-            <Box
-              display="flex"
-              justifyContent="center"
-              alignItems="center"
-              height="100vh"
-            >
-              <CircularProgress />
-            </Box>
-        ): (
-            <BarChart
-            height={440} 
-            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-            slotProps={{ legend: { hidden: true } }}
+    <div className="bg-transparent p-4 rounded-lg pb-8 w-full h-[585px] border border-[#0038A8]">
+      <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
+        {`Regional Summary of ${categoryFilter}`}
+      </p>
+      <CustomLegend
+        activeGameType={activeGameType}
+        categoryFilter={categoryFilter}
+        dateFilter={dateFilter}
+        firstDateSpecific={firstDateSpecific}
+        secondDateSpecific={secondDateSpecific}
+        firstDateDuration={firstDateDuration}
+        secondDateDuration={secondDateDuration}
+      />
+
+      <div className="h-full flex flex-col flex-grow bg-transparent">
+        {loading ? (
+          <div className="flex justify-center items-center h-screen">
+            <CircularProgress />
+          </div>
+        ) : (
+          <BarChart
+            height={400}
+            margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
             xAxis={[
               {
+                label: "Amount (in 100,000 units)",
                 scaleType: "band",
-                data: philippineRegions, // Ensure this matches the number of data points
+                data: philippineRegions,
               },
             ]}
             yAxis={[
               {
-                label: "Amount (in 100,000 units)",
+                //label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100, // Adjust max to fit your data range
-                // tickValues: yAxisTicks, // Ensure all ticks are displayed
-                // tickSpacing: 5, // Optional: Adjust spacing between ticks
+                max: 10,
               },
             ]}
             series={generateSeries(chartData, urlParam)}
-            // Optional: Increase width for better x-axis spacing
+            slotProps={{ legend: { hidden: true } }}
           />
         )}
-        </Box>
-        </Box>
+      </div>
+    </div>
   )
 }
 export default ChartWinnersandWinningsRegionalSummary;

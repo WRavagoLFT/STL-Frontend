@@ -1,8 +1,5 @@
-// import { useRouter } from 'next/router';
-// import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import BettingSummaryPage from '../index';
-// import getTransactionsData from '~/utils/api/transactions/get.TransactionsData.service';
 
 const DynamicBettingSummary = () => {
   const router = useRouter();

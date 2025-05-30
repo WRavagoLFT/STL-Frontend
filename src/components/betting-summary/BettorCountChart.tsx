@@ -67,17 +67,17 @@ const ChartBettorsSummary = () => {
           from: today,
           to: today,
         }); // Add query params if needed
-        console.log(today);
-        console.log(response);
+        //console.log(today);
+        //console.log(response);
         // Filter Data for Today's Date
         const res = response.data.filter((item: { TransactionDate: string }) =>
           item.TransactionDate.startsWith(today)
         );
 
-        console.log(
-          "Result Data from BettorsvsBetsPlacedChart: " +
-            JSON.stringify(res.data, null, 2)
-        );
+        // console.log(
+        //   "Result Data from BettorsvsBetsPlacedChart: " +
+        //     JSON.stringify(res.data, null, 2)
+        // );
 
         if (response.success && Array.isArray(res)) {
           // Aggregate data by GameTypeId
@@ -147,7 +147,7 @@ const ChartBettorsSummary = () => {
               swer4: item.swer4 / 100000,
             }))
           );
-          console.log(formattedData);
+          //console.log(formattedData);
           setLoading(false);
         }
       } catch (error) {
@@ -183,7 +183,7 @@ const ChartBettorsSummary = () => {
           </div>
         ) : (
           <BarChart
-            height={350}
+            height={300}
             // width={{100%}}
             grid={{ vertical: true }}
             slotProps={{ legend: { hidden: true } }}

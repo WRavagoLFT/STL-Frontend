@@ -23,7 +23,7 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
     setIsLoading(true);
     const today = new Date().toISOString().split("T")[0];
 
-    console.log("Date Today, TopBettingRegion: ", today);
+    //console.log("Date Today, TopBettingRegion: ", today);
 
     // Assuming fetchHistoricalRegion accepts a date parameter
     const response = await fetchHistoricalRegion({ date: today });
@@ -90,7 +90,7 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
   }, [params.gameCategoryId]);
 
   return (
-    <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
+    <div className="w-full flex-1 h-[52.4rem] bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
       <div className="flex mb-2 items-center w-full">
         <div className="bg-[#0038A8] rounded-lg p-1">
           <FaDiceSix size={24} color={"#F6BA12"} />

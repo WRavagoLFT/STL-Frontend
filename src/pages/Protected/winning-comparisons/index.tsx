@@ -1,28 +1,20 @@
 import React, { useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
-} from "@mui/material";
+import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import dayjs from "dayjs";
-// Components
+
 import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinners&Winnings";
 import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinners&Winnings";
-
 import { useWinningStore, categoryType } from "../../../store/useWinningStore";
 import { useSideBarStore } from "../../../store/useSideBarStore";
-
 import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
+import BackIconButton from "~/components/ui/icons/BackButton";
+import router from "next/router";
+import dayjs from "dayjs";
 
-type dateType = 'Specific Date' | 'Date Duration';
+type dateType = "Specific Date" | "Date Duration";
 
 const WinningComparison = () => {
   const {
@@ -41,29 +33,27 @@ const WinningComparison = () => {
     setFirstDateSpecific,
     setSecondDateSpecific,
     setFirstDateDuration,
-    setSecondDateDuration
+    setSecondDateDuration,
   } = useWinningStore();
 
   // Format dates to MM/DD/YYYY
   const formattedFirstDateSpecific = firstDateSpecific
-  ? dayjs(firstDateSpecific).format("MM/DD/YYYY")
-  : null;
+    ? dayjs(firstDateSpecific).format("MM/DD/YYYY")
+    : null;
 
-const formattedSecondDateSpecific = secondDateSpecific
-  ? dayjs(secondDateSpecific).format("MM/DD/YYYY")
-  : null;
+  const formattedSecondDateSpecific = secondDateSpecific
+    ? dayjs(secondDateSpecific).format("MM/DD/YYYY")
+    : null;
 
-const formattedFirstDateDuration = firstDateDuration
-  ? dayjs(firstDateDuration).format("MM/DD/YYYY")
-  : null;
+  const formattedFirstDateDuration = firstDateDuration
+    ? dayjs(firstDateDuration).format("MM/DD/YYYY")
+    : null;
 
-const formattedSecondDateDuration = secondDateDuration
-  ? dayjs(secondDateDuration).format("MM/DD/YYYY")
-  : null;
+  const formattedSecondDateDuration = secondDateDuration
+    ? dayjs(secondDateDuration).format("MM/DD/YYYY")
+    : null;
 
-  const { 
-    SideBarActiveGameType,
-  } = useSideBarStore();
+  const { SideBarActiveGameType } = useSideBarStore();
 
   useEffect(() => {
     if (SideBarActiveGameType !== activeGameType) {
@@ -81,330 +71,238 @@ const formattedSecondDateDuration = secondDateDuration
     "Total Winners by Game Type",
   ];
 
-    // Debugging: Log all states whenever they change
-    useEffect(() => {
-      console.log("Active Sidebar State:", activeGameType)
-      console.log("State values:");
-      console.log("categoryFilter:", categoryFilter);
-      console.log("dateFilter:", dateFilter);
-      console.log("firstDateSpecific:", firstDateSpecific);
-      console.log("secondDateSpecific:", secondDateSpecific);
-      console.log("firstDateDuration:", firstDateDuration);
-      console.log("secondDateDuration:", secondDateDuration);
-    }, [
-      activeGameType,
-      categoryFilter,
-      dateFilter,
-      firstDateSpecific,
-      secondDateSpecific,
-      firstDateDuration,
-      secondDateDuration,
-    ]);
+  // Debugging: Log all states whenever they change
+  useEffect(() => {
+    //console.log("Active Sidebar State:", activeGameType)
+    //console.log("State values:");
+    //console.log("categoryFilter:", categoryFilter);
+    //console.log("dateFilter:", dateFilter);
+    //console.log("firstDateSpecific:", firstDateSpecific);
+    //console.log("secondDateSpecific:", secondDateSpecific);
+    //console.log("firstDateDuration:", firstDateDuration);
+    //console.log("secondDateDuration:", secondDateDuration);
+  }, [
+    activeGameType,
+    categoryFilter,
+    dateFilter,
+    firstDateSpecific,
+    secondDateSpecific,
+    firstDateDuration,
+    secondDateDuration,
+  ]);
 
   return (
-    <Box>
-      <Typography sx={{ fontWeight: 700 }} variant="h4">
-        STL Winning Summary Overview
-      </Typography>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          height: "100%",
-          width: "100%",
-          mt: 4,
-        }}
-      >
-        <Grid container spacing={2}>
+    <div className="w-full">
+      <div className="flex flex-row items-center">
+        <BackIconButton
+          bgColor="#0038A8"
+          hoverColor="#004ccf"
+          iconColor="#fff"
+          size={30}
+          onClick={() => {
+            router.push("/winning-summary/dashboard");
+          }} // this should be dynamic
+        />
+        <div className="text-3xl ml-3 font-bold">
+           {(activeGameType === "Dashboard" ? "STL" : activeGameType)} Winnning Summary Overview
+        </div>
+      </div>
+      <div className="flex flex-col gap-4 w-full h-full mt-8">
+        <div className="grid grid-cols-12 gap-4">
+          {dateFilter === "Specific Date" && (
+            <div className="col-span-12 md:col-span-8 flex flex-row gap-4">
+              {/* Left Side */}
+              <div className="flex flex-col gap-4 w-1/2">
+                <FormControl>
+                  <InputLabel id="category-label">
+                    Filter by Category
+                  </InputLabel>
+                  <Select
+                    labelId="category-label"
+                    id="category"
+                    value={categoryFilter}
+                    label="Filter by Category"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (categoryTypes.includes(value as categoryType)) {
+                        setCategoryFilter(value as categoryType);
+                      }
+                    }}
+                    IconComponent={() => (
+                      <FilterListIcon style={{ pointerEvents: "none" }} />
+                    )}
+                    sx={{ pr: 2 }}
+                    // size="small"
+                  >
+                    {categoryTypes.map((gameType) => (
+                      <MenuItem key={gameType} value={gameType}>
+                        {gameType}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="First Date"
+                    value={firstDateSpecific ? dayjs(firstDateSpecific) : null}
+                    onChange={(newValue) =>
+                      newValue
+                        ? setFirstDateSpecific(newValue.format("YYYY-MM-DD"))
+                        : setFirstDateSpecific("")
+                    }
+                  />
+                </LocalizationProvider>
+              </div>
 
-          { dateFilter === "Specific Date" &&
-          <Grid
-            item
-            xs={12}
-            sm={8}
-            md={8}
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 2,
-            }}
-          >
-            {/* Left Side */}
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              md={4}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
-              <FormControl>
-                <InputLabel id="category-label">Filter by Category</InputLabel>
-                <Select
-                  labelId="category-label"
-                  id="category"
-                  value={categoryFilter}
-                  label="Filter by Category"
-                  onChange={(e) =>
-                    setCategoryFilter(e.target.value as categoryType)
-                  } // Cast value to categoryType
-                  IconComponent={() => (
-                    <FilterListIcon style={{ pointerEvents: "none" }} /> // Prevent flipping
-                  )}
-                  sx={{ pr: 2 }}
-                >
-                  {categoryTypes.map((gameType) => (
-                    <MenuItem key={gameType} value={gameType}>
-                      {gameType}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="First Date"
-                  value={firstDateSpecific ? dayjs(firstDateSpecific) : null}
-                  onChange={(newValue) => {
-                    if(newValue){
-                      setFirstDateSpecific(newValue.format('YYYY-MM-DD'))
-                    }else{
-                      setFirstDateSpecific('')
+              {/* Right Side */}
+              <div className="flex flex-col gap-4 w-1/2">
+                <FormControl>
+                  <InputLabel id="date-filter-label">Filter by Date</InputLabel>
+                  <Select
+                    labelId="date-filter-label"
+                    id="date-filter"
+                    value={dateFilter}
+                    label="Filter by Date"
+                    onChange={(e) => setDateFilter(e.target.value as dateType)}
+                    IconComponent={() => (
+                      <FilterListIcon style={{ pointerEvents: "none" }} />
+                    )}
+                    sx={{ pr: 2 }}
+                  >
+                    <MenuItem value="Specific Date">Specific Date</MenuItem>
+                    <MenuItem value="Date Duration">Date Duration</MenuItem>
+                  </Select>
+                </FormControl>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Second Date"
+                    value={
+                      secondDateSpecific ? dayjs(secondDateSpecific) : null
                     }
-                  }
-                }
-                />
-              </LocalizationProvider>
-            </Grid>
-            {/* Right Side */}
-            <Grid
-              item
-              xs={12}
-              sm={4}
-              md={4}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
-              <FormControl>
-                <InputLabel id="date-filter-label">Filter by Date</InputLabel>
-                <Select
-                  labelId="date-filter-label"
-                  id="date-filter"
-                  value={dateFilter}
-                  label="Filter by Date"
-                  onChange={(e) => setDateFilter(e.target.value as dateType)} // Cast value to dateType
-                  IconComponent={() => (
-                    <FilterListIcon style={{ pointerEvents: "none" }} /> // Prevent flipping
-                  )}
-                  sx={{ pr: 2 }}
-                >
-                  <MenuItem value="Specific Date">Specific Date</MenuItem>
-                  <MenuItem value="Date Duration">Date Duration</MenuItem>
-                </Select>
-              </FormControl>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Second Date"
-                  value={secondDateSpecific ? dayjs(secondDateSpecific) : null}
-                  onChange={(newValue) =>{
-                    if(newValue){
-                      setSecondDateSpecific(newValue.format('YYYY-MM-DD'))
-                    }else{
-                      setSecondDateSpecific('')
+                    onChange={(newValue) =>
+                      setSecondDateSpecific(newValue as unknown as string)
                     }
-                  }
-                  }
-                />
-              </LocalizationProvider>
-            </Grid>
-          </Grid>
-          }
+                  />
+                </LocalizationProvider>
+              </div>
+            </div>
+          )}
 
-          { dateFilter === "Date Duration" &&
-            <Grid
-            item
-            xs={12}
-            sm={12}
-            md={12}
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              gap: 2,
-            }}
-          >
-            {/* Column 1 */}
-            <Grid
-              item
-              xs={12}
-              sm={3}
-              md={3}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
-              <FormControl>
-                <InputLabel id="category-label">Filter by Category</InputLabel>
-                <Select
-                  labelId="category-label"
-                  id="category"
-                  value={categoryFilter}
-                  label="Filter by Category"
-                  onChange={(e) =>
-                    setCategoryFilter(e.target.value as categoryType)
-                  } // Cast value to categoryType
-                  IconComponent={() => (
-                    <FilterListIcon style={{ pointerEvents: "none" }} /> // Prevent flipping
-                  )}
-                  sx={{ pr: 2 }}
-                >
-                  {categoryTypes.map((gameType) => (
-                    <MenuItem key={gameType} value={gameType}>
-                      {gameType}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="First Date"
-                  value={firstDateSpecific ? dayjs(firstDateSpecific) : null}
-                  onChange={(newValue) =>{
-                    if(newValue){
-                      setFirstDateSpecific(newValue.format('YYYY-MM-DD'))
-                    }else{
-                      setFirstDateSpecific('')
+          {dateFilter === "Date Duration" && (
+            <div className="col-span-12 flex flex-row gap-4">
+              {/* Column 1 */}
+              <div className="flex flex-col gap-4 w-1/4">
+                <FormControl>
+                  <InputLabel id="category-label">
+                    Filter by Category
+                  </InputLabel>
+                  <Select
+                    labelId="category-label"
+                    id="category"
+                    value={categoryFilter}
+                    label="Filter by Category"
+                    onChange={(e) =>
+                      setCategoryFilter(e.target.value as categoryType)
                     }
-                  }
-                  } // Correct setter function
-                  // renderInput={(params) => <TextField {...params} />}
-                />
-              </LocalizationProvider>
-            </Grid>
-            {/* Column 2 */}
-            <Grid
-              item
-              xs={12}
-              sm={3}
-              md={3}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
-              <FormControl>
-                <InputLabel id="date-filter-label">Filter by Date</InputLabel>
-                <Select
-                  labelId="date-filter-label"
-                  id="date-filter"
-                  value={dateFilter}
-                  label="Filter by Date"
-                  onChange={(e) => setDateFilter(e.target.value as dateType)} // Cast value to dateType
-                  IconComponent={() => (
-                    <FilterListIcon style={{ pointerEvents: "none" }} /> // Prevent flipping
-                  )}
-                  sx={{ pr: 2 }}
-                >
-                  <MenuItem value="Specific Date">Specific Date</MenuItem>
-                  <MenuItem value="Date Duration">Date Duration</MenuItem>
-                </Select>
-              </FormControl>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Second Date"
-                  value={secondDateSpecific ? dayjs(secondDateSpecific) : null}
-                  onChange={(newValue) =>{
-                    if(newValue){
-                      setSecondDateSpecific(newValue.format('YYYY-MM-DD'))
-                    }else{
-                      setSecondDateSpecific('')
+                    IconComponent={() => (
+                      <FilterListIcon style={{ pointerEvents: "none" }} />
+                    )}
+                    sx={{ pr: 2 }}
+                  >
+                    {categoryTypes.map((gameType) => (
+                      <MenuItem key={gameType} value={gameType}>
+                        {gameType}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="First Date"
+                    value={firstDateSpecific ? dayjs(firstDateSpecific) : null}
+                    onChange={(newValue) =>
+                      newValue
+                        ? setFirstDateSpecific(newValue.format("YYYY-MM-DD"))
+                        : setFirstDateSpecific("")
                     }
-                  }
-                  }
-                />
-              </LocalizationProvider>
-            </Grid>
-            {/* Column 3 */}
-            <Grid
-              item
-              xs={12}
-              sm={3}
-              md={3}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
-              {/* Spacer Box */}
-              <Box
-                sx={{
-                  height: "56px", // Adjust height to match the height of the Select component
-                }}
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="First Date"
-                  value={firstDateDuration ? dayjs(firstDateDuration) : null}
-                  onChange={(newValue) =>{
-                    if(newValue){
-                      setFirstDateDuration(newValue.format('YYYY-MM-DD'))
-                    }else{
-                      setFirstDateDuration('')
-                    }
-                  }
-                  } // Correct setter function
-                  // renderInput={(params) => <TextField {...params} />}
-                />
-              </LocalizationProvider>
-            </Grid>
-            {/* Column 4 */}
-            <Grid
-              item
-              xs={12}
-              sm={3}
-              md={3}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
-              {/* Spacer Box */}
-              <Box
-                sx={{
-                  height: "56px", // Adjust height to match the height of the Select component
-                }}
-              />
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Second Date"
-                  value={secondDateDuration ? dayjs(secondDateDuration) : null}
-                  onChange={(newValue) => {
-                    if(newValue){
-                      setSecondDateDuration(newValue.format('YYYY-MM-DD'))
-                    }else{
-                      setFirstDateDuration('')
-                    }
-                  }
-                  }
-                />
-              </LocalizationProvider>
-            </Grid>
-          </Grid>       
-          }
-        </Grid>
-        
+                  />
+                </LocalizationProvider>
+              </div>
 
-        {categoryFilter === "Top Winning Region by Total Winnings" || categoryFilter === "Top Winner Region by Total Winners" ? (
+              {/* Column 2 */}
+              <div className="flex flex-col gap-4 w-1/4">
+                <FormControl>
+                  <InputLabel id="date-filter-label">Filter by Date</InputLabel>
+                  <Select
+                    labelId="date-filter-label"
+                    id="date-filter"
+                    value={dateFilter}
+                    label="Filter by Date"
+                    onChange={(e) => setDateFilter(e.target.value as dateType)}
+                    IconComponent={() => (
+                      <FilterListIcon style={{ pointerEvents: "none" }} />
+                    )}
+                    sx={{ pr: 2 }}
+                  >
+                    <MenuItem value="Specific Date">Specific Date</MenuItem>
+                    <MenuItem value="Date Duration">Date Duration</MenuItem>
+                  </Select>
+                </FormControl>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Second Date"
+                    value={
+                      secondDateSpecific ? dayjs(secondDateSpecific) : null
+                    }
+                    onChange={(newValue) =>
+                      newValue
+                        ? setSecondDateSpecific(newValue.format("YYYY-MM-DD"))
+                        : setSecondDateSpecific("")
+                    }
+                  />
+                </LocalizationProvider>
+              </div>
+
+              {/* Column 3 */}
+              <div className="flex flex-col gap-4 w-1/4">
+                <div className="h-[56px]" />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="First Date"
+                    value={firstDateDuration ? dayjs(firstDateDuration) : null}
+                    onChange={(newValue) =>
+                      newValue
+                        ? setFirstDateDuration(newValue.format("YYYY-MM-DD"))
+                        : setFirstDateDuration("")
+                    }
+                  />
+                </LocalizationProvider>
+              </div>
+
+              {/* Column 4 */}
+              <div className="flex flex-col gap-4 w-1/4">
+                <div className="h-[56px]" />
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Second Date"
+                    value={
+                      secondDateDuration ? dayjs(secondDateDuration) : null
+                    }
+                    onChange={(newValue) =>
+                      newValue
+                        ? setSecondDateDuration(newValue.format("YYYY-MM-DD"))
+                        : setSecondDateDuration("")
+                    }
+                  />
+                </LocalizationProvider>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Conditional MUI Chart Rendering */}
+        {categoryFilter === "Top Winning Region by Total Winnings" ||
+        categoryFilter === "Top Winner Region by Total Winners" ? (
           <ChartTopRegionByWinsandWinners
             activeGameType={activeGameType}
             categoryFilter={categoryFilter}
@@ -412,9 +310,9 @@ const formattedSecondDateDuration = secondDateDuration
             firstDateSpecific={formattedFirstDateSpecific}
             secondDateSpecific={formattedSecondDateSpecific}
             firstDateDuration={formattedFirstDateDuration}
-            secondDateDuration={formattedSecondDateDuration}         
+            secondDateDuration={formattedSecondDateDuration}
           />
-          ) : (
+        ) : (
           <>
             <ChartWinnersandWinningsSummary
               activeGameType={activeGameType}
@@ -436,8 +334,8 @@ const formattedSecondDateDuration = secondDateDuration
             />
           </>
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 
