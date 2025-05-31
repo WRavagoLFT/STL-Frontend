@@ -45,7 +45,6 @@ const getBetTypeSeries = (gameCategoryId?: number) => {
   }
 };
 
-
 const getCustomLegend = (gameCategoryId?: number) => {
   const series = getBetTypeSeries(gameCategoryId);
   return (
@@ -198,7 +197,7 @@ const ChartWinnersBetTypeSummary = ({
           </div>
         ) : (
           <BarChart
-            height={280}
+            height={300}
             grid={{ vertical: true }}
             layout="horizontal"
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}

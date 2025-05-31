@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
-import { Box, Typography, Divider } from "@mui/material";
-import MoneyIcon from "@mui/icons-material/AttachMoney";
-//import { fetchWinners } from "~/utils/api/winners";
-import { fetchHistoricalRegion, fetchHistoricalSummary } from "~/utils/api/transactions";
-import { historicalSummaryByRegionCategory } from "~/utils/transforms";
 import { FaDiceSix } from "react-icons/fa";
-// import fetchHistoricalRegion from "~/utils/api/getHistoricalRegion";
+import { fetchWinners } from "~/utils/api/winners";
 
 // Define types
 interface RegionData {
@@ -14,68 +9,73 @@ interface RegionData {
   trend?: number;
 }
 
-const TableWinningActivityToday = (params: {gameCategoryId?: number}) => {
+const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
   const [rankedRegions, setRankedRegions] = useState<
-        { region: RegionData; rank: number; trend: number }[]
-      >([]);
-  
-      const getWinningRegions = async () => {
-        const today = new Date().toISOString().split('T')[0];
-  
-        const response = await fetchHistoricalRegion();
-      
-        if (!response.success || response.data.length === 0) {
-          console.warn("No data found in API response!");
-          return;
-        }
+    { region: RegionData; rank: number; trend: number }[]
+  >([]);
 
-        let filteredData = response.data.filter(
-          (item: { TransactionDate: string }) =>
-            item.TransactionDate.startsWith(today)
+  const getWinningRegions = async () => {
+    try {
+      const response = await fetchWinners({
+        from: "2000-01-01",
+        to: "2099-12-31",
+      });
+
+      if (!response.success || !response.data || response.data.length === 0) {
+        console.warn("No winners found in API response.");
+        return;
+      }
+
+      let filteredData = response.data;
+
+      // Filter by gameCategoryId if provided
+      if (params.gameCategoryId && params.gameCategoryId > 0) {
+        filteredData = filteredData.filter(
+          (entry: { GameCategoryId: number }) =>
+            entry.GameCategoryId === params.gameCategoryId
         );
+      }
 
-        if(params.gameCategoryId && params.gameCategoryId > 0) {
-          const historicalSummary = await fetchHistoricalSummary();
-          const filteredSummary = historicalSummary.data.filter(
-            (item: { TransactionDate: string }) =>
-              item.TransactionDate.startsWith(today)
-          )
-          filteredData = historicalSummaryByRegionCategory(filteredSummary, params.gameCategoryId);
-          console.log(filteredData)
+      // Group by Region and sum PayoutAmount
+      const regionMap = new Map<string, RegionData>();
+
+      filteredData.forEach((entry: any) => {
+        const regionName = entry.Region;
+        const payout = entry.PayoutAmount;
+
+        if (regionMap.has(regionName)) {
+          const existing = regionMap.get(regionName)!;
+          existing.TotalPayout += payout;
+        } else {
+          regionMap.set(regionName, {
+            Region: regionName,
+            TotalPayout: payout,
+          });
         }
-      
-        // Aggregate TotalBettors per RegionId using reduce()
-        const regionMap: Map<number, RegionData> = filteredData.reduce((map: { get: (arg0: any) => any; set: (arg0: any, arg1: any) => void; }, entry: { RegionId: any; TotalBettors: any; }) => {
-          const existing = map.get(entry.RegionId);
-          if (existing) {
-            existing.TotalBettors += entry.TotalBettors;
-          } else {
-            map.set(entry.RegionId, { ...entry });
-          }
-          return map;
-        }, new Map<number, RegionData>());
-      
-        // Convert to array and explicitly cast to RegionData[]
-        const sortedRegions = Array.from(regionMap.values() as Iterable<RegionData>)
-          .sort((a, b) => b.TotalPayout - a.TotalPayout)
-          // .filter(region => region.TotalBetAmount > 0);
-      
-        const ranked: { region: RegionData; rank: number; trend: number }[] =
-          sortedRegions.map((region, index) => ({
-            region,
-            rank: index + 1,
-            trend: index,
-          }));
-      
-        setRankedRegions(ranked);
-      };
-      
-      useEffect(() => {
-        getWinningRegions();
-      }, []);
+      });
+
+      const sortedRegions = Array.from(regionMap.values()).sort(
+        (a, b) => b.TotalPayout - a.TotalPayout
+      );
+
+      const ranked = sortedRegions.map((region, index) => ({
+        region,
+        rank: index + 1,
+        trend: 0,
+      }));
+
+      setRankedRegions(ranked);
+    } catch (error) {
+      console.error("Failed to fetch winning regions:", error);
+    }
+  };
+
+  useEffect(() => {
+    getWinningRegions();
+  }, [params.gameCategoryId]);
 
   return (
-    <div className="w-full flex-1 h-[53.5rem] bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
+    <div className="w-full flex-1 h-[53.1rem] bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
       <div className="flex mb-2 items-center w-full">
         <div className="bg-[#0038A8] rounded-lg p-1">
           <FaDiceSix size={24} color={"#F6BA12"} />
@@ -83,46 +83,53 @@ const TableWinningActivityToday = (params: {gameCategoryId?: number}) => {
         <div className="flex items-center justify-between flex-1 ml-3">
           <p className="text-base">Top Winning Regions Today</p>
           <button className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
-            View Comparison  
+            View Comparison
           </button>
         </div>
       </div>
-      <div className="h-px bg-[#303030] mb-4" />
+      <div className="h-px bg-[#ACA993] mt-1 mb-2" />
       <div className="mt-2 w-full max-h-[720px] overflow-y-auto">
-        {rankedRegions.map((item, index) => (
-          <div
-            key={index}
-            className={`flex items-center py-2 ${
-              index === rankedRegions.length - 1 ? "border-none" : ""
-            }`}
-          >
-            <div className="flex items-center w-[15%]">
-              <span
-                className={`font-bold text-[0.85rem] ${
-                  item.trend > 0
-                    ? "text-[#046115]"
-                    : item.trend < 0
-                      ? "text-[#CE1126]"
-                      : "text-[#aaa]"
-                }`}
-              >
-                {item.trend > 0
-                  ? `↑${item.trend}`
-                  : item.trend < 0
-                    ? `↓${Math.abs(item.trend)}`
-                    : "→"}
-              </span>
-            </div>
-
-            <p className="text-[#0038A8] flex-1 ml-2 text-[0.9rem] whitespace-nowrap overflow-hidden text-ellipsis">
-              {item.region.Region}
-            </p>
-
-            <p className="text-[#212121] font-bold text-right flex-1 text-[0.95rem]">
-              ₱{item.region.TotalPayout.toLocaleString()}
-            </p>
+        {rankedRegions.length === 0 ? (
+          <div className="p-8 text-sm text-center text-[#888]">
+            <p>Top Winning Regions Today</p>
+            <p>Data will be displayed once available.</p>
           </div>
-        ))}
+        ) : (
+          rankedRegions.map((item, index) => (
+            <div
+              key={index}
+              className={`flex items-center py-2 ${
+                index === rankedRegions.length - 1 ? "border-none" : ""
+              }`}
+            >
+              <div className="flex items-center w-[15%]">
+                <span
+                  className={`font-bold text-md ${
+                    item.trend > 0
+                      ? "text-[#046115]"
+                      : item.trend < 0
+                        ? "text-[#CE1126]"
+                        : "text-[#aaa]"
+                  }`}
+                >
+                  {item.trend > 0
+                    ? `↑${item.trend}`
+                    : item.trend < 0
+                      ? `↓${Math.abs(item.trend)}`
+                      : "→"}
+                </span>
+              </div>
+
+              <p className="text-[#0038A8] flex-1 ml-2 text-[0.9rem] whitespace-nowrap overflow-hidden text-ellipsis">
+                {item.region.Region}
+              </p>
+
+              <p className="text-[#212121] font-bold text-right flex-1 text-[0.95rem]">
+                ₱{item.region.TotalPayout.toLocaleString()}
+              </p>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

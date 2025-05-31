@@ -109,40 +109,47 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
         </div>
       ) : (
         <div className="mt-2 w-full max-h-[720px] overflow-y-auto">
-          {rankedRegions.map((item, index) => (
-            <div
-              key={index}
-              className={`flex items-center py-2 ${
-                index === rankedRegions.length - 1 ? "border-none" : ""
-              }`}
-            >
-              <div className="flex items-center w-[15%]">
-                <span
-                  className={`font-bold text-[0.85rem] ${
-                    item.trend > 0
-                      ? "text-[#046115]"
-                      : item.trend < 0
-                        ? "text-[#CE1126]"
-                        : "text-[#aaa]"
-                  }`}
-                >
-                  {item.trend > 0
-                    ? `↑${item.trend}`
-                    : item.trend < 0
-                      ? `↓${Math.abs(item.trend)}`
-                      : "→"}
-                </span>
-              </div>
-
-              <p className="text-[#0038A8] flex-1 ml-2 text-[0.9rem] whitespace-nowrap overflow-hidden text-ellipsis">
-                {item.region.Region}
-              </p>
-
-              <p className="text-[#212121] font-bold text-right flex-1 text-[0.95rem]">
-                ₱{item.region.TotalBetAmount.toLocaleString()}
-              </p>
+          {rankedRegions.length === 0 ? (
+            <div className="p-8 text-sm text-center text-[#888]">
+              <p>Top Betting Regions Today</p>
+              <p>Data will be displayed once available.</p>
             </div>
-          ))}
+          ) : (
+            rankedRegions.map((item, index) => (
+              <div
+                key={index}
+                className={`flex items-center py-2 ${
+                  index === rankedRegions.length - 1 ? "border-none" : ""
+                }`}
+              >
+                <div className="flex items-center w-[15%]">
+                  <span
+                    className={`font-bold text-[0.85rem] ${
+                      item.trend > 0
+                        ? "text-[#046115]"
+                        : item.trend < 0
+                          ? "text-[#CE1126]"
+                          : "text-[#aaa]"
+                    }`}
+                  >
+                    {item.trend > 0
+                      ? `↑${item.trend}`
+                      : item.trend < 0
+                        ? `↓${Math.abs(item.trend)}`
+                        : "→"}
+                  </span>
+                </div>
+
+                <p className="text-[#0038A8] flex-1 ml-2 text-[0.9rem] whitespace-nowrap overflow-hidden text-ellipsis">
+                  {item.region.Region}
+                </p>
+
+                <p className="text-[#212121] font-bold text-right flex-1 text-[0.95rem]">
+                  ₱{item.region.TotalBetAmount.toLocaleString()}
+                </p>
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>

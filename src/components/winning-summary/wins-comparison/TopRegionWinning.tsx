@@ -85,31 +85,19 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
         );
 
   return (
-    <Stack direction="row" spacing={4} sx={{ mt: 0.5, mr: 4 }}>
+    <div className="flex flex-row space-x-4 mt-0.5 mr-4">
       {legendItems.map((item, index) => (
-        <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
-          <Box
-            sx={{
-              width: 14,
-              height: 14,
-              borderRadius: "50%",
-              backgroundColor: item.color,
-              mr: 1.5,
-            }}
+        <div key={index} className="flex items-center">
+          <div
+            className="w-[14px] h-[14px] rounded-full mr-1.5"
+            style={{ backgroundColor: item.color }}
           />
-          <Typography
-            color="#212121"
-            sx={{
-              fontSize: "12px",
-              fontWeight: 400,
-              lineHeight: "14px",
-            }}
-          >
+          <p className="text-[#212121] text-[12px] font-normal leading-[14px]">
             {item.label}
-          </Typography>
-        </Box>
+          </p>
+        </div>
       ))}
-    </Stack>
+    </div>
   );
 };
 
