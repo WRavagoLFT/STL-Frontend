@@ -28,11 +28,6 @@ interface AggregatedDrawData {
 const getBetTypeSeries = (gameCategoryId?: number) => {
   switch (gameCategoryId) {
     case 1: // STL PARES
-      return [
-        { dataKey: "Tumbok", color: "#E5C7FF" },
-        { dataKey: "Sahod", color: "#5050A5" },
-        { dataKey: "Casas", color: "#7266C9" },
-      ];
     case 2: // STL SWER2
       return [
         { dataKey: "Tumbok", color: "#E5C7FF" },
@@ -50,13 +45,17 @@ const getBetTypeSeries = (gameCategoryId?: number) => {
   }
 };
 
+
 const getCustomLegend = (gameCategoryId?: number) => {
   const series = getBetTypeSeries(gameCategoryId);
   return (
     <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
       {series.map((item) => (
         <div className="flex items-center" key={item.dataKey}>
-          <div className="w-3.5 h-3.5 rounded-full mr-2" style={{ backgroundColor: item.color }} />
+          <div
+            className="w-3.5 h-3.5 rounded-full mr-2"
+            style={{ backgroundColor: item.color }}
+          />
           <p className="text-sm">{item.dataKey}</p>
         </div>
       ))}
@@ -64,7 +63,11 @@ const getCustomLegend = (gameCategoryId?: number) => {
   );
 };
 
-const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: number }) => {
+const ChartWinnersBetTypeSummary = ({
+  gameCategoryId,
+}: {
+  gameCategoryId?: number;
+}) => {
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<AggregatedDrawData[]>([]);
 
@@ -86,7 +89,13 @@ const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: numbe
 
           const aggregatedByDraw: Record<number, AggregatedDrawData> = {
             1: { draw: "First Draw", Tumbok: 0, Sahod: 0, Ramble: 0, Casas: 0 },
-            2: { draw: "Second Draw", Tumbok: 0, Sahod: 0, Ramble: 0, Casas: 0 },
+            2: {
+              draw: "Second Draw",
+              Tumbok: 0,
+              Sahod: 0,
+              Ramble: 0,
+              Casas: 0,
+            },
             3: { draw: "Third Draw", Tumbok: 0, Sahod: 0, Ramble: 0, Casas: 0 },
           };
 
@@ -121,11 +130,18 @@ const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: numbe
               drawData.Tumbok += Tumbok;
             }
 
-            if ("Sahod" in item && gameCategoryId !== 3 && gameCategoryId !== 4) {
+            if (
+              "Sahod" in item &&
+              gameCategoryId !== 3 &&
+              gameCategoryId !== 4
+            ) {
               drawData.Sahod += Sahod;
             }
 
-            if ("Ramble" in item && (gameCategoryId === 3 || gameCategoryId === 4)) {
+            if (
+              "Ramble" in item &&
+              (gameCategoryId === 3 || gameCategoryId === 4)
+            ) {
               drawData.Ramble += Ramble;
             }
 
@@ -136,9 +152,9 @@ const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: numbe
 
           const formattedData = Object.values(aggregatedByDraw).map((draw) => {
             const scaledDraw = { ...draw };
-              (["Tumbok", "Sahod", "Ramble", "Casas"] as const).forEach((key) => {
-                scaledDraw[key] = scaledDraw[key] / 100000; // divided to 100,000
-              });
+            (["Tumbok", "Sahod", "Ramble", "Casas"] as const).forEach((key) => {
+              scaledDraw[key] = scaledDraw[key] / 100000; // divided to 100,000
+            });
 
             return scaledDraw;
           });

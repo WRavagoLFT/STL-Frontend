@@ -1,61 +1,62 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Stack,
-  CircularProgress,
-  Button,
-} from "@mui/material";
+import { CircularProgress, Button, } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchTransactions } from "~/utils/api/transactions";
-import {
-  TodaysBettorCountByGameTypeData,
-  addLabelsBets,
-  addLabelsGameTypes,
-} from "~/components/betting-summary/tooltips/dataSet";
 import { buttonStyles } from "~/styles/theme";
-// import fetchHistoricalSummary from "~/utils/api/transactions/getHistoricalSummary";
 
-// Custom Legend (Dynamically Handles Bet Types)
-const CustomLegend = () => (
-  <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#E5C7FF] mr-2" />
-      <p className="text-sm">Tumbok</p>
+// Returns the bet types series for a gameCategoryId
+const getBetTypeSeries = (gameCategoryId?: number) => {
+  switch (gameCategoryId) {
+    case 1: // STL PARES
+    case 2: // STL SWER2
+      return [
+        { dataKey: "Tumbok", color: "#E5C7FF" },
+        { dataKey: "Sahod", color: "#5050A5" },
+        { dataKey: "Casas", color: "#7266C9" },
+      ];
+    case 3: // STL SWER3
+    case 4: // STL SWER4
+      return [
+        { dataKey: "Tumbok", color: "#E5C7FF" },
+        { dataKey: "Ramble", color: "#5050A5" },
+      ];
+    default:
+      return [];
+  }
+};
+
+// Dynamic legend component based on gameCategoryId
+const CustomLegend = ({ gameCategoryId }: { gameCategoryId?: number }) => {
+  const series = getBetTypeSeries(gameCategoryId);
+
+  return (
+    <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
+      {series.map(({ dataKey, color }) => (
+        <div key={dataKey} className="flex items-center">
+          <div
+            className="w-3.5 h-3.5 rounded-full mr-2"
+            style={{ backgroundColor: color }}
+          />
+          <p className="text-sm">{dataKey}</p>
+        </div>
+      ))}
     </div>
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#5050A5] mr-2" />
-      <p className="text-sm">Sahod</p>
-    </div>
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#7266C9] mr-2" />
-      <p className="text-sm">Ramble</p>
-    </div>
-  </div>
-);
+  );
+};
 
 const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
-  // const ChartBettorsBetTypeSummary = () => {
   const [data, setData] = useState<
-    { draw: string; tumbok: number; sahod: number; ramble: number }[]
+    { draw: string; [key: string]: number | string }[]
   >([]);
   const [loading, setLoading] = useState(false);
-
-  const xAxisTicks = [
-    0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90,
-    95, 100,
-  ];
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
         const today = new Date().toISOString().split("T")[0];
-        console.log(today); // Output: "2025-03-25T00:00:00.000Z"
-        const response = await fetchTransactions({ from: today, to: today }); // Add query params if needed
-        console.log(response);
+        const response = await fetchTransactions({ from: today, to: today });
 
-        // Filter Data for Today's Date
         let res = response.data.filter(
           (item: { DateOfTransaction: string; GameCategoryId: number }) =>
             item.DateOfTransaction.startsWith(today)
@@ -68,92 +69,73 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
           );
         }
 
-        //console.log("BettorCountByBetType Response:", res);
-
         if (response.success && Array.isArray(res)) {
-          // Aggregate data by GameTypeId
+          // Get series keys dynamically
+          const series = getBetTypeSeries(params.gameCategoryId);
+
+          // Aggregate data by DrawOrder and bet types dynamically
           const aggregatedData: Record<
             number,
-            { tumbok: number; sahod: number; ramble: number }
+            Record<string, number>
           > = {};
 
-          res.forEach(
-            (item: {
-              DrawOrder: number;
-              Tumbok: number;
-              Sahod: number;
-              Ramble: number;
-              GameCategoryId: number;
-            }) => {
-              if (!aggregatedData[item.DrawOrder]) {
-                aggregatedData[item.DrawOrder] = {
-                  tumbok: 0,
-                  sahod: 0,
-                  ramble: 0,
-                };
-              }
-
-              aggregatedData[item.DrawOrder].tumbok += item.Tumbok;
-              aggregatedData[item.DrawOrder].sahod += item.Sahod;
-              aggregatedData[item.DrawOrder].ramble += item.Ramble;
+          res.forEach((item: any) => {
+            if (!aggregatedData[item.DrawOrder]) {
+              aggregatedData[item.DrawOrder] = {};
+              // Initialize keys to 0 for all series dataKeys
+              series.forEach(({ dataKey }) => {
+                aggregatedData[item.DrawOrder][dataKey.toLowerCase()] = 0;
+              });
             }
-          );
 
-          // Convert aggregated data into the required format
-          const formattedData = [
-            {
-              draw: "First Draw",
-              tumbok: aggregatedData[1]?.tumbok || 0,
-              sahod: aggregatedData[1]?.sahod || 0,
-              ramble: aggregatedData[1]?.ramble || 0,
-            },
-            {
-              draw: "Second Draw",
-              tumbok: aggregatedData[2]?.tumbok || 0,
-              sahod: aggregatedData[2]?.sahod || 0,
-              ramble: aggregatedData[2]?.ramble || 0,
-            },
-            {
-              draw: "Third Draw",
-              tumbok: aggregatedData[3]?.tumbok || 0,
-              sahod: aggregatedData[3]?.sahod || 0,
-              ramble: aggregatedData[3]?.ramble || 0,
-            },
-          ];
+            series.forEach(({ dataKey }) => {
+              const keyLower = dataKey.toLowerCase();
+              aggregatedData[item.DrawOrder][keyLower] += item[dataKey] || 0;
+            });
+          });
 
-          setData(
-            formattedData.map((item) => ({
-              ...item,
-              tumbok: item.tumbok / 100000,
-              sahod: item.sahod / 100000,
-              ramble: item.ramble / 100000,
-            }))
-          );
+          // Prepare formatted data for 3 draws
+          const formattedData = [1, 2, 3].map((drawNum) => {
+            const entry: { draw: string; [key: string]: number | string } = {
+              draw:
+                drawNum === 1
+                  ? "First Draw"
+                  : drawNum === 2
+                  ? "Second Draw"
+                  : "Third Draw",
+            };
 
-          setLoading(false);
-          console.log("Formatted Data ", formattedData);
-          // setLoading(false);
+            series.forEach(({ dataKey }) => {
+              const keyLower = dataKey.toLowerCase();
+              entry[keyLower] = (aggregatedData[drawNum]?.[keyLower] || 0) / 100000;
+            });
+
+            return entry;
+          });
+
+          setData(formattedData);
         }
       } catch (error) {
-        console.log(
-          "Error loading BettorsvsBetsPlacedSummary: " +
-            (error as Error).message
-        );
+        console.error("Error loading BettorsvsBetsPlacedSummary:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
-    //console.log(`Bettors vs Bets Placed Summary Data: ${data}`);
   }, [params.gameCategoryId]);
+
+  // Get series for rendering BarChart series
+  const series = getBetTypeSeries(params.gameCategoryId);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
       <div className="flex justify-between items-center w-full mb-4">
         <div className="flex flex-col leading-none">
           <p className="text-lg leading-none">
-            Today's Bettor Count by Game Type
+            Today's Summary of Bets By Bet Type
           </p>
-          <CustomLegend />
+          <CustomLegend gameCategoryId={params.gameCategoryId} />
         </div>
         <Button sx={buttonStyles} variant="contained">
           Export as CSV
@@ -169,13 +151,16 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
           <BarChart
             height={300}
             grid={{ vertical: true }}
-            slotProps={{ 
-            noDataOverlay: { message: 'Summary of Bettors and Bets Placed data will be displayed once available.' },
-            legend: { hidden: true } }}
+            slotProps={{
+              noDataOverlay: {
+                message:
+                  "Summary of Bets data will be displayed once available.",
+              },
+              legend: { hidden: true },
+            }}
             layout="horizontal"
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
             dataset={data}
-
             yAxis={[
               {
                 scaleType: "band",
@@ -189,28 +174,11 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
                 max: 100,
               },
             ]}
-            series={addLabelsBets([
-              {
-                dataKey: "tumbok",
-                label: "Tumbok",
-                color: "#E5C7FF",
-              },
-              {
-                dataKey: "sahod",
-                label: "Sahod",
-                color: "#5050A5",
-              },
-              {
-                dataKey: "ramble",
-                label: "Ramble",
-                color: "#7266C9",
-              },
-              {
-                dataKey: "casas",
-                label: "Casas",
-                color: "#E5C7FF",
-              },
-            ])}
+            series={series.map(({ dataKey, color }) => ({
+              dataKey: dataKey.toLowerCase(),
+              label: dataKey,
+              color,
+            }))}
           />
         )}
       </div>
