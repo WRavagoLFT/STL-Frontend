@@ -68,7 +68,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
           );
         }
 
-        console.log("BettorCountByBetType Response:", res);
+        //console.log("BettorCountByBetType Response:", res);
 
         if (response.success && Array.isArray(res)) {
           // Aggregate data by GameTypeId

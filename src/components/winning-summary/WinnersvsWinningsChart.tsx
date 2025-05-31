@@ -1,18 +1,23 @@
-import {
-  CircularProgress,
-  Button,
-} from "@mui/material";
+import { CircularProgress, Button } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { TodaysWinnersAndWinsData, addLabels } from "./tooltips/dataSet";
 import { buttonStyles } from "~/styles/theme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchWinners } from "~/utils/api/winners";
+import dayjs from "dayjs";
 
-// Custom Legend (Dynamically Handles Bet Types)
+interface Winner {
+  GameCategoryId: number;
+  DrawOrder: number;
+  PayoutAmount?: number;
+}
+
+type DrawNumber = 1 | 2 | 3;
+
 const CustomLegend = () => (
   <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#E5C7FF] mr-2" />
-      <p className="text-sm">Winners</p> 
+      <p className="text-sm">Winners</p>
     </div>
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#5050A5] mr-2" />
@@ -21,16 +26,74 @@ const CustomLegend = () => (
   </div>
 );
 
-const ChartWinnersvsWinningsSummary = (params: { gameCategoryId?: number }) => {
+const drawLabelMap: Record<number, string> = {
+  1: "First Draw",
+  2: "Second Draw",
+  3: "Third Draw",
+};
+
+const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: number }) => {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<
-   { draw: string; winners: number; winnings: number }[]
+  const [chartData, setChartData] = useState<
+    { draw: string; winners: number; winnings: number }[]
   >([]);
 
-  const xAxisTicks = [
-    0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90,
-    95, 100,
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const from = "2025-05-01";
+      const to = "2025-05-30";
+      //const today = new Date().toISOString().split("T")[0];
+
+      //console.log("Fetching winners with params:", { gameCategoryId, from: today, to: today });
+
+      const result = await fetchWinners({
+        from,
+        to,
+        gameCategoryId,
+      });
+
+      if (!result.success || !Array.isArray(result.data)) {
+        setLoading(false);
+        return;
+      }
+
+      const filteredData: Winner[] = gameCategoryId
+        ? (result.data as Winner[]).filter((item) => item.GameCategoryId === gameCategoryId)
+        : (result.data as Winner[]);
+
+      const drawSummary: Record<DrawNumber, { winners: number; winnings: number }> = {
+        1: { winners: 0, winnings: 0 },
+        2: { winners: 0, winnings: 0 },
+        3: { winners: 0, winnings: 0 },
+      };
+
+      for (const item of filteredData) {
+        const draw = item.DrawOrder as DrawNumber;
+        if (drawSummary[draw]) {
+          drawSummary[draw].winners += 1;
+          drawSummary[draw].winnings += item.PayoutAmount || 0;
+        }
+      }
+
+      const finalChartData = [1, 2, 3].map((draw) => {
+        const drawNum = draw as DrawNumber;
+        return {
+          draw: drawLabelMap[drawNum] || `Draw ${drawNum}`,
+          winners: drawSummary[drawNum].winners,
+          winnings: drawSummary[drawNum].winnings,
+          GameCategoryId: gameCategoryId ?? null,
+        };
+      });
+
+      console.log("Final chart data:", finalChartData);
+      setChartData(finalChartData);
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, [gameCategoryId]);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
@@ -56,31 +119,26 @@ const ChartWinnersvsWinningsSummary = (params: { gameCategoryId?: number }) => {
             height={300}
             grid={{ vertical: true }}
             layout="horizontal"
-            //backgroundColor = "transparent"
             slotProps={{ legend: { hidden: true } }}
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-            dataset={TodaysWinnersAndWinsData}
+            dataset={chartData}
             yAxis={[
               {
                 scaleType: "band",
-                data: ["First Draw", "Second Draw", "Third Draw"],
-                // series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }]},
+                data: chartData.map((d) => d.draw),
               },
             ]}
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
-                // scaleType: "linear",
                 min: 0,
                 max: 100,
-                //tickValues: xAxisTicks,
-                //tickSpacing: 1 ,
               },
             ]}
-            series={addLabels([
-              { dataKey: "winners", color: "#E5C7FF" },
-              { dataKey: "winnings", color: "#5050A5" },
-            ])}
+            series={[
+              { dataKey: "winners", color: "#E5C7FF", label: "Winners" },
+              { dataKey: "winnings", color: "#5050A5", label: "Winnings" },
+            ]}
           />
         )}
       </div>

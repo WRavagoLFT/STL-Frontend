@@ -8,18 +8,29 @@ const validateRelativeUrl = (url: string) => {
     return url;
 };
 
-export const fetchWinners = async (p0?: { date: string; }) => {
-    try {
-        const url = validateRelativeUrl("/winners/getWinners");
-        const response = await axiosInstance.get(url, {
-        });
+export const fetchWinners = async (params?: {
+  from: string;
+  to: string;
+  gameCategoryId?: number; // accept gameCategoryId here
+}) => {
+  try {
+    const url = validateRelativeUrl("/winners/getWinners");
 
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching users:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: [] };
-    }
+    const response = await axiosInstance.get(url, {
+      params: {
+        from: params?.from,
+        to: params?.to,
+        gameType: params?.gameCategoryId, // map gameCategoryId to gameType here
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching winners:", (error as Error).message);
+    return { success: false, message: (error as Error).message, data: [] };
+  }
 };
+
 
 export const fetchCompareHistoricalWinnersDate = async (
   urlPath: string,
