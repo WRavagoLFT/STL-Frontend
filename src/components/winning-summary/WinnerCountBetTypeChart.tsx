@@ -1,54 +1,174 @@
-import React, { useState } from "react";
-import { Box, Typography, Stack, Button, CircularProgress } from "@mui/material";
+import React, { useState, useEffect } from "react";
+import { Button, CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import {TodaysWinnerCountByGameTypeData,addLabelsGameTypes } from "~/components/winning-summary/tooltips/dataSet";
 import { buttonStyles } from "~/styles/theme";
-// import { fetchHistoricalSummary, fetchTransactions } from "~/utils/api/transactions";
-// import { fetchWinners } from "~/utils/api/winners";
-// import fetchHistoricalSummary from "~/utils/api/transactions/getHistoricalSummary";
+import { fetchWinners } from "~/utils/api/winners";
 
-// Mapping GameTypeId to Draw Names
-// const drawNames: Record<number, string> = {
-//   1: "First Draw",
-//   2: "Second Draw",
-//   3: "Third Draw",
-// };
+interface WinnerItem {
+  GameCategoryId: number;
+  DrawOrder: number;
+  Tumbok?: number;
+  Sahod?: number;
+  Ramble?: number;
+  TresCasas?: number;
+  SaisCasas?: number;
+  DyisCasas?: number;
+}
 
-// Custom Legend (Dynamically Handles Bet Types)
-const CustomLegend = () => (
-  <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#E5C7FF] mr-2" />
-      <p className="text-sm">Tumbok</p>
-    </div>
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#D2A7FF] mr-2" />
-      <p className="text-sm">Sahod</p>
-    </div>
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#BB86FC] mr-2" />
-      <p className="text-sm">Ramble</p>
-    </div>
-  </div>
-);
+interface AggregatedDrawData {
+  draw: string;
+  Tumbok: number;
+  Sahod: number;
+  Ramble: number;
+  Casas: number;
+  [key: string]: string | number;
+}
 
-const ChartWinnersBetTypeSummary = (params: {gameCategoryId?: number}) => {
+// Returns the bet types series for a gameCategoryId
+const getBetTypeSeries = (gameCategoryId?: number) => {
+  switch (gameCategoryId) {
+    case 1: // STL PARES
+      return [
+        { dataKey: "Tumbok", color: "#E5C7FF" },
+        { dataKey: "Sahod", color: "#5050A5" },
+        { dataKey: "Casas", color: "#7266C9" },
+      ];
+    case 2: // STL SWER2
+      return [
+        { dataKey: "Tumbok", color: "#E5C7FF" },
+        { dataKey: "Sahod", color: "#5050A5" },
+        { dataKey: "Casas", color: "#7266C9" },
+      ];
+    case 3: // STL SWER3
+    case 4: // STL SWER4
+      return [
+        { dataKey: "Tumbok", color: "#E5C7FF" },
+        { dataKey: "Ramble", color: "#5050A5" },
+      ];
+    default:
+      return [];
+  }
+};
+
+const getCustomLegend = (gameCategoryId?: number) => {
+  const series = getBetTypeSeries(gameCategoryId);
+  return (
+    <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
+      {series.map((item) => (
+        <div className="flex items-center" key={item.dataKey}>
+          <div className="w-3.5 h-3.5 rounded-full mr-2" style={{ backgroundColor: item.color }} />
+          <p className="text-sm">{item.dataKey}</p>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: number }) => {
   const [loading, setLoading] = useState(true);
-  
-  const xAxisTicks = [
-    0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90,
-    95, 100,
-  ];
+  const [chartData, setChartData] = useState<AggregatedDrawData[]>([]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      //console.log("Using gameCategoryId:", gameCategoryId);
+
+      try {
+        const from = "2000-01-01";
+        const to = "2999-01-01";
+        const response = await fetchWinners({ from, to, gameCategoryId });
+
+        //console.log("Response received:", response);
+
+        if (response.success && Array.isArray(response.data)) {
+          const data = response.data as WinnerItem[];
+          //console.log(`Total items fetched: ${data.length}`);
+
+          const aggregatedByDraw: Record<number, AggregatedDrawData> = {
+            1: { draw: "First Draw", Tumbok: 0, Sahod: 0, Ramble: 0, Casas: 0 },
+            2: { draw: "Second Draw", Tumbok: 0, Sahod: 0, Ramble: 0, Casas: 0 },
+            3: { draw: "Third Draw", Tumbok: 0, Sahod: 0, Ramble: 0, Casas: 0 },
+          };
+
+          data.forEach((item, index) => {
+            if (item.GameCategoryId !== gameCategoryId) {
+              // console.log(
+              //   `[${index}] Skipped item due to mismatched GameCategoryId: ${item.GameCategoryId}`
+              // );
+              return;
+            }
+
+            const drawData = aggregatedByDraw[item.DrawOrder];
+            if (!drawData) {
+              console.warn(`Skipped unknown draw order: ${item.DrawOrder}`);
+              return;
+            }
+
+            const Tumbok = Number(item.Tumbok) || 0;
+            const Sahod = Number(item.Sahod) || 0;
+            const Ramble = Number(item.Ramble) || 0;
+            const TresCasas = Number(item.TresCasas) || 0;
+            const SaisCasas = Number(item.SaisCasas) || 0;
+            const DyisCasas = Number(item.DyisCasas) || 0;
+
+            // console.log(
+            //   `[${index}] Draw: ${item.DrawOrder}, Tumbok: ${Tumbok}, Sahod: ${Sahod}, Ramble: ${Ramble}, Casas: ${
+            //     TresCasas + SaisCasas + DyisCasas
+            //   }`
+            // );
+
+            if ("Tumbok" in item) {
+              drawData.Tumbok += Tumbok;
+            }
+
+            if ("Sahod" in item && gameCategoryId !== 3 && gameCategoryId !== 4) {
+              drawData.Sahod += Sahod;
+            }
+
+            if ("Ramble" in item && (gameCategoryId === 3 || gameCategoryId === 4)) {
+              drawData.Ramble += Ramble;
+            }
+
+            drawData.Casas += TresCasas + SaisCasas + DyisCasas;
+          });
+
+          // console.log("Aggregated results before scaling:", aggregatedByDraw);
+
+          const formattedData = Object.values(aggregatedByDraw).map((draw) => {
+            const scaledDraw = { ...draw };
+              (["Tumbok", "Sahod", "Ramble", "Casas"] as const).forEach((key) => {
+                scaledDraw[key] = scaledDraw[key] / 100000; // divided to 100,000
+              });
+
+            return scaledDraw;
+          });
+
+          formattedData.forEach((draw, i) => {
+            //console.log(`Draw ${i + 1} after scaling:`, draw);
+          });
+
+          setChartData(formattedData);
+        } else {
+          console.warn("Invalid or unsuccessful response format.");
+        }
+      } catch (error) {
+        console.error("Error fetching winners data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [gameCategoryId]);
+
+  const betTypeSeries = getBetTypeSeries(gameCategoryId);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
       <div className="flex justify-between items-center w-full mb-4">
         <div className="flex flex-col leading-none">
-          <p className="text-lg leading-none">
-            Today's Winnings by Game Type
-          </p>
-          <CustomLegend />
+          <p className="text-lg leading-none">Today's Winnings by Game Type</p>
+          {getCustomLegend(gameCategoryId)}
         </div>
         <Button sx={buttonStyles} variant="contained">
           Export as CSV
@@ -62,36 +182,26 @@ const ChartWinnersBetTypeSummary = (params: {gameCategoryId?: number}) => {
           </div>
         ) : (
           <BarChart
-            height={300}
-            // width={{100%}}
+            height={280}
             grid={{ vertical: true }}
             layout="horizontal"
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
             slotProps={{ legend: { hidden: true } }}
-            dataset={TodaysWinnerCountByGameTypeData}
+            dataset={chartData}
             yAxis={[
               {
                 scaleType: "band",
-                data: ["First Draw", "Second Draw", "Third Draw"], 
-                // series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }]},
+                data: ["First Draw", "Second Draw", "Third Draw"],
               },
             ]}
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
-                // scaleType: "linear",
-                min: 0, 
+                min: 0,
                 max: 100,
-                //tickValues: xAxisTicks,
-                //tickSpacing:1 ,
               },
             ]}
-            series={addLabelsGameTypes([
-              { dataKey: 'STL_Pares', color: '#E5C7FF' },
-              { dataKey: 'STL_Swer2', color: '#5050A5' },
-              { dataKey: 'STL_Swer3', color: '#7266C9' },
-              { dataKey: 'STL_Swer4', color: '#3B3B81' }
-            ])}
+            series={betTypeSeries}
           />
         )}
       </div>

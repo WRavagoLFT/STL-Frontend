@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Stack,
-  CircularProgress,
-  Button,
-} from "@mui/material";
+import { CircularProgress, Button, } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { buttonStyles } from "~/styles/theme";
 import { fetchWinners } from "~/utils/api/winners";
@@ -60,7 +54,7 @@ const ChartWinnersSummary = () => {
 
         const result = await fetchWinners({ from, to });
 
-        console.log("Raw result from fetchWinners:", result);
+        //console.log("Raw result from fetchWinners:", result);
 
         if (!result.success || !Array.isArray(result.data)) {
           console.warn("Result unsuccessful or data is not an array.");
@@ -104,7 +98,7 @@ const ChartWinnersSummary = () => {
           }
         });
 
-        console.log("Aggregated data by draw and category:", aggregatedData);
+        //console.log("Aggregated data by draw and category:", aggregatedData);
 
         const formattedData = [
           {
@@ -130,19 +124,19 @@ const ChartWinnersSummary = () => {
           },
         ];
 
-        console.log("Formatted data before scaling:", formattedData);
+        //console.log("Formatted data before scaling:", formattedData);
 
-        // const scaledData = formattedData.map((item) => ({
-        //   ...item,
-        //   pares: item.pares / 100000,
-        //   swer2: item.swer2 / 100000,
-        //   swer3: item.swer3 / 100000,
-        //   swer4: item.swer4 / 100000,
-        // }));
+        const scaledData = formattedData.map((item) => ({
+           ...item,
+           pares: item.pares / 100000,
+           swer2: item.swer2 / 100000,
+           swer3: item.swer3 / 100000,
+           swer4: item.swer4 / 100000,
+         }));
 
-        console.log("Final scaled data:", formattedData);
+        //console.log("Final scaled data:", scaledData);
 
-        setData(formattedData);
+        setData(scaledData);
       } catch (error) {
         console.error("Error fetching winners summary:", error);
       } finally {

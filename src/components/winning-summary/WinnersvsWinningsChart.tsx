@@ -80,7 +80,8 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
         return {
           draw: drawLabelMap[drawNum] || `Draw ${drawNum}`,
           winners: drawSummary[drawNum].winners,
-          winnings: drawSummary[drawNum].winnings,
+          //winnings: drawSummary[drawNum].winnings,
+          winnings: drawSummary[drawNum].winnings / 100000, // scalling data
           GameCategoryId: gameCategoryId ?? null,
         };
       });
