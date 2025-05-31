@@ -41,8 +41,8 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const from = "2025-05-01";
-      const to = "2025-05-30";
+      const from = "2000-05-01";
+      const to = "2099-05-30";
       //const today = new Date().toISOString().split("T")[0];
       //console.log("Fetching winners with params:", { gameCategoryId, from: today, to: today });
 
@@ -80,7 +80,7 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
         return {
           draw: drawLabelMap[drawNum] || `Draw ${drawNum}`,
           winners: drawSummary[drawNum].winners,
-          //winnings: drawSummary[drawNum].winnings,
+          // winnings: drawSummary[drawNum].winnings,
           winnings: drawSummary[drawNum].winnings / 100000, // scalling data
           GameCategoryId: gameCategoryId ?? null,
         };

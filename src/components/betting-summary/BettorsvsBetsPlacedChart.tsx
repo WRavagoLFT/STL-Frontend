@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Stack,
-  CircularProgress,
-  Button,
-} from "@mui/material";
+import { CircularProgress, Button, } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { addLabels } from "./tooltips/dataSet";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";

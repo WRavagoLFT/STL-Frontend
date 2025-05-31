@@ -1,54 +1,75 @@
 import React, { useState, useEffect } from "react";
-import { fetchHistoricalRegion } from "~/utils/api/transactions";
+import { fetchWinners } from "~/utils/api/winners";
 import { FaMoneyBillAlt } from "react-icons/fa";
-import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import router from "next/router";
 
+// Define RegionData type
 interface RegionData {
-  RegionId: number;
+  RegionId?: number;
   Region: string;
-  RegionFull: string;
-  TotalWinners: number;
+  RegionFull?: string;
+  TotalWinners?: number;
+  TotalPayout: number;
+  trend?: number;
 }
 
 const TopWinningRegionPage = () => {
   const [rankedRegions, setRankedRegions] = useState<
-    { region: RegionData; rank: number; trend: "up" | "down" | "same" }[]
+    { region: RegionData; rank: number; trend: number }[]
   >([]);
 
   const getWinningRegions = async () => {
-    const response = await fetchHistoricalRegion();
+    try {
+      const response = await fetchWinners({
+        from: "2000-01-01",
+        to: "2099-12-31",
+      });
 
-    if (!response.success || response.data.length === 0) {
-      console.warn("No data found in API response!");
-      return;
-    }
-
-    // Aggregate TotalBettors per RegionId using reduce()
-    const regionMap: Map<number, RegionData> = response.data.reduce((map: { get: (arg0: any) => any; set: (arg0: any, arg1: any) => void; }, entry: { RegionId: any; TotalBettors: any; }) => {
-      const existing = map.get(entry.RegionId);
-      if (existing) {
-        existing.TotalBettors += entry.TotalBettors;
-      } else {
-        map.set(entry.RegionId, { ...entry });
+      if (!response.success || !response.data || response.data.length === 0) {
+        console.warn("No winners found in API response.");
+        return;
       }
-      return map;
-    }, new Map<number, RegionData>());
 
-    // Convert to array and explicitly cast to RegionData[]
-    const sortedRegions = Array.from(regionMap.values() as Iterable<RegionData>)
-      .sort((a, b) => b.TotalWinners - a.TotalWinners)
-      .filter(region => region.TotalWinners > 0);
+      console.log('TOTAL WINNERS IN THE TOP WINNING REGION:', response.data);
 
-    const ranked: { region: RegionData; rank: number; trend: "up" | "down" | "same" }[] =
-      sortedRegions.slice(0, 5).map((region, index) => ({
+      const filteredData = response.data;
+
+      // Group by Region and sum PayoutAmount
+      const regionMap = new Map<string, RegionData>();
+
+      filteredData.forEach((entry: any) => {
+        const regionName = entry.Region || "Unknown";
+        const payout = entry.PayoutAmount || 0;
+
+        if (regionMap.has(regionName)) {
+          const existing = regionMap.get(regionName)!;
+          existing.TotalPayout += payout;
+          existing.TotalWinners = (existing.TotalWinners || 0) + 1;
+        } else {
+          regionMap.set(regionName, {
+            RegionId: entry.RegionId,
+            Region: regionName,
+            RegionFull: entry.RegionFull || regionName,
+            TotalPayout: payout,
+            TotalWinners: 1,
+          });
+        }
+      });
+
+      const sortedRegions = Array.from(regionMap.values()).sort(
+        (a, b) => b.TotalPayout - a.TotalPayout
+      );
+
+      const ranked = sortedRegions.map((region, index) => ({
         region,
         rank: index + 1,
-        trend: index % 2 === 0 ? "up" : "down",
+        trend: 0, // Default stub, update later if needed
       }));
 
-    setRankedRegions(ranked);
+      setRankedRegions(ranked);
+    } catch (error) {
+      console.error("Failed to fetch winning regions:", error);
+    }
   };
 
   useEffect(() => {
@@ -56,50 +77,66 @@ const TopWinningRegionPage = () => {
   }, []);
 
   return (
-  <div className="bg-transparent p-4 rounded-xl border border-[#0038A8]">
+    <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
       <div className="flex mb-2 items-center w-full">
         <div className="bg-[#0038A8] rounded-lg p-1">
           <FaMoneyBillAlt size={24} color={"#F6BA12"} />
         </div>
         <div className="flex items-center justify-between flex-1 ml-3">
-          <p className="text-base">Top Betting Regions Today</p>
+          <p className="text-base">Top Winning Regions Today</p>
           <button
-            onClick={() => { router.push("/winning-summary/dashboard");}}
-            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
+            onClick={() => router.push("/winning-summary/dashboard")}
+            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
+          >
             View Winners
           </button>
         </div>
       </div>
-      <div className="bg-[#303030] h-px mb-4" />
+      <div className="h-px bg-[#ACA993] mt-1 mb-2" />
 
-      {/* Display Ranked Regions */}
-      {rankedRegions.length > 0 ? (
-        rankedRegions.map(({ region, rank, trend }) => (
-          <div key={region.RegionId} className="flex items-center py-1">
-            <div className="flex items-center w-[15%]">
-              <span className={`font-bold ${trend === "up" ? "text-[#4CAF50]" : "text-[#FF7A7A]"}`}>
-                {rank}
-              </span>
-              {trend === "up" ? (
-                <ArrowUpwardIcon className="text-[#4CAF50] ml-1 text-lg" />
-              ) : (
-                <ArrowDownwardIcon className="text-[#FF7A7A] ml-1 text-lg" />
-              )}
-            </div>
-            <p className="flex-1 ml-4">
-              {region.RegionFull}
-            </p>
-            <p className="text-center flex-1">
-              {region.TotalWinners.toLocaleString()}
-            </p>
+      <div className="mt-2 w-full max-h-[720px] overflow-y-auto">
+        {rankedRegions.length === 0 ? (
+          <div className="p-8 text-sm text-center text-[#888]">
+            <p>Top Winning Regions</p>
+            <p>Data will be displayed once available.</p>
           </div>
-        ))
-      ) : (
-        <div className="p-8 text-sm text-center text-[#888]">
-          <p>Top Betting Regions </p>
-          <p> data will be displayed once available.</p>
-        </div>
-      )}
+        ) : (
+          rankedRegions.map((item, index) => (
+            <div
+              key={item.region.RegionId ?? item.region.Region}
+              className={`flex items-center py-2 ${
+                index === rankedRegions.length - 1 ? "border-none" : ""
+              }`}
+            >
+              <div className="flex items-center w-[15%]">
+                <span
+                  className={`font-bold text-md ${
+                    item.trend > 0
+                      ? "text-[#046115]"
+                      : item.trend < 0
+                      ? "text-[#CE1126]"
+                      : "text-[#aaa]"
+                  }`}
+                >
+                  {item.trend > 0
+                    ? `↑${item.trend}`
+                    : item.trend < 0
+                    ? `↓${Math.abs(item.trend)}`
+                    : "→"}
+                </span>
+              </div>
+
+              <p className="text-[#0038A8] flex-1 ml-2 text-md whitespace-nowrap overflow-hidden text-ellipsis">
+                {item.region.RegionFull}
+              </p>
+
+              <p className="text-[#212121] font-bold text-right flex-1 text-md">
+                {(item.region.TotalPayout ?? 0).toLocaleString()}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

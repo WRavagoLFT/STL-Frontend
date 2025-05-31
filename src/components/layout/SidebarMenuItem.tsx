@@ -109,7 +109,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
         key={path}
         onClick={() => handleListItemClick({ name, path })}
         className={clsx(
-          "ml-6 py-2 pl-4 pr-2 pt-3 rounded-md cursor-pointer text-sm transition-colors",
+          "ml-6 py-1.5 pl-4 pr-2 pt-3 rounded-md cursor-pointer text-sm transition-colors",
           isActive(path)
             ? "text-[#F6BA12] font-semibold"
             : "text-gray-300 hover:text-white"

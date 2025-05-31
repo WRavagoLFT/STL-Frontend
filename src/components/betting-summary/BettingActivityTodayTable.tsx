@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
-import {
-  fetchHistoricalRegion,
-  fetchHistoricalSummary,
-} from "~/utils/api/transactions";
+import { fetchHistoricalRegion, fetchHistoricalSummary, } from "~/utils/api/transactions";
 import { historicalSummaryByRegionCategory } from "~/utils/transforms";
 import { FaDiceSix } from "react-icons/fa";
 
@@ -124,7 +121,7 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
               >
                 <div className="flex items-center w-[15%]">
                   <span
-                    className={`font-bold text-[0.85rem] ${
+                    className={`font-bold text-md ${
                       item.trend > 0
                         ? "text-[#046115]"
                         : item.trend < 0
@@ -140,11 +137,11 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
                   </span>
                 </div>
 
-                <p className="text-[#0038A8] flex-1 ml-2 text-[0.9rem] whitespace-nowrap overflow-hidden text-ellipsis">
+                <p className="text-[#0038A8] flex-1 ml-2 text-md whitespace-nowrap overflow-hidden text-ellipsis">
                   {item.region.Region}
                 </p>
 
-                <p className="text-[#212121] font-bold text-right flex-1 text-[0.95rem]">
+                <p className="text-[#212121] font-bold text-right flex-1 text-md">
                   ₱{item.region.TotalBetAmount.toLocaleString()}
                 </p>
               </div>

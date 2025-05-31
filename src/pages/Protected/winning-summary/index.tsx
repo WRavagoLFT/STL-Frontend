@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { useRouter } from 'next/router';
 
-// Components
 import DashboardCardsPage from "~/components/dashboard/DashboardCards";
 import TableWinningActivityToday from "~/components/winning-summary/WinningActivityTodayTable";
 import ChartWinnersvsWinningsSummary from "~/components/winning-summary/WinnersvsWinningsChart";
@@ -13,13 +12,36 @@ import { buttonStyles } from "~/styles/theme";
 
 const WinningSummaryPage = (params: {gameCategoryId?: number}) => {
   const router = useRouter();
+  const [ title, setTitle ] = useState('STL')
+  
+  useEffect(() => {
+    switch(params.gameCategoryId) {
+      case 0: 
+        setTitle('STL')
+        break;
+      case 1:
+        setTitle('STL Pares')
+        break;
+      case 2:
+        setTitle('STL Swer 2')
+        break;
+      case 3:
+        setTitle('STL Swer 3')
+        break;
+      case 4:
+        setTitle('STL Swer 4')
+        break;
+    }
+  }, [params.gameCategoryId])
 
   const handleViewComparisonClick = () => {
     router.push("/wins-comparisons")
   }
+  
   return (
     <div className="space-y-4 h-full">
-      <h1 className="text-3xl font-bold">STL Winning Summary</h1>
+      {/* this title should be dynamic */}
+      <h1 className="text-3xl font-bold">{title} Winning Summary</h1> 
       <DashboardCardsPage gameCategoryId={params.gameCategoryId} />
       <div className="flex flex-col items-center space-y-4">
         <div className="w-full space-y-4">

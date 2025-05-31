@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaDiceSix } from "react-icons/fa";
 import { fetchWinners } from "~/utils/api/winners";
 
-// Define types
 interface RegionData {
   Region: string;
   TotalPayout: number;
-  trend?: number;
+}
+
+interface RankedRegion {
+  region: RegionData;
+  rank: number;
+  trend: number; // negative = moved up, positive = moved down
 }
 
 const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
-  const [rankedRegions, setRankedRegions] = useState<
-    { region: RegionData; rank: number; trend: number }[]
-  >([]);
+  const [rankedRegions, setRankedRegions] = useState<RankedRegion[]>([]);
+  const previousRanksRef = useRef<Map<string, number>>(new Map());
 
   const getWinningRegions = async () => {
     try {
@@ -28,7 +31,6 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
 
       let filteredData = response.data;
 
-      // Filter by gameCategoryId if provided
       if (params.gameCategoryId && params.gameCategoryId > 0) {
         filteredData = filteredData.filter(
           (entry: { GameCategoryId: number }) =>
@@ -36,7 +38,6 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
         );
       }
 
-      // Group by Region and sum PayoutAmount
       const regionMap = new Map<string, RegionData>();
 
       filteredData.forEach((entry: any) => {
@@ -44,8 +45,7 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
         const payout = entry.PayoutAmount;
 
         if (regionMap.has(regionName)) {
-          const existing = regionMap.get(regionName)!;
-          existing.TotalPayout += payout;
+          regionMap.get(regionName)!.TotalPayout += payout;
         } else {
           regionMap.set(regionName, {
             Region: regionName,
@@ -58,13 +58,27 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
         (a, b) => b.TotalPayout - a.TotalPayout
       );
 
-      const ranked = sortedRegions.map((region, index) => ({
-        region,
-        rank: index + 1,
-        trend: 0,
-      }));
+      const newRanked: RankedRegion[] = sortedRegions.map((region, index) => {
+        const regionName = region.Region;
+        const newRank = index + 1;
+        const previousRank = previousRanksRef.current.get(regionName);
+        const trend = previousRank ? previousRank - newRank : 0;
 
-      setRankedRegions(ranked);
+        return {
+          region,
+          rank: newRank,
+          trend,
+        };
+      });
+
+      // Update reference to previous ranks for next comparison
+      const newRankMap = new Map<string, number>();
+      newRanked.forEach((item) => {
+        newRankMap.set(item.region.Region, item.rank);
+      });
+      previousRanksRef.current = newRankMap;
+
+      setRankedRegions(newRanked);
     } catch (error) {
       console.error("Failed to fetch winning regions:", error);
     }
@@ -106,25 +120,25 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
                 <span
                   className={`font-bold text-md ${
                     item.trend > 0
-                      ? "text-[#046115]"
+                      ? "text-[#CE1126]" // moved down
                       : item.trend < 0
-                        ? "text-[#CE1126]"
-                        : "text-[#aaa]"
+                      ? "text-[#046115]" // moved up
+                      : "text-[#aaa]" // no change
                   }`}
                 >
                   {item.trend > 0
-                    ? `↑${item.trend}`
+                    ? `↓${Math.abs(item.trend)}`
                     : item.trend < 0
-                      ? `↓${Math.abs(item.trend)}`
-                      : "→"}
+                    ? `↑${Math.abs(item.trend)}`
+                    : "→"}
                 </span>
               </div>
 
-              <p className="text-[#0038A8] flex-1 ml-2 text-[0.9rem] whitespace-nowrap overflow-hidden text-ellipsis">
+              <p className="text-[#0038A8] flex-1 ml-2 text-md whitespace-nowrap overflow-hidden text-ellipsis">
                 {item.region.Region}
               </p>
 
-              <p className="text-[#212121] font-bold text-right flex-1 text-[0.95rem]">
+              <p className="text-[#212121] font-bold text-right flex-1 text-md">
                 ₱{item.region.TotalPayout.toLocaleString()}
               </p>
             </div>

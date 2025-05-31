@@ -147,7 +147,7 @@ const ChartBettorsSummary = () => {
     };
 
     fetchData();
-    console.log(`Bettors vs Bets Placed Summary Data: ${data}`);
+    //console.log(`Bettors vs Bets Placed Summary Data: ${data}`);
   }, []);
 
   return (
@@ -204,13 +204,11 @@ const ChartBettorsSummary = () => {
               {
                 scaleType: "band",
                 data: ["First Draw", "Second Draw", "Third Draw"],
-                // series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }]},
               } as any,
             ]}
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
-                // scaleType: "linear",
                 min: 0,
                 max: 100,
                 tickValues: xAxisTicks,

@@ -6,21 +6,17 @@ import { FaSignOutAlt } from "react-icons/fa";
 import { useAuthStore } from "~/store/useAuthStore";
 import UserInfo from "./UserInfo";
 import SidebarMenuItem from "./SidebarMenuItem";
-import SidebarUserSection from "./SidebarUserSection";
+import SidebarLogoSection from "./SidebarLogoSection";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
   const currentPath = router.asPath;
-  const { SideBarActiveGameType, setSideBarActiveGameType } = useSideBarStore();
+  const { setSideBarActiveGameType } = useSideBarStore();
   const userTypeId = useAuthStore((state) => state.userTypeId);
   const [collapsed, setCollapsed] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-  const [user, setUser] = useState<{
-    firstName: string;
-    lastName: string;
-    userTypeId: number;
-  } | null>(null);
-
+  const [user, setUser] = useState<{firstName: string; lastName: string; userTypeId: number;} | null>(null);
+  
   const handleLogout = async () => {
     try {
       await logoutUser();
@@ -83,7 +79,7 @@ const Sidebar: React.FC = () => {
       className={`p-3 bg-blue-800 text-white flex flex-col transition-all duration-200 
     ${collapsed ? "w-20" : "w-64"} sticky top-0 h-screen z-50 overflow-y-auto sidebar-scrollbar`}
     >
-      <SidebarUserSection
+      <SidebarLogoSection
         collapsed={collapsed}
         toggleCollapse={toggleCollapse}
       />
