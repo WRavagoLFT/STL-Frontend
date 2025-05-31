@@ -34,15 +34,12 @@ const CustomLegend = () => (
 
 const ChartWinnersBetTypeSummary = (params: {gameCategoryId?: number}) => {
   const [loading, setLoading] = useState(true);
-  // const [data, setData] = useState<
-  //     { draw: string; tumbok: number, sahod: number, ramble: number }[]
-  //   >([]);
-  // const [loading, setLoading] = useState(false);
-
+  
   const xAxisTicks = [
     0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90,
     95, 100,
   ];
+
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">

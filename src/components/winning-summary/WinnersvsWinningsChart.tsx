@@ -14,7 +14,7 @@ interface Winner {
 type DrawNumber = 1 | 2 | 3;
 
 const CustomLegend = () => (
-  <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
+  <div className="flex flex-row text-sm space-x-5 justify-start mt-0.5 mr-4">
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#E5C7FF] mr-2" />
       <p className="text-sm">Winners</p>
@@ -44,7 +44,6 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
       const from = "2025-05-01";
       const to = "2025-05-30";
       //const today = new Date().toISOString().split("T")[0];
-
       //console.log("Fetching winners with params:", { gameCategoryId, from: today, to: today });
 
       const result = await fetchWinners({
@@ -86,7 +85,7 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
         };
       });
 
-      console.log("Final chart data:", finalChartData);
+      //console.log("Final chart data:", finalChartData);
       setChartData(finalChartData);
 
       setLoading(false);
