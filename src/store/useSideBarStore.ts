@@ -10,9 +10,11 @@ export type gameType =
 interface SideBarStore {
   SideBarActiveGameType: string;
   setSideBarActiveGameType: (gameType: gameType)=> void;
+  reset: () => void;
 }
 
 export const useSideBarStore = create<SideBarStore>((set) => ({
   SideBarActiveGameType: '',
   setSideBarActiveGameType: (gameType) => set({ SideBarActiveGameType: gameType }), // Use `set` to update the state
+  reset: () => set({ SideBarActiveGameType: '' }), // <- Reset to default
 }));

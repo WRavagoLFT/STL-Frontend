@@ -71,7 +71,7 @@ const RetailReceiptPage = () => {
     const [year, month] = operationDate.split("-");
     fetchRetailReceipts(Number(year), Number(month)).then((data) => {
       if (data?.success) {
-        console.log("[RetailReceipts] Full data:", data.data);
+        //console.log("[RetailReceipts] Full data:", data.data);
         setReceiptData(data.data);
       }
     });
@@ -114,6 +114,7 @@ const RetailReceiptPage = () => {
               value={operationDate}
               onChange={(e) => setOperationDate(e.target.value)}
               className="w-full rounded border border-[#0038A8] bg-[#F8F0E3] px-3 py-2 text-sm"
+              max={new Date().toISOString().slice(0, 7)}
             />
           </div>
         </div>

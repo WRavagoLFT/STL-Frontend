@@ -143,7 +143,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
     };
 
     fetchData();
-    console.log(`Bettors vs Bets Placed Summary Data: ${data}`);
+    //console.log(`Bettors vs Bets Placed Summary Data: ${data}`);
   }, [params.gameCategoryId]);
 
   return (
@@ -151,7 +151,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
       <div className="flex justify-between items-center w-full mb-4">
         <div className="flex flex-col leading-none">
           <p className="text-lg leading-none">
-            Summary of Bettors and Bets Placed Today
+            Today's Bettor Count by Game Type
           </p>
           <CustomLegend />
         </div>
@@ -169,10 +169,13 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
           <BarChart
             height={300}
             grid={{ vertical: true }}
-            slotProps={{ legend: { hidden: true } }}
+            slotProps={{ 
+            noDataOverlay: { message: 'Summary of Bettors and Bets Placed data will be displayed once available.' },
+            legend: { hidden: true } }}
             layout="horizontal"
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
             dataset={data}
+
             yAxis={[
               {
                 scaleType: "band",

@@ -37,15 +37,15 @@ const WINNING_SUBMENUS = [
   { name: "STL Swer4", path: "/winning-summary/stl-swer4" },
 ];
 
-// menu visibility - 'access guard' is different since this only restricts from VIEWING.
+// menu visibility - 'ACCESS GUARD component' is different since this only restricts from VIEWING.
 const MENU_VISIBILITY: Record<string, number[]> = {
   Dashboard: [1, 2, 3, 4, 6],
   Managers: [6],
   Executive: [6],
+  Operators: [6],
   "Betting Summary": [3, 4, 6],
   "Winning Summary": [3, 4, 6],
-  "Draw Summary": [3, 4, 5],
-  Operators: [6],
+  "Draw Summary": [3, 4, 5, 6,],
   "Retail Receipt": [3, 4, 6],
 };
 
@@ -53,10 +53,10 @@ const iconMap: Record<string, React.ReactNode> = {
   Dashboard: <FaHome size={19} />,
   Managers: <FaUserShield size={19} />,
   Executive: <FaBusinessTime size={19} />,
+  Operators: <FaStoreAlt size={19} />,
   "Betting Summary": <FaDiceSix size={19} />,
   "Winning Summary": <FaMoneyBillAlt size={19} />,
   "Draw Summary": <FaBroadcastTower size={19} />,
-  Operators: <FaStoreAlt size={19} />,
   "Retail Receipt": <FaReceipt size={19} />,
 };
 
@@ -64,10 +64,10 @@ const routeMap: Record<string, string> = {
   Dashboard: "/dashboard",
   Managers: "/managers",
   Executive: "/executives",
+  Operators: "/operators",
   "Betting Summary": "/betting-summary",
   "Winning Summary": "/winning-summary",
   "Draw Summary": "/draw-summary",
-  Operators: "/operators",
   "Retail Receipt": "/retail-receipt",
 };
 
@@ -92,7 +92,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
       : null;
 
   const path = routeMap[label] ?? `/${label.toLowerCase().replace(/\s+/g, "-")}`;
-
+  
   const isGroup = submenu !== null;
   const isGroupActive = currentPath.startsWith(path);
 
@@ -140,7 +140,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
             : "hover:text-[#F6BA12] text-gray-300"
         )}
       >
-        <span className="flex items-center gap-2 text-sm">
+        <span className="flex items-center gap-3 text-sm">
           {iconMap[label]}
           {!collapsed && label}
         </span>

@@ -83,7 +83,7 @@ const TableWinningActivityToday = (params: {gameCategoryId?: number}) => {
         <div className="flex items-center justify-between flex-1 ml-3">
           <p className="text-base">Top Winning Regions Today</p>
           <button className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
-            View Comparison 
+            View Comparison  
           </button>
         </div>
       </div>

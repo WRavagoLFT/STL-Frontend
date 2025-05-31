@@ -9,6 +9,7 @@ interface AuthState {
 
   userTypeId: number | null;
   setUserTypeId: (id: number) => void;
+  reset: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -18,4 +19,5 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   userTypeId: null,
   setUserTypeId: (id) => set({ userTypeId: id }),
+  reset: () => set({ userTypeId: null })
 }));

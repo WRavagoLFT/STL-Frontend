@@ -47,10 +47,10 @@ const App = ({ Component, pageProps }: AppProps) => {
       try {
         await waitUntilNotRefreshing();
         const data = await getCurrentUser({});
-        console.log("getCurrentUser response:", data);
+        //console.log("getCurrentUser response:", data);
         if (data?.success) {
           const roleId = data.data?.UserTypeId;
-          console.log("", roleId)
+          //console.log("", roleId)
           setUserTypeId(roleId); // update roleId
 
           setLoading(false);
@@ -73,8 +73,8 @@ const App = ({ Component, pageProps }: AppProps) => {
             if (data?.success) {
               const roleId = data.user?.UserTypeId;
               setUserTypeId(roleId);
-              console.log('CURRENT USER', data);
-              console.log("UserTypeId:", roleId);
+              //console.log('CURRENT USER', data);
+              //console.log("UserTypeId:", roleId);
 
               setLoading(false);
               return;

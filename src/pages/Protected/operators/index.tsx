@@ -148,7 +148,6 @@ const OperatorsPage = () => {
         cities={cities}
         areaOfOperations={areaOfOperations}
       />
-
     </div>
   );
 };

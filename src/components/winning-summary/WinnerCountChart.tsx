@@ -41,98 +41,6 @@ const CustomLegend = () => (
 
 
 const ChartWinnersSummary = () => {
-  // const [chartData, setChartData] = useState<
-  //   Array<{ gameType: string } & Record<string, number>>
-  // >([]);
-  // const [loading, setLoading] = useState(true);
-  // const [betTypes, setBetTypes] = useState<string[]>([]);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await fetchHistoricalSummary({});
-
-  //       console.log(
-  //         "Result Data from BetTypeChart:",
-  //         JSON.stringify(res.data, null, 2)
-  //       );
-
-  //       if (res.success && Array.isArray(res.data)) {
-  //         // Aggregate TotalBetAmount by GameTypeId and BetType
-  //         // Aggregated Data is an object where
-  //         // keys - number
-  //         // values - object where:
-  //         // key(string) value(number)
-  //         const aggregatedData: Record<number, Record<string, number>> = {};
-
-  //         res.data.forEach(
-  //           (item: {
-  //             GameTypeId: number;
-  //             BetType: string;
-  //             TotalBetAmount: number;
-  //           }) => {
-  //             if (!aggregatedData[item.GameTypeId]) {
-  //               aggregatedData[item.GameTypeId] = {};
-  //             }
-
-  //             if (!aggregatedData[item.GameTypeId][item.BetType]) {
-  //               aggregatedData[item.GameTypeId][item.BetType] = 0;
-  //             }
-
-  //             aggregatedData[item.GameTypeId][item.BetType] +=
-  //               item.TotalBetAmount;
-  //           }
-  //         );
-
-  //         console.log(
-  //           "Aggregated Data from BetTypeChart:",
-  //           JSON.stringify(aggregatedData, null, 2)
-  //         );
-
-  //         // Extract unique Bet Types
-  //         const uniqueBetTypes = Array.from(
-  //           new Set(res.data.map((item) => item.BetType))
-  //         );
-
-  //         // Format Data for Chart
-  //         const formattedData = Object.entries(aggregatedData).map(
-  //           ([gameTypeId, betTypes]) => ({
-  //             gameTypeId: Number(gameTypeId),
-  //             ...uniqueBetTypes.reduce(
-  //               (acc, betType) => {
-  //                 acc[betType] = betTypes[betType] || 0;
-  //                 return acc;
-  //               },
-  //               {} as Record<string, number>
-  //             ),
-  //           })
-  //         );
-
-  //         console.log("Formatted Chart Data:", formattedData);
-
-  //         setChartData(formattedData);
-  //         setBetTypes(uniqueBetTypes); // Store unique bet types for reference
-  //       }
-  //     } catch (error) {
-  //       console.error("Error loading data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
-  // const maxX =
-  //   chartData.length > 0
-  //     ? Math.max(
-  //         70,
-  //         ...chartData.flatMap((item) =>
-  //           betTypes.map((bet) => (item[bet] || 0) / 100000)
-  //         )
-  //       )
-  //     : 70;
-  // const xAxisTicks = Array.from({ length: 15 }, (_, i) => (i + 1) * 5); // Generates [5, 10, ..., 70]
 
   const [data, setData] = useState<
     {
@@ -244,7 +152,7 @@ const ChartWinnersSummary = () => {
       <div className="flex justify-between items-center w-full mb-4">
         <div className="flex flex-col leading-none">
           <p className="text-lg leading-none">
-            Today&apos;s Winners and Winnings
+            Today's Winnings by Game Type
           </p>
           <CustomLegend />
         </div>

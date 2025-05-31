@@ -202,9 +202,9 @@ const RolePage = () => {
           columns={editLogtableColumns}
           onClose={() => setShowEditLog(false)}
           userTypeId={roleId}
+          selectedUser={selectedUser}
         />
       )}
-
     </div>
   );
 };

@@ -24,6 +24,8 @@ const Sidebar: React.FC = () => {
   const handleLogout = async () => {
     try {
       await logoutUser();
+      useAuthStore.getState().reset();
+      useSideBarStore.getState().reset();
       router.push("/auth/login");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -95,10 +97,10 @@ const Sidebar: React.FC = () => {
           "Dashboard",
           "Managers",
           "Executive",
+          "Operators",
           "Betting Summary",
           "Winning Summary",
           "Draw Summary",
-          "Operators",
           "Retail Receipt",
         ].map((label) => (
           <SidebarMenuItem

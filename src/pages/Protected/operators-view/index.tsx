@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import OperatorViewPage from "~/components/operators/OperatorView";
 import { useOperatorFormStore } from "../../../store/useOperatorFormStore";
-import { useOperatorsData } from "../../../store/useOperatorStore";
 import { operatorSchema } from "~/schemas/operatorSchema";
 import { Operator } from "~/types/types";
 import RetailReceiptOperatorsPage from "~/components/operators/RetailReceipts";
@@ -119,17 +118,13 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
 
           {selectedOperatorId !== null && showEditLog && (
             <>
-              {console.log(
-                "Opening EditModalPage with OperatorId:",
-                selectedOperatorId
-              )}
-
               <EditModalPage
                 open={showEditLog}
                 id={selectedOperatorId}
                 fetchData={editLogOperator}
                 columns={editLogtableColumns}
                 onClose={() => setShowEditLog(false)}
+                initialUserOperatorData={operator}
               />
             </>
           )}
@@ -137,7 +132,9 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
 
         {/* Right side - Retail Receipt */}
         <div className="flex flex-col w-full md:w-2/5 min-w-0">
-          <RetailReceiptOperatorsPage operatorId={operator?.data.OperatorId} />
+          <RetailReceiptOperatorsPage 
+            operatorId={operator?.data.OperatorId} 
+          />
         </div>
       </div>
     </div>
