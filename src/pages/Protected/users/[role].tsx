@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { userTableColumns } from "~/config/userTableColumns";
 import useUserRoleStore from "../../../store/useUserStore";
 import CardsPage from "~/components/user/CardsData";
-import { addUser, editLogUser, fetchUsers, updateUser } from "~/utils/api/users";
+import { addUser, editLogUser, fetchOperatorMap, fetchUsersByRole, updateUser } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
 import { User } from "~/types/types";
 import UpdateUserModal from "~/components/user/UpdateUser";
@@ -78,13 +78,28 @@ const RolePage = () => {
 
   const openEditLogModal = (user: User) => {setSelectedUser(user);setShowEditLog(true);};
 
-  useEffect(() => {
-    if (roleConfig?.roleId) {
-      fetchUsers(roleConfig.roleId, setData).then((map) => {
-        if (map) setOperatorMap(map);
-      });
+  const loadUsers = useCallback(async () => {
+    if (!roleConfig?.roleId || !roleKey) return;
+
+    // If role is 'kabo' or 'kubrador', skip operator map
+    if (roleKey === "kabo" || roleKey === "kubrador") {
+      await fetchUsersByRole(roleConfig.roleId, null, setData);
+      return;
     }
-  }, [roleConfig, setData]);
+
+    // Otherwise, fetch operator map first
+    const operatorMap = await fetchOperatorMap();
+    if (operatorMap) {
+      setOperatorMap(operatorMap);
+      await fetchUsersByRole(roleConfig.roleId, operatorMap, setData);
+    } else {
+      setData([]); // fallback
+    }
+  }, [roleConfig?.roleId, roleKey, setData]);
+
+  useEffect(() => {
+    loadUsers();
+  }, [loadUsers]);
 
   //console.log("DATA USER", data);
   //console.log("operatormappp", operatorMap);
@@ -105,7 +120,7 @@ const RolePage = () => {
 
       if (result.success) {
         console.log("User added successfully:", result.data);
-        await fetchUsers(roleConfig.roleId, setData);
+        //await fetchUsers(roleConfig.roleId, setData);
 
         Swal.fire({
           icon: "success",
@@ -145,7 +160,7 @@ const RolePage = () => {
 
       if (result.success) {
         console.log("User updated successfully:", result.data);
-        await fetchUsers(roleConfig.roleId, setData);
+        //await fetchUsers(roleConfig.roleId, setData);
 
         Swal.fire({
           icon: "success",

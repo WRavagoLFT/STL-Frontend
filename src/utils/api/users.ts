@@ -10,69 +10,77 @@ const validateRelativeUrl = (url: string) => {
 };
 
 // fetching of users and operator map
-const fetchUsers = async (
+export const fetchUsersByRole = async (
   roleId: number,
+  operatorMap: Record<number, Operator> | null,
   setData: (data: User[]) => void
-): Promise<Record<number, Operator> | null> => {
+): Promise<void> => {
   if (!roleId) {
     console.warn("No roleId provided");
     setData([]);
-    return null;
+    return;
   }
 
-  // Cache URLs once
   const userUrl = validateRelativeUrl("/users/getUsers");
-  const operatorUrl = validateRelativeUrl("/operators/getOperators");
 
   try {
-    const [userResponse, operatorResponse] = await Promise.all([
-      axiosInstance.get(userUrl, { params: { roleId }, withCredentials: true }),
-      axiosInstance.get(operatorUrl, { withCredentials: true }),
-    ]);
+    const response = await axiosInstance.get(userUrl, {
+      params: { roleId },
+      withCredentials: true,
+    });
 
-    const users: User[] = userResponse.data?.data ?? [];
-    const operators: Operator[] = operatorResponse.data?.data ?? [];
+    const users: User[] = response.data?.data ?? [];
 
-    // Validate success flags and arrays early
-    if (!userResponse.data.success || !operatorResponse.data.success) {
+    if (!response.data.success) {
       setData([]);
-      return null;
+      return;
     }
 
-    // Create operator map
-    const operatorMap = operators.reduce<Record<number, Operator>>((map, operator) => {
-      const id = operator.OperatorId;
-
-      if (typeof id === 'number') {
-        map[id] = operator;
-      }
-
-      return map;
-    }, {});
-
-    // Helper to build full name
     const buildFullName = (user: User) =>
       [user.FirstName, user.LastName].filter(Boolean).join(" ");
 
-    // Filter and enrich users
     const filteredUsers = users
       .filter(user => user.UserTypeId === roleId)
-        .map(user => {
-          const operatorId = user.OperatorId;
-          const operatorDetails = typeof operatorId === 'number' ? operatorMap[operatorId] ?? null : null;
+      .map(user => {
+        const operatorId = user.OperatorId;
+        const operatorDetails = typeof operatorId === 'number' ? operatorMap?.[operatorId] ?? null : null;
 
-          return {
-            ...user,
-            fullName: buildFullName(user),
-            OperatorDetails: operatorDetails,
-          };
-        });
+        return {
+          ...user,
+          fullName: buildFullName(user),
+          OperatorDetails: operatorDetails,
+        };
+      });
 
-    setData(filteredUsers); // 
+    setData(filteredUsers);
+  } catch (error) {
+    console.error("Error fetching users:", (error as Error).message);
+    setData([]);
+  }
+};
+
+export const fetchOperatorMap = async (): Promise<Record<number, Operator> | null> => {
+  const operatorUrl = validateRelativeUrl("/operators/getOperators");
+
+  try {
+    const response = await axiosInstance.get(operatorUrl, { withCredentials: true });
+    const operators: Operator[] = response.data?.data ?? [];
+
+    if (!response.data.success) {
+      return null;
+    }
+
+    const operatorMap = operators.reduce<Record<number, Operator>>((map, operator) => {
+      const id = operator.OperatorId;
+      if (typeof id === 'number') {
+        map[id] = operator;
+      }
+      return map;
+    }, {});
+
     return operatorMap;
   } catch (error) {
-    console.error("Error fetching users or operators:", (error as Error).message);
-    setData([]);
+    console.error("Error fetching operators:", (error as Error).message);
     return null;
   }
 };
@@ -192,4 +200,4 @@ const editLogUser = async (userId: number) => {
     }
 };
 
-export { fetchUsers, addUser, updateUser, fetchUserById, editLogUser };
+export { addUser, updateUser, fetchUserById, editLogUser };
