@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import React from 'react';
 import WinningSummaryPage from '..';
+import { AccessGuard } from '~/components/auth/AccessGuard';
 
 const DynamicWinningSummary = () => {
   const router = useRouter();
@@ -15,7 +16,11 @@ const DynamicWinningSummary = () => {
     'stl-swer4': 4,
   }
 
-  return <WinningSummaryPage gameCategoryId={gameCategoryMapping[gameCategory as string]} />;
+  return (
+    <AccessGuard allowedUserTypes={[3, 4, 6]}>
+      <WinningSummaryPage gameCategoryId={gameCategoryMapping[gameCategory as string]} />
+    </AccessGuard>
+  );
 };
 
 export default DynamicWinningSummary;

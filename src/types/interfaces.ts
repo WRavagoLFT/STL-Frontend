@@ -52,14 +52,14 @@ export interface ChartCardProps<T = unknown> {
   label: string;
   chartData: ChartDataItem<T>[];
   regions: string[];
-  pageType: "manager" | "executive" | "operator";
+  pageType?: "executive" | "manager" | "operator" | "kabo" | "kubrador" | "Device Information";
   title?: string;
   roleLabel?: string;
   statsPerRegion: any[];
 }
 
 export interface CustomLegendProps {
-  pageType: "manager" | "executive" | "operator";
+  pageType?: "executive" | "manager" | "operator" | "kabo" | "kubrador" | "Device Information";
   label: string;
 }
 
@@ -73,7 +73,7 @@ export interface ChartsDataPageProps<T extends { region: string }> {
   dashboardData: T[];
   userType?: string;
   getUserStatus?: (user: T, date: string) => string;
-  pageType?: "manager" | "executive" | "operator";
+  pageType?: "executive" | "manager" | "operator" | "kabo" | "kubrador" | "Device Information";
   operatorMap?: Record<number, Operator>;
 }
 
@@ -82,7 +82,7 @@ export interface DetailedTableProps<T> {
   columns: Column<T>[];
   onCreate?: () => void;
   actionsRender?: (row: T) => React.ReactNode;
-  pageType?: "manager" | "executive" | "operator";
+  pageType?: "executive" | "manager" | "operator" | "kabo" | "kubrador" | "Device Information";
   showExportButton?: boolean;
   onExportCSV?: () => void;
   operatorMap?: Record<number, Operator>;

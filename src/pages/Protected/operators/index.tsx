@@ -4,7 +4,6 @@ import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { operatorTableColumns } from "~/config/operatorTableColumns";
 import CardsPage from "~/components/user/CardsData";
-import AddOperatorModal from "~/components/operators/AddOperator";
 import { Operator } from "~/types/types";
 import { addOperator } from "~/utils/api/operators";
 import { useOperatorFormStore } from "../../../store/useOperatorFormStore";
@@ -17,6 +16,8 @@ import {
 } from "~/utils/api/location";
 import { fetchOperators } from "~/utils/api/operators";
 import Swal from "sweetalert2";
+import { AccessGuard } from "~/components/auth/AccessGuard";
+import AddOperatorPage from "../operators-add";
   
 const OperatorsPage = () => {
   const { data, setData } = useOperatorsData();
@@ -117,38 +118,29 @@ const OperatorsPage = () => {
   };
 
   return (
-    <div className="mx-auto px-0 py-1">
-      <h1 className="text-3xl font-bold mb-3">Small Town Lottery Operators</h1>
-      <CardsPage 
-        dashboardData={data}
-        textlabel={textlabel}
-      />
-      
-      <ChartsDataPage
-        userType="operator"
-        pageType="operator"
-        dashboardData={dashboardData}
-      />
-      
-      <DetailedTable
-        data={data}
-        columns={tableColumns}
-        pageType="operator"
-        source="operators"
-        onAddClick={openModal}
-      />
-
-      <AddOperatorModal
-        open={isModalOpen}
-        onClose={closeModal}
-        onSubmit={handleAddOperator}
-        gameTypes={gameTypes}
-        regions={regions}
-        provinces={provinces}
-        cities={cities}
-        areaOfOperations={areaOfOperations}
-      />
-    </div>
+    <AccessGuard allowedUserTypes={[6]}>
+      <div className="mx-auto px-0 py-1">
+        <h1 className="text-3xl font-bold mb-3">Small Town Lottery Operators</h1>
+        <CardsPage 
+          dashboardData={data}
+          textlabel={textlabel}
+        />
+        
+        <ChartsDataPage
+          userType="operator"
+          pageType="operator"
+          dashboardData={dashboardData}
+        />
+        
+        <DetailedTable
+          data={data}
+          columns={tableColumns}
+          pageType="operator"
+          source="operators"
+          onAddClick={openModal}
+        />
+      </div>
+    </AccessGuard>
   );
 };
 

@@ -1,6 +1,6 @@
 import dynamic from "next/dynamic";
 import React, { Suspense } from "react";
-import { AccessGuard } from "~/components/AccessGuard";
+import { AccessGuard } from "~/components/auth/AccessGuard";
 import GameCombinationModal from "~/components/dashboard/GameCombinationForm";
 
 const DashboardSkeletonPage = dynamic(() => import("~/components/dashboard/DashboardSkeleton")
@@ -26,7 +26,7 @@ const DashboardPage = () => {
                 <DrawResultsPage />
                 <TopBettingRegionPage />
                 <TopWinningRegionPage />
-                <GameCombinationModal />
+                {/* <GameCombinationModal /> */}
               </div>
 
               {/* Right Column */}

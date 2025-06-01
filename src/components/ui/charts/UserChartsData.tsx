@@ -135,7 +135,7 @@ export const ChartsDataPage = <T extends RegionUser & { OperatorName?: string }>
         chartData={chartData}
         regions={regions}
         title={`${(pageType ?? "Unknown").charAt(0).toUpperCase() + (pageType ?? "Unknown").slice(1)} Summary`}
-        pageType={pageType ?? "operator"}
+        pageType={pageType}
         statsPerRegion={statsPerRegion}
       />
     </div>

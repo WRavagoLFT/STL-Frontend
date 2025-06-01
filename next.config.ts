@@ -67,6 +67,10 @@ const nextConfig: NextConfig = {
         destination: '/Protected/operators/:slug',
       },
       {
+        source: '/operators-add',
+        destination: '/Protected/operators-add',
+      },
+      {
         source: '/draw-selected',
         destination: '/Protected/draw-selected',
       },
@@ -77,6 +81,18 @@ const nextConfig: NextConfig = {
       {
         source: '/retail-receipt',
         destination: '/Protected/retail-receipt',
+      },
+      {
+        source: '/kabo',
+        destination: '/Protected/users/kabo',
+      },
+      {
+        source: '/kubrador',
+        destination: '/Protected/users/kubrador',
+      },
+      {
+        source: '/device-information',
+        destination: '/Protected/device-information',
       },
     ];
   },

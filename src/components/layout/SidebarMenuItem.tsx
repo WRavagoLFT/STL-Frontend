@@ -10,6 +10,9 @@ import {
   FaMoneyBillAlt,
   FaStoreAlt,
   FaReceipt,
+  FaUsers,
+  FaBuilding,
+  FaMobileAlt,
 } from "react-icons/fa";
 
 interface SidebarMenuItemProps {
@@ -43,9 +46,12 @@ const MENU_VISIBILITY: Record<string, number[]> = {
   Managers: [6],
   Executive: [6],
   Operators: [6],
+  Kabo: [3, 4],
+  Kubrador: [3, 4],
   "Betting Summary": [3, 4, 6],
   "Winning Summary": [3, 4, 6],
   "Draw Summary": [3, 4, 5, 6,],
+  "Device Information": [5],
   "Retail Receipt": [3, 4, 6],
 };
 
@@ -54,9 +60,12 @@ const iconMap: Record<string, React.ReactNode> = {
   Managers: <FaUserShield size={19} />,
   Executive: <FaBusinessTime size={19} />,
   Operators: <FaStoreAlt size={19} />,
+  Kabo: <FaUsers size={19} />,
+  Kubrador: <FaBuilding size={19} />,
   "Betting Summary": <FaDiceSix size={19} />,
   "Winning Summary": <FaMoneyBillAlt size={19} />,
   "Draw Summary": <FaBroadcastTower size={19} />,
+  "Device Information": <FaMobileAlt size={19} />,
   "Retail Receipt": <FaReceipt size={19} />,
 };
 
@@ -65,9 +74,12 @@ const routeMap: Record<string, string> = {
   Managers: "/managers",
   Executive: "/executives",
   Operators: "/operators",
+  Kabo: "/kabo",
+  Kubrador: "/kubrador",
   "Betting Summary": "/betting-summary",
   "Winning Summary": "/winning-summary",
   "Draw Summary": "/draw-summary",
+  "Device Information": "/device-information",
   "Retail Receipt": "/retail-receipt",
 };
 
@@ -81,7 +93,6 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
 }) => {
   const router = useRouter();
   const currentPath = router.asPath;
-
   if (!MENU_VISIBILITY[label]?.includes(userTypeId)) return null;
 
   const submenu =
@@ -92,10 +103,9 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
       : null;
 
   const path = routeMap[label] ?? `/${label.toLowerCase().replace(/\s+/g, "-")}`;
-  
   const isGroup = submenu !== null;
-  const isGroupActive = currentPath.startsWith(path);
 
+  const isGroupActive = currentPath.startsWith(path);
   const isActive = (path: string) => currentPath === path;
 
   const handleListItemClick = (subItem: (typeof BETTING_SUBMENUS)[number]) => {

@@ -12,25 +12,52 @@ import UpdateUserModal from "~/components/user/UpdateUser";
 import Swal from "sweetalert2";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
+import { AccessGuard } from "~/components/auth/AccessGuard";
 
-const roleMap: Record<string, { label: string; textlabel: string; roleId: number }> = {
-managers: {
-    label: "Small Town Lottery Manager",
-    textlabel: "Managers",
-    roleId: 4,
+const roleMap: Record<string, { label: string; textlabel: string; roleId: number, permittedUserTypes: number[] }> = {
+  kubrador: {
+    label: "Kubrador",
+    textlabel: "Kubrador",
+    roleId: 1,
+    permittedUserTypes: [3, 4], // managers, exec, admin
+  },
+  kabo: {
+    label: "Kabo",
+    textlabel: "Kabo",
+    roleId: 2,
+    permittedUserTypes: [3, 4], // managers, exec, admin
   },
   executive: {
     label: "Small Town Lottery Executive",
     textlabel: "Executives",
     roleId: 3,
+    permittedUserTypes: [3, 6], // executives, admin
+  },
+  managers: {
+    label: "Small Town Lottery Manager",
+    textlabel: "Managers",
+    roleId: 4,
+    permittedUserTypes: [4, 6], // managers, admin
   },
 };
 
 const RolePage = () => {
   const { query } = useRouter();
   const role = query.role as string;
-  const roleKey = role?.toLowerCase().includes("manager") ? "manager" : "executive";
+
+  const roleKey: "executive" | "manager" | "kabo" | "kubrador" | undefined =
+    role?.includes("manager")
+      ? "manager"
+      : role?.includes("executive")
+      ? "executive"
+      : role?.includes("kabo")
+      ? "kabo"
+      : role?.includes("kubrador")
+      ? "kubrador"
+      : undefined;
+
   const roleConfig = roleMap[role?.toLowerCase() || ""];
+  
   const operatorMap = useUserRoleStore((state) => state.operatorMap);
   const setOperatorMap = useUserRoleStore((state) => state.setOperatorMap);
   const { data, setData } = useUserRoleStore();
@@ -151,61 +178,63 @@ const RolePage = () => {
   };
 
   return (
-    <div className="mx-auto px-0 py-1">
-      <h1 className="text-3xl font-bold mb-3">{label}</h1>
-      <CardsPage 
-        dashboardData={data} 
-        roleLabel={label} 
-        textlabel={textlabel}
-      />
+    <AccessGuard allowedUserTypes={roleConfig.permittedUserTypes}>
+      <div className="mx-auto px-0 py-1">
+        <h1 className="text-3xl font-bold mb-3">{label}</h1>
+        <CardsPage 
+          dashboardData={data} 
+          roleLabel={label} 
+          textlabel={textlabel}
+        />
 
-      <ChartsDataPage 
-        pageType={roleKey} 
-        dashboardData={data}
-      />
+        <ChartsDataPage 
+          pageType={roleKey} 
+          dashboardData={data}
+        />
 
-      <DetailedTable
-        data={data}
-        columns={tableColumns}
-        pageType={roleKey}
-        operatorMap={operatorMap}
-        roleId={roleId}
-        statsPerRegion={data}
-        source="users"
-        onAddClick={openCreateModal}
-        onUpdateClick={openUpdateModal}
-      />
+        <DetailedTable
+          data={data}
+          columns={tableColumns}
+          pageType={roleKey}
+          operatorMap={operatorMap}
+          roleId={roleId}
+          statsPerRegion={data}
+          source="users"
+          onAddClick={openCreateModal}
+          onUpdateClick={openUpdateModal}
+        />
 
-      <AddUserModal
-        open={isCreateModalOpen}
-        onClose={closeCreateModal}
-        onSubmit={handleAddUser}
-        operatorMap={operatorMap}
-        userTypeId={roleId}
-      />
+        <AddUserModal
+          open={isCreateModalOpen}
+          onClose={closeCreateModal}
+          onSubmit={handleAddUser}
+          operatorMap={operatorMap}
+          userTypeId={roleId}
+        />
 
-      <UpdateUserModal
-        open={isUpdateModalOpen}
-        onClose={closeUpdateModal}
-        onSubmit={handleUpdateUser}
-        operatorMap={operatorMap}
-        userTypeId={roleId}
-        selectedUser={selectedUser}
-        onViewEditLogs={() => openEditLogModal(selectedUser!)}
-      />
-
-      {selectedUser && showEditLog && (
-        <EditModalPage
-          open={showEditLog}
-          id={selectedUser.UserId!}
-          fetchData={editLogUser}
-          columns={editLogtableColumns}
-          onClose={() => setShowEditLog(false)}
+        <UpdateUserModal
+          open={isUpdateModalOpen}
+          onClose={closeUpdateModal}
+          onSubmit={handleUpdateUser}
+          operatorMap={operatorMap}
           userTypeId={roleId}
           selectedUser={selectedUser}
+          onViewEditLogs={() => openEditLogModal(selectedUser!)}
         />
-      )}
-    </div>
+
+        {selectedUser && showEditLog && (
+          <EditModalPage
+            open={showEditLog}
+            id={selectedUser.UserId!}
+            fetchData={editLogUser}
+            columns={editLogtableColumns}
+            onClose={() => setShowEditLog(false)}
+            userTypeId={roleId}
+            selectedUser={selectedUser}
+          />
+        )}
+      </div>
+    </AccessGuard>
   );
 };
 

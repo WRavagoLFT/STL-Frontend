@@ -18,7 +18,7 @@ const Sidebar: React.FC = () => {
   const [user, setUser] = useState<{firstName: string; lastName: string; userTypeId: number;} | null>(null);
   
   const handleLogout = async () => {
-    try {
+    try { 
       await logoutUser();
       useAuthStore.getState().reset();
       useSideBarStore.getState().reset();
@@ -35,9 +35,9 @@ const Sidebar: React.FC = () => {
       case 2:
         return "Kabo";
       case 3:
-        return "Executive";
+        return "AAC - Executive";
       case 4:
-        return "Manager";
+        return "AAC - Manager"; 
       case 5:
         return "Provincial Admin";
       case 6:
@@ -69,7 +69,6 @@ const Sidebar: React.FC = () => {
   }, []);
 
   // console.log("User state:", user);
-
   if (userTypeId === null) {
     return null; // or loading spinner
   }
@@ -91,12 +90,15 @@ const Sidebar: React.FC = () => {
       <nav className="flex flex-col space-y-1 mt-1 px-1">
         {[
           "Dashboard",
+          "Kabo", // read only page
+          "Kubrador", // read only page
           "Managers",
           "Executive",
-          "Operators",
+          "Operators", 
           "Betting Summary",
           "Winning Summary",
           "Draw Summary",
+          "Device Information", // for provincial role
           "Retail Receipt",
         ].map((label) => (
           <SidebarMenuItem

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
 
@@ -11,18 +11,24 @@ export const AccessGuard = ({
 }) => {
   const { userTypeId } = useAuthStore();
   const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    console.log("UserTypeId IN THE ACCESSGUARD:", userTypeId);
-
-    if (userTypeId !== null && !allowedUserTypes.includes(userTypeId)) {
-      router.replace("/unauthorized");
+    if (userTypeId === null) {
+      // if null means not logged in, redirect to login
+      //router.replace("/auth/login");
+      return;
     }
+
+    if (!allowedUserTypes.includes(userTypeId)) {
+      router.replace("/unauthorized");
+      return;
+    }
+
+    setIsChecking(false); // Safe to render
   }, [userTypeId, allowedUserTypes, router]);
 
-  if (userTypeId === null || !allowedUserTypes.includes(userTypeId)) {
-    return null;
-  }
+  if (isChecking) return null; // or a spinner
 
   return <>{children}</>;
 };
