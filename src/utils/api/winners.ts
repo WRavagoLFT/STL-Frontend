@@ -31,7 +31,6 @@ export const fetchWinners = async (params?: {
   }
 };
 
-
 export const fetchCompareHistoricalWinnersDate = async (
   urlPath: string,
   chartType: string,

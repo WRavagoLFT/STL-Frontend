@@ -6,17 +6,11 @@ import { Operator } from "~/types/types";
 import RetailReceiptOperatorsPage from "~/components/operators/RetailReceipts";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import router from "next/router";
-import { fetchGameCategories } from "~/utils/api/gamecategories";
-import {
-  fetchAreaOfOperations,
-  fetchCities,
-  fetchProvinces,
-  fetchRegions,
-} from "~/utils/api/location";
 import { editLogOperator } from "~/utils/api/operators";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { operatorEditColumns } from "~/config/operatorEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";
+import { fetchFormOptionsData } from "..";
 
 export interface OperatorViewPageProps {
   slug: string;
@@ -26,7 +20,6 @@ export interface OperatorViewPageProps {
 const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
   const [showEditLog, setShowEditLog] = useState(false);
   const editLogtableColumns = operatorEditColumns();
-  //const initialUserOperatorData = operator?.data;
   const [selectedOperatorId, setSelectedOperatorId] = useState<number | null>(
     null
   );
@@ -42,46 +35,13 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
     provinces,
     cities,
     areaOfOperations,
-    setGameTypes,
-    setRegions,
-    setProvinces,
-    setCities,
-    setAreaOfOperations,
   } = useOperatorFormStore();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const gameTypesResponse = await fetchGameCategories();
-        const regions = await fetchRegions();
-        const provinces = await fetchProvinces();
-        const cities = await fetchCities({ availableOnly: true });
-        const areaOfOperations = await fetchAreaOfOperations();
-        //const operators = await fetchOperators();
-
-        // Set into Zustand store
-        setGameTypes(gameTypesResponse.data);
-        setRegions(regions.data);
-        setProvinces(provinces.data);
-        setCities(cities.data);
-        setAreaOfOperations(areaOfOperations.data);
-        //setData(operators.data);
-
-        //console.log("Fetched and set game types:", gameTypes);
-        //console.log("Fetched and set regions:", regions);
-        //console.log("Fetched and set provinces:", provinces);
-        //console.log("Fetched and set cities:", cities);
-        //console.log("Fetched and set area of operations:", areaOfOperations);
-        //console.log('fetched operators:', operators)
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   //console.log("operatorrr console", operator);
+  
+  useEffect(() => {
+    fetchFormOptionsData();
+  }, []);
 
   return (
     <AccessGuard allowedUserTypes={[6]}>

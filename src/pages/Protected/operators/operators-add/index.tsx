@@ -4,16 +4,9 @@ import Swal from "sweetalert2";
 import AddOperatorPage from "~/components/operators/AddOperator";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { useOperatorFormStore } from "~/store/useOperatorFormStore";
-import { useOperatorsData } from "~/store/useOperatorStore";
 import { Operator } from "~/types/types";
-import { fetchGameCategories } from "~/utils/api/gamecategories";
-import {
-  fetchAreaOfOperations,
-  fetchCities,
-  fetchProvinces,
-  fetchRegions,
-} from "~/utils/api/location";
 import { addOperator, fetchOperators } from "~/utils/api/operators";
+import { fetchFormOptionsData } from "..";
 
 export default function AddOperator() {
   const {
@@ -22,37 +15,11 @@ export default function AddOperator() {
     provinces,
     cities,
     areaOfOperations,
-    setGameTypes,
-    setRegions,
-    setProvinces,
-    setCities,
-    setAreaOfOperations,
   } = useOperatorFormStore();
-
-  const { data, setData } = useOperatorsData();
+  const { data, setData } = useOperatorFormStore();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const gameTypesResponse = await fetchGameCategories();
-        const regions = await fetchRegions();
-        const provinces = await fetchProvinces();
-        const cities = await fetchCities({ availableOnly: true });
-        const areaOfOperations = await fetchAreaOfOperations();
-        const operators = await fetchOperators();
-
-        setGameTypes(gameTypesResponse.data);
-        setRegions(regions.data);
-        setProvinces(provinces.data);
-        setCities(cities.data);
-        setAreaOfOperations(areaOfOperations.data);
-        setData(operators.data);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+    fetchFormOptionsData();
   }, []);
 
   const handleAddOperator = async (data: Operator): Promise<void> => {
