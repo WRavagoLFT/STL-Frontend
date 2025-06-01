@@ -173,7 +173,7 @@ const ChartTopRegionByWinsandWinners: React.FC<
     return {};
   };
 
-  // SpecificDate
+  // Specific Date
   const processSpecificPayloadData = (payload: {
     FirstDate: DateSpecific[];
     SecondDate: DateSpecific[];
@@ -211,64 +211,76 @@ const ChartTopRegionByWinsandWinners: React.FC<
     setChartData(data);
   };
 
-  // fetching the data
+  // Date Payload Data
   const fetchData = useCallback(async () => {
     setLoading(true);
+
     try {
       const gameCategoryParam = getGameCategoryParam();
-      if (
-        dateFilter === "Specific Date" &&
-        firstDateSpecific &&
-        secondDateSpecific
-      ) {
-        console.log(
-          "Fetching Specific Date:",
-          formatDate(firstDateSpecific),
-          formatDate(secondDateSpecific)
-        );
+
+      // Check if required date values are available
+      if (!firstDateSpecific || !secondDateSpecific) {
+        console.warn("Missing required specific dates.");
+        setLoading(false);
+        return;
+      }
+
+      if (dateFilter === "Specific Date") {
+        const formattedFirst = formatDate(firstDateSpecific);
+        const formattedSecond = formatDate(secondDateSpecific);
+
+        console.log("Fetching Specific Date with:", {
+          first: formattedFirst,
+          second: formattedSecond,
+          ...gameCategoryParam,
+        });
+
         const resp = await fetchCompareHistoricalWinnersDate(
           "/winners/compareHistoricalWinners/chartType/",
           urlParam,
           {
-            first: formatDate(firstDateSpecific),
-            second: formatDate(secondDateSpecific),
+            first: formattedFirst,
+            second: formattedSecond,
             ...gameCategoryParam,
           }
         );
-        console.log("Payload (Specific Date):", resp);
-        // resp now has { FirstDate: [...], SecondDate: [...] }
-        if (resp && resp.FirstDate && resp.SecondDate) {
-          processSpecificPayloadData(resp);
+
+        if (resp?.data?.FirstDate && resp?.data?.SecondDate) {
+          processSpecificPayloadData(resp.data);
         } else {
-          console.warn("Unexpected payload:", resp);
+          console.warn("No data received for Specific Date", resp);
         }
+
       } else if (
         dateFilter === "Date Duration" &&
-        firstDateSpecific &&
-        secondDateSpecific &&
         firstDateDuration &&
         secondDateDuration
       ) {
-        console.log("Fetching Date Duration ranges");
+        const formatted = {
+          firstStart: formatDate(firstDateSpecific),
+          firstEnd: formatDate(secondDateSpecific),
+          secondStart: formatDate(firstDateDuration),
+          secondEnd: formatDate(secondDateDuration),
+          ...gameCategoryParam,
+        };
+
+        console.log("Fetching Date Duration with:", formatted);
+
         const resp = await fetchCompareHistoricalWinnersRange(
           "/winners/compareHistoricalWinnersRange/chartType/",
           urlParam,
-          {
-            firstStart: formatDate(firstDateSpecific),
-            firstEnd: formatDate(secondDateSpecific),
-            secondStart: formatDate(firstDateDuration),
-            secondEnd: formatDate(secondDateDuration),
-            ...gameCategoryParam,
-          }
+          formatted
         );
-        console.log("Payload (Date Duration):", resp);
-        // resp now has { FirstDate: [...], SecondDate: [...] }
-        if (resp && resp.FirstRange && resp.SecondRange) {
-          processRangePayloadData(resp);
+
+        if (resp?.data?.FirstRange && resp?.data?.SecondRange) {
+          processRangePayloadData(resp.data);
         } else {
-          console.warn("Unexpected payload:", resp);
+          console.warn("No data received for Date Duration", resp);
         }
+      } else {
+        console.warn("Missing date ranges for Date Duration");
       }
+
     } catch (err) {
       console.error("Error fetching chart data:", err);
     } finally {
@@ -282,9 +294,8 @@ const ChartTopRegionByWinsandWinners: React.FC<
     secondDateDuration,
     urlParam,
     aggregateField,
-    gameCategoryParam,
   ]);
-
+  
   useEffect(() => {
     fetchData();
   }, [fetchData]);

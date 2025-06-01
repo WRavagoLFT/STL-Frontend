@@ -83,7 +83,7 @@ const BettingSummaryPage = (params: { gameCategoryId?: number }) => {
                 </div>
               </div>
             </div>
-            <div className="mt-2">
+            <div className="mt-0">
               <TableBettingSummary gameCategoryId={params.gameCategoryId} />
             </div>
           </div>

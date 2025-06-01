@@ -180,7 +180,8 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
   secondDateDuration,
 }) => {
   // Determine which legend items map to use based on the dateFilter
-  console.log("categoryFilter:", categoryFilter);
+  //console.log("categoryFilter:", categoryFilter);
+
   const legendItems =
     dateFilter === "Specific Date"
       ? getLegendItemsMap_Specific(
@@ -735,11 +736,7 @@ const ChartWinnersandWinningsSummary: React.FC<
     try {
       const gameCategoryParam = getGameCategoryParam();
 
-      if (
-        dateFilter === "Specific Date" &&
-        firstDateSpecific &&
-        secondDateSpecific
-      ) {
+      if (dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific) {
         console.log(
           "Fetching for Specific Date:",
           formatDate(firstDateSpecific),
@@ -747,7 +744,7 @@ const ChartWinnersandWinningsSummary: React.FC<
         );
 
         const resp = await fetchCompareHistoricalWinnersDate(
-          "/transactions/compareHistoricalDate/chartType/",
+          "/winners/compareHistoricalWinners/chartType/",
           urlParam,
           {
             first: formatDate(firstDateSpecific),
@@ -755,8 +752,8 @@ const ChartWinnersandWinningsSummary: React.FC<
             ...gameCategoryParam,
           }
         );
-        //console.log('GAME CATEG', gameCategoryParam);
-        //console.log("Response payload:", resp);
+        console.log('GAME CATEG', gameCategoryParam);
+        console.log("Response payload:", resp);
 
         // Use resp.data to get the actual payload
         if (resp?.data?.DrawOrder) {
@@ -766,11 +763,11 @@ const ChartWinnersandWinningsSummary: React.FC<
             firstDateSpecific,
             secondDateSpecific
           );
-          //console.log("Processed Data:", processedData);
+          console.log("Processed Data:", processedData);
           setChartData(processedData);
         } else {
           console.warn("Unexpected payload for Specific Date:", resp);
-          setChartData([]); // clear data on bad response
+          setChartData([]);  // clear data on bad response
         }
       } else if (
         dateFilter === "Date Duration" &&
@@ -780,7 +777,7 @@ const ChartWinnersandWinningsSummary: React.FC<
         secondDateDuration
       ) {
         const resp = await fetchCompareHistoricalWinnersRange(
-          "/transactions/compareHistoricalRange/chartType/",
+          "/winners/compareHistoricalWinnersRange/chartType/",
           urlParam,
           {
             firstStart: formatDate(firstDateSpecific),
@@ -790,7 +787,7 @@ const ChartWinnersandWinningsSummary: React.FC<
             ...gameCategoryParam,
           }
         );
-        //console.log("Response payload:", resp);
+        console.log("Response payload:", resp);
 
         if (resp?.data?.DrawOrder) {
           const processedData = processSpecificDatePayload(
@@ -799,7 +796,7 @@ const ChartWinnersandWinningsSummary: React.FC<
             firstDateSpecific,
             secondDateSpecific
           );
-          //console.log("Processed Data:", processedData);
+          console.log("Processed Data:", processedData);
           setChartData(processedData);
         } else {
           console.warn("Unexpected payload for Date Duration:", resp);
@@ -939,6 +936,7 @@ const ChartWinnersandWinningsSummary: React.FC<
     };
     return colorMap[category] || "#CCCCCC";
   };
+
   return (
     <div className="bg-transparent p-4 rounded-lg pb-8 w-full h-[511px] border border-[#7266C9]">
       <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
