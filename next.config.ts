@@ -68,7 +68,7 @@ const nextConfig: NextConfig = {
       },
       {
         source: '/operators-add',
-        destination: '/Protected/operators-add',
+        destination: '/Protected/operators/operators-add',
       },
       {
         source: '/draw-selected',

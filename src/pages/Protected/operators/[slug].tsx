@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { fetchOperatorById } from "~/services/userService";
-import OperatorsView from "../operators-view";
+import OperatorsView from "./operators-view";
 import { Operator } from "~/types/types";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 

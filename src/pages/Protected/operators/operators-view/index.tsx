@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import OperatorViewPage from "~/components/operators/OperatorView";
-import { useOperatorFormStore } from "../../../store/useOperatorFormStore";
+import { useOperatorFormStore } from "../../../../store/useOperatorFormStore";
 import { operatorSchema } from "~/schemas/operatorSchema";
 import { Operator } from "~/types/types";
 import RetailReceiptOperatorsPage from "~/components/operators/RetailReceipts";
