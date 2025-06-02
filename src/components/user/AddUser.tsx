@@ -13,8 +13,9 @@ type AddUserModalProps = {
 };
 
 export default function AddUserModal({ open, onClose, operatorMap, onSubmit, userTypeId, pcsoBranchMap }: AddUserModalProps) {
-  const title = 
-    userTypeId === 2 ? "Add Kabo"
+  const title =
+  userTypeId === 1 ? "Add Kubrador"
+    : userTypeId === 2 ? "Add Kabo"
     : userTypeId === 4 ? "Add Manager"
     : userTypeId === 5 ? "Add Executive"
     : "Add User";

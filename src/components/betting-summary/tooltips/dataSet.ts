@@ -2,12 +2,14 @@ export const translations = {
   bettors: "Bettors",
   bets: "Bets",
 } as const
+
 export const translationsGameTypes = {
   pares: "STL Pares",
   swer2: "STL Swer 2",
   swer3: "STL Swer 3",
   swer4: "STL Swer 4",
 } as const;
+
 export const translationsBets = {
   tumbok: "Tumbok",
   sahod: "Sahod",
@@ -20,26 +22,35 @@ export const translationsBets = {
 //  The value of that dataKey must be one of the keys of translations.
 //  series is a parameter, an array of type T
 //  each element in the array must match the rules of T.
+
 export function addLabels<
-  T extends { dataKey: keyof typeof translations }
-  >(series: T[]) {
-  
-  // creates new object based on each item
-  // adds extra props (label and valueFormatter)
+  T extends { dataKey: "bettors" | "bets" | "ratio" }
+>(series: T[]) {
   return series.map((item) => ({
     ...item,
-    label: translations[item.dataKey],
+    label:
+      item.dataKey === "bettors"
+        ? "Bettors"
+        : item.dataKey === "bets"
+        ? "Bets"
+        : "Ratio",
     valueFormatter: (v: number | null) => {
-      if (v === null) return '-';
-      const formattedValue = (v * 100000).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-      // Add peso sign for 'bets'
-      return item.dataKey === 'bets' ? `₱ ${formattedValue}` : formattedValue;
+      if (v === null) return "-";
+      if (item.dataKey === "bets") {
+        const formatted = (v * 100000).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+        return `₱ ${formatted}`;
+      }
+      if (item.dataKey === "ratio") {
+        return `1:${v.toFixed(2)}`;
+      }
+      return v.toLocaleString();
     },
   }));
 }
+
 export function addLabelsGameTypes<
   T extends { dataKey: keyof typeof translationsGameTypes }
 >(series: T[]) {

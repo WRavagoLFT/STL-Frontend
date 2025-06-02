@@ -91,7 +91,7 @@ const RolePage = () => {
 
       // Special roles that skip operator mapping
       if (roleKey === "kabo" || roleKey === "kubrador") {
-        console.log(`Skipping operator/branch map for ${roleKey}`);
+        //console.log(`Skipping operator/branch map for ${roleKey}`);
         await fetchUsersByRole(roleConfig.roleId, null, null, setData);
         return;
       }
@@ -106,14 +106,14 @@ const RolePage = () => {
       //console.log("Operator map fetched:", operatorMap);
       setOperatorMap(operatorMap);
 
-      console.log("Fetching PCSO branch map...");
+      //console.log("Fetching PCSO branch map...");
       const pcsoBranchMap = await fetchPCSOBranch();
       if (!pcsoBranchMap) {
         console.warn("No PCSO branch map found.");
         setData([]);
         return;
       }
-      console.log("PCSO branch map fetched:", pcsoBranchMap);
+      //console.log("PCSO branch map fetched:", pcsoBranchMap);
       setPscoBranchMap(pcsoBranchMap);
 
       //console.log("Fetching users with operator & branch maps...");

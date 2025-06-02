@@ -240,7 +240,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
               type="text"
               id="execLastName"
               placeholder="Enter Last Name"
-              className="mt-1"
+              //className="mt-1"
               {...formik.getFieldProps("execLastName")}
               error={
                 !!(formik.touched.execLastName && formik.errors.execLastName)
@@ -252,7 +252,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           </div>
 
           <div>
-            <label htmlFor="execSuffix" className="block text-sm mb-1">
+            <label htmlFor="execSuffix" className="block text-sm">
               Suffix
             </label>
             <CustomSelect
@@ -309,9 +309,11 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         </div>
 
         <div>
+          <label htmlFor="password" className="block text-sm">
+            Password
+          </label>
           <div className="flex space-x-2">
             {/* Password Input with Eye Toggle */}
-
             <div className="relative flex-1">
               <Input
                 type={showPassword ? "text" : "password"}
@@ -354,7 +356,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         </div>
       </div>
 
-      <div className="text-md font-bold mt-[2rem] my-2">
+      <div className="text-md font-bold mt-[1.5rem] my-2">
         Corporation Information
       </div>
 

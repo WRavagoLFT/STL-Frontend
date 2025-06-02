@@ -108,7 +108,7 @@ const RetailReceiptPage = () => {
                 htmlFor="operationDate"
                 className="text-sm font-medium text-[#0038A8]"
               >
-                Date of Report
+                Filter By
               </label>
               <input
                 id="operationDate"
@@ -120,17 +120,28 @@ const RetailReceiptPage = () => {
               />
             </div>
           </div>
-          <div className="flex-[1_1_200px]" />
+          <div className="flex-[1_1_200px]">
+            <div>
+              <label
+                htmlFor="operationDate"
+                className="text-sm font-medium text-[#0038A8]"
+              >
+                Date of Report
+              </label>
+              <input
+                id="operationDate"
+                type="month"
+                value={operationDate}
+                onChange={(e) => setOperationDate(e.target.value)}
+                className="w-full rounded border border-[#0038A8] bg-[#F8F0E3] px-3 py-2 text-sm"
+                max={new Date().toISOString().slice(0, 7)}
+              />
+            </div>
+          </div>          
           <div className="flex-[1_1_200px]" />
           <div className="flex-[1_1_200px] content-end">
-            <Button sx={buttonStylesretail} variant="contained">
-              Export as CSV
-            </Button>
           </div>
           <div className="flex-[1_1_200px] content-end">
-            <Button sx={buttonStylesretail} variant="contained">
-              Export as PDF
-            </Button>
           </div>
         </div>
 
@@ -143,7 +154,7 @@ const RetailReceiptPage = () => {
           </div>
         )}
 
-        <div className="flex gap-4 mt-8 mb-3">
+        <div className="flex gap-6 mt-8 mb-3">
           <div className="w-1/2">
             <div className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 md:grid-cols-2 items-center gap-2 text-left">
               <div className="flex flex-col">
@@ -158,43 +169,57 @@ const RetailReceiptPage = () => {
         </div>
         
         {/* Accordion content below */}
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Left Column */}
-          <div className="w-full md:w-1/2">
-            <GrossAACSharePage
-              totalPercentage={aacTotalPercentage}
-              totalShareAmount={aacTotalShareAmount}
-              breakdown={aacBreakdown}
-            />
-            <AACTaxesPage
-              totalPercentage={aacTaxTotalPercentage}
-              totalShareAmount={aacTaxTotalShareAmount}
-              breakdown={aacTaxBreakdown}
-            />
-            <NetAACIncomePage
-              netAmount={netAacTotalAmount}
-              netPercentage={netAacTotalPercentage}
-            />
-          </div>
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Left Column */}
+            <div className="w-full md:w-1/2 flex flex-col justify-between">
+              <div>
+                <GrossAACSharePage
+                  totalPercentage={aacTotalPercentage}
+                  totalShareAmount={aacTotalShareAmount}
+                  breakdown={aacBreakdown}
+                />
+                <AACTaxesPage
+                  totalPercentage={aacTaxTotalPercentage}
+                  totalShareAmount={aacTaxTotalShareAmount}
+                  breakdown={aacTaxBreakdown}
+                />
+                <NetAACIncomePage
+                  netAmount={netAacTotalAmount}
+                  netPercentage={netAacTotalPercentage}
+                />
+              </div>
 
-          {/* Right Column */}
-          <div className="w-full md:w-1/2">
-            <GrossPSCOSharePage
-              totalPercentage={pcsoTotalPercentage}
-              totalShareAmount={pcsoTotalShareAmount}
-              breakdown={pcsoBreakdown}
-            />
-            <PCSOTaxesPage
-              totalPercentage={pcsoTaxTotalPercentage}
-              totalShareAmount={pcsoTaxTotalShareAmount}
-              breakdown={pcsoTaxBreakdown}
-            />
-            <NetPSCOIncomePage
-              netAmount={netPcsoTotalAmount}
-              netPercentage={netPcsoTotalPercentage}
-            />
+              {/* Export buttons */}
+              <div className="flex gap-4">
+                <Button sx={buttonStylesretail} variant="contained">
+                  Export as CSV
+                </Button>
+                <Button sx={buttonStylesretail} variant="contained">
+                  Export as PDF
+                </Button>
+              </div>
+            </div>
+
+            {/* Right Column */}
+            <div className="w-full md:w-1/2 flex flex-col justify-between">
+              <div>
+                <GrossPSCOSharePage
+                  totalPercentage={pcsoTotalPercentage}
+                  totalShareAmount={pcsoTotalShareAmount}
+                  breakdown={pcsoBreakdown}
+                />
+                <PCSOTaxesPage
+                  totalPercentage={pcsoTaxTotalPercentage}
+                  totalShareAmount={pcsoTaxTotalShareAmount}
+                  breakdown={pcsoTaxBreakdown}
+                />
+                <NetPSCOIncomePage
+                  netAmount={netPcsoTotalAmount}
+                  netPercentage={netPcsoTotalPercentage}
+                />
+              </div>
+            </div>
           </div>
-        </div>
       </div>
     </AccessGuard>
   );

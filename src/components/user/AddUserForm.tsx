@@ -258,27 +258,21 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
 
         {/* this still needs adjustments if text input or select input */}
         {/* FOR KABO ONLY */}
-        {formik.values.userTypeId === 2 && ( 
+        {formik.values.userTypeId === 2 && (
           <div>
-            <label htmlFor="BranchId" className="block text-sm mb-1">
+            <label htmlFor="areaZone" className="block text-sm">
               Assigned Area / Zone
             </label>
-            <CustomSelect
-              name="BranchId"
-              //options={pcsoBranchOptions}
-              value={
-                pcsoBranchOptions.find(
-                  (opt) => opt.value === formik.values.BranchId?.toString()
-                ) || null
-              }
-              onChange={(e) => {
-                formik.setFieldValue("BranchId", e.target.value);
-              }}
-              placeholder="Select Assigned Area / Zone"
-              error={!!getError("BranchId")}
-            />
+              <Input
+                type="areaZone"
+                id="areaZone"
+                placeholder="Enter Assigned Area / Zone"
+                className="mt-1"
+                {...formik.getFieldProps("areaZone")}
+                error={!!(formik.touched.email && formik.errors.email)}
+              />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("BranchId") || "\u00A0"}
+              {getError("areaZone") || "\u00A0"}
             </p>
           </div>
         )}

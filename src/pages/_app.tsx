@@ -40,7 +40,7 @@ const App = ({ Component, pageProps }: AppProps) => {
 
     const handleAuthFailure = () => {
       console.warn("No valid auth found! Redirecting to login...");
-      router.replace("/auth/login");
+      //router.replace("/auth/login");
     };
 
     const checkAuth = async () => {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { CircularProgress, Button, } from "@mui/material";
-import { BarChart } from "@mui/x-charts/BarChart";
+import { BarChart  } from "@mui/x-charts/BarChart";
 import { addLabels } from "./tooltips/dataSet";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import { buttonStyles } from "~/styles/theme";
@@ -46,9 +46,9 @@ interface TransactionData {
 const ChartBettorsvsBetsPlacedSummary = (params: {
   gameCategoryId?: number;
 }) => {
-  //console.log("BettersvsBetsPlacedChart Params:", params);
   const [loading, setLoading] = useState(true);
   const [chartData, setChartData] = useState<{ draw: string; bettors: number; bets: number }[]>([]);
+  //console.log("BettersvsBetsPlacedChart Params:", params);
   //console.log("Chart Data: BETTING SUMMARY", chartData);
 
   useEffect(() => {
@@ -56,14 +56,14 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
       setLoading(true);
       try {
 
-        // setChartData(Object.values(drawMap));
+        //setChartData(Object.values(drawMap));
         const today = new Date().toISOString().split("T")[0];
         const response = await fetchHistoricalSummary({
           from: today,
           to: today,
         });
 
-        console.log("Bettors Bets", response);
+        //console.log("Bettors Bets", response);
 
         let data = response.data as TransactionData[];
 
@@ -89,13 +89,17 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
         });
 
         // setChartData(Object.values(drawMap));
-
         setChartData(
-          Object.values(drawMap).map((item) => ({
-            draw: item.draw,
-            bettors: item.bettors / 10000,
-            bets: item.bets / 10000,
-          }))
+          Object.values(drawMap).map((item) => {
+            const bettors = item.bettors / 10000;
+            const bets = item.bets / 10000;
+            return {
+              draw: item.draw,
+              bettors,
+              bets,
+              ratio: bettors ? bets / bettors : 0,
+            };
+          })
         );
 
         //console.log("BettorsvsBetsPlacedSummary chart: ", data);
@@ -156,6 +160,7 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
             series={addLabels([
               { dataKey: "bettors", color: "#E5C7FF" },
               { dataKey: "bets", color: "#D2A7FF" },
+              { dataKey: "ratio", color: 'none' }
             ])}
           />
         )}
