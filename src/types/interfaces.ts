@@ -195,7 +195,7 @@ export interface UserFieldFormPageProps {
 
 export interface CSVExportButtonProps {
   statsPerRegion: any[];
-  pageType: string;
+  pageType?: "executive" | "manager" | "operator" | "kabo" | "kubrador" | "Device Information";
   roleId?: number;
   fileName?: string;
   columns?: any[];

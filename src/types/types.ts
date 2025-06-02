@@ -10,7 +10,8 @@ export interface User {
   suffix: string | null;
   operatorId: number;
   userTypeId: number;
-
+  accountType: number;
+  
   UserId?: number;
   FirstName?: string;
   LastName?: string;
@@ -19,6 +20,9 @@ export interface User {
   Suffix?: string | null;
   OperatorId?: number;
   UserTypeId?: number;
+  
+  BranchId?: number;
+  BranchName?: string;
 
   fullName?: string;
   DateOfRegistration?: string;
@@ -134,6 +138,12 @@ export interface NetIncomePageProps {
   netAmount: number;
   netPercentage: number;
 }
+
+export type Branch = {
+  BranchId: number;
+  BranchName: string;
+  // Add more fields if needed
+};
 
 
 

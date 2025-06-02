@@ -12,7 +12,8 @@ const validateRelativeUrl = (url: string) => {
 // fetching of users and operator map
 export const fetchUsersByRole = async (
   roleId: number,
-  operatorMap: Record<number, Operator> | null,
+  operatorMap: any | null,
+  pscoBranchMap: any | null,
   setData: (data: User[]) => void
 ): Promise<void> => {
   if (!roleId) {
@@ -87,17 +88,23 @@ export const fetchOperatorMap = async (): Promise<Record<number, Operator> | nul
 
 // Add user function
 const addUser = async (userData: Record<string, any>) => {
-    try {
-        const url = validateRelativeUrl("/users/addUser");
-        const response = await axiosInstance.post(url, userData, {
-            withCredentials: true,
-        });
+  try {
+    const url = validateRelativeUrl("/users/addUser");
+    const response = await axiosInstance.post(url, userData, {
+      withCredentials: true,
+    });
 
-        return response.data;
-    } catch (error) {
-        console.error("Error adding user:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: {} };
-    }
+    console.log("Backend response received:", response.data);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error adding user:", error); // log entire error object
+    return {
+      success: false,
+      message: (error as Error).message,
+      data: {},
+    };
+  }
 };
 
 // Fetch user by ID function

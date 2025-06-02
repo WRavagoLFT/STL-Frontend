@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";
+import { fetchPCSOBranch } from "~/utils/api/location";
 
 const roleMap: Record<string, { label: string; textlabel: string; roleId: number, permittedUserTypes: number[] }> = {
   kubrador: {
@@ -30,7 +31,7 @@ const roleMap: Record<string, { label: string; textlabel: string; roleId: number
   executive: {
     label: "Small Town Lottery Executive",
     textlabel: "Executives",
-    roleId: 3,
+    roleId: 5, // just adjusted 06/02
     permittedUserTypes: [3, 6], // executives, admin
   },
   managers: {
@@ -77,23 +78,50 @@ const RolePage = () => {
   const [showEditLog, setShowEditLog] = useState(false);
 
   const openEditLogModal = (user: User) => {setSelectedUser(user);setShowEditLog(true);};
+  const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
 
   const loadUsers = useCallback(async () => {
-    if (!roleConfig?.roleId || !roleKey) return;
+    try {
+      if (!roleConfig?.roleId || !roleKey) {
+        console.warn("Missing roleId or roleKey");
+        return;
+      }
 
-    // If role is 'kabo' or 'kubrador', skip operator map
-    if (roleKey === "kabo" || roleKey === "kubrador") {
-      await fetchUsersByRole(roleConfig.roleId, null, setData);
-      return;
-    }
+      //console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
 
-    // Otherwise, fetch operator map first
-    const operatorMap = await fetchOperatorMap();
-    if (operatorMap) {
+      // Special roles that skip operator mapping
+      if (roleKey === "kabo" || roleKey === "kubrador") {
+        console.log(`Skipping operator/branch map for ${roleKey}`);
+        await fetchUsersByRole(roleConfig.roleId, null, null, setData);
+        return;
+      }
+
+      //console.log("Fetching operator map...");
+      const operatorMap = await fetchOperatorMap();
+      if (!operatorMap) {
+        console.warn("No operator map found.");
+        setData([]);
+        return;
+      }
+      //console.log("Operator map fetched:", operatorMap);
       setOperatorMap(operatorMap);
-      await fetchUsersByRole(roleConfig.roleId, operatorMap, setData);
-    } else {
-      setData([]); // fallback
+
+      console.log("Fetching PCSO branch map...");
+      const pcsoBranchMap = await fetchPCSOBranch();
+      if (!pcsoBranchMap) {
+        console.warn("No PCSO branch map found.");
+        setData([]);
+        return;
+      }
+      console.log("PCSO branch map fetched:", pcsoBranchMap);
+      setPscoBranchMap(pcsoBranchMap);
+
+      //console.log("Fetching users with operator & branch maps...");
+      await fetchUsersByRole(roleConfig.roleId, operatorMap, pcsoBranchMap, setData);
+
+    } catch (error) {
+      console.error("Error in loadUsers:", (error as Error).message);
+      setData([]);
     }
   }, [roleConfig?.roleId, roleKey, setData]);
 
@@ -225,6 +253,7 @@ const RolePage = () => {
           onSubmit={handleAddUser}
           operatorMap={operatorMap}
           userTypeId={roleId}
+          pcsoBranchMap={pcsoBranchMap}
         />
 
         <UpdateUserModal

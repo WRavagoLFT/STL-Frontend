@@ -21,7 +21,7 @@ const Sidebar: React.FC = () => {
     try { 
       await logoutUser();
       useAuthStore.getState().reset();
-      useSideBarStore.getState().reset();
+      //useSideBarStore.getState().reset();
       router.push("/auth/login");
     } catch (error) {
       console.error("Logout failed:", error);

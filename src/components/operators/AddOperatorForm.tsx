@@ -354,7 +354,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         </div>
       </div>
 
-      <div className="text-md font-bold mt-[2rem] mb-1">
+      <div className="text-md font-bold mt-[2rem] my-2">
         Corporation Information
       </div>
 

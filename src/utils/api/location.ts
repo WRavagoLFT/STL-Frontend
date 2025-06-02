@@ -71,4 +71,17 @@ export const fetchAreaOfOperations = async () => {
     }
 }
 
+export const fetchPCSOBranch = async () => {
+    try {
+        const url = validateRelativeUrl("/location/pcso-branches");
+        const response = await axiosInstance.get(url)
+        return response.data
+    }
+
+    catch (error) {
+        console.error("Error fetching regions:", (error as Error).message);
+        return { success: false, message: (error as Error).message, data: [] };
+    }
+}
+
 

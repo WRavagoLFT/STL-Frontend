@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Operator, User } from "~/types/types";
+import { Branch, Operator, User } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { useFormik } from "formik";
@@ -17,6 +17,7 @@ interface AddUserFormProps {
   initialData?: Partial<User>;
   userTypeId: number;
   onClose?: () => void;
+  pcsoBranchMap: { data: Branch[] };
 }
 
 const AddUserForm: React.FC<AddUserFormProps> = ({
@@ -25,6 +26,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
   onSubmit,
   userTypeId,
   onClose,
+  pcsoBranchMap
 }) => {
   const operatorOptions: OptionType[] = Object.values(operatorMap).map(
     (operator) => ({
@@ -36,12 +38,17 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
     })
   );
 
+  const pcsoBranchOptions: OptionType[] = (pcsoBranchMap?.data || []).map((branch) => ({
+    value: branch.BranchId?.toString() ?? "0",
+    label: branch.BranchName ?? "Unknown",
+  }));
+
   const suffixOptions: OptionType[] = [
     { label: "N/A", value: "" },
     { label: "Jr.", value: "Jr." },
     { label: "Sr.", value: "Sr." },
     { label: "II", value: "II" },
-    { label: "III", value: "III" },
+    { label: "III", value: "III" }, 
     { label: "IV", value: "IV" },
     { label: "V", value: "V" },
     { label: "PhD", value: "PhD" },
@@ -57,7 +64,10 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
   // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
-  const handleModalClose = () => { closeConfirmModal(); if (onClose) onClose();};
+  const handleModalClose = () => {
+    closeConfirmModal();
+    if (onClose) onClose();
+  };
   
   const formik = useFormik({
     initialValues: {
@@ -72,6 +82,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         initialData.operatorId !== undefined && initialData.operatorId !== null
           ? initialData.operatorId.toString()
           : "",
+      accountType: 2,
+      BranchId: initialData.BranchId || "",
     },
     validationSchema: toFormikValidationSchema(userSchema),
     onSubmit: async (values) => {
@@ -191,29 +203,85 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       </div>
 
       {/* Column 2 */}
+      {/* FOR MANAGERS ONLY */}
       <div className="flex flex-col gap-x-6 gap-y-2">
-        <div>
-          <label htmlFor="operatorId" className="block text-sm mb-1">
-            Assigned PCSO Branch
-          </label>
-          <CustomSelect
-            name="operatorId"
-            options={operatorOptions}
-            value={
-              operatorOptions.find(
-                (opt) => opt.value === formik.values.operatorId
-              ) || null
-            }
-            onChange={(e) => {
-              formik.setFieldValue("operatorId", e.target.value);
-            }}
-            placeholder="Select Assigned PCSO Branch"
-            error={!!getError("operatorId")}
-          />
-          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-            {getError("operatorId") || "\u00A0"}
-          </p>
-        </div>
+        {formik.values.userTypeId === 4 && (
+          <div>
+            <label htmlFor="operatorId" className="block text-sm mb-1">
+              Assigned Company
+            </label>
+            <CustomSelect
+              name="operatorId"
+              options={operatorOptions}
+              value={
+                operatorOptions.find(
+                  (opt) => opt.value === formik.values.operatorId
+                ) || null
+              }
+              onChange={(e) => {
+                formik.setFieldValue("operatorId", e.target.value);
+              }}
+              placeholder="Select Assigned Company"
+              error={!!getError("operatorId")}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("operatorId") || "\u00A0"}
+            </p>
+          </div>
+        )}
+
+        {/* FOR EXECUTIVE - PROVINCIAL ADMIN ONLY */}
+        {formik.values.userTypeId === 5 && (
+          <div>
+            <label htmlFor="BranchId" className="block text-sm mb-1">
+              Assigned PCSO Branch
+            </label>
+            <CustomSelect
+              name="BranchId"
+              options={pcsoBranchOptions}
+              value={
+                pcsoBranchOptions.find(
+                  (opt) => opt.value === formik.values.BranchId?.toString()
+                ) || null
+              }
+              onChange={(e) => {
+                formik.setFieldValue("BranchId", e.target.value);
+              }}
+              placeholder="Select Assigned PCSO Branch"
+              error={!!getError("BranchId")}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("BranchId") || "\u00A0"}
+            </p>
+          </div>
+        )}
+
+        {/* this still needs adjustments if text input or select input */}
+        {/* FOR KABO ONLY */}
+        {formik.values.userTypeId === 2 && ( 
+          <div>
+            <label htmlFor="BranchId" className="block text-sm mb-1">
+              Assigned Area / Zone
+            </label>
+            <CustomSelect
+              name="BranchId"
+              //options={pcsoBranchOptions}
+              value={
+                pcsoBranchOptions.find(
+                  (opt) => opt.value === formik.values.BranchId?.toString()
+                ) || null
+              }
+              onChange={(e) => {
+                formik.setFieldValue("BranchId", e.target.value);
+              }}
+              placeholder="Select Assigned Area / Zone"
+              error={!!getError("BranchId")}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("BranchId") || "\u00A0"}
+            </p>
+          </div>
+        )}
 
         <div>
           <label htmlFor="email" className="block text-sm">
@@ -296,8 +364,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           onConfirm={async () => {
             try {
               await onSubmit(formData as unknown as User); // submit from the parent component handled after password verification
-              closeConfirmModal();              // close confirm modal
-              if (onClose) onClose();           // optionally close the parent modal
+              closeConfirmModal(); // close confirm modal
+              if (onClose) onClose(); // optionally close the parent modal
             } catch (err) {
               console.error("Error during onSubmit:", err);
             }
