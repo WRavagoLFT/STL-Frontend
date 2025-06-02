@@ -36,10 +36,15 @@ const SummaryWinnersDrawTimePage = () => {
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const from = "2000-05-01";
-      const to = "2099-05-30"; // temporarily set date for debugging
+      //const from = "2000-05-01";
+      //const to = "2099-05-30"; // temporarily set date for debugging
+      
+      const today = new Date().toISOString().split("T")[0];
 
-      const result = await fetchWinners({ from, to });
+      const result = await fetchWinners({
+        from: today,
+        to: today,
+      });
 
       if (!result.success || !Array.isArray(result.data)) {
         setLoading(false);

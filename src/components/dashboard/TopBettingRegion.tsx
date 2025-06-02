@@ -7,7 +7,7 @@ interface RegionData {
   RegionId?: number;
   Region: string;
   RegionFull?: string;
-  TotalPayout: number;
+  TotalPayout?: number;
   trend?: number;
   TotalBettors: number;
   TotalBetAmount: number;
@@ -90,7 +90,7 @@ const TopBettingRegionPage = () => {
     <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
       <div className="flex mb-2 items-center w-full">
         <div className="bg-[#0038A8] rounded-lg p-1">
-          <FaDiceSix size={24} color={"#F6BA12"} />
+          <FaDiceSix size={20} color={"#F6BA12"} />
         </div>
         <div className="flex items-center justify-between flex-1 ml-3">
           <p className="text-base">Top Betting Regions Today</p>
@@ -98,7 +98,7 @@ const TopBettingRegionPage = () => {
             onClick={() => router.push("/winning-summary/dashboard")}
             className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
           >
-            View Winners
+            View Bettors
           </button>
         </div>
       </div>
@@ -140,7 +140,7 @@ const TopBettingRegionPage = () => {
                 {item.region.Region}
               </p>
 
-              <p className="text-[#212121] font-bold text-right flex-1 text-md">
+              <p className="text-[#212121] text-right flex-1 text-md">
                 {(item.region.TotalBetAmount ?? 0).toLocaleString()}
               </p>
             </div>

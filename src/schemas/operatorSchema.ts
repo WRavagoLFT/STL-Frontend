@@ -1,11 +1,55 @@
 import { z } from "zod";
 
 export const operatorSchema = z.object({
-  name: z
+  execFirstName: z
     .string({ required_error: "Given Name is required" })
     .min(1, "Given Name is required")
     .refine((val) => /^[A-Za-z\s]+$/.test(val), {
       message: "First Name can only contain letters and spaces.",
+    }),
+  execLastName: z
+    .string({ required_error: "Last Name is required" })
+    .min(1, "Last Name is required")
+    .refine((val) => /^[A-Za-z\s]+$/.test(val), {
+      message: "First Name can only contain letters and spaces.",
+    }),
+  execSuffix: z.string().optional(),
+  execNumber: z
+    .string({ required_error: "Phone Number is required" })
+    .min(1, "Phone Number is required")
+    .refine((val) => /^09\d{9}$/.test(val), {
+      message:
+        "Please enter a valid phone number starting with 09 and 11 digits long (e.g. 09XXXXXXXXX).",
+    }),
+  execEmail: z
+    .string({ required_error: "Email is required" })
+    .min(1, "Email is required")
+    .refine((val) => /\S+@\S+\.\S+/.test(val), {
+      message: "Please enter a valid email address e.g. xxx@email.com",
+    }),
+  execPassword: z
+    .string({ required_error: "Password is required" })
+    .min(1, "Password is required")
+    .refine((val) => val.length >= 8, {
+      message: "Password must be at least 8 characters long.",
+    })
+    .refine((val) => /[A-Z]/.test(val), {
+      message: "Password must include at least one uppercase letter.",
+    })
+    .refine((val) => /[a-z]/.test(val), {
+      message: "Password must include at least one lowercase letter.",
+    })
+    .refine((val) => /\d/.test(val), {
+      message: "Password must include at least one number.",
+    })
+    .refine((val) => /[!@#$%^&*]/.test(val), {
+      message: "Password must include at least one special character (!@#$%^&*).",
+    }),
+  name: z
+    .string({ required_error: "Operator Name is required" })
+    .min(1, "Operator Name is required")
+    .refine((val) => /^[A-Za-z\s]+$/.test(val), {
+      message: "Operator Name can only contain letters and spaces.",
     }),
   contactNumber: z
     .string({ required_error: "Phone Number is required" })

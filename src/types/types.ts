@@ -49,6 +49,13 @@ export interface Operator {
   provinces: any[];
   OperatorId?: any[];
 
+  execFirstName?: string;
+  execLastName?: string;
+  execSuffix?: string;
+  execNumber?: string;
+  execEmail?: string;
+  execPassword?: string;
+
   Cities?: { CityId: number; CityName: string }[]; // Optional, if not always present
   data?: any; // for operator update
   OperatorName?: string;

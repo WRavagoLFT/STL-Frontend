@@ -8,6 +8,8 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { operatorSchema } from "~/schemas/operatorSchema";
 import Swal from "sweetalert2";
+import { generateValidPassword } from "~/utils/passwordgenerate";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface AddOperatorFormProps {
   title?: string;
@@ -43,6 +45,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   const showRegionsAndProvinces = selectedAreaId === 1 || selectedAreaId === 2;
   const showCities = selectedAreaId !== 1;
   const showExcluded = selectedAreaId !== 2;
+  const [showPassword, setShowPassword] = useState(false);
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   // Open the confirm modal after submit
@@ -80,6 +83,19 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       label: aop.AreaOfOperations,
     })
   );
+
+  const suffixOptions: OptionType[] = [
+    { label: "N/A", value: "" },
+    { label: "Jr.", value: "Jr." },
+    { label: "Sr.", value: "Sr." },
+    { label: "II", value: "II" },
+    { label: "III", value: "III" },
+    { label: "IV", value: "IV" },
+    { label: "V", value: "V" },
+    { label: "PhD", value: "PhD" },
+    { label: "MD", value: "MD" },
+    { label: "Esq.", value: "Esq." },
+  ];
 
   const provinceOptions = filteredProvinces;
   const cityOptions = filteredCities;
@@ -153,6 +169,13 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       cities: initialData.cities || [],
       regions: initialData.regions || [],
       provinces: initialData.provinces || [],
+
+      execFirstName: initialData.execFirstName || "",
+      execLastName: initialData.execLastName || "",
+      execSuffix: initialData.execSuffix || "",
+      execNumber: initialData.execNumber || "",
+      execEmail: initialData.execEmail || "",
+      execPassword: initialData.execPassword || "",
     },
     validationSchema: toFormikValidationSchema(operatorSchema),
     onSubmit: async (values) => {
@@ -187,6 +210,154 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
   return (
     <form onSubmit={formik.handleSubmit}>
+      <div className="text-md font-bold my-1">Owner Information</div>
+      <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+        {/* Name */}
+        <div>
+          <label className="block text-sm">Given Name</label>
+          <Input
+            type="text"
+            name="execFirstName"
+            value={formik.values.execFirstName}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Enter Given Name"
+            error={
+              !!(formik.touched.execFirstName && formik.errors.execFirstName)
+            }
+          />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("execFirstName") || "\u00A0"}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-2">
+            <label htmlFor="execLastName" className="block text-sm">
+              Last Name
+            </label>
+            <Input
+              type="text"
+              id="execLastName"
+              placeholder="Enter Last Name"
+              className="mt-1"
+              {...formik.getFieldProps("execLastName")}
+              error={
+                !!(formik.touched.execLastName && formik.errors.execLastName)
+              }
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("execLastName") || "\u00A0"}
+            </p>
+          </div>
+
+          <div>
+            <label htmlFor="execSuffix" className="block text-sm mb-1">
+              Suffix
+            </label>
+            <CustomSelect
+              name="execSuffix"
+              options={suffixOptions}
+              value={
+                suffixOptions.find(
+                  (option) => option.value === formik.values.execSuffix
+                ) || null
+              }
+              onChange={(e) => {
+                formik.setFieldValue("execSuffix", e.target.value);
+              }}
+              placeholder="Enter Suffix"
+              error={!!getError("execSuffix")}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("execSuffix") || "\u00A0"}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm">Phone Number</label>
+          <Input
+            type="tel"
+            name="execNumber"
+            value={formik.values.execNumber}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Enter Phone Number"
+            error={!!(formik.touched.execNumber && formik.errors.execNumber)}
+          />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("execNumber") || "\u00A0"}
+          </p>
+        </div>
+
+        {/* Contact Number */}
+        <div>
+          <label className="block text-sm">Email Address</label>
+          <Input
+            type="text"
+            name="execEmail"
+            value={formik.values.execEmail}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            placeholder="Enter Email Address"
+            error={!!(formik.touched.execEmail && formik.errors.execEmail)}
+          />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("execEmail") || "\u00A0"}
+          </p>
+        </div>
+
+        <div>
+          <div className="flex space-x-2">
+            {/* Password Input with Eye Toggle */}
+
+            <div className="relative flex-1">
+              <Input
+                type={showPassword ? "text" : "password"}
+                id="execPassword"
+                placeholder="Generate Password"
+                className="pr-10" // padding for eye icon
+                {...formik.getFieldProps("execPassword")}
+                error={
+                  !!(formik.touched.execPassword && formik.errors.execPassword)
+                }
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute inset-y-0 right-2 flex items-center text-gray-500 hover:text-gray-700"
+                tabIndex={-1}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+
+            {/* Generate Button */}
+            <button
+              type="button"
+              onClick={() => {
+                const generatedPassword = generateValidPassword();
+                formik.setFieldValue("execPassword", generatedPassword);
+              }}
+              className="bg-[#F6BA12] hover:bg-[#D1940F] text-[#181A1B] text-sm px-4 py-2 rounded-lg whitespace-nowrap flex-shrink-0 basis-40"
+            >
+              Generate
+            </button>
+          </div>
+          {/* Error Message */}
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {formik.touched.execPassword && formik.errors.execPassword
+              ? formik.errors.execPassword
+              : "\u00A0"}
+          </p>
+        </div>
+      </div>
+
+      <div className="text-md font-bold mt-[2rem] mb-1">
+        Corporation Information
+      </div>
+
       <div className="grid grid-cols-2 gap-x-6 gap-y-2">
         {/* Name */}
         <div>
@@ -470,7 +641,6 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           </div>
         )}
       </div>
-
       {/* Submit Button */}
       <div className="col-span-2">
         <button
