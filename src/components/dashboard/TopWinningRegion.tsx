@@ -20,9 +20,10 @@ const TopWinningRegionPage = () => {
 
   const getWinningRegions = async () => {
     try {
+      const today = new Date().toISOString().split("T")[0];
       const response = await fetchWinners({
-        from: "2000-01-01",
-        to: "2099-12-31",
+        from: today,
+        to: today,
       });
 
       if (!response.success || !response.data || response.data.length === 0) {
@@ -30,7 +31,7 @@ const TopWinningRegionPage = () => {
         return;
       }
 
-      console.log('TOTAL WINNERS IN THE TOP WINNING REGION:', response.data);
+      //console.log('TOTAL WINNERS IN THE TOP WINNING REGION:', response.data);
 
       const filteredData = response.data;
 
@@ -40,6 +41,8 @@ const TopWinningRegionPage = () => {
       filteredData.forEach((entry: any) => {
         const regionName = entry.Region || "Unknown";
         const payout = entry.PayoutAmount || 0;
+
+        if (payout === 0) return;
 
         if (regionMap.has(regionName)) {
           const existing = regionMap.get(regionName)!;

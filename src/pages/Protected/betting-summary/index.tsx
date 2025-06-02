@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/router";
 
-// Components
 import DashboardCardsPage from "~/components/dashboard/DashboardCards";
 import TableBettingActivityToday from "~/components/betting-summary/BettingActivityTodayTable";
 import ChartBettorsvsBetsPlacedSummary from "~/components/betting-summary/BettorsvsBetsPlacedChart";
