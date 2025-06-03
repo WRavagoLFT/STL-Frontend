@@ -8,6 +8,9 @@ interface OperatorFormStore {
   cities: Operator[];
   areaOfOperations: Operator[];
 
+  data: Operator[];               // <-- Add main operator data here
+  setData: (data: Operator[]) => void;
+
   setGameTypes: (gameTypes: Operator[]) => void;
   setRegions: (regions: Operator[]) => void;
   setProvinces: (provinces: Operator[]) => void;
@@ -21,6 +24,9 @@ export const useOperatorFormStore = create<OperatorFormStore>((set) => ({
   provinces: [],
   cities: [],
   areaOfOperations: [],
+
+  data: [],                    // <-- initial data empty array
+  setData: (data) => set({ data }),
 
   setGameTypes: (gameTypes) => set({ gameTypes }),
   setRegions: (regions) => set({ regions }),

@@ -192,7 +192,7 @@ const DrawResultsPage = () => {
     <div className="bg-transparent p-4 rounded-xl border border-[#0038A8]">
       <div className="flex mb-2 items-center w-full">
         <div className="bg-[#0038A8] rounded-lg p-1">
-          <FaBroadcastTower size={24} color={"#F6BA12"} />
+          <FaBroadcastTower size={20} color={"#F6BA12"} />
         </div>
         <div className="flex items-center justify-between flex-1 ml-3">
           <p className="text-base">Draw Results Today</p>

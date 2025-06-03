@@ -220,7 +220,7 @@ export const buttonStylesretail = {
   textTransform: "none",
   fontSize: 12,
   borderRadius: "8px",
-  width: "100%",
+  width: "35%",
   fontWeight: 1,
 };
 

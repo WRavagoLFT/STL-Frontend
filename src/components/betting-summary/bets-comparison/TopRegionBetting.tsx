@@ -52,9 +52,7 @@ interface DateRange {
 }
 
 const formatDate = (date: string | null): string => {
-  if (!date) {
-    throw new Error("Invalid date: null or undefined value provided");
-  }
+  if (!date) return "";
   const d = new Date(date);
   const year = d.getFullYear();
   const month = `${d.getMonth() + 1}`.padStart(2, "0");

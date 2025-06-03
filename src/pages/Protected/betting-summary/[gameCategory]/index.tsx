@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import BettingSummaryPage from '../index';
+import { AccessGuard } from '~/components/auth/AccessGuard';
 
 const DynamicBettingSummary = () => {
   const router = useRouter();
@@ -13,7 +14,14 @@ const DynamicBettingSummary = () => {
     'stl-swer4': 4,
   }
 
-  return <BettingSummaryPage gameCategoryId={gameCategoryMapping[gameCategory as string]}/>;
+  return (
+    <AccessGuard allowedUserTypes={[3, 4, 6]}>
+      <BettingSummaryPage gameCategoryId={gameCategoryMapping[gameCategory as string]}/>
+    </AccessGuard>
+  );
 };
 
 export default DynamicBettingSummary;
+
+
+

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { fetchOperatorById } from "~/services/userService";
-import OperatorsView from "../operators-view";
+import OperatorsView from "./operators-view";
 import { Operator } from "~/types/types";
+import { AccessGuard } from "~/components/auth/AccessGuard";
 
 const OperatorSlugPage = () => {
   const router = useRouter();
@@ -51,7 +52,11 @@ const OperatorSlugPage = () => {
     return <p className="text-center text-red-500">No operator found.</p>;
   }
 
-  return <OperatorsView operator={operator} slug={slug as string} />;
+  return (
+    <AccessGuard allowedUserTypes={[6]}>
+      <OperatorsView operator={operator} slug={slug as string} />
+    </AccessGuard>
+  );
 };
 
 export default OperatorSlugPage;

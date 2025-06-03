@@ -10,7 +10,8 @@ export interface User {
   suffix: string | null;
   operatorId: number;
   userTypeId: number;
-
+  accountType: number;
+  
   UserId?: number;
   FirstName?: string;
   LastName?: string;
@@ -19,6 +20,9 @@ export interface User {
   Suffix?: string | null;
   OperatorId?: number;
   UserTypeId?: number;
+  
+  BranchId?: number;
+  BranchName?: string;
 
   fullName?: string;
   DateOfRegistration?: string;
@@ -48,6 +52,13 @@ export interface Operator {
   regions: any[];
   provinces: any[];
   OperatorId?: any[];
+
+  execFirstName?: string;
+  execLastName?: string;
+  execSuffix?: string;
+  execNumber?: string;
+  execEmail?: string;
+  execPassword?: string;
 
   Cities?: { CityId: number; CityName: string }[]; // Optional, if not always present
   data?: any; // for operator update
@@ -127,6 +138,12 @@ export interface NetIncomePageProps {
   netAmount: number;
   netPercentage: number;
 }
+
+export type Branch = {
+  BranchId: number;
+  BranchName: string;
+  // Add more fields if needed
+};
 
 
 

@@ -85,31 +85,19 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
         );
 
   return (
-    <Stack direction="row" spacing={4} sx={{ mt: 0.5, mr: 4 }}>
+    <div className="flex flex-row space-x-4 mt-0.5 mr-4">
       {legendItems.map((item, index) => (
-        <Box key={index} sx={{ display: "flex", alignItems: "center" }}>
-          <Box
-            sx={{
-              width: 14,
-              height: 14,
-              borderRadius: "50%",
-              backgroundColor: item.color,
-              mr: 1.5,
-            }}
+        <div key={index} className="flex items-center">
+          <div
+            className="w-[14px] h-[14px] rounded-full mr-1.5"
+            style={{ backgroundColor: item.color }}
           />
-          <Typography
-            color="#212121"
-            sx={{
-              fontSize: "12px",
-              fontWeight: 400,
-              lineHeight: "14px",
-            }}
-          >
+          <p className="text-[#212121] text-[12px] font-normal leading-[14px]">
             {item.label}
-          </Typography>
-        </Box>
+          </p>
+        </div>
       ))}
-    </Stack>
+    </div>
   );
 };
 
@@ -185,7 +173,7 @@ const ChartTopRegionByWinsandWinners: React.FC<
     return {};
   };
 
-  // SpecificDate
+  // Specific Date
   const processSpecificPayloadData = (payload: {
     FirstDate: DateSpecific[];
     SecondDate: DateSpecific[];
@@ -223,64 +211,76 @@ const ChartTopRegionByWinsandWinners: React.FC<
     setChartData(data);
   };
 
-  // fetching the data
+  // Date Payload Data
   const fetchData = useCallback(async () => {
     setLoading(true);
+
     try {
       const gameCategoryParam = getGameCategoryParam();
-      if (
-        dateFilter === "Specific Date" &&
-        firstDateSpecific &&
-        secondDateSpecific
-      ) {
-        console.log(
-          "Fetching Specific Date:",
-          formatDate(firstDateSpecific),
-          formatDate(secondDateSpecific)
-        );
+
+      // Check if required date values are available
+      if (!firstDateSpecific || !secondDateSpecific) {
+        console.warn("Missing required specific dates.");
+        setLoading(false);
+        return;
+      }
+
+      if (dateFilter === "Specific Date") {
+        const formattedFirst = formatDate(firstDateSpecific);
+        const formattedSecond = formatDate(secondDateSpecific);
+
+        console.log("Fetching Specific Date with:", {
+          first: formattedFirst,
+          second: formattedSecond,
+          ...gameCategoryParam,
+        });
+
         const resp = await fetchCompareHistoricalWinnersDate(
           "/winners/compareHistoricalWinners/chartType/",
           urlParam,
           {
-            first: formatDate(firstDateSpecific),
-            second: formatDate(secondDateSpecific),
+            first: formattedFirst,
+            second: formattedSecond,
             ...gameCategoryParam,
           }
         );
-        console.log("Payload (Specific Date):", resp);
-        // resp now has { FirstDate: [...], SecondDate: [...] }
-        if (resp && resp.FirstDate && resp.SecondDate) {
-          processSpecificPayloadData(resp);
+
+        if (resp?.data?.FirstDate && resp?.data?.SecondDate) {
+          processSpecificPayloadData(resp.data);
         } else {
-          console.warn("Unexpected payload:", resp);
+          console.warn("No data received for Specific Date", resp);
         }
+
       } else if (
         dateFilter === "Date Duration" &&
-        firstDateSpecific &&
-        secondDateSpecific &&
         firstDateDuration &&
         secondDateDuration
       ) {
-        console.log("Fetching Date Duration ranges");
+        const formatted = {
+          firstStart: formatDate(firstDateSpecific),
+          firstEnd: formatDate(secondDateSpecific),
+          secondStart: formatDate(firstDateDuration),
+          secondEnd: formatDate(secondDateDuration),
+          ...gameCategoryParam,
+        };
+
+        console.log("Fetching Date Duration with:", formatted);
+
         const resp = await fetchCompareHistoricalWinnersRange(
           "/winners/compareHistoricalWinnersRange/chartType/",
           urlParam,
-          {
-            firstStart: formatDate(firstDateSpecific),
-            firstEnd: formatDate(secondDateSpecific),
-            secondStart: formatDate(firstDateDuration),
-            secondEnd: formatDate(secondDateDuration),
-            ...gameCategoryParam,
-          }
+          formatted
         );
-        console.log("Payload (Date Duration):", resp);
-        // resp now has { FirstDate: [...], SecondDate: [...] }
-        if (resp && resp.FirstRange && resp.SecondRange) {
-          processRangePayloadData(resp);
+
+        if (resp?.data?.FirstRange && resp?.data?.SecondRange) {
+          processRangePayloadData(resp.data);
         } else {
-          console.warn("Unexpected payload:", resp);
+          console.warn("No data received for Date Duration", resp);
         }
+      } else {
+        console.warn("Missing date ranges for Date Duration");
       }
+
     } catch (err) {
       console.error("Error fetching chart data:", err);
     } finally {
@@ -294,9 +294,8 @@ const ChartTopRegionByWinsandWinners: React.FC<
     secondDateDuration,
     urlParam,
     aggregateField,
-    gameCategoryParam,
   ]);
-
+  
   useEffect(() => {
     fetchData();
   }, [fetchData]);

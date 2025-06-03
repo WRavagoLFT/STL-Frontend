@@ -8,7 +8,7 @@ interface SidebarUserSectionProps {
   toggleCollapse: () => void;
 }
 
-const SidebarUserSection: React.FC<SidebarUserSectionProps> = ({
+const SidebarLogoSection: React.FC<SidebarUserSectionProps> = ({
   collapsed,
   toggleCollapse,
 }) => {
@@ -54,4 +54,4 @@ const SidebarUserSection: React.FC<SidebarUserSectionProps> = ({
   );
 };
 
-export default SidebarUserSection;
+export default SidebarLogoSection;

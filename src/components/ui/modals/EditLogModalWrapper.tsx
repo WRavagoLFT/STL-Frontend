@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useState } from "react";
 import EditLogsTablePage from "../tables/EditLogTable";
 import BackIconButton from "../icons/BackButton";
@@ -8,7 +10,9 @@ export interface EditModalPageProps {
   fetchData: (id: number) => Promise<any>;
   columns: any[];
   onClose: () => void;
-  userTypeId: number;
+  userTypeId?: number;
+  selectedUser?: any; // for users
+  initialUserOperatorData? : any; // for operators
 }
 
 const EditModalPage: React.FC<EditModalPageProps> = ({
@@ -18,20 +22,24 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
   columns,
   onClose,
   userTypeId,
+  selectedUser,
+  initialUserOperatorData,
 }) => {
-  const [data, setData] = useState<any[]>([]);
+  const [editData, setEditData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const title = userTypeId === 3 ? "Manager" : userTypeId === 4 ? "Executive" : "Operator";
-
+  const title =
+    userTypeId === 3 ? "Manager" :
+    userTypeId === 4 ? "Executive" : "Operator";
+  
+  //console.log('DATAAAA USER', initialUserOperatorData);
   useEffect(() => {
-    if (!open) return; // only fetch when modal is open
+    if (!open) return;
 
     const getEditData = async () => {
       setLoading(true);
       const response = await fetchData(id);
-      //console.log("Edit data response:", response);
       if (response?.success) {
-        setData(response.data || []);
+        setEditData(response.data || []);
       }
       setLoading(false);
     };
@@ -49,10 +57,7 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
     };
 
     window.addEventListener("keydown", handleEsc);
-
-    return () => {
-      window.removeEventListener("keydown", handleEsc);
-    };
+    return () => window.removeEventListener("keydown", handleEsc);
   }, [open, onClose]);
 
   if (!open) return null;
@@ -64,8 +69,8 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
     >
       <div
         className="rounded-lg px-4 pt-5 pb-10 max-w-[90%] sm:max-w-[80%] md:max-w-[800px] 
-             lg:max-w-[650px] xl:max-w-[940px] 
-             max-h-[90vh] w-full shadow-lg relative bg-[#F8F0E3]"
+                   lg:max-w-[650px] xl:max-w-[940px] 
+                   max-h-[90vh] w-full shadow-lg relative bg-[#F8F0E3]"
         onClick={(e) => e.stopPropagation()}
       >
         <BackIconButton
@@ -73,14 +78,15 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
           hoverColor="#9b987e"
           iconColor="#fff"
           size={30}
-          onClick={onClose} // Just close the modal
+          onClick={onClose}
         />
         <div className="mt-3">
           <div className="text-2xl font-bold leading-none">
-            {data.length > 0 ? data[0].User || data[0].Operator : ""}
+            {selectedUser?.FirstName ?? ""} {selectedUser?.LastName ?? ""} 
+            {initialUserOperatorData?.data.OperatorName ? `  ${initialUserOperatorData?.data.OperatorName}` : ""}
           </div>
           <div className="text-sm mb-3">{title}</div>
-          <EditLogsTablePage data={data} columns={columns} />
+          <EditLogsTablePage data={editData} columns={columns}/>
         </div>
       </div>
     </div>

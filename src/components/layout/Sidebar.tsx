@@ -6,24 +6,22 @@ import { FaSignOutAlt } from "react-icons/fa";
 import { useAuthStore } from "~/store/useAuthStore";
 import UserInfo from "./UserInfo";
 import SidebarMenuItem from "./SidebarMenuItem";
-import SidebarUserSection from "./SidebarUserSection";
+import SidebarLogoSection from "./SidebarLogoSection";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
   const currentPath = router.asPath;
-  const { SideBarActiveGameType, setSideBarActiveGameType } = useSideBarStore();
+  const { setSideBarActiveGameType } = useSideBarStore();
   const userTypeId = useAuthStore((state) => state.userTypeId);
   const [collapsed, setCollapsed] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-  const [user, setUser] = useState<{
-    firstName: string;
-    lastName: string;
-    userTypeId: number;
-  } | null>(null);
-
+  const [user, setUser] = useState<{firstName: string; lastName: string; userTypeId: number;} | null>(null);
+  
   const handleLogout = async () => {
-    try {
+    try { 
       await logoutUser();
+      useAuthStore.getState().reset();
+      //useSideBarStore.getState().reset();
       router.push("/auth/login");
     } catch (error) {
       console.error("Logout failed:", error);
@@ -37,9 +35,9 @@ const Sidebar: React.FC = () => {
       case 2:
         return "Kabo";
       case 3:
-        return "Executive";
+        return "AAC - Executive";
       case 4:
-        return "Manager";
+        return "AAC - Manager"; 
       case 5:
         return "Provincial Admin";
       case 6:
@@ -71,7 +69,6 @@ const Sidebar: React.FC = () => {
   }, []);
 
   // console.log("User state:", user);
-
   if (userTypeId === null) {
     return null; // or loading spinner
   }
@@ -81,7 +78,7 @@ const Sidebar: React.FC = () => {
       className={`p-3 bg-blue-800 text-white flex flex-col transition-all duration-200 
     ${collapsed ? "w-20" : "w-64"} sticky top-0 h-screen z-50 overflow-y-auto sidebar-scrollbar`}
     >
-      <SidebarUserSection
+      <SidebarLogoSection
         collapsed={collapsed}
         toggleCollapse={toggleCollapse}
       />
@@ -93,12 +90,15 @@ const Sidebar: React.FC = () => {
       <nav className="flex flex-col space-y-1 mt-1 px-1">
         {[
           "Dashboard",
+          "Kabo", // read only page
+          "Kubrador", // read only page
           "Managers",
           "Executive",
+          "Operators", 
           "Betting Summary",
           "Winning Summary",
           "Draw Summary",
-          "Operators",
+          "Device Information", // for provincial role
           "Retail Receipt",
         ].map((label) => (
           <SidebarMenuItem

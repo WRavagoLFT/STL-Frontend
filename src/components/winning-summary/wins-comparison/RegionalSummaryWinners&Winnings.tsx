@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react"
-import {
-  Box,
-  Typography,
-  Stack,
-  CircularProgress
-} from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { BarChart } from '@mui/x-charts/BarChart';
 import { 
   WinnersandWinningsSummaryProps,
@@ -203,7 +198,7 @@ const gameCategoryMap: Record<string, number> = {
   "STL Swer4": 4,
 }
 const gameTypeParam = gameCategoryMap[activeGameType];
-console.log('Game Category Param:', gameTypeParam)
+//console.log('Game Category Param:', gameTypeParam)
 
 // Add gameType parameter if activeGameType is valid (1-4)
 const getGameCategoryParam = () => {
@@ -532,6 +527,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     }
   };
 
+  // Date Payload Data
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -543,7 +539,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
         secondDateSpecific
       ) {
         const resp = await fetchCompareHistoricalWinnersDate(
-          "/transactions/compareHistoricalDate/chartType/",
+          "/winners/compareHistoricalWinners/chartType/",
           urlParam,
           {
             first: formatDate(firstDateSpecific),
@@ -572,7 +568,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
         secondDateDuration
       ) {
         const resp = await fetchCompareHistoricalWinnersRange(
-          "/transactions/compareHistoricalRange/chartType/",
+          "/winners/compareHistoricalWinnersRange/chartType/",
           urlParam,
           {
             firstStart: formatDate(firstDateSpecific),
@@ -689,6 +685,7 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
       ];
     } else if (urlParam === "3" || urlParam === "6") {
       const gameCategories = ["STLPares", "STLSwer2", "STLSwer3", "STLSwer4"];
+      
       return gameCategories.flatMap(category => [
         {
           data: chartData.map((item: any) => 

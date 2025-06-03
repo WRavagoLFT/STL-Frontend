@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from "react";
 
-// Generate 10 unique random numbers between 0–10
-const generateRandomNumbers = (length: number, min = 0, max = 10) => {
-  const numbers = new Set<number>();
-  while (numbers.size < length) {
-    const num = Math.floor(Math.random() * (max - min + 1)) + min;
-    numbers.add(num);
-  }
-  return Array.from(numbers);
-};
-
 const DrawCounterTablePage = (data: {
   numberArr: Object;
   gameCategory: number;

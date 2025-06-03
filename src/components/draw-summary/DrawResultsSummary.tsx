@@ -1,56 +1,46 @@
 import React from "react";
 
 const DrawResultsSummaryPage = (data: {
-  firstDraw: string[];
-  secondDraw: string[];
-  thirdDraw: string[];
+  firstDraw?: string[];  // made optional for safety
+  secondDraw?: string[];
+  thirdDraw?: string[];
 }) => {
 
-  console.log(data);
+  const renderDrawNumbers = (drawData?: string[]) => {
+    if (!drawData || drawData.length === 0) {
+      return <p className="text-gray-500 italic">No Data</p>;
+    }
+
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        {drawData.map((number, index) => (
+          <div
+            key={index}
+            className="bg-transparent border border-[#0038A8] rounded-sm p-5 md:px-9 md:py-7 flex items-center justify-center"
+          >
+            <p className="font-bold text-3xl lg:text-5xl">{number}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <React.Fragment>
       <div className="flex flex-col md:flex-row gap-6 flex-wrap md:space-x-6 md:items-stretch md:[&>div]:flex-1">
         <div className="flex flex-col">
           <p className="text-sm font-light mb-1">First Draw</p>
-          <div className="grid grid-cols-2 gap-2">
-            {data.firstDraw.map((number, index) => (
-              <div
-                key={index}
-                className="bg-transparent border border-[#0038A8] rounded-sm p-5 md:px-9 md:py-7 flex items-center justify-center"
-              >
-                <p className="font-bold text-3xl lg:text-5xl">{number}</p>
-              </div>
-            ))}
-          </div>
+          {renderDrawNumbers(data.firstDraw)}
         </div>
 
         <div className="flex flex-col">
           <p className="text-sm font-light mb-1">Second Draw</p>
-          <div className="grid grid-cols-2 gap-2">
-            {data.secondDraw.map((number, index) => (
-              <div
-                key={index}
-                className="bg-transparent border border-[#0038A8] rounded-sm p-5 md:px-9 md:py-7 flex items-center justify-center"
-              >
-                <p className="font-bold text-3xl lg:text-5xl">{number}</p>
-              </div>
-            ))}
-          </div>
+          {renderDrawNumbers(data.secondDraw)}
         </div>
 
         <div className="flex flex-col">
           <p className="text-sm font-light mb-1">Third Draw</p>
-          <div className="grid grid-cols-2 gap-2">
-            {data.thirdDraw.map((number, index) => (
-              <div
-                key={index}
-                className="bg-transparent border border-[#0038A8] rounded-sm p-5 md:px-9 md:py-7 flex items-center justify-center"
-              >
-                <p className="font-bold text-3xl lg:text-5xl">{number}</p>
-              </div>
-            ))}
-          </div>
+          {renderDrawNumbers(data.thirdDraw)}
         </div>
       </div>
 

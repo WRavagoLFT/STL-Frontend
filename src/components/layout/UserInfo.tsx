@@ -8,7 +8,7 @@ interface UserInfoProps {
 
 const UserInfo: React.FC<UserInfoProps> = ({ user, getUserRole, collapsed }) => {
   if (collapsed) return null;
-  //console.log('USER TYPE ID SA USER INFO:', user?.userTypeId);
+  // console.log('USER TYPE ID SA USER INFO:', user?.userTypeId);
 
   return (
     <div className="pt-5 pb-3 px-1">

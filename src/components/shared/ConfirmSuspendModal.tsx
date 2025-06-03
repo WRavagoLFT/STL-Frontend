@@ -7,11 +7,9 @@ import {
 } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { verifyPass } from "~/utils/api/auth";
-import { ConfirmUserActionModalProps } from "~/types/interfaces";
 import axiosInstance from "~/utils/axiosInstance";
 import useUserRoleStore from "../../store/useUserStore";
 import { LoginSectionData } from "~/data/LoginSectionData";
-import { fetchUsers } from "~/utils/api/users";
 
 const ConfirmSuspendModal: React.FC<ConfirmUserActionModalProps> = ({
   formData,

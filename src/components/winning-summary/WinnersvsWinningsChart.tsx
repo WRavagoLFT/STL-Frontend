@@ -1,16 +1,20 @@
-import {
-  CircularProgress,
-  Button,
-} from "@mui/material";
+import { CircularProgress, Button } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-// import { fetchHistoricalSummary } from "~/utils/api/transactions";
-import { TodaysWinnersAndWinsData, addLabels } from "./tooltips/dataSet";
 import { buttonStyles } from "~/styles/theme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { fetchWinners } from "~/utils/api/winners";
+import dayjs from "dayjs";
 
-// Custom Legend (Dynamically Handles Bet Types)
+interface Winner {
+  GameCategoryId: number;
+  DrawOrder: number;
+  PayoutAmount?: number;
+}
+
+type DrawNumber = 1 | 2 | 3;
+
 const CustomLegend = () => (
-  <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
+  <div className="flex flex-row text-sm space-x-5 justify-start mt-0.5 mr-4">
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#E5C7FF] mr-2" />
       <p className="text-sm">Winners</p>
@@ -22,97 +26,74 @@ const CustomLegend = () => (
   </div>
 );
 
-const ChartWinnersvsWinningsSummary = (params: { gameCategoryId?: number }) => {
+const drawLabelMap: Record<number, string> = {
+  1: "First Draw",
+  2: "Second Draw",
+  3: "Third Draw",
+};
+
+const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: number }) => {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<
-   { draw: string; winners: number; winnings: number }[]
+  const [chartData, setChartData] = useState<
+    { draw: string; winners: number; winnings: number }[]
   >([]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     // setLoading(true);
-  //     try {
-  //       const response = await fetchHistoricalSummary(); // Add query params if needed
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const from = "2000-05-01";
+      const to = "2099-05-30";
+      //const today = new Date().toISOString().split("T")[0];
+      //console.log("Fetching winners with params:", { gameCategoryId, from: today, to: today });
 
-  //       const today = new Date().toISOString().split("T")[0];
-  //         console.log(today); // Output: "2025-03-25T00:00:00.000Z"
+      const result = await fetchWinners({
+        from,
+        to,
+        gameCategoryId,
+      });
 
-  //         // Filter Data for Today's Date
-  //         let res = response.data.filter((item: { TransactionDate: string }) =>
-  //           item.TransactionDate.startsWith(today)
-  //         );
+      if (!result.success || !Array.isArray(result.data)) {
+        setLoading(false);
+        return;
+      }
 
-  //         if (params.gameCategoryId && params.gameCategoryId > 0) {
-  //           res = res.filter((item: { GameCategoryId: number }) =>
-  //             item.GameCategoryId === params.gameCategoryId
-  //           );
-  //         }
+      const filteredData: Winner[] = gameCategoryId
+        ? (result.data as Winner[]).filter((item) => item.GameCategoryId === gameCategoryId)
+        : (result.data as Winner[]);
 
-  //       if (response.success && Array.isArray(res)) {
-  //         // Aggregate data by GameTypeId
-  //         const aggregatedData: Record<
-  //           number,
-  //           { winners: number; winnings: number }
-  //         > = {};
+      const drawSummary: Record<DrawNumber, { winners: number; winnings: number }> = {
+        1: { winners: 0, winnings: 0 },
+        2: { winners: 0, winnings: 0 },
+        3: { winners: 0, winnings: 0 },
+      };
 
-  //         res.forEach(
-  //           (item: {
-  //             DrawOrder: number;
-  //             TotalWinners: number;
-  //             TotalPayout: number;
-  //           }) => {
-  //             if (!aggregatedData[item.DrawOrder]) {
-  //               aggregatedData[item.DrawOrder] = { winners: 0, winnings: 0 };
-  //             }
+      for (const item of filteredData) {
+        const draw = item.DrawOrder as DrawNumber;
+        if (drawSummary[draw]) {
+          drawSummary[draw].winners += 1;
+          drawSummary[draw].winnings += item.PayoutAmount || 0;
+        }
+      }
 
-  //             aggregatedData[item.DrawOrder].winners += item.TotalWinners;
-  //             aggregatedData[item.DrawOrder].winnings += item.TotalPayout;
-  //           }
-  //         );
+      const finalChartData = [1, 2, 3].map((draw) => {
+        const drawNum = draw as DrawNumber;
+        return {
+          draw: drawLabelMap[drawNum] || `Draw ${drawNum}`,
+          winners: drawSummary[drawNum].winners,
+          // winnings: drawSummary[drawNum].winnings,
+          winnings: drawSummary[drawNum].winnings / 100000, // scalling data
+          GameCategoryId: gameCategoryId ?? null,
+        };
+      });
 
-  //         // Convert aggregated data into the required format
-  //         const formattedData = [
-  //           {
-  //             draw: "First Draw",
-  //             winners: aggregatedData[1]?.winners || 0,
-  //             winnings: aggregatedData[1]?.winnings || 0,
-  //           },
-  //           {
-  //             draw: "Second Draw",
-  //             winners: aggregatedData[2]?.winners || 0,
-  //             winnings: aggregatedData[2]?.winnings || 0,
-  //           },
-  //           {
-  //             draw: "Third Draw",
-  //             winners: aggregatedData[3]?.winners || 0,
-  //             winnings: aggregatedData[3]?.winnings || 0,
-  //           },
-  //         ];
+      //console.log("Final chart data:", finalChartData);
+      setChartData(finalChartData);
 
-  //         setData(formattedData);
-  //         // setLoading(false);
-  //       }
-  //     } catch (error) {
-  //       console.log(
-  //         "Error loading BettorsvsBetsPlacedSummary: " +
-  //           (error as Error).message
-  //       );
-  //     }
-  //   };
+      setLoading(false);
+    };
 
-  //   fetchData();
-  //   console.log(`Bettors vs Bets Placed Summary Data: ${data}`);
-  // }, []);
-
-  // const maxX = Math.max(
-  //   70,
-  //   ...data.map((item) => item.bettors / 10000),
-  //   ...data.map((item) => item.bets / 100000)
-  // );
-  const xAxisTicks = [
-    0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90,
-    95, 100,
-  ];
+    fetchData();
+  }, [gameCategoryId]);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
@@ -138,31 +119,26 @@ const ChartWinnersvsWinningsSummary = (params: { gameCategoryId?: number }) => {
             height={300}
             grid={{ vertical: true }}
             layout="horizontal"
-            //backgroundColor = "transparent"
             slotProps={{ legend: { hidden: true } }}
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-            dataset={TodaysWinnersAndWinsData}
+            dataset={chartData}
             yAxis={[
               {
                 scaleType: "band",
-                data: ["First Draw", "Second Draw", "Third Draw"],
-                // series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }]},
+                data: chartData.map((d) => d.draw),
               },
             ]}
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
-                // scaleType: "linear",
                 min: 0,
                 max: 100,
-                //tickValues: xAxisTicks,
-                //tickSpacing: 1 ,
               },
             ]}
-            series={addLabels([
-              { dataKey: "winners", color: "#E5C7FF" },
-              { dataKey: "winnings", color: "#5050A5" },
-            ])}
+            series={[
+              { dataKey: "winners", color: "#E5C7FF", label: "Winners" },
+              { dataKey: "winnings", color: "#5050A5", label: "Winnings" },
+            ]}
           />
         )}
       </div>

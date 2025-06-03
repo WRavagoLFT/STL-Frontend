@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { useOperatorsData } from "../../../store/useOperatorStore";
+import React, { useEffect } from "react";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { operatorTableColumns } from "~/config/operatorTableColumns";
 import CardsPage from "~/components/user/CardsData";
-import AddOperatorModal from "~/components/operators/AddOperator";
-import { Operator } from "~/types/types";
-import { addOperator } from "~/utils/api/operators";
-import { useOperatorFormStore } from "../../../store/useOperatorFormStore";
+import { fetchOperators } from "~/utils/api/operators";
+import { AccessGuard } from "~/components/auth/AccessGuard";
+import router from "next/router";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import {
   fetchAreaOfOperations,
@@ -15,15 +13,40 @@ import {
   fetchProvinces,
   fetchRegions,
 } from "~/utils/api/location";
-import { fetchOperators } from "~/utils/api/operators";
-import Swal from "sweetalert2";
-  
+import { useOperatorFormStore } from "~/store/useOperatorFormStore";
+
+export const fetchFormOptionsData = async () => {
+  try {
+    const {
+      setGameTypes,
+      setRegions,
+      setProvinces,
+      setCities,
+      setAreaOfOperations,
+      setData,
+    } = useOperatorFormStore.getState();
+
+    const gameTypesResponse = await fetchGameCategories();
+    const regionsRes = await fetchRegions();
+    const provincesRes = await fetchProvinces();
+    const citiesRes = await fetchCities({ availableOnly: true });
+    const areaOpsRes = await fetchAreaOfOperations();
+    const operators = await fetchOperators();
+
+    setData(operators.data);
+    setGameTypes(gameTypesResponse.data);
+    setRegions(regionsRes.data);
+    setProvinces(provincesRes.data);
+    setCities(citiesRes.data);
+    setAreaOfOperations(areaOpsRes.data);
+  } catch (error) {
+    console.error("Error fetching form options:", error);
+  }
+};
+
 const OperatorsPage = () => {
-  const { data, setData } = useOperatorsData();
+  const { data } = useOperatorFormStore();
   const textlabel = "Operators";
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => setIsModalOpen(false);
   const tableColumns = operatorTableColumns();
 
   const dashboardData = data.map((op) => ({
@@ -31,125 +54,31 @@ const OperatorsPage = () => {
     region: op.OperatorRegion?.RegionName ?? "Unknown",
   }));
 
-  const {
-    gameTypes,
-    regions,
-    provinces,
-    cities,
-    areaOfOperations,
-    setGameTypes,
-    setRegions,
-    setProvinces,
-    setCities,
-    setAreaOfOperations,
-  } = useOperatorFormStore();
-
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const gameTypesResponse = await fetchGameCategories();
-        const regions = await fetchRegions();
-        const provinces = await fetchProvinces();
-        const cities = await fetchCities({ availableOnly: true });
-        const areaOfOperations = await fetchAreaOfOperations();
-        const operators = await fetchOperators();
-
-        // Set into Zustand store
-        setGameTypes(gameTypesResponse.data);
-        setRegions(regions.data);
-        setProvinces(provinces.data);
-        setCities(cities.data);
-        setAreaOfOperations(areaOfOperations.data);
-        setData(operators.data);
-
-        //console.log("Fetched and set game types:", gameTypes);
-        //console.log("Fetched and set regions:", regions);
-        //console.log("Fetched and set provinces:", provinces);
-        //console.log("Fetched and set cities:", cities);
-        //console.log("Fetched and set area of operations:", areaOfOperations);
-        //console.log("Fetched and set operators:", operators);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+    fetchFormOptionsData();
   }, []);
 
-  const handleAddOperator = async (data: Operator): Promise<void> => {
-    try {
-      //console.log("Adding operator:", data);
-
-      const result = await addOperator(data);
-      if (result.success) {
-        const operatorsResult = await fetchOperators();
-        setData(operatorsResult?.data ?? []);
-
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: "Operator added successfully.",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      } else {
-        console.error("Failed to add operator:", result.message);
-        Swal.fire({
-          icon: "error",
-          title: "Add Failed",
-          text:
-            result.message || "Something went wrong while adding the operator.",
-        });
-      }
-
-      setIsModalOpen(false);
-    } catch (error) {
-      console.error(
-        "Unexpected error in handleAddOperator:",
-        (error as Error).message
-      );
-      Swal.fire({
-        icon: "error",
-        title: "Unexpected Error",
-        text: (error as Error).message || "An unexpected error occurred.",
-      });
-    }
-  };
-
   return (
-    <div className="mx-auto px-0 py-1">
-      <h1 className="text-3xl font-bold mb-3">Small Town Lottery Operators</h1>
-      <CardsPage 
-        dashboardData={data}
-        textlabel={textlabel}
-      />
-      
-      <ChartsDataPage
-        userType="operator"
-        pageType="operator"
-        dashboardData={dashboardData}
-      />
-      
-      <DetailedTable
-        data={data}
-        columns={tableColumns}
-        pageType="operator"
-        source="operators"
-        onAddClick={openModal}
-      />
-
-      <AddOperatorModal
-        open={isModalOpen}
-        onClose={closeModal}
-        onSubmit={handleAddOperator}
-        gameTypes={gameTypes}
-        regions={regions}
-        provinces={provinces}
-        cities={cities}
-        areaOfOperations={areaOfOperations}
-      />
-
-    </div>
+    <AccessGuard allowedUserTypes={[6]}>
+      <div className="mx-auto px-0 py-1">
+        <h1 className="text-3xl font-bold mb-3">
+          Small Town Lottery Operators
+        </h1>
+        <CardsPage dashboardData={data} textlabel={textlabel} />
+        <ChartsDataPage
+          userType="operator"
+          pageType="operator"
+          dashboardData={dashboardData}
+        />
+        <DetailedTable
+          data={data}
+          columns={tableColumns}
+          pageType="operator"
+          source="operators"
+          onAddClick={() => router.push("/operators/operators-add")}
+        />
+      </div>
+    </AccessGuard>
   );
 };
 

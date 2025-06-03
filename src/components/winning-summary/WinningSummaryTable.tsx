@@ -2,27 +2,27 @@ import React, { useState, useEffect } from "react";
 import { fetchWinners } from "~/utils/api/winners";
 import ReadOnlyTablePage from "../ui/tables/ReadOnlyTable";
 import { winningTableColumns } from "~/config/winningTableColumns";
+import axios from "axios";
 
 export interface Transactions {
   transactionNumber: string;
   date: string;
   drawTime: string;
-  region: string,
-  province: string,
+  region: string;
+  province: string;
   betAmount: number;
-  tumbok: number,
-  sahod: number,
-  ramble: number,
-  winType: string,
+  tumbok: number;
+  sahod: number;
+  ramble: number;
+  winType: string;
   gameType: string;
   selectedPair: string;
   status: string;
-  payoutAmount: number
+  payoutAmount: number;
 }
 
-const TableWinningSummary = (params: {gameCategoryId?: number}) => {
+const TableWinningSummary = (params: { gameCategoryId?: number }) => {
   const tableColumns = winningTableColumns();
-
   const [transactions, setTransactions] = useState<Transactions[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -30,26 +30,43 @@ const TableWinningSummary = (params: {gameCategoryId?: number}) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetchWinners();
-        console.log(response);
+        const gameCategoryId =
+          params.gameCategoryId && params.gameCategoryId > 0
+            ? params.gameCategoryId
+            : undefined;
 
-        if (params.gameCategoryId && params.gameCategoryId > 0) {
-          response.data = response.data.filter(
-            (item: { GameCategoryId: number }) =>
-              item.GameCategoryId === params.gameCategoryId
-          );
-        }
+        const fetchParams: {
+          from: string;
+          to: string;
+          gameCategoryId?: number;
+        } = {
+          from: "2000-01-01",
+          to: "2099-12-31",
+          ...(gameCategoryId && { gameCategoryId }), // only include if defined
+        };
+
+        //console.log("Fetching winners with params:", fetchParams);
+
+        const response = await fetchWinners(fetchParams);
+
+        //console.log("API Response:", response);
 
         if (response.success) {
-          const transformedData = response.data.map((transaction: any) => ({
+          const dataToUse = gameCategoryId
+            ? response.data.filter(
+                (item: any) => item.GameCategoryId === gameCategoryId
+              )
+            : response.data;
+
+          const transformedData = dataToUse.map((transaction: any) => ({
             transactionNumber: transaction.TransactionNumber,
             date: new Date(transaction.DateOfTransaction).toLocaleDateString(),
             drawTime:
-              transaction.DrawOrder == 1
+              transaction.DrawOrder === 1
                 ? "First Draw"
-                : transaction.DrawOrder == 2
-                  ? "Second Draw"
-                  : "Third Draw",
+                : transaction.DrawOrder === 2
+                ? "Second Draw"
+                : "Third Draw",
             betAmount: transaction.BetAmount,
             region: transaction.Region,
             province: transaction.Province,
@@ -58,26 +75,37 @@ const TableWinningSummary = (params: {gameCategoryId?: number}) => {
             ramble: transaction.Ramble,
             payoutAmount: transaction.PayoutAmount,
             gameType: transaction.GameCategory,
-            selectedPair: `${transaction.WinningCombinationOne}-${transaction.WinningCombinationTwo}${transaction.WinningCombinationThree > 0 ? `-${transaction.WinningCombinationThree}` : ""}${transaction.WinningCombinationFour > 0 ? `-${transaction.WinningCombinationFour}` : ""}`, // Use hyphen instead of ampersand
+            selectedPair: `${transaction.WinningCombinationOne}-${transaction.WinningCombinationTwo}${
+              transaction.WinningCombinationThree > 0
+                ? `-${transaction.WinningCombinationThree}`
+                : ""
+            }${
+              transaction.WinningCombinationFour > 0
+                ? `-${transaction.WinningCombinationFour}`
+                : ""
+            }`,
             status: transaction.TransactionStatus,
           }));
 
           setTransactions(transformedData);
         } else {
+          console.error("API returned failure:", response.message);
           setError(response.message || "Failed to fetch transactions");
         }
       } catch (err) {
         setError("An error occurred while fetching transactions");
-        console.error(err);
+        console.error("Caught error in fetchData:", err);
+
+        if (axios.isAxiosError(err)) {
+          console.error("Axios error response:", err.response?.data);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
-
-  // console.log('Winning Transactions:',transactions); // we have no data here
+  }, [params.gameCategoryId]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -85,16 +113,9 @@ const TableWinningSummary = (params: {gameCategoryId?: number}) => {
 
   if (error) {
     return <div>Error: {error}</div>;
-  } 
+  }
 
-  return (
-    <ReadOnlyTablePage
-      data={transactions}
-      columns={tableColumns}
-    />
-  );
+  return <ReadOnlyTablePage data={transactions} columns={tableColumns} />;
 };
 
 export default TableWinningSummary;
-
-

@@ -1,23 +1,9 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  Stack,
-  CircularProgress,
-  Button,
-} from "@mui/material";
+import { CircularProgress, Button } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import { addLabelsGameTypes } from "./tooltips/dataSet";
 import { buttonStyles } from "~/styles/theme";
-// import fetchHistoricalSummary from "~/utils/api/transactions/getHistoricalSummary";
-
-// Mapping GameTypeId to Draw Names
-// const drawNames: Record<number, string> = {
-//   1: "First Draw",
-//   2: "Second Draw",
-//   3: "Third Draw",
-// };
 
 // Custom Legend (Dynamically Handles Bet Types)
 const CustomLegend = () => (
@@ -66,7 +52,9 @@ const ChartBettorsSummary = () => {
         const response = await fetchHistoricalSummary({
           from: today,
           to: today,
-        }); // Add query params if needed
+        });
+
+        // Add query params if needed
         //console.log(today);
         //console.log(response);
         // Filter Data for Today's Date
@@ -159,7 +147,7 @@ const ChartBettorsSummary = () => {
     };
 
     fetchData();
-    console.log(`Bettors vs Bets Placed Summary Data: ${data}`);
+    //console.log(`Bettors vs Bets Placed Summary Data: ${data}`);
   }, []);
 
   return (
@@ -167,7 +155,7 @@ const ChartBettorsSummary = () => {
       <div className="flex justify-between items-center w-full mb-4">
         <div className="flex flex-col leading-none">
           <p className="text-lg leading-none">
-            Summary of Bettors and Bets Placed Today
+            Today's Bettor Count by Game Type
           </p>
           <CustomLegend />
         </div>
@@ -216,13 +204,11 @@ const ChartBettorsSummary = () => {
               {
                 scaleType: "band",
                 data: ["First Draw", "Second Draw", "Third Draw"],
-                // series={[{ data: [4, 3, 5] }, { data: [1, 6, 3] }]},
               } as any,
             ]}
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
-                // scaleType: "linear",
                 min: 0,
                 max: 100,
                 tickValues: xAxisTicks,

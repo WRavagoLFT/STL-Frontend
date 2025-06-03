@@ -43,7 +43,7 @@ const CustomLegend: React.FC<{ pageType: string }> = ({ pageType }) => (
           className="w-4 h-4 rounded-full mr-1.5"
           style={{ backgroundColor: item.color }}
         />
-        <p className=" text-xs">{item.label}</p>
+        <p className="text-sm">{item.label}</p>
       </div>
     ))}
   </div>
@@ -62,7 +62,7 @@ export const ChartCard = <T,>({
         <div className="pt-1 flex justify-between items-center flex-wrap">
           <div>
             <p className="text-lg">{title}</p>
-            <CustomLegend pageType={pageType} />
+            <CustomLegend pageType={pageType ?? ""} />
           </div>
           <div className="flex items-center">
             <CSVExportButtonDashboard statsPerRegion={statsPerRegion} pageType={pageType} />

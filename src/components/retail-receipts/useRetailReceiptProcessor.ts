@@ -37,7 +37,6 @@ export const useRetailReceiptProcessor = (
   ];
 
   const PCSO_TITLES = [
-    "PCSO Share",
     "Printing cost to PCSO",
     "PCSO Charity fund",
     "PCSO Operating fund",

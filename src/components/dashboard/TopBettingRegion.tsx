@@ -1,71 +1,85 @@
 import React, { useState, useEffect } from "react";
 import { FaDiceSix } from "react-icons/fa";
-import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { fetchHistoricalRegion } from "~/utils/api/transactions";
 import router from "next/router";
 
 interface RegionData {
-  RegionId: number;
+  RegionId?: number;
   Region: string;
-  RegionFull: string;
+  RegionFull?: string;
+  TotalPayout?: number;
+  trend?: number;
   TotalBettors: number;
+  TotalBetAmount: number;
 }
 
 const TopBettingRegionPage = () => {
   const [rankedRegions, setRankedRegions] = useState<
-    { region: RegionData; rank: number; trend: "up" | "down" | "same" }[]
+    { region: RegionData; rank: number; trend: number }[]
   >([]);
 
   const getBettingRegions = async () => {
-    const today = new Date().toISOString().split("T")[0];
+    try {
+      const today = new Date().toISOString().split("T")[0]; // 'YYYY-MM-DD'
+      const response = await fetchHistoricalRegion({ date: today });
+      //console.log("DATE TODAY:", today);
 
-    console.log("Date Today, TopBettingRegion: ", today);
+      if (!response.success || !response.data || response.data.length === 0) {
+        console.warn("No data returned from API.");
+        return;
+      }
 
-    // Assuming fetchHistoricalRegion accepts a date parameter
-    const response = await fetchHistoricalRegion({ date: today });
+      const filteredData = response.data.filter((entry: any) => {
+        const entryDate = entry.TransactionDate?.split("T")[0]; // 'YYYY-MM-DD'
+        return entryDate === today;
+      });
 
-    if (!response.success || response.data.length === 0) {
-      console.warn("No data found in API response!");
-      return;
-    }
-    const filteredData = response.data.filter(
-      (item: { TransactionDate: string }) =>
-        item.TransactionDate.startsWith(today)
-    );
+      if (filteredData.length === 0) {
+        console.warn("No matching entries for today's date.");
+        return;
+      }
 
-    // Aggregate TotalBettors per RegionId using reduce()
-    const regionMap: Map<number, RegionData> = filteredData.reduce(
-      (
-        map: { get: (arg0: any) => any; set: (arg0: any, arg1: any) => void },
-        entry: { RegionId: any; TotalBettors: any }
-      ) => {
-        const existing = map.get(entry.RegionId);
-        if (existing) {
-          existing.TotalBettors += entry.TotalBettors;
+      // Group by Region and sum TotalBetAmount
+      const regionMap = new Map<string, RegionData>();
+
+      filteredData.forEach((entry: any) => {
+        const regionName = entry.Region || "Unknown";
+        const payout = entry.TotalPayout || 0;
+        const betAmount = entry.TotalBetAmount || 0;
+
+        if (betAmount === 0) return; // Skip regions with 0 total bets
+
+        if (regionMap.has(regionName)) {
+          const existing = regionMap.get(regionName)!;
+          existing.TotalPayout += payout;
+          existing.TotalBettors += entry.TotalBettors || 0;
+          existing.TotalBetAmount += betAmount;
         } else {
-          map.set(entry.RegionId, { ...entry });
+          regionMap.set(regionName, {
+            RegionId: entry.RegionId,
+            Region: regionName,
+            RegionFull: entry.RegionFull || regionName,
+            TotalPayout: payout,
+            TotalBettors: entry.TotalBettors || 0,
+            TotalBetAmount: betAmount,
+          });
         }
-        return map;
-      },
-      new Map<number, RegionData>()
-    );
+      });
 
-    // Convert to array and explicitly cast to RegionData[]
-    const sortedRegions = Array.from(regionMap.values() as Iterable<RegionData>)
-      .sort((a, b) => b.TotalBettors - a.TotalBettors)
-      .filter((region) => region.TotalBettors > 0);
+      const sortedRegions = Array.from(regionMap.values()).sort(
+        (a, b) => b.TotalBetAmount - a.TotalBetAmount
+      );
 
-    const ranked: {
-      region: RegionData;
-      rank: number;
-      trend: "up" | "down" | "same";
-    }[] = sortedRegions.slice(0, 5).map((region, index) => ({
-      region,
-      rank: index + 1,
-      trend: index % 2 === 0 ? "up" : "down",
-    }));
+      const ranked = sortedRegions.map((region, index) => ({
+        region,
+        rank: index + 1,
+        trend: 0,
+      }));
 
-    setRankedRegions(ranked);
+      setRankedRegions(ranked);
+    } catch (error) {
+      console.error("Failed to fetch winning regions:", error);
+    }
   };
 
   useEffect(() => {
@@ -73,52 +87,66 @@ const TopBettingRegionPage = () => {
   }, []);
 
   return (
-    <div className="bg-transparent p-4 rounded-xl border border-[#0038A8]">
+    <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
       <div className="flex mb-2 items-center w-full">
         <div className="bg-[#0038A8] rounded-lg p-1">
-          <FaDiceSix size={24} color={"#F6BA12"} />
+          <FaDiceSix size={20} color={"#F6BA12"} />
         </div>
         <div className="flex items-center justify-between flex-1 ml-3">
           <p className="text-base">Top Betting Regions Today</p>
           <button
-            onClick={() => { router.push("/betting-summary/dashboard");}} 
-            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
+            onClick={() => router.push("/winning-summary/dashboard")}
+            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
+          >
             View Bettors
           </button>
         </div>
       </div>
-      <div className="h-px bg-[#303030] mb-4" />
+      <div className="h-px bg-[#ACA993] mt-1 mb-2" />
 
-      {/* Display Ranked Regions */}
-      {rankedRegions.length > 0 ? (
-        rankedRegions.map(({ region, rank, trend }) => (
-          <div key={region.RegionId} className="flex items-center py-1">
-            <div className="flex items-center w-[15%]">
-              <p
-                className={`font-bold ${
-                  trend === "up" ? "text-[#4CAF50]" : "text-[#FF7A7A]"
-                }`}
-              >
-                {rank}
-              </p>
-              {trend === "up" ? (
-                <ArrowUpward className="text-[#4CAF50] ml-1 w-4 h-4" />
-              ) : (
-                <ArrowDownward className="text-[#FF7A7A] ml-1 w-4 h-4" />
-              )}
-            </div>
-            <p className="flex-1 ml-2">{region.RegionFull}</p>
-            <p className="text-center flex-1">
-              {region.TotalBettors.toLocaleString()}
-            </p>
+      <div className="mt-2 w-full max-h-[720px] overflow-y-auto">
+        {rankedRegions.length === 0 ? (
+          <div className="p-8 text-sm text-center text-[#888]">
+            <p>Top Winning Regions</p>
+            <p>Data will be displayed once available.</p>
           </div>
-        ))
-      ) : (
-        <div className="p-8 text-sm text-center text-[#888]">
-          <p>Top Betting Regions </p>
-          <p> data will be displayed once available.</p>
-        </div>
-      )}
+        ) : (
+          rankedRegions.map((item, index) => (
+            <div
+              key={item.region.RegionId ?? item.region.Region}
+              className={`flex items-center py-2 ${
+                index === rankedRegions.length - 1 ? "border-none" : ""
+              }`}
+            >
+              <div className="flex items-center w-[15%]">
+                <span
+                  className={`font-bold text-md ${
+                    item.trend > 0
+                      ? "text-[#046115]"
+                      : item.trend < 0
+                      ? "text-[#CE1126]"
+                      : "text-[#aaa]"
+                  }`}
+                >
+                  {item.trend > 0
+                    ? `↑${item.trend}`
+                    : item.trend < 0
+                    ? `↓${Math.abs(item.trend)}`
+                    : "→"}
+                </span>
+              </div>
+
+              <p className="text-[#0038A8] flex-1 ml-2 text-md whitespace-nowrap overflow-hidden text-ellipsis">
+                {item.region.Region}
+              </p>
+
+              <p className="text-[#212121] text-right flex-1 text-md">
+                {(item.region.TotalBetAmount ?? 0).toLocaleString()}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 };

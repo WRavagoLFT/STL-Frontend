@@ -68,6 +68,7 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
           className="w-full border rounded px-3 py-1.5 text-sm bg-[#F8F0E3] border-[#0038A8]"
           value={operationDate}
           onChange={(e) => setOperationDate(e.target.value)}
+          max={new Date().toISOString().slice(0, 7)}
         />
       </div>
 

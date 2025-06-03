@@ -1,36 +1,64 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { userTableColumns } from "~/config/userTableColumns";
 import useUserRoleStore from "../../../store/useUserStore";
 import CardsPage from "~/components/user/CardsData";
-import { addUser, editLogUser, fetchUsers, updateUser } from "~/utils/api/users";
+import { addUser, editLogUser, fetchOperatorMap, fetchUsersByRole, updateUser } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
 import { User } from "~/types/types";
 import UpdateUserModal from "~/components/user/UpdateUser";
 import Swal from "sweetalert2";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
+import { AccessGuard } from "~/components/auth/AccessGuard";
+import { fetchPCSOBranch } from "~/utils/api/location";
 
-const roleMap: Record<string, { label: string; textlabel: string; roleId: number }> = {
-managers: {
-    label: "Small Town Lottery Manager",
-    textlabel: "Managers",
-    roleId: 4,
+const roleMap: Record<string, { label: string; textlabel: string; roleId: number, permittedUserTypes: number[] }> = {
+  kubrador: {
+    label: "Kubrador",
+    textlabel: "Kubrador",
+    roleId: 1,
+    permittedUserTypes: [3, 4], // managers, exec, admin
+  },
+  kabo: {
+    label: "Kabo",
+    textlabel: "Kabo",
+    roleId: 2,
+    permittedUserTypes: [3, 4], // managers, exec, admin
   },
   executive: {
     label: "Small Town Lottery Executive",
     textlabel: "Executives",
-    roleId: 3,
+    roleId: 5, // just adjusted 06/02
+    permittedUserTypes: [3, 6], // executives, admin
+  },
+  managers: {
+    label: "Small Town Lottery Manager",
+    textlabel: "Managers",
+    roleId: 4,
+    permittedUserTypes: [4, 6], // managers, admin
   },
 };
 
 const RolePage = () => {
   const { query } = useRouter();
   const role = query.role as string;
-  const roleKey = role?.toLowerCase().includes("manager") ? "manager" : "executive";
+
+  const roleKey: "executive" | "manager" | "kabo" | "kubrador" | undefined =
+    role?.includes("manager")
+      ? "manager"
+      : role?.includes("executive")
+      ? "executive"
+      : role?.includes("kabo")
+      ? "kabo"
+      : role?.includes("kubrador")
+      ? "kubrador"
+      : undefined;
+
   const roleConfig = roleMap[role?.toLowerCase() || ""];
+  
   const operatorMap = useUserRoleStore((state) => state.operatorMap);
   const setOperatorMap = useUserRoleStore((state) => state.setOperatorMap);
   const { data, setData } = useUserRoleStore();
@@ -50,14 +78,56 @@ const RolePage = () => {
   const [showEditLog, setShowEditLog] = useState(false);
 
   const openEditLogModal = (user: User) => {setSelectedUser(user);setShowEditLog(true);};
+  const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
+
+  const loadUsers = useCallback(async () => {
+    try {
+      if (!roleConfig?.roleId || !roleKey) {
+        console.warn("Missing roleId or roleKey");
+        return;
+      }
+
+      //console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
+
+      // Special roles that skip operator mapping
+      if (roleKey === "kabo" || roleKey === "kubrador") {
+        //console.log(`Skipping operator/branch map for ${roleKey}`);
+        await fetchUsersByRole(roleConfig.roleId, null, null, setData);
+        return;
+      }
+
+      //console.log("Fetching operator map...");
+      const operatorMap = await fetchOperatorMap();
+      if (!operatorMap) {
+        console.warn("No operator map found.");
+        setData([]);
+        return;
+      }
+      //console.log("Operator map fetched:", operatorMap);
+      setOperatorMap(operatorMap);
+
+      //console.log("Fetching PCSO branch map...");
+      const pcsoBranchMap = await fetchPCSOBranch();
+      if (!pcsoBranchMap) {
+        console.warn("No PCSO branch map found.");
+        setData([]);
+        return;
+      }
+      //console.log("PCSO branch map fetched:", pcsoBranchMap);
+      setPscoBranchMap(pcsoBranchMap);
+
+      //console.log("Fetching users with operator & branch maps...");
+      await fetchUsersByRole(roleConfig.roleId, operatorMap, pcsoBranchMap, setData);
+
+    } catch (error) {
+      console.error("Error in loadUsers:", (error as Error).message);
+      setData([]);
+    }
+  }, [roleConfig?.roleId, roleKey, setData]);
 
   useEffect(() => {
-    if (roleConfig?.roleId) {
-      fetchUsers(roleConfig.roleId, setData).then((map) => {
-        if (map) setOperatorMap(map);
-      });
-    }
-  }, [roleConfig, setData]);
+    loadUsers();
+  }, [loadUsers]);
 
   //console.log("DATA USER", data);
   //console.log("operatormappp", operatorMap);
@@ -78,7 +148,7 @@ const RolePage = () => {
 
       if (result.success) {
         console.log("User added successfully:", result.data);
-        await fetchUsers(roleConfig.roleId, setData);
+        //await fetchUsers(roleConfig.roleId, setData);
 
         Swal.fire({
           icon: "success",
@@ -118,7 +188,7 @@ const RolePage = () => {
 
       if (result.success) {
         console.log("User updated successfully:", result.data);
-        await fetchUsers(roleConfig.roleId, setData);
+        //await fetchUsers(roleConfig.roleId, setData);
 
         Swal.fire({
           icon: "success",
@@ -151,61 +221,64 @@ const RolePage = () => {
   };
 
   return (
-    <div className="mx-auto px-0 py-1">
-      <h1 className="text-3xl font-bold mb-3">{label}</h1>
-      <CardsPage 
-        dashboardData={data} 
-        roleLabel={label} 
-        textlabel={textlabel}
-      />
-
-      <ChartsDataPage 
-        pageType={roleKey} 
-        dashboardData={data}
-      />
-
-      <DetailedTable
-        data={data}
-        columns={tableColumns}
-        pageType={roleKey}
-        operatorMap={operatorMap}
-        roleId={roleId}
-        statsPerRegion={data}
-        source="users"
-        onAddClick={openCreateModal}
-        onUpdateClick={openUpdateModal}
-      />
-
-      <AddUserModal
-        open={isCreateModalOpen}
-        onClose={closeCreateModal}
-        onSubmit={handleAddUser}
-        operatorMap={operatorMap}
-        userTypeId={roleId}
-      />
-
-      <UpdateUserModal
-        open={isUpdateModalOpen}
-        onClose={closeUpdateModal}
-        onSubmit={handleUpdateUser}
-        operatorMap={operatorMap}
-        userTypeId={roleId}
-        selectedUser={selectedUser}
-        onViewEditLogs={() => openEditLogModal(selectedUser!)}
-      />
-
-      {selectedUser && showEditLog && (
-        <EditModalPage
-          open={showEditLog}
-          id={selectedUser.UserId!}
-          fetchData={editLogUser}
-          columns={editLogtableColumns}
-          onClose={() => setShowEditLog(false)}
-          userTypeId={roleId}
+    <AccessGuard allowedUserTypes={roleConfig.permittedUserTypes}>
+      <div className="mx-auto px-0 py-1">
+        <h1 className="text-3xl font-bold mb-3">{label}</h1>
+        <CardsPage 
+          dashboardData={data} 
+          roleLabel={label} 
+          textlabel={textlabel}
         />
-      )}
 
-    </div>
+        <ChartsDataPage 
+          pageType={roleKey} 
+          dashboardData={data}
+        />
+
+        <DetailedTable
+          data={data}
+          columns={tableColumns}
+          pageType={roleKey}
+          operatorMap={operatorMap}
+          roleId={roleId}
+          statsPerRegion={data}
+          source="users"
+          onAddClick={openCreateModal}
+          onUpdateClick={openUpdateModal}
+        />
+
+        <AddUserModal
+          open={isCreateModalOpen}
+          onClose={closeCreateModal}
+          onSubmit={handleAddUser}
+          operatorMap={operatorMap}
+          userTypeId={roleId}
+          pcsoBranchMap={pcsoBranchMap}
+        />
+
+        <UpdateUserModal
+          open={isUpdateModalOpen}
+          onClose={closeUpdateModal}
+          onSubmit={handleUpdateUser}
+          operatorMap={operatorMap}
+          userTypeId={roleId}
+          selectedUser={selectedUser}
+          onViewEditLogs={() => openEditLogModal(selectedUser!)}
+        />
+
+        {selectedUser && showEditLog && (
+          <EditModalPage
+            open={showEditLog}
+            id={selectedUser.UserId!}
+            fetchData={editLogUser}
+            columns={editLogtableColumns}
+            onClose={() => setShowEditLog(false)}
+            userTypeId={roleId}
+            selectedUser={selectedUser}
+          />
+        )}
+      </div>
+    </AccessGuard>
   );
 };
 

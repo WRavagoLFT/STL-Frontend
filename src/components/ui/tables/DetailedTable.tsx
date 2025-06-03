@@ -17,6 +17,7 @@ import router from "next/router";
 import ConfirmSuspendModal from "~/components/shared/ConfirmSuspendModal";
 import { useModalStore } from "~/store/useModalStore";
 import useDetailTableStore from "~/store/useTableStore";
+import { useAuthStore } from "~/store/useAuthStore";
 
 const DetailedTable = <T extends User | Operator>({
   data,
@@ -40,7 +41,8 @@ const DetailedTable = <T extends User | Operator>({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [actionType, setActionType] = useState<'suspend' | 'create' | 'update' | 'delete'>('suspend');
   const modalStore = useModalStore.getState();
-
+  const { userTypeId } = useAuthStore();
+  
   // FILTER + SEARCH
   const filteredData = useMemo(() => {
     const filterKeys = columns
@@ -92,7 +94,6 @@ const DetailedTable = <T extends User | Operator>({
     const end = start + rowsPerPage;
     return sortedData.slice(start, end);
   }, [sortedData, page, rowsPerPage]);
-
 
   const generateSlug = (operatorName: string, operatorId: number) =>
     `${operatorId}-${operatorName
@@ -204,13 +205,23 @@ const DetailedTable = <T extends User | Operator>({
               )}
             </IconButton>
           </div>
-          <Button variant="contained" onClick={onAddClick} sx={buttonStyles}>
-            {pageType === "manager"
-              ? "Add Manager"
-              : pageType === "executive"
-                ? "Add Executive"
-                : "Add Operator"}
-          </Button>
+          {userTypeId !== null && [4, 5, 6].includes(userTypeId) && pageType && ( // not show when executive
+              <Button variant="contained" onClick={onAddClick} sx={buttonStyles}>
+                {pageType === "manager"
+                  ? "Add Manager"
+                  : pageType === "executive"
+                  ? "Add Executive"
+                  : pageType === "kubrador"
+                  ? "Add Kubrador"
+                  : pageType === "operator"
+                  ? "Add Operator"
+                  : pageType === "kabo"
+                  ? "Add Kabo"
+                  : pageType === "Device Information"
+                  ? "Add Device"
+                  : "Add"}
+              </Button>
+            )}
         </div>
         <Table size="small">
           <TableHead>
@@ -237,7 +248,17 @@ const DetailedTable = <T extends User | Operator>({
                   <div className="flex flex-col items-center py-7 text-[#0038A8]">
                     <PersonOffIcon style={{ fontSize: 50 }} />
                     <h6 className="mt-2 font-sm text-lg">
-                      {pageType === "manager" ? "No managers available" : "No executives available"}
+                        {pageType === "manager"
+                          ? "No Manager available"
+                          : pageType === "executive"
+                          ? "No Executive available"
+                          : pageType === "kubrador"
+                          ? "No Kubrador available"
+                          : pageType === "operator"
+                          ? "No Operator available"
+                          : pageType === "Device Information"
+                          ? "No Device Information available"
+                          : "No data available"}
                     </h6>
                   </div>
                 </TableCell>
