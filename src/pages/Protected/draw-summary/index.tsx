@@ -27,46 +27,70 @@ const DrawSelectedPage = () => {
 
   const todayDate = new Date().getDate()
 
+const monthOptions = [
+  { value: "", label: "Select Month" },
+  { value: "1", label: "January" },
+  { value: "2", label: "February" },
+  { value: "3", label: "March" },
+  { value: "4", label: "April" },
+  { value: "5", label: "May" },
+  { value: "6", label: "June" },
+  { value: "7", label: "July" },
+  { value: "8", label: "August" },
+  { value: "9", label: "September" },
+  { value: "10", label: "October" },
+  { value: "11", label: "November" },
+  { value: "12", label: "December" },
+];
+
   // fetch data
   const fetchData = async () => {
     const dataFetch = await fetchDrawSummary(Number(selectedProvince), Number(selectedGameCategory), Number(selectedMonth))
     setData(dataFetch.data)
-    console.log(dataFetch)
+    //console.log(dataFetch)
   }
 
   const loadData = async () => {
 
     const regionFetch = await fetchRegions()
-    console.log(regionFetch)
-    setRegions(regionFetch.data.map((region: any) => {
-      return {
+    //console.log(regionFetch)
+if (regionFetch?.data && Array.isArray(regionFetch.data)) {
+  setRegions(
+    regionFetch.data
+      .filter((region: any) => region?.RegionName && region?.RegionId)
+      .map((region: any) => ({
         label: region.RegionName,
         value: region.RegionId.toString()
-      }
-    }))
+      }))
+  );
+}
 
-    
     const provinceFetch = await fetchProvinces()
-    console.log(provinceFetch)
+    //console.log(provinceFetch)
     setProvinces(provinceFetch.data)
 
-    const filteredProvinces = provinceFetch.data.filter((province: any) => {
-      return province.RegionId == selectedRegion
-    })
-    
-    setFilteredProvinces(filteredProvinces.map((province: any) => {
-      return {
-        label: province.ProvinceName,
-        value: province.ProvinceId.toString()
-      }
-    })) 
+    if (provinceFetch.data) {
+      const filteredProvinces = provinceFetch.data.filter((province: any) => {
+        return province && province.RegionId === selectedRegion;
+      });
+
+      setFilteredProvinces(
+        filteredProvinces
+          .filter((province: any) => province.ProvinceId && province.ProvinceName)
+          .map((province: any) => ({
+            label: province.ProvinceName,
+            value: province.ProvinceId.toString()
+          }))
+      );
+    }
 
     // default region
     setSelectedRegion("1")
     setSelectedProvince("1")
 
     const gameCategoryFetch = await fetchGameCategories()
-    console.log(gameCategoryFetch)
+    //console.log(gameCategoryFetch)
+
     setGameCategories(gameCategoryFetch.data.map((gameCategory: any) => {
       return {
         label: gameCategory.GameCategory,
@@ -82,21 +106,25 @@ const DrawSelectedPage = () => {
   }, [])
 
   useEffect(() => { 
-    if(provinces.length > 0){
+    if (provinces.length > 0 && selectedRegion) {
       const filteredProvinces = provinces.filter((province) => {
-        return province.RegionId == selectedRegion
-      })
+        return province.RegionId == selectedRegion;
+      });
 
-      setFilteredProvinces(filteredProvinces.map((province: any) => {
-        return {
-          label: province.ProvinceName,
-          value: province.ProvinceId.toString()
-        }
-      }))
+      const mappedProvinces = filteredProvinces.map((province: any) => ({
+        label: province.ProvinceName,
+        value: province.ProvinceId.toString()
+      }));
 
-      setSelectedProvince(filteredProvinces[0].ProvinceId)
+      setFilteredProvinces(mappedProvinces);
+
+      if (filteredProvinces.length > 0) {
+        setSelectedProvince(filteredProvinces[0].ProvinceId);
+      } else {
+        setSelectedProvince(""); // or null or undefined depending on your default
+      }
     }
-  }, [selectedRegion, provinces])
+  }, [selectedRegion, provinces]);
 
   useEffect(() => {
     if(Number(selectedRegion) != 0 && Number(selectedProvince) != 0 && Number(selectedGameCategory) != 0 && selectedMonth != 0){
@@ -172,9 +200,7 @@ const DrawSelectedPage = () => {
     <AccessGuard allowedUserTypes={[3, 4, 5, 6]}>
       <div className="flex flex-col gap-4">
         <div className="flex flex-row mb-1">
-          <h1 className="text-3xl font-bold">
-            STL Pares Provincial Draw Summary
-          </h1>
+          <h1 className="text-3xl font-bold">STL Provincial Draw Summary</h1>
         </div>
 
         {/* Input Selects */}
@@ -187,29 +213,33 @@ const DrawSelectedPage = () => {
             >
               Region
             </label>
-            <select
+            <Select
               id="region"
-              value={selectedRegion}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSelectedRegion(val);
-                setSelectedProvince("");
+              value={regions.find((option) => option.value === selectedRegion)}
+              onChange={(selectedOption) => {
+                if (selectedOption) {
+                  setSelectedRegion(selectedOption.value);
+                  setSelectedProvince("");
+                }
               }}
-              className="w-full border rounded px-3 py-3 text-sm !bg-[#F6BA12] focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="" className="bg-white text-black">
-                Select Region
-              </option>
-              {regions.map((region) => (
-                <option
-                  key={region.value}
-                  value={region.value}
-                  className="bg-white text-black"
-                >
-                  {region.label}
-                </option>
-              ))}
-            </select>
+              options={regions}
+              placeholder="Select a Region"
+              classNamePrefix="react-select-dashboard"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  borderRadius: "0.5rem",
+                  color: "#2F2F2F",
+                  padding: "0.25rem",
+                  boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#F8C73F",
+                  zIndex: 10,
+                }),
+              }}
+            />
           </div>
 
           {/* Second Select */}
@@ -220,26 +250,35 @@ const DrawSelectedPage = () => {
             >
               Province
             </label>
-            <select
+
+            <Select
               id="province"
-              value={selectedProvince}
-              onChange={(e) => {
-                const val = e.target.value;
-                console.log("Province changed to " + val);
-                setSelectedProvince(val);
+              value={filteredProvinces.find(
+                (option) => option.value === selectedProvince
+              )}
+              onChange={(selectedOption) => {
+                if (selectedOption) {
+                  setSelectedProvince(selectedOption.value);
+                }
               }}
-              className="w-full border rounded px-3 py-3 text-sm !bg-[#F6BA12] text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {filteredProvinces.map((province) => (
-                <option
-                  key={province.value}
-                  value={province.value}
-                  className="bg-white text-black"
-                >
-                  {province.label}
-                </option>
-              ))}
-            </select>
+              options={filteredProvinces}
+              placeholder="Select a Province"
+              classNamePrefix="react-select-dashboard"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  borderRadius: "0.5rem",
+                  color: "#2F2F2F",
+                  padding: "0.25rem",
+                  boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#F8C73F",
+                  zIndex: 10,
+                }),
+              }}
+            />
           </div>
 
           {/* Third Select */}
@@ -250,25 +289,34 @@ const DrawSelectedPage = () => {
             >
               Game Category
             </label>
-            <select
+            <Select
               id="gameCategory"
-              value={selectedGameCategory}
-              onChange={(e) => {
-                const val = e.target.value;
-                setSelectedGameCategory(val);
+              value={gameCategories.find(
+                (option) => option.value === selectedGameCategory
+              )}
+              onChange={(selectedOption) => {
+                if (selectedOption) {
+                  setSelectedGameCategory(selectedOption.value);
+                }
               }}
-              className="w-full border rounded px-3 py-3 text-sm !bg-[#F6BA12] text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {gameCategories.map((gameCategory) => (
-                <option
-                  key={gameCategory.value}
-                  value={gameCategory.value}
-                  className="bg-white text-black"
-                >
-                  {gameCategory.label}
-                </option>
-              ))}
-            </select>
+              options={gameCategories}
+              placeholder="Select a Game Category"
+              classNamePrefix="react-select-dashboard"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  borderRadius: "0.5rem",
+                  color: "#2F2F2F",
+                  padding: "0.25rem",
+                  boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#F8C73F",
+                  zIndex: 10,
+                }),
+              }}
+            />
           </div>
 
           {/* Fourth Select */}
@@ -279,55 +327,33 @@ const DrawSelectedPage = () => {
             >
               Month
             </label>
-            <select
-              id="select-4"
-              value={selectedMonth}
-              onChange={(e: any) => {
-                const val = e.target.value;
-                setSelectedMonth(val);
+            <Select
+              id="month"
+              options={monthOptions}
+              value={monthOptions.find(
+                (option) => parseInt(option.value) === selectedMonth
+              )}
+              onChange={(selectedOption) =>
+                setSelectedMonth(
+                  selectedOption ? parseInt(selectedOption.value) : 1
+                )
+              }
+              placeholder="Select a Month"
+              classNamePrefix="react-select-dashboard"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  borderRadius: "0.5rem",
+                  padding: "0.25rem",
+                  boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  backgroundColor: "#F8C73F",
+                  zIndex: 10,
+                }),
               }}
-              className="w-full border rounded px-3 py-3 text-sm !bg-[#F6BA12] text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="" className="bg-white text-black">
-                Select Month
-              </option>
-              <option value="1" className="bg-white text-black">
-                January
-              </option>
-              <option value="2" className="bg-white text-black">
-                February
-              </option>
-              <option value="3" className="bg-white text-black">
-                March
-              </option>
-              <option value="4" className="bg-white text-black">
-                April
-              </option>
-              <option value="5" className="bg-white text-black">
-                May
-              </option>
-              <option value="6" className="bg-white text-black">
-                June
-              </option>
-              <option value="7" className="bg-white text-black">
-                July
-              </option>
-              <option value="8" className="bg-white text-black">
-                August
-              </option>
-              <option value="9" className="bg-white text-black">
-                September
-              </option>
-              <option value="10" className="bg-white text-black">
-                October
-              </option>
-              <option value="11" className="bg-white text-black">
-                November
-              </option>
-              <option value="12" className="bg-white text-black">
-                December
-              </option>
-            </select>
+            />
           </div>
         </div>
 
@@ -360,7 +386,9 @@ const DrawSelectedPage = () => {
                 )}
                 <div className="flex gap-3">
                   {data?.HotNumbers && (
-                    <HotNumberPage number={data?.HotNumbers[0]?.number || "-"} />
+                    <HotNumberPage
+                      number={data?.HotNumbers[0]?.number || "-"}
+                    />
                   )}
                   {data?.ColdNumbers && (
                     <ColdNumberPage
@@ -385,7 +413,8 @@ const DrawSelectedPage = () => {
                 <DrawListSummaryPage
                   location={
                     filteredProvinces.find(
-                      (province) => province.value == selectedProvince.toString()
+                      (province) =>
+                        province.value == selectedProvince.toString()
                     )?.label || ""
                   }
                   month={selectedMonth}
