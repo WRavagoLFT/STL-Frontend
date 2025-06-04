@@ -1,10 +1,8 @@
-import dynamic from "next/dynamic";
 import React, { Suspense } from "react";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import GameCombinationModal from "~/components/dashboard/GameCombinationForm";
+//import GameCombinationModal from "~/components/dashboard/GameCombinationForm";
 
-const DashboardSkeletonPage = dynamic(() => import("~/components/dashboard/DashboardSkeleton")
-  .then((mod) => ({default: mod.DashboardSkeletonPage,})));
+//const DashboardSkeletonPage = dynamic(() => import("~/components/dashboard/DashboardSkeleton").then((mod) => ({default: mod.DashboardSkeletonPage,})));
 const DashboardCardsPage = React.lazy(() => import("~/components/dashboard/DashboardCards"));
 const DrawResultsPage = React.lazy(() => import("~/components/dashboard/DrawResults"));
 const TopBettingRegionPage = React.lazy(() => import("~/components/dashboard/TopBettingRegion"));
@@ -14,7 +12,7 @@ const SummaryWinnersDrawTimePage = React.lazy(() => import("~/components/dashboa
 
 const DashboardPage = () => {
   return (
-    <AccessGuard allowedUserTypes={[1, 2, 3, 4, 5, 6]}>
+    <AccessGuard allowedUserTypes={[3, 4, 6]}>
       <div className="space-y-4 h-full">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <DashboardCardsPage />

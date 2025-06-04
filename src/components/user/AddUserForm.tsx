@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Branch, Operator, User } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { useFormik } from "formik";
-import { toFormikValidationSchema } from "zod-formik-adapter";
 import { userSchema } from "~/schemas/userSchema";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { generateValidPassword } from "~/utils/passwordgenerate";
 import Swal from "sweetalert2";
+import { toFormikValidationSchema } from "~/utils/formikHelpers";
 
 interface AddUserFormProps {
   title?: string;
@@ -68,7 +68,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
     closeConfirmModal();
     if (onClose) onClose();
   };
-  
+  const validate = toFormikValidationSchema(userSchema);
+
   const formik = useFormik({
     initialValues: {
       firstName: initialData.firstName || "",
@@ -85,8 +86,10 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       accountType: 2,
       BranchId: initialData.BranchId || "",
     },
-    validationSchema: toFormikValidationSchema(userSchema),
+    validate,    
     onSubmit: async (values) => {
+    console.log("[Form Submit] Submitted Values:", values);
+
       const result = await Swal.fire({
         title: "Add Confirmation",
         text: "Did you enter the correct details?",
@@ -110,12 +113,22 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
     },
   });
 
+  useEffect(() => {
+    console.log("Validation Errors:", formik.errors);
+    //console.log("Touched Fields:", formik.touched);
+  }, [formik.errors, formik.touched]);
+  
   // Helpers to display errors
-  const getError = (field: string) =>
-    formik.touched[field as keyof typeof formik.touched] &&
-    formik.errors[field as keyof typeof formik.errors]
-      ? (formik.errors[field as keyof typeof formik.errors] as string)
-      : null;
+  const getError = (field: string) => {
+    const error = formik.errors[field as keyof typeof formik.errors];
+    const touched = formik.touched[field as keyof typeof formik.touched];
+    
+    if (touched && error && typeof error === "string") {
+      return error.split("|")[0].trim();  // show only the first error message
+    }
+    
+    return null;
+  };
 
   return (
     <form

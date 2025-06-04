@@ -21,7 +21,7 @@ export const AccessGuard = ({
     }
 
     if (!allowedUserTypes.includes(userTypeId)) {
-      router.replace("/unauthorized");
+      router.replace("/error404");
       return;
     }
 

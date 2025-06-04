@@ -10,7 +10,7 @@ import SidebarLogoSection from "./SidebarLogoSection";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
-  const currentPath = router.asPath;
+  //const currentPath = router.asPath;
   const { setSideBarActiveGameType } = useSideBarStore();
   const userTypeId = useAuthStore((state) => state.userTypeId);
   const [collapsed, setCollapsed] = useState(false);
@@ -23,11 +23,12 @@ const Sidebar: React.FC = () => {
       setIsLoggingOut(true);
       await logoutUser();
 
-      //const authStore = useAuthStore.getState();
-      //const sidebarStore = useSideBarStore.getState();
+      // we need to handle this gracefully (w/o glitch)
+      const authStore = useAuthStore.getState();
+      const sidebarStore = useSideBarStore.getState();
 
-      //if (typeof authStore.reset === "function") authStore.reset();
-      //if (typeof sidebarStore.reset === "function") sidebarStore.reset();
+      if (typeof authStore.reset === "function") authStore.reset();
+      if (typeof sidebarStore.reset === "function") sidebarStore.reset();
 
       router.push("/auth/login");
     } catch (error) {
