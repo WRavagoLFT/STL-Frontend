@@ -94,8 +94,13 @@ const nextConfig: NextConfig = {
         source: '/device-information',
         destination: '/Protected/device-information',
       },
+      // error page
+      {
+        source: '/error404',
+        destination: '/auth/error404',
+      },
     ];
   },
-};
+};  
 
 export default (nextConfig);

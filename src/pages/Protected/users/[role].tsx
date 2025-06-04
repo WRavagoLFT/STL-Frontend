@@ -32,13 +32,13 @@ const roleMap: Record<string, { label: string; textlabel: string; roleId: number
     label: "Small Town Lottery Executive",
     textlabel: "Executives",
     roleId: 5, // just adjusted 06/02
-    permittedUserTypes: [3, 6], // executives, admin
+    permittedUserTypes: [6], // admin ONLY
   },
   managers: {
     label: "Small Town Lottery Manager",
     textlabel: "Managers",
     roleId: 4,
-    permittedUserTypes: [4, 6], // managers, admin
+    permittedUserTypes: [6], // admin ONLY
   },
 };
 
@@ -46,16 +46,22 @@ const RolePage = () => {
   const { query } = useRouter();
   const role = query.role as string;
 
-  const roleKey: "executive" | "manager" | "kabo" | "kubrador" | undefined =
-    role?.includes("manager")
-      ? "manager"
-      : role?.includes("executive")
-      ? "executive"
-      : role?.includes("kabo")
-      ? "kabo"
-      : role?.includes("kubrador")
-      ? "kubrador"
-      : undefined;
+  const roleKey = (() => {
+    switch (role?.toLowerCase()) {
+      case "manager":
+      case "managers":
+        return "manager";
+      case "executive":
+      case "executives":
+        return "executive";
+      case "kubrador":
+        return "kubrador";
+      case "kabo":
+        return "kabo";
+      default:
+        return undefined;
+    }
+  })();
 
   const roleConfig = roleMap[role?.toLowerCase() || ""];
   
@@ -64,7 +70,9 @@ const RolePage = () => {
   const { data, setData } = useUserRoleStore();
 
   const { roleId, label, textlabel } = roleConfig;
-  const tableColumns = userTableColumns();
+
+  const tableColumns = userTableColumns(roleId);
+
   const editLogtableColumns = userEditColumns();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -80,14 +88,14 @@ const RolePage = () => {
   const openEditLogModal = (user: User) => {setSelectedUser(user);setShowEditLog(true);};
   const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
 
-  const loadUsers = useCallback(async () => {
+  const loadUsers = useCallback(async () => { 
     try {
       if (!roleConfig?.roleId || !roleKey) {
         console.warn("Missing roleId or roleKey");
         return;
       }
 
-      //console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
+      console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
 
       // Special roles that skip operator mapping
       if (roleKey === "kabo" || roleKey === "kubrador") {
@@ -113,7 +121,7 @@ const RolePage = () => {
         setData([]);
         return;
       }
-      //console.log("PCSO branch map fetched:", pcsoBranchMap);
+      console.log("PCSO branch map fetched:", pcsoBranchMap);
       setPscoBranchMap(pcsoBranchMap);
 
       //console.log("Fetching users with operator & branch maps...");

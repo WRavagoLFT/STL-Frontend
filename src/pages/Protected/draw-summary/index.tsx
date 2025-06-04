@@ -1,8 +1,4 @@
 import React, { useEffect, useState } from "react";
-import HotNumberPage from "~/components/draw-summary/HotNumbers";
-import DrawResultsSummaryPage from "~/components/draw-summary/DrawResultsSummary";
-import ColdNumberPage from "~/components/draw-summary/ColdNumbers";
-import DrawCounterTablePage from "~/components/draw-summary/DrawCounterTable";
 import { fetchProvinces, fetchRegions } from "~/utils/api/location";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { fetchDrawSummary } from "~/utils/api/transactions";
@@ -10,38 +6,39 @@ import Select from 'react-select';
 import { AccessGuard } from "~/components/auth/AccessGuard";
 
 const DrawListSummaryPage = React.lazy(() => import("~/components/draw-summary/DrawListSummary"));
+const HotNumberPage = React.lazy(() => import("~/components/draw-summary/HotNumbers"));
+const ColdNumberPage = React.lazy(() => import("~/components/draw-summary/ColdNumbers"));
+const DrawCounterTablePage = React.lazy(() => import("~/components/draw-summary/DrawCounterTable"));
+const DrawResultsSummaryPage = React.lazy(() => import("~/components/draw-summary/DrawResultsSummary"));
 
 const DrawSelectedPage = () => {
-
   const [regions, setRegions] = useState<{label: string, value: string}[]> ([]);
   const [provinces, setProvinces] = useState<any[]> ([]);
   const [gameCategories, setGameCategories] = useState<{label: string, value: string}[]> ([]);
   const [filteredProvinces, setFilteredProvinces] = useState<{label: string, value: string}[]> ([]);
-  
+
   const [selectedRegion, setSelectedRegion] = useState("1");
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedGameCategory, setSelectedGameCategory] = useState("1");
   const [selectedMonth, setSelectedMonth] = useState((new Date()).getMonth() + 1);
-
   const [data, setData] = useState<any>({});
-
   const todayDate = new Date().getDate()
 
-const monthOptions = [
-  { value: "", label: "Select Month" },
-  { value: "1", label: "January" },
-  { value: "2", label: "February" },
-  { value: "3", label: "March" },
-  { value: "4", label: "April" },
-  { value: "5", label: "May" },
-  { value: "6", label: "June" },
-  { value: "7", label: "July" },
-  { value: "8", label: "August" },
-  { value: "9", label: "September" },
-  { value: "10", label: "October" },
-  { value: "11", label: "November" },
-  { value: "12", label: "December" },
-];
+  const monthOptions = [
+    { value: "", label: "Select Month" },
+    { value: "1", label: "January" },
+    { value: "2", label: "February" },
+    { value: "3", label: "March" },
+    { value: "4", label: "April" },
+    { value: "5", label: "May" },
+    { value: "6", label: "June" },
+    { value: "7", label: "July" },
+    { value: "8", label: "August" },
+    { value: "9", label: "September" },
+    { value: "10", label: "October" },
+    { value: "11", label: "November" },
+    { value: "12", label: "December" },
+  ];
 
   // fetch data
   const fetchData = async () => {

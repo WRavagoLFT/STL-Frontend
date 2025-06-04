@@ -51,7 +51,7 @@ const MENU_VISIBILITY: Record<string, number[]> = {
   "Betting Summary": [3, 4, 6],
   "Winning Summary": [3, 4, 6],
   "Draw Summary": [3, 4, 5, 6,],
-  "Device Information": [5],
+  "Device Information": [5, 6],
   "Retail Receipt": [3, 4, 6],
 };
 

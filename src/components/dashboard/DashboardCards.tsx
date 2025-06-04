@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchHistoricalSummary } from "../../utils/api/transactions";
+import { fetchWinners } from "../../utils/api/winners"; // <-- import it
 import Card from "../ui/dashboardcards/Cards";
 
 const DashboardCardsPage = ({ gameCategoryId }: { gameCategoryId?: number }) => {
@@ -15,15 +16,21 @@ const DashboardCardsPage = ({ gameCategoryId }: { gameCategoryId?: number }) => 
     const fetchDataDashboard = async () => {
       try {
         const today = new Date().toISOString().split("T")[0];
-        const response = await fetchHistoricalSummary({
-          from: today,
-          to: today,
-        });
 
-        if (response.success) {
-          let filteredData = response.data;
+        const [summaryResponse, winnersResponse] = await Promise.all([
+          fetchHistoricalSummary({ from: today, to: today }),
+          fetchWinners({
+            from: today,
+            to: today,
+            gameCategoryId,
+          }),
+        ]);
 
-          // Optional filter by game category
+        console.log(winnersResponse);
+
+        if (summaryResponse.success) {
+          let filteredData = summaryResponse.data;
+
           if (gameCategoryId && gameCategoryId > 0) {
             filteredData = filteredData.filter(
               (item: { GameCategoryId: number }) =>
@@ -32,9 +39,8 @@ const DashboardCardsPage = ({ gameCategoryId }: { gameCategoryId?: number }) => 
           }
 
           const totals = filteredData.reduce(
-            (acc:any, item:any) => {
+            (acc: any, item: any) => {
               acc.totalBettors += item.TotalBettors || 0;
-              acc.totalWinners += item.TotalWinners || 0;
               acc.totalBetsPlaced += item.TotalBetAmount || 0;
               acc.totalPayout += item.TotalPayout || 0;
               acc.totalRevenue += item.TotalEarnings || 0;
@@ -49,12 +55,19 @@ const DashboardCardsPage = ({ gameCategoryId }: { gameCategoryId?: number }) => 
             }
           );
 
+          // Fix: count number of winning entries
+          if (winnersResponse.success && Array.isArray(winnersResponse.data)) {
+            totals.totalWinners = winnersResponse.data.length;
+          } else {
+            console.warn("Failed to fetch winners:", winnersResponse.message);
+          }
+
           setDashboardData(totals);
         } else {
-          console.error("API Request Failed:", response.message);
+          console.error("API Request Failed:", summaryResponse.message);
         }
       } catch (error) {
-        console.error("Error Fetching Data:", error);
+        console.error("Error Fetching Dashboard Data:", error);
       }
     };
 

@@ -145,5 +145,30 @@ export type Branch = {
   // Add more fields if needed
 };
 
+export interface Device {
+  assignmentDate: any;
+  usageNotes: number;
+  simNumber: number;
+  telcoProvider: string;
+  dataPlan: string;
+  assignedUser: number;
+
+  DeviceId?: number;
+  AssignmentDate?: string;
+  IssuedBy?: string;
+  UsageNotes?: string;
+  SIMNumber?: string;
+  TelcoProvider?: string;
+  DataPlan?: string;
+  LastSyncTimestamp?: string;
+  DeviceStatus?: string;
+  LastMaintenanceDate?: string | null;
+  LastReplacementDate?: string | null;
+  ApplicationVersion?: string | null;
+  DateApplicationInstalled?: string | null;
+  DateApplicationUpdated?: string | null;
+  LastLoginTime?: string;
+}
+
 
 

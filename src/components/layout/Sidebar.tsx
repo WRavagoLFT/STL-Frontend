@@ -10,20 +10,29 @@ import SidebarLogoSection from "./SidebarLogoSection";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
-  const currentPath = router.asPath;
+  //const currentPath = router.asPath;
   const { setSideBarActiveGameType } = useSideBarStore();
   const userTypeId = useAuthStore((state) => state.userTypeId);
   const [collapsed, setCollapsed] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const [user, setUser] = useState<{firstName: string; lastName: string; userTypeId: number;} | null>(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   const handleLogout = async () => {
-    try { 
+    try {
+      setIsLoggingOut(true);
       await logoutUser();
-      useAuthStore.getState().reset();
-      //useSideBarStore.getState().reset();
+
+      // we need to handle this gracefully (w/o glitch)
+      //const authStore = useAuthStore.getState();
+      //const sidebarStore = useSideBarStore.getState();
+
+      //if (typeof authStore.reset === "function") authStore.reset();
+      //if (typeof sidebarStore.reset === "function") sidebarStore.reset();
+
       router.push("/auth/login");
     } catch (error) {
+      //setIsLoggingOut(false); 
       console.error("Logout failed:", error);
     }
   };
@@ -54,7 +63,7 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const response = await getCurrentUser({});
-      console.log("getcurrentuser response", response);
+      //console.log("getcurrentuser response", response);
 
       if (response && response.data) {
         setUser({
@@ -68,6 +77,7 @@ const Sidebar: React.FC = () => {
     fetchUser();
   }, []);
 
+  //if (isLoggingOut) return <div className="p-4 text-white">Logging out...</div>;
   // console.log("User state:", user);
   if (userTypeId === null) {
     return null; // or loading spinner

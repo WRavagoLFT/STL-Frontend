@@ -4,7 +4,6 @@ export const LoginSectionData = {
   title: "Small Town Lottery",
   logoTitle: "Philippine Charity Sweepstakes Office",
   logoDescription: "PCSO Hindi Umuurong sa Pagtulong",
-  description: "Big wins. Stronger communities.",
   cardTitle: "Welcome!",
   cardDescription: (
     <>
@@ -50,7 +49,6 @@ export const LoginSectionData = {
       </span>
     </>
   ),
-
   PasswordResetTitle: "Password Reset",
   PasswordResetDescription: (
     <>

@@ -16,16 +16,16 @@ const excludedPaths = [
   "/auth/email-verification",
   "/auth/password-reset",
   "/auth/set-password",
+  "/auth/error404",
 ];
 
 const App = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
   const isExcludedPath = excludedPaths.includes(router.pathname);
   const [loading, setLoading] = useState(true);
-  
-  const { userTypeId, setUserTypeId } = useAuthStore.getState(); // set directly (outside React)
+  const { userTypeId, setUserTypeId } = useAuthStore.getState(); 
   //console.log("UserTypeId from store:", userTypeId);
-
+  
   const waitUntilNotRefreshing = async () => {
     while (isRefreshing) {
       await new Promise((r) => requestAnimationFrame(r));
