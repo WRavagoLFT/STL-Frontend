@@ -32,13 +32,13 @@ const roleMap: Record<string, { label: string; textlabel: string; roleId: number
     label: "Small Town Lottery Executive",
     textlabel: "Executives",
     roleId: 5, // just adjusted 06/02
-    permittedUserTypes: [3, 6], // executives, admin
+    permittedUserTypes: [6], // admin ONLY
   },
   managers: {
     label: "Small Town Lottery Manager",
     textlabel: "Managers",
     roleId: 4,
-    permittedUserTypes: [4, 6], // managers, admin
+    permittedUserTypes: [6], // admin ONLY
   },
 };
 

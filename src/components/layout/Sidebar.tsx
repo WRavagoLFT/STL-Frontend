@@ -24,11 +24,11 @@ const Sidebar: React.FC = () => {
       await logoutUser();
 
       // we need to handle this gracefully (w/o glitch)
-      const authStore = useAuthStore.getState();
-      const sidebarStore = useSideBarStore.getState();
+      //const authStore = useAuthStore.getState();
+      //const sidebarStore = useSideBarStore.getState();
 
-      if (typeof authStore.reset === "function") authStore.reset();
-      if (typeof sidebarStore.reset === "function") sidebarStore.reset();
+      //if (typeof authStore.reset === "function") authStore.reset();
+      //if (typeof sidebarStore.reset === "function") sidebarStore.reset();
 
       router.push("/auth/login");
     } catch (error) {
