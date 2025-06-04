@@ -1,4 +1,3 @@
-import axios from "axios";
 import axiosInstance from "../axiosInstance";
 
 const validateRelativeUrl = (url: string) => {
@@ -120,15 +119,6 @@ export const fetchRetailReceipts = async (
     };
   }
 };
-
-interface CompareHistoricalDateParams {
-  chartType: string;
-  query: {
-    first: string;
-    second: string;
-    [key: string]: any; // for dynamic gameCategoryParam
-  };
-}
 
 export const fetchCompareHistoricalDate = async (
   urlPath: string,

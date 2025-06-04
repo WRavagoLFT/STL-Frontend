@@ -8,7 +8,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { SortableTableCell, filterData, sortData } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { buttonStyles } from "~/styles/theme";
-import { User, Operator, SortConfig } from "~/types/types";
+import { User, Operator, SortConfig, Device } from "~/types/types";
 import { getUserStatus } from "~/utils/dashboarddata";
 import dayjs from "dayjs";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
@@ -19,7 +19,7 @@ import { useModalStore } from "~/store/useModalStore";
 import useDetailTableStore from "~/store/useTableStore";
 import { useAuthStore } from "~/store/useAuthStore";
 
-const DetailedTable = <T extends User | Operator>({
+const DetailedTable = <T extends User | Operator | Device>({
   data,
   columns,
   actionsRender,
@@ -351,7 +351,7 @@ const DetailedTable = <T extends User | Operator>({
       </TableContainer>
       <div className="flex justify-end pt-2">
         <CSVExportButtonTable
-          pageType={pageType ?? "unknown"}
+          pageType={pageType}
           columns={columns}
           statsPerRegion={data}
           operatorMap={operatorMap ? Object.values(operatorMap) : []}

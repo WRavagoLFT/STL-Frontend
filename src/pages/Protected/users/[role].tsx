@@ -46,16 +46,22 @@ const RolePage = () => {
   const { query } = useRouter();
   const role = query.role as string;
 
-  const roleKey: "executive" | "manager" | "kabo" | "kubrador" | undefined =
-    role?.includes("manager")
-      ? "manager"
-      : role?.includes("executive")
-      ? "executive"
-      : role?.includes("kabo")
-      ? "kabo"
-      : role?.includes("kubrador")
-      ? "kubrador"
-      : undefined;
+  const roleKey = (() => {
+    switch (role?.toLowerCase()) {
+      case "manager":
+      case "managers":
+        return "manager";
+      case "executive":
+      case "executives":
+        return "executive";
+      case "kubrador":
+        return "kubrador";
+      case "kabo":
+        return "kabo";
+      default:
+        return undefined;
+    }
+  })();
 
   const roleConfig = roleMap[role?.toLowerCase() || ""];
   
