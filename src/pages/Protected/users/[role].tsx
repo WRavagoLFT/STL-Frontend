@@ -70,7 +70,9 @@ const RolePage = () => {
   const { data, setData } = useUserRoleStore();
 
   const { roleId, label, textlabel } = roleConfig;
-  const tableColumns = userTableColumns();
+
+  const tableColumns = userTableColumns(roleId);
+
   const editLogtableColumns = userEditColumns();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -86,14 +88,14 @@ const RolePage = () => {
   const openEditLogModal = (user: User) => {setSelectedUser(user);setShowEditLog(true);};
   const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
 
-  const loadUsers = useCallback(async () => {
+  const loadUsers = useCallback(async () => { 
     try {
       if (!roleConfig?.roleId || !roleKey) {
         console.warn("Missing roleId or roleKey");
         return;
       }
 
-      //console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
+      console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
 
       // Special roles that skip operator mapping
       if (roleKey === "kabo" || roleKey === "kubrador") {
@@ -119,7 +121,7 @@ const RolePage = () => {
         setData([]);
         return;
       }
-      //console.log("PCSO branch map fetched:", pcsoBranchMap);
+      console.log("PCSO branch map fetched:", pcsoBranchMap);
       setPscoBranchMap(pcsoBranchMap);
 
       //console.log("Fetching users with operator & branch maps...");
