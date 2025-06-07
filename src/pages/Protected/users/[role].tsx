@@ -95,7 +95,7 @@ const RolePage = () => {
         return;
       }
 
-      console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
+      //console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
 
       // Special roles that skip operator mapping
       if (roleKey === "kabo" || roleKey === "kubrador") {
@@ -137,8 +137,8 @@ const RolePage = () => {
     loadUsers();
   }, [loadUsers]);
 
-  //console.log("DATA USER", data);
-  //console.log("operatormappp", operatorMap);
+  // console.log("DATA USER", data);
+  // console.log("operatormappp", operatorMap);
 
   if (!roleConfig) {
     return (

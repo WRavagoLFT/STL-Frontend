@@ -24,6 +24,7 @@ const Sidebar: React.FC = () => {
       await logoutUser();
 
       // we need to handle this gracefully (w/o glitch)
+      // this resets the value of the prev user (role)
       //const authStore = useAuthStore.getState();
       //const sidebarStore = useSideBarStore.getState();
 

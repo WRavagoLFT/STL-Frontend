@@ -90,7 +90,7 @@ export const userSchema = z
         .optional()
     ),
 
-    BranchId: z.preprocess(
+    pcsoBranchId: z.preprocess(
       (val) =>
         val === "" ? undefined : typeof val === "string" ? parseInt(val) : val,
       z
@@ -114,7 +114,7 @@ export const userSchema = z
 
     // Require BranchId for userTypeId === 5
     if (data.userTypeId === 5) {
-      if (data.BranchId === undefined) {
+      if (data.pcsoBranchId === undefined) {
         ctx.addIssue({
           path: ["BranchId"],
           code: z.ZodIssueCode.custom,

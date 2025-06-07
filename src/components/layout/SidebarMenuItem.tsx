@@ -51,7 +51,7 @@ const MENU_VISIBILITY: Record<string, number[]> = {
   "Betting Summary": [3, 4, 6],
   "Winning Summary": [3, 4, 6],
   "Draw Summary": [3, 4, 5, 6,],
-  "Device Information": [5, 6],
+  "Device Information": [5],
   "Retail Receipt": [3, 4, 6],
 };
 
@@ -93,6 +93,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
 }) => {
   const router = useRouter();
   const currentPath = router.asPath;
+
   if (!MENU_VISIBILITY[label]?.includes(userTypeId)) return null;
 
   const submenu =

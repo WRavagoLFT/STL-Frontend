@@ -21,8 +21,11 @@ export interface User {
   OperatorId?: number;
   UserTypeId?: number;
   
+  pcsoBranchId?: number;
   BranchId?: number;
   BranchName?: string;
+
+  cityId?: number;
 
   fullName?: string;
   DateOfRegistration?: string;
@@ -143,6 +146,7 @@ export type Branch = {
   BranchId: number;
   BranchName: string;
   // Add more fields if needed
+  //branchId: number;
 };
 
 export interface Device {
