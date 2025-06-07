@@ -1,3 +1,4 @@
+import router from "next/router";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import Card from "~/components/ui/dashboardcards/Cards";
@@ -37,18 +38,10 @@ const DeviceInformationPage = () => {
         // Calculate device summary data
         const summary = {
           TotalDevices: fetchedDevices.length,
-          TotalActiveDevices: fetchedDevices.filter(
-            (d: Device) => d.DeviceStatus === "Active"
-          ).length,
-          TotalDamagedDevices: fetchedDevices.filter(
-            (d: Device) => d.DeviceStatus === "Damaged"
-          ).length,
-          TotalInactiveDevices: fetchedDevices.filter(
-            (d: Device) => d.DeviceStatus === "Inactive"
-          ).length,
-          TotalNewDevices: fetchedDevices.filter(
-            (d: Device) => d.DeviceStatus === "New"
-          ).length,
+          TotalActiveDevices: fetchedDevices.filter((d: Device) => d.DeviceStatus === "Active").length,
+          TotalDamagedDevices: fetchedDevices.filter((d: Device) => d.DeviceStatus === "Damaged").length,
+          TotalInactiveDevices: fetchedDevices.filter((d: Device) => d.DeviceStatus === "Inactive").length,
+          TotalNewDevices: fetchedDevices.filter((d: Device) => d.DeviceStatus === "New").length,
         };
 
         setDeviceInfoData(summary);
@@ -61,6 +54,7 @@ const DeviceInformationPage = () => {
     }
   }, []);
 
+  // for dashboard data
   const calculatedDevices = useMemo(() => {
     if (!deviceInfoData) return [];
 
@@ -93,8 +87,7 @@ const DeviceInformationPage = () => {
             data={devices} 
             columns={tableColumns} 
             pageType="Device Information" 
-            //loading={loading}
-            //error={error}
+            onAddClick={() => router.push("/device-information/device-information-add")}
           />
         </div>
       </div>

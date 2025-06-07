@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import UpdateUserForm from "~/components/user/UpdateUserForm";
 import { User } from "~/types/types";
@@ -10,13 +10,14 @@ type UsersViewPageProps = {
 };
 
 const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
-  console.log("USER IN THE SLUG", user);
+  const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">("kabo");
+
   const backUrl =
     user?.data.UserTypeId === 1
       ? "/users/kubrador"
       : user?.data.UserTypeId === 2
-        ? "/users/kabo"
-        : "/";
+      ? "/users/kabo"
+      : "/";
 
   return (
     <div>
@@ -36,30 +37,68 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
       <div className="grid grid-cols-2 gap-6 items-center my-4">
         {/* Left side */}
         <div className="flex gap-6">
-          <button className="rounded-lg px-12 py-4 text-sm bg-[#F6BA12] hover:bg-[#FFD100] font-bold">
+          <button
+            onClick={() => setActiveTab("kabo")}
+            className={`rounded-lg px-12 py-4 text-sm font-bold ${
+              activeTab === "kabo"
+                ? "bg-[#F6BA12] hover:bg-[#FFD100]"
+                : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
+            }`}
+          >
             Kabo Information
           </button>
-          <button className="rounded-lg px-12 py-4 text-sm text-white bg-[#0038A8] hover:bg-[#004ccf] font-bold">
+          <button
+            onClick={() => setActiveTab("device")}
+            className={`rounded-lg px-12 py-4 text-sm font-bold ${
+              activeTab === "device"
+                ? "bg-[#F6BA12] hover:bg-[#FFD100]"
+                : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
+            }`}
+          >
             Device Information
           </button>
         </div>
 
         {/* Right side - one button */}
         <div className="flex justify-start">
-          <button className="rounded-lg px-12 py-4 text-sm text-white bg-[#0038A8] hover:bg-[#004ccf] font-bold">
+          <button
+            onClick={() => setActiveTab("history")}
+            className={`rounded-lg px-12 py-4 text-sm font-bold ${
+              activeTab === "history"
+                ? "bg-[#F6BA12] hover:bg-[#FFD100]"
+                : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
+            }`}
+          >
             Update History
           </button>
         </div>
       </div>
 
-      <UpdateUserForm
-        operatorMap={{}}
-        onSubmit={(data) => {
-          console.log("Submitted user:", data);
-        }}
-        userTypeId={user?.data?.UserTypeId ?? 0}
-        selectedUser={user?.data}
-      />
+      {/* Conditionally render content based on activeTab */}
+      {activeTab === "kabo" && (
+        <UpdateUserForm
+          operatorMap={{}}
+          onSubmit={(data) => {
+            console.log("Submitted user:", data);
+          }}
+          userTypeId={user?.data?.UserTypeId ?? 0}
+          selectedUser={user?.data}
+        />
+      )}
+
+      {activeTab === "device" && (
+        <div>
+          {/* Future Device Information component */}
+          <p>Device Information Content Here</p>
+        </div>
+      )}
+
+      {activeTab === "history" && (
+        <div>
+          {/* Future Update History component */}
+          <p>Update History Content Here</p>
+        </div>
+      )}
     </div>
   );
 };

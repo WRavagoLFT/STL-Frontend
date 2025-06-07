@@ -70,7 +70,7 @@ export const ChartCard = <T,>({
         </div>
         <div className="h-[270px] w-full min-w-0">
           <BarChart
-            xAxis={[{ scaleType: "band", data: regions }]}
+            xAxis={[{ scaleType: "band", label: "Regions", data: regions }]}
             yAxis={[{ label: "Number of Users" }]}
             series={chartData.map(({ label, color, data }) => ({
               data,

@@ -95,6 +95,10 @@ const nextConfig: NextConfig = {
         destination: '/Protected/device-information',
       },
       {
+        source: '/device-information/device-information-add',
+        destination: '/Protected/device-information/device-information-add',
+      },
+      {
         source: '/users/users-view/:slug',
         destination: '/Protected/users/users-view/:slug',
       },

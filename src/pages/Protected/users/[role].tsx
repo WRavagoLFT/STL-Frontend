@@ -80,45 +80,51 @@ const RolePage = () => {
   })();
 
   const roleConfig = roleMap[role?.toLowerCase() || ""];
+  if (!roleConfig) {
+    return (
+      <div className="container mx-auto px-0 py-1">
+        <h1 className="text-2xl font-semibold mb-4">Role not found</h1>
+      </div>
+    );
+  }
 
+  const { roleId, label, textlabel } = roleConfig;
   const operatorMap = useUserRoleStore((state) => state.operatorMap);
   const setOperatorMap = useUserRoleStore((state) => state.setOperatorMap);
   const { data, setData } = useUserRoleStore();
-
-  const { roleId, label, textlabel } = roleConfig;
-
   const tableColumns = userTableColumns(roleId);
-
   const editLogtableColumns = userEditColumns();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showEditLog, setShowEditLog] = useState(false);
+  const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
+  const [kaboMap, setKaboMap] = React.useState<User | null>(null);
+  const [showUserView, setShowUserView] = useState(false);
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 
   const openCreateModal = () => {
     setIsCreateModalOpen(true);
   };
+
   const closeCreateModal = () => {
     setIsCreateModalOpen(false);
   };
+
   const openUpdateModal = (user: User) => {
     setSelectedUser(user);
     setIsUpdateModalOpen(true);
   };
+
   const closeUpdateModal = () => {
     setSelectedUser(null);
     setIsUpdateModalOpen(false);
   };
-  const [showEditLog, setShowEditLog] = useState(false);
 
   const openEditLogModal = (user: User) => {
     setSelectedUser(user);
     setShowEditLog(true);
   };
-  const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
-  const [kaboMap, setKaboMap] = React.useState<User | null>(null);
-
-  const [showUserView, setShowUserView] = useState(false);
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 
   const loadUsers = useCallback(async () => {
     try {
@@ -137,7 +143,7 @@ const RolePage = () => {
       }
 
       if (roleKey === "kubrador") {
-        const response = await axiosInstance.get('/users/getUsers?userType=2');
+        const response = await axiosInstance.get("/users/getUsers?userType=2");
         setKaboMap(response.data);
 
         await fetchUsersByRole(roleConfig.roleId, null, null, setData);
@@ -186,14 +192,6 @@ const RolePage = () => {
   // console.log("DATA USER", data);
   // console.log("operatormappp", operatorMap);
 
-  if (!roleConfig) {
-    return (
-      <div className="container mx-auto px-0 py-1">
-        <h1 className="text-2xl font-semibold mb-4">Role not found</h1>
-      </div>
-    );
-  }
-
   const handleAddUser = async (data: User): Promise<void> => {
     try {
       console.log("Adding user:", data);
@@ -202,7 +200,7 @@ const RolePage = () => {
 
       if (result.success) {
         console.log("User added successfully:", result.data);
-        //await fetchUsers(roleConfig.roleId, setData);
+        await loadUsers();
 
         Swal.fire({
           icon: "success",
@@ -237,12 +235,11 @@ const RolePage = () => {
   const handleUpdateUser = async (data: User): Promise<void> => {
     try {
       console.log("Updating user:", data);
-
       const result = await updateUser(data);
 
       if (result.success) {
         console.log("User updated successfully:", result.data);
-        //await fetchUsers(roleConfig.roleId, setData);
+        await loadUsers();
 
         Swal.fire({
           icon: "success",
@@ -307,7 +304,7 @@ const RolePage = () => {
           pcsoBranchMap={pcsoBranchMap}
           kaboMap={kaboMap}
         />
-        
+
         {isUpdateModalOpen && (
           <UpdateUserModal
             open={isUpdateModalOpen}

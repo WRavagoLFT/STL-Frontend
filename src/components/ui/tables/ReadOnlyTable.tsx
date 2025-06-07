@@ -188,7 +188,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
       </TableContainer>
       <div className="flex justify-end pt-2">
         <CSVExportButtonTable
-          pageType={pageType ?? "unknown"}
+          pageType={pageType}
           columns={columns}
           statsPerRegion={data}
           operatorMap={operatorMap ? Object.values(operatorMap) : []}

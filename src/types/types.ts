@@ -159,6 +159,8 @@ export interface Device {
   dataPlan: string;
   assignedUser: number;
 
+  issuedBy: string;
+
   DeviceId?: number;
   AssignmentDate?: string;
   IssuedBy?: string;
