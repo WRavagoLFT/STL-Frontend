@@ -94,6 +94,10 @@ const nextConfig: NextConfig = {
         source: '/device-information',
         destination: '/Protected/device-information',
       },
+      {
+        source: '/users/users-view/:slug',
+        destination: '/Protected/users/users-view/:slug',
+      },
       // error page
       {
         source: '/error404',

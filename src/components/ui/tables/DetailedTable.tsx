@@ -51,10 +51,15 @@ const DetailedTable = <T extends User | Operator | Device>({
       .filter((key): key is string => !!key);
 
     const enrichedData = data.map((item) => {
-      const operatorId = item.OperatorId;
+      let operatorId: number | undefined;
+
+      // Narrow the type safely to access OperatorId
+      if ("OperatorId" in item && typeof item.OperatorId === "number") {
+        operatorId = item.OperatorId;
+      }
 
       const operator =
-        typeof operatorId === "number" ? operatorMap?.[operatorId] : undefined;
+        operatorId !== undefined ? operatorMap?.[operatorId] : undefined;
 
       return {
         ...item,
@@ -101,38 +106,50 @@ const DetailedTable = <T extends User | Operator | Device>({
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")}`;
 
-  const handleOpenViewModal = useCallback(() => {
-    if (!selectedRow) {
-      console.warn("[handleOpenViewModal] No selected row available.");
+const handleOpenViewModal = useCallback(() => {
+  if (!selectedRow) {
+    console.warn("[handleOpenViewModal] No selected row available.");
+    return;
+  }
+
+  const { OperatorName, OperatorId, FirstName, LastName, UserId, UserTypeId } = selectedRow;
+
+  if (source === "operators") {
+    if (!OperatorName || !OperatorId) {
+      console.warn("[handleOpenViewModal] Missing OperatorName or OperatorId.");
       return;
     }
 
-    const { OperatorName, OperatorId } = selectedRow;
+    const slug = generateSlug(OperatorName, OperatorId);
+    modalStore.setSelectedData(selectedRow);
+    modalStore.setOperatorId(OperatorId);
+    router.push(`/operators/${slug}`);
+  }
 
-    if (source === "operators") {
-      if (!OperatorName || !OperatorId) {
-        console.warn("[handleOpenViewModal] Missing OperatorName or OperatorId.");
-        return;
-      }
-
-      const slug = generateSlug(OperatorName, OperatorId);
-
-      modalStore.setSelectedData(selectedRow);
-      modalStore.setOperatorId(OperatorId);
-
-      router.push(`/operators/${slug}`);
-    } else {
-      // If you're opening a modal for update instead of view
-      if (onUpdateClick) {
-        onUpdateClick(selectedRow); // e.g., for users // 
-      } else {
-        modalStore.openModal("view", selectedRow); // fallback
-      }
+  // Only open slug for specific UserTypeId (e.g., 4 = Kubrador)
+  else if (source === "users" && UserTypeId === 1 || UserTypeId === 2) {
+    if (!FirstName || !UserId) {
+      console.warn("[handleOpenViewModal] Missing FirstName or UserId.");
+      return;
     }
 
-    setOpenEditLogModal(false);
-  }, [selectedRow, source, router, onUpdateClick, setOpenEditLogModal]);
+    const fullName = `${FirstName} ${LastName || ""}`.trim();
+    const slug = generateSlug(fullName, UserId);
+    modalStore.setSelectedData(selectedRow);
+    router.push(`/users/users-view/${slug}`);
+  }
 
+  // fallback (non-slug behavior)
+  else {
+    if (onUpdateClick) {
+      onUpdateClick(selectedRow);
+    } else {
+      modalStore.openModal("view", selectedRow);
+    }
+  }
+
+  setOpenEditLogModal(false);
+}, [selectedRow, source, router, onUpdateClick, setOpenEditLogModal]);
   
   const handleClose = () => {
     setIsVerifyModalOpen(false); // Close the verification modal

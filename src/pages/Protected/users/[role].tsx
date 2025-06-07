@@ -115,7 +115,6 @@ const RolePage = () => {
   };
   const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
   const [kaboMap, setKaboMap] = React.useState<User | null>(null);
-  //const [kaboMap, setKaboMap] = useState<{ data: User[] }>({ data: [] });
 
   const loadUsers = useCallback(async () => {
     try {
