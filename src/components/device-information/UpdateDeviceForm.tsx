@@ -7,14 +7,17 @@ import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 
-interface AddDeviceFormProps {
+interface UpdateDeviceFormProps {
   title?: string;
   onSubmit: (data: Device) => void;
   initialData?: Partial<Device>;
   onClose?: () => void;
+
+  device?: Device;
+  slug?: string;
 }
 
-const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
+const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
   onSubmit,
   initialData = {},
   onClose,
@@ -41,7 +44,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
     // validationSchema: toFormikValidationSchema(operatorSchema),
     onSubmit: async (values) => {
       const result = await Swal.fire({
-        title: "Add Confirmation",
+        title: "Update Confirmation",
         text: "Did you enter the correct details?",
         icon: "question",
         showCancelButton: true,
@@ -103,7 +106,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
             <Input
               type="text"
               id="issuedBy"
-              placeholder="Select Assignment Dat"
+              placeholder="Select Assignment Date"
               className="mt-1"
               {...formik.getFieldProps("issuedBy")}
               error={
@@ -147,7 +150,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
             <Input
               type="text"
               id="issuedBy"
-              placeholder="Select Assignment Dat"
+              placeholder="Select Assignment Date"
               className="mt-1"
               {...formik.getFieldProps("issuedBy")}
               error={
@@ -168,7 +171,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
             <Input
               type="text"
               id="issuedBy"
-              placeholder="Select Assignment Dat"
+              placeholder="Select Assignment Date"
               className="mt-1"
               {...formik.getFieldProps("issuedBy")}
               error={
@@ -189,7 +192,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
             <Input
               type="text"
               id="issuedBy"
-              placeholder="Select Assignment Dat"
+              placeholder="Select Assignment Date"
               className="mt-1"
               {...formik.getFieldProps("issuedBy")}
               error={
@@ -322,7 +325,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
           <Input
             type="text"
             id="issuedBy"
-            placeholder="Select Assignment Dat"
+            placeholder="Select Assignment Date"
             className="mt-1"
             {...formik.getFieldProps("issuedBy")}
             error={
@@ -417,4 +420,4 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
   );
 };
 
-export default AddDeviceForm;
+export default UpdateDeviceForm;

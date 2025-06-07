@@ -25,6 +25,7 @@ const DeviceInformationPage = () => {
     try {
       setLoading(true);
       const result = await fetchDevices();
+      console.log(result);
 
       if (result.success === false) {
         setError(result.message || "Failed to fetch devices.");
@@ -88,7 +89,12 @@ const DeviceInformationPage = () => {
             columns={tableColumns} 
             pageType="Device Information" 
             onAddClick={() => router.push("/device-information/device-information-add")}
+            source="device"
           />
+
+
+
+          
         </div>
       </div>
     </AccessGuard>

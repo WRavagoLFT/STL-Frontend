@@ -112,8 +112,18 @@ const DetailedTable = <T extends User | Operator | Device>({
       return;
     }
 
-    const { OperatorName, OperatorId, FirstName, LastName, UserId, UserTypeId } = selectedRow;
+    const {
+      OperatorName,
+      OperatorId,
+      FirstName,
+      LastName,
+      UserId,
+      UserTypeId,
+      DeviceName,
+      DeviceId,
+    } = selectedRow;
 
+    // Operators
     if (source === "operators") {
       if (!OperatorName || !OperatorId) {
         console.warn("[handleOpenViewModal] Missing OperatorName or OperatorId.");
@@ -126,8 +136,8 @@ const DetailedTable = <T extends User | Operator | Device>({
       router.push(`/operators/${slug}`);
     }
 
-    // Only open slug for specific UserTypeId (e.g., 4 = Kubrador)
-    else if (source === "users" && UserTypeId === 1 || UserTypeId === 2) {
+    // Users (UserTypeId 1 or 2)
+    else if (source === "users" && (UserTypeId === 1 || UserTypeId === 2)) {
       if (!FirstName || !UserId) {
         console.warn("[handleOpenViewModal] Missing FirstName or UserId.");
         return;
@@ -139,7 +149,21 @@ const DetailedTable = <T extends User | Operator | Device>({
       router.push(`/users/users-view/${slug}`);
     }
 
-    // fallback (non-slug behavior)
+    // Devices
+      else if (source === "device") {
+        const { DeviceId, AssignedUser } = selectedRow;
+
+        if (!AssignedUser || !DeviceId) {
+          console.warn("[handleOpenViewModal] Missing AssignedUser or DeviceId.");
+          return;
+        }
+
+        const slug = generateSlug(AssignedUser, DeviceId);
+        modalStore.setSelectedData(selectedRow);
+        router.push(`/device-information/device-information-view/${slug}`);
+      }
+
+    // Fallback to modal views
     else {
       if (onUpdateClick) {
         onUpdateClick(selectedRow);

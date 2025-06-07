@@ -163,6 +163,7 @@ export interface Device {
 
   DeviceId?: number;
   AssignmentDate?: string;
+  AssignedUser?: string;
   IssuedBy?: string;
   UsageNotes?: string;
   SIMNumber?: string;

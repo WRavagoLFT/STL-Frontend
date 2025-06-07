@@ -9,7 +9,7 @@ const validateRelativeUrl = (url: string) => {
 
 export const fetchDevices = async () => {
     try {
-        const url = validateRelativeUrl("/devices/");
+        const url = validateRelativeUrl("/devices");
         const response = await axiosInstance.get(url)
         return response.data
     }
@@ -19,3 +19,18 @@ export const fetchDevices = async () => {
         return { success: false, message: (error as Error).message, data: [] };
     }
 }
+
+export const fetchDeviceById = async (deviceId: number | string) => {
+  try {
+    const url = validateRelativeUrl(`/devices/?deviceId=${deviceId}`);
+    const response = await axiosInstance.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching device:", (error as Error).message);
+    return {
+      success: false,
+      message: (error as Error).message,
+      data: [],
+    };
+  }
+};
