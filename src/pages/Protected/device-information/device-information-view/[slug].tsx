@@ -3,8 +3,46 @@ import { useRouter } from "next/router";
 import { Device } from "~/types/types";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { fetchDeviceById } from "~/utils/api/device";
-import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import DevicesViewPage from ".";
+
+// Exportable fetch logic
+export const fetchAndSetDevice = async (
+  slug: string,
+  setDevice: (d: Device | null) => void,
+  setLoading: (l: boolean) => void
+) => {
+  if (!slug || typeof slug !== "string") {
+    console.log("Slug is not ready or not a string yet");
+    return;
+  }
+
+  const [idStr] = slug.split("-");
+  const deviceId = Number(idStr);
+
+  if (isNaN(deviceId)) {
+    console.error("Invalid device ID in slug:", slug);
+    setDevice(null);
+    setLoading(false);
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const response = await fetchDeviceById(deviceId);
+
+    if (response?.data && response.data.length > 0) {
+      setDevice(response.data[0]);
+    } else {
+      setDevice(null);
+    }
+  } catch (err) {
+    console.error("Error fetching device by ID:", err);
+    setDevice(null);
+  } finally {
+    setLoading(false);
+  }
+};
 
 const DeviceSlugPage = () => {
   const router = useRouter();
@@ -13,39 +51,9 @@ const DeviceSlugPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!slug || typeof slug !== "string") {
-      console.log("Slug is not ready or not a string yet");
-      return;
+    if (slug && typeof slug === "string") {
+      fetchAndSetDevice(slug, setDevice, setLoading);
     }
-
-    const [idStr] = slug.split("-");
-    const deviceId = Number(idStr);
-
-    if (isNaN(deviceId)) {
-      console.error("Invalid device ID in slug:", slug);
-      setDevice(null);
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-
-    fetchDeviceById(deviceId)
-      .then((response) => {
-        // response is { success, message, data: Device[] }
-        if (response?.data && response.data.length > 0) {
-          setDevice(response.data[0]);  // Set first device in array
-        } else {
-          setDevice(null);
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching device by ID:", err);
-        setDevice(null);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
   }, [slug]);
 
   if (loading) {
@@ -59,6 +67,8 @@ const DeviceSlugPage = () => {
   if (!device) {
     return <p className="text-center text-red-500">No device found.</p>;
   }
+
+  //console.log('DEVICE IN SLUG', device);
 
   return (
     <AccessGuard allowedUserTypes={[5]}>

@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import UpdateUserForm from "~/components/user/UpdateUserForm";
-import { User } from "~/types/types";
+import { Device, User } from "~/types/types";
+import { fetchAndSetDevice } from "../../device-information/device-information-view/[slug]";
 
 type UsersViewPageProps = {
   user?: User;
@@ -11,6 +13,10 @@ type UsersViewPageProps = {
 
 const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">("kabo");
+  //console.log(user);
+
+  const [device, setDevice] = useState<Device | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const backUrl =
     user?.data.UserTypeId === 1
@@ -18,6 +24,18 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
       : user?.data.UserTypeId === 2
       ? "/users/kabo"
       : "/";
+
+  useEffect(() => {
+    console.log("activeTab changed:", activeTab);
+    console.log("user?.data.DeviceId:", user?.data?.DeviceId);
+    
+    const shouldFetch = activeTab === "device" && !!user?.data?.DeviceId;
+    if (shouldFetch) {
+      const slugString = `${user.data.DeviceId}-device`;
+      console.log("fetching device with slug:", slugString);
+      fetchAndSetDevice(slugString, setDevice, setLoading);
+    }
+  }, [activeTab, user?.data?.DeviceId]);
 
   return (
     <div>
@@ -39,7 +57,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
         <div className="flex gap-6">
           <button
             onClick={() => setActiveTab("kabo")}
-            className={`rounded-lg px-12 py-4 text-sm font-bold ${
+            className={`w-full rounded-lg px-12 py-4 text-sm font-bold ${
               activeTab === "kabo"
                 ? "bg-[#F6BA12] hover:bg-[#FFD100]"
                 : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
@@ -49,7 +67,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
           </button>
           <button
             onClick={() => setActiveTab("device")}
-            className={`rounded-lg px-12 py-4 text-sm font-bold ${
+            className={`w-full rounded-lg px-12 py-4 text-sm font-bold ${
               activeTab === "device"
                 ? "bg-[#F6BA12] hover:bg-[#FFD100]"
                 : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
@@ -88,8 +106,15 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
 
       {activeTab === "device" && (
         <div>
-          {/* Future Device Information component */}
-          <p>Device Information Content Here</p>
+          {device ? (
+            <UpdateDeviceForm
+              device={device}
+              deviceId={user?.data?.DeviceId}
+              onSubmit={(data) => {
+                console.log("Submitted user:", data);
+              }}
+            />
+          ) : null}
         </div>
       )}
 

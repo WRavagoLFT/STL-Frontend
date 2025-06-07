@@ -13,6 +13,7 @@ const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
   const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">(
     "kabo"
   );
+  
   return (
     <div>
       <div className="flex items-center space-x-4">
@@ -33,7 +34,7 @@ const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
         <div className="flex gap-6">
           <button
             onClick={() => setActiveTab("kabo")}
-            className={`rounded-lg px-12 py-4 text-sm font-bold ${
+            className={`w-full rounded-lg px-12 py-4 text-sm font-bold ${
               activeTab === "kabo"
                 ? "bg-[#F6BA12] hover:bg-[#FFD100]"
                 : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
@@ -43,7 +44,7 @@ const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
           </button>
           <button
             onClick={() => setActiveTab("history")}
-            className={`rounded-lg px-12 py-4 text-sm font-bold ${
+            className={`w-full rounded-lg px-12 py-4 text-sm font-bold ${
               activeTab === "history"
                 ? "bg-[#F6BA12] hover:bg-[#FFD100]"
                 : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
@@ -57,6 +58,7 @@ const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
       {/* Conditionally render content based on activeTab */}
       {activeTab === "kabo" && (
         <UpdateDeviceForm
+          device={device}
           onSubmit={(data) => {
             console.log("Submitted user:", data);
           }}

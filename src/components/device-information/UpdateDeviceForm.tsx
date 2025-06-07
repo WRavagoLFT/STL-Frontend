@@ -10,19 +10,23 @@ import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 interface UpdateDeviceFormProps {
   title?: string;
   onSubmit: (data: Device) => void;
-  initialData?: Partial<Device>;
   onClose?: () => void;
 
   device?: Device;
+  deviceId?: Device;
   slug?: string;
 }
 
 const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
   onSubmit,
-  initialData = {},
   onClose,
+  device,
+  deviceId,
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>({});
+  console.log('PASSED DEVICE ID', deviceId);
+  console.log('PASSED DEVICE', device);
+
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
@@ -36,10 +40,10 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
 
   const formik = useFormik({
     initialValues: {
-      assignmentDate: initialData.assignmentDate || "",
-      simNumber: initialData.simNumber || "",
-      telcoProvider: initialData.telcoProvider || "",
-      dataPlan: initialData.dataPlan || "",
+      assignmentDate: device?.assignmentDate || "",
+      simNumber: device?.simNumber || "",
+      telcoProvider: device?.telcoProvider || "",
+      DataPlan: device?.DataPlan || "",
     },
     // validationSchema: toFormikValidationSchema(operatorSchema),
     onSubmit: async (values) => {
@@ -246,71 +250,70 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
           </div>
 
           <div>
-            <label htmlFor="dataPlan" className="block text-sm">
+            <label htmlFor="DataPlan" className="block text-sm">
               Data Plan
             </label>
             <Input
-              type="tel"
-              id="dataPlan"
-              placeholder="Enter Data Plan"
+              type="text"
+              id="DataPlan"
               className="mt-1"
-              {...formik.getFieldProps("dataPlan")}
-              error={!!(formik.touched.dataPlan && formik.errors.dataPlan)}
+              {...formik.getFieldProps("DataPlan")}
+              error={!!(formik.touched.DataPlan && formik.errors.DataPlan)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("dataPlan") || "\u00A0"}
+              {getError("DataPlan") || "\u00A0"}
             </p>
           </div>
           <div className="text-md font-bold">Maintenance & Support</div>
 
           <div>
-            <label htmlFor="dataPlan" className="block text-sm">
+            <label htmlFor="sssss" className="block text-sm">
               Device Status
             </label>
             <Input
               type="text"
-              id="dataPlan"
-              placeholder="Enter Data Plan"
+              id="sssss"
+              placeholder="Enter Device Status"
               className="mt-1"
-              {...formik.getFieldProps("dataPlan")}
-              error={!!(formik.touched.dataPlan && formik.errors.dataPlan)}
+              {...formik.getFieldProps("sssss")}
+              error={!!(formik.touched.sssss && formik.errors.sssss)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("dataPlan") || "\u00A0"}
+              {getError("sssss") || "\u00A0"}
             </p>
           </div>
 
           <div>
-            <label htmlFor="dataPlan" className="block text-sm">
+            <label htmlFor="sssss" className="block text-sm">
               Last Maintenance
             </label>
             <Input
-              type="date"
-              id="dataPlan"
-              placeholder="Enter Data Plan"
+              type="sssss"
+              id="sssss"
+              placeholder="Enter sssss"
               className="mt-1"
-              {...formik.getFieldProps("dataPlan")}
-              error={!!(formik.touched.dataPlan && formik.errors.dataPlan)}
+              {...formik.getFieldProps("sssss")}
+              error={!!(formik.touched.sssss && formik.errors.sssss)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("dataPlan") || "\u00A0"}
+              {getError("sssss") || "\u00A0"}
             </p>
           </div>
 
           <div>
-            <label htmlFor="dataPlan" className="block text-sm">
+            <label htmlFor="sssss" className="block text-sm">
               Replacement History
             </label>
             <Input
               type="date"
-              id="dataPlan"
+              id="sssss"
               placeholder="Enter Data Plan"
               className="mt-1"
-              {...formik.getFieldProps("dataPlan")}
-              error={!!(formik.touched.dataPlan && formik.errors.dataPlan)}
+              {...formik.getFieldProps("sssss")}
+              error={!!(formik.touched.sssss && formik.errors.sssss)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("dataPlan") || "\u00A0"}
+              {getError("sssss") || "\u00A0"}
             </p>
           </div>
         </div>
@@ -399,7 +402,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
           type="submit"
           className="w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2 mt-4"
         >
-          Add Device
+          Update Device
         </button>
 
         <ConfirmUserActionModalPage
