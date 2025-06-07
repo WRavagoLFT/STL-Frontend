@@ -18,6 +18,7 @@ interface AddUserFormProps {
   userTypeId: number;
   onClose?: () => void;
   pcsoBranchMap: { data: Branch[] };
+  kaboMap: User | null;
 }
 
 const AddUserForm: React.FC<AddUserFormProps> = ({
@@ -26,8 +27,10 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
   onSubmit,
   userTypeId,
   onClose,
-  pcsoBranchMap
+  pcsoBranchMap,
+  kaboMap
 }) => {
+  
   const operatorOptions: OptionType[] = Object.values(operatorMap).map(
     (operator) => ({
       value:
@@ -47,6 +50,16 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       label: branch.BranchName ?? "Unknown",
     })
   );
+
+  //console.log("kaboMap:", kaboMap);
+  const kaboOptions = Array.isArray(kaboMap?.data)
+    ? kaboMap.data.map(user => ({
+        value: user.UserId !== undefined ? user.UserId.toString() : "0",
+        label: user.FirstName ?? "Unknown",
+      }))
+    : [];
+
+  console.log('KABO OPTIONS', kaboOptions);
 
   const suffixOptions: OptionType[] = [
     { label: "N/A", value: "" },
@@ -90,7 +103,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           : "",
       accountType: 2,
       pcsoBranchId: initialData.pcsoBranchId || "",
-      //cityId: initialData.cityId || "",
+      cityName: initialData.cityName || "",
+      kaboId: initialData.kaboId || "",
     },
     validate,    
     onSubmit: async (values) => {
@@ -114,13 +128,48 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
 
         // Clean up operatorId
         if (
-          !values.operatorId ||              // "", null, undefined
-          isNaN(parseInt(values.operatorId)) || // not a valid number
-          values.userTypeId !== 4            // only required for userTypeId 4
+          !values.operatorId ||
+          isNaN(parseInt(values.operatorId)) ||
+          values.userTypeId !== 4
         ) {
           delete submittedData.operatorId;
         } else {
           submittedData.operatorId = parseInt(values.operatorId);
+        }
+
+        // Clean up pcsoBranchId
+        if (
+          values.userTypeId !== 5 ||
+          values.pcsoBranchId === "" ||
+          values.pcsoBranchId === null ||
+          values.pcsoBranchId === undefined ||
+          isNaN(Number(values.pcsoBranchId))
+        ) {
+          delete submittedData.pcsoBranchId;
+        } else {
+          submittedData.pcsoBranchId = Number(values.pcsoBranchId);
+        }
+
+        // Inside your result.isConfirmed block
+        if (values.kaboId && !isNaN(Number(values.kaboId))) {
+          submittedData.kaboId = Number(values.kaboId);
+        } else {
+          delete submittedData.kaboId;
+        }
+
+        // Cast cityName safely for Kabo
+        if (values.userTypeId === 2) {
+          const cityNameStr = String(values.cityName);
+          submittedData.cityName = cityNameStr
+            ? cityNameStr.split(",").map((s) => s.trim())
+            : [];
+        }
+
+        // Cast cityName safely for Kubrador → rename to barangayName
+        if (values.userTypeId === 1) {
+          const barangayStr = String(values.cityName).trim();
+          submittedData.barangayName = barangayStr ? [barangayStr] : [];
+          delete submittedData.cityName;
         }
 
         setFormData(submittedData);
@@ -282,47 +331,48 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         )}
 
         {/* this still needs adjustments if text input or select input */}
-        {/* FOR KABO ONLY */}
-        {formik.values.userTypeId === 2 || formik.values.userTypeId === 1 && (
+        {/* FOR KABO AND KUBRADOR ONLY */}
+        {[1, 2].includes(formik.values.userTypeId) && (
           <div>
-            <label htmlFor="cityId" className="block text-sm">
+            <label htmlFor="cityName" className="block text-sm">
               Assigned Area / Zone
             </label>
               <Input
-                type="cityId"
-                id="cityId"
-                placeholder="Enter Assigned Area / Zone"
+                type="cityName"
+                id="cityName"
+                placeholder="Enter Barangay, City/Municipality, Province"
                 className="mt-1"
-                {...formik.getFieldProps("cityId")}
+                {...formik.getFieldProps("cityName")}
                 error={!!(formik.touched.email && formik.errors.email)}
               />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("cityId") || "\u00A0"}
+              {getError("cityName") || "\u00A0"}
             </p>
           </div>
         )}
 
+        {/* FOR KUBRADOR ONLY */}
         {formik.values.userTypeId === 1 && (
           <div>
-            <label htmlFor="pcsoBranchId" className="block text-sm mb-1">
+            <label htmlFor="kaboId" className="block text-sm mb-1">
               Assigned Kabo
             </label>
             <CustomSelect
-              name="pcsoBranchId"
-              options={pcsoBranchOptions}
+              name="kaboId"
+              options={kaboOptions}
               value={
-                pcsoBranchOptions.find(
-                  (opt) => opt.value === formik.values.pcsoBranchId?.toString()
+                kaboOptions.find(
+                  (opt) => opt.value === formik.values.kaboId?.toString()
                 ) || null
               }
               onChange={(e) => {
-                formik.setFieldValue("pcsoBranchId", e.target.value);
+                formik.setFieldValue("kaboId", e.target.value);
               }}
               placeholder="Select Assigned Kabo"
-              error={!!getError("pcsoBranchId")}
+              error={!!getError("kaboId")}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("pcsoBranchId") || "\u00A0"}
+              {getError("kaboId") || "\u00A0"}
             </p>
           </div>
         )}

@@ -1,6 +1,7 @@
 import { ZodSchema } from "zod";
 
 export interface User {
+  data?: any;
   userId?: number;
   firstName: string;
   lastName: string;
@@ -25,7 +26,8 @@ export interface User {
   BranchId?: number;
   BranchName?: string;
 
-  cityId?: number;
+  cityName?: number;
+  kaboId?: number;
 
   fullName?: string;
   DateOfRegistration?: string;

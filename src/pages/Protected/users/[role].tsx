@@ -5,7 +5,13 @@ import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { userTableColumns } from "~/config/userTableColumns";
 import useUserRoleStore from "../../../store/useUserStore";
 import CardsPage from "~/components/user/CardsData";
-import { addUser, editLogUser, fetchOperatorMap, fetchUsersByRole, updateUser } from "~/utils/api/users";
+import {
+  addUser,
+  editLogUser,
+  fetchOperatorMap,
+  fetchUsersByRole,
+  updateUser,
+} from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
 import { User } from "~/types/types";
 import UpdateUserModal from "~/components/user/UpdateUser";
@@ -14,8 +20,17 @@ import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { fetchPCSOBranch } from "~/utils/api/location";
+import axiosInstance from "~/utils/axiosInstance";
 
-const roleMap: Record<string, { label: string; textlabel: string; roleId: number, permittedUserTypes: number[] }> = {
+const roleMap: Record<
+  string,
+  {
+    label: string;
+    textlabel: string;
+    roleId: number;
+    permittedUserTypes: number[];
+  }
+> = {
   kubrador: {
     label: "Kubrador",
     textlabel: "Kubrador",
@@ -64,7 +79,7 @@ const RolePage = () => {
   })();
 
   const roleConfig = roleMap[role?.toLowerCase() || ""];
-  
+
   const operatorMap = useUserRoleStore((state) => state.operatorMap);
   const setOperatorMap = useUserRoleStore((state) => state.setOperatorMap);
   const { data, setData } = useUserRoleStore();
@@ -74,21 +89,35 @@ const RolePage = () => {
   const tableColumns = userTableColumns(roleId);
 
   const editLogtableColumns = userEditColumns();
-
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  
-  const openCreateModal = () => {setIsCreateModalOpen(true);};
-  const closeCreateModal = () => {setIsCreateModalOpen(false);};
-  const openUpdateModal = (user: User) => {setSelectedUser(user);setIsUpdateModalOpen(true);};
-  const closeUpdateModal = () => {setSelectedUser(null);setIsUpdateModalOpen(false);};
+
+  const openCreateModal = () => {
+    setIsCreateModalOpen(true);
+  };
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+  };
+  const openUpdateModal = (user: User) => {
+    setSelectedUser(user);
+    setIsUpdateModalOpen(true);
+  };
+  const closeUpdateModal = () => {
+    setSelectedUser(null);
+    setIsUpdateModalOpen(false);
+  };
   const [showEditLog, setShowEditLog] = useState(false);
 
-  const openEditLogModal = (user: User) => {setSelectedUser(user);setShowEditLog(true);};
+  const openEditLogModal = (user: User) => {
+    setSelectedUser(user);
+    setShowEditLog(true);
+  };
   const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
+  const [kaboMap, setKaboMap] = React.useState<User | null>(null);
+  //const [kaboMap, setKaboMap] = useState<{ data: User[] }>({ data: [] });
 
-  const loadUsers = useCallback(async () => { 
+  const loadUsers = useCallback(async () => {
     try {
       if (!roleConfig?.roleId || !roleKey) {
         console.warn("Missing roleId or roleKey");
@@ -98,11 +127,21 @@ const RolePage = () => {
       //console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
 
       // Special roles that skip operator mapping
-      if (roleKey === "kabo" || roleKey === "kubrador") {
+      if (roleKey === "kabo") {
         //console.log(`Skipping operator/branch map for ${roleKey}`);
         await fetchUsersByRole(roleConfig.roleId, null, null, setData);
         return;
       }
+
+      if (roleKey === "kubrador") {
+        const response = await axiosInstance.get('/users/getUsers?userType=2');
+        setKaboMap(response.data);
+
+        await fetchUsersByRole(roleConfig.roleId, null, null, setData);
+        return;
+      }
+
+      //console.log('KABO MAP', kaboMap);
 
       //console.log("Fetching operator map...");
       const operatorMap = await fetchOperatorMap();
@@ -121,12 +160,16 @@ const RolePage = () => {
         setData([]);
         return;
       }
-      console.log("PCSO branch map fetched:", pcsoBranchMap);
+      //console.log("PCSO branch map fetched:", pcsoBranchMap);
       setPscoBranchMap(pcsoBranchMap);
 
       //console.log("Fetching users with operator & branch maps...");
-      await fetchUsersByRole(roleConfig.roleId, operatorMap, pcsoBranchMap, setData);
-
+      await fetchUsersByRole(
+        roleConfig.roleId,
+        operatorMap,
+        pcsoBranchMap,
+        setData
+      );
     } catch (error) {
       console.error("Error in loadUsers:", (error as Error).message);
       setData([]);
@@ -232,16 +275,13 @@ const RolePage = () => {
     <AccessGuard allowedUserTypes={roleConfig.permittedUserTypes}>
       <div className="mx-auto px-0 py-1">
         <h1 className="text-3xl font-bold mb-3">{label}</h1>
-        <CardsPage 
-          dashboardData={data} 
-          roleLabel={label} 
+        <CardsPage
+          dashboardData={data}
+          roleLabel={label}
           textlabel={textlabel}
         />
 
-        <ChartsDataPage 
-          pageType={roleKey} 
-          dashboardData={data}
-        />
+        <ChartsDataPage pageType={roleKey} dashboardData={data} />
 
         <DetailedTable
           data={data}
@@ -262,6 +302,7 @@ const RolePage = () => {
           operatorMap={operatorMap}
           userTypeId={roleId}
           pcsoBranchMap={pcsoBranchMap}
+          kaboMap={kaboMap}
         />
 
         <UpdateUserModal
