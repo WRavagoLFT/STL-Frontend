@@ -29,7 +29,8 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   onClose,
 }) => {
   const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
-
+  console.log('DYNAMMIC USER TYPE ID', userTypeId);
+  
   const sevenDaysAgo = dayjs().subtract(7, "day");
   const [formData, setFormData] = useState<{[key: string]: string | number | string[];}>({});
   const [isDisabled, setIsDisabled] = useState(true);
@@ -256,88 +257,92 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
           </div>
         </div>
       </div>
+      
+      {formik.values.userTypeId !== 1 && formik.values.userTypeId !== 2 && (
+        <>
+          <h2 className="font-bold mt-3 mb-1">Update History</h2>
+          <div className="grid grid-cols-2 gap-6">
+            {/* Column 1 */}
+            <div className="flex flex-col gap-x-6 gap-y-3">
+              <div>
+                <label htmlFor="CreatedBy" className="block text-sm">
+                  Created By
+                </label>
+                <Input
+                  type="text"
+                  name="CreatedBy"
+                  id="CreatedBy"
+                  className="mt-1"
+                  value={selectedUser?.CreatedBy || ""}
+                  disabled
+                />
+              </div>
 
-      <h2 className="font-bold mt-3 mb-1">Update History</h2>
-      <div className="grid grid-cols-2 gap-6">
-        {/* Column 1 */}
-        <div className="flex flex-col gap-x-6 gap-y-3">
-          <div>
-            <label htmlFor="CreatedBy" className="block text-sm">
-              Created By
-            </label>
-            <Input
-              type="text"
-              name="CreatedBy"
-              id="CreatedBy"
-              className="mt-1"
-              value={selectedUser?.CreatedBy || ""}
-              disabled
-            />
-          </div>
-
-          <div>
-            <label htmlFor="DateOfRegistration" className="block text-sm">
-              Creation Date
-            </label>
-            <Input
-              type="date"
-              name="DateOfRegistration"
-              id="DateOfRegistration"
-              className="mt-1"
-              value={
-                selectedUser?.DateOfRegistration
-                  ? selectedUser.DateOfRegistration.slice(0, 10)
-                  : ""
-              }
-              disabled
-            />
-          </div>
-        </div>
-
-        {/* Column 2 */}
-        <div className="flex flex-col gap-x-6 gap-y-3">
-          <div>
-            <label htmlFor="LastUpdatedBy" className="block text-sm">
-              Last Updated By
-            </label>
-            <Input
-              type="text"
-              name="LastUpdatedBy"
-              id="LastUpdatedBy"
-              className="mt-1"
-              value={selectedUser?.LastUpdatedBy || "N/A"}
-              disabled
-            />
-          </div>
-
-          <div>
-            <label htmlFor="LastUpdatedDate" className="block text-sm">
-              Last Updated Date
-            </label>
-            <Input
-              type="date"
-              name="LastUpdatedDate"
-              id="LastUpdatedDate"
-              className="mt-1"
-              value={
-                selectedUser?.LastUpdatedDate
-                  ? selectedUser.LastUpdatedDate.slice(0, 10)
-                  : "N/A"
-              }
-              disabled
-            />
-          </div>
-          {/* View Edit Logs button */}
-          {selectedUser && (
-            <div
-              className="text-sm cursor-pointer hover:none flex justify-end leading-none"
-              onClick={() => onViewEditLogs(selectedUser.UserId as number)}
-            >
-              View Update History
+              <div>
+                <label htmlFor="DateOfRegistration" className="block text-sm">
+                  Creation Date
+                </label>
+                <Input
+                  type="date"
+                  name="DateOfRegistration"
+                  id="DateOfRegistration"
+                  className="mt-1"
+                  value={
+                    selectedUser?.DateOfRegistration
+                      ? selectedUser.DateOfRegistration.slice(0, 10)
+                      : ""
+                  }
+                  disabled
+                />
+              </div>
             </div>
-          )}
-        </div>
-      </div>
+
+            {/* Column 2 */}
+            <div className="flex flex-col gap-x-6 gap-y-3">
+              <div>
+                <label htmlFor="LastUpdatedBy" className="block text-sm">
+                  Last Updated By
+                </label>
+                <Input
+                  type="text"
+                  name="LastUpdatedBy"
+                  id="LastUpdatedBy"
+                  className="mt-1"
+                  value={selectedUser?.LastUpdatedBy || "N/A"}
+                  disabled
+                />
+              </div>
+
+              <div>
+                <label htmlFor="LastUpdatedDate" className="block text-sm">
+                  Last Updated Date
+                </label>
+                <Input
+                  type="date"
+                  name="LastUpdatedDate"
+                  id="LastUpdatedDate"
+                  className="mt-1"
+                  value={
+                    selectedUser?.LastUpdatedDate
+                      ? selectedUser.LastUpdatedDate.slice(0, 10)
+                      : "N/A"
+                  }
+                  disabled
+                />
+              </div>
+              {/* View Edit Logs button */}
+              {selectedUser && (
+                <div
+                  className="text-sm cursor-pointer hover:none flex justify-end leading-none"
+                  onClick={() => onViewEditLogs(selectedUser.UserId as number)}
+                >
+                  View Update History
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Remarks input shown only when editing */}
       {!isDisabled && (

@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { User } from "~/types/types"; // make sure this is the correct type
+import { User } from "~/types/types";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { fetchUserById } from "~/utils/api/users";
-import UpdateUser from "~/components/user/UpdateUser";
 import UsersViewPage from ".";
 
 const UserSlugPage = () => {
   const router = useRouter();
   const { slug } = router.query;
-
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -50,7 +48,6 @@ const UserSlugPage = () => {
   }, [slug]);
 
   if (loading) {
-    console.log("Loading user data...");
     return (
       <div className="flex items-center justify-center h-full py-10">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>

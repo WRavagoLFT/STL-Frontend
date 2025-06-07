@@ -106,50 +106,50 @@ const DetailedTable = <T extends User | Operator | Device>({
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")}`;
 
-const handleOpenViewModal = useCallback(() => {
-  if (!selectedRow) {
-    console.warn("[handleOpenViewModal] No selected row available.");
-    return;
-  }
-
-  const { OperatorName, OperatorId, FirstName, LastName, UserId, UserTypeId } = selectedRow;
-
-  if (source === "operators") {
-    if (!OperatorName || !OperatorId) {
-      console.warn("[handleOpenViewModal] Missing OperatorName or OperatorId.");
+  const handleOpenView = useCallback(() => {
+    if (!selectedRow) {
+      console.warn("[handleOpenViewModal] No selected row available.");
       return;
     }
 
-    const slug = generateSlug(OperatorName, OperatorId);
-    modalStore.setSelectedData(selectedRow);
-    modalStore.setOperatorId(OperatorId);
-    router.push(`/operators/${slug}`);
-  }
+    const { OperatorName, OperatorId, FirstName, LastName, UserId, UserTypeId } = selectedRow;
 
-  // Only open slug for specific UserTypeId (e.g., 4 = Kubrador)
-  else if (source === "users" && UserTypeId === 1 || UserTypeId === 2) {
-    if (!FirstName || !UserId) {
-      console.warn("[handleOpenViewModal] Missing FirstName or UserId.");
-      return;
+    if (source === "operators") {
+      if (!OperatorName || !OperatorId) {
+        console.warn("[handleOpenViewModal] Missing OperatorName or OperatorId.");
+        return;
+      }
+
+      const slug = generateSlug(OperatorName, OperatorId);
+      modalStore.setSelectedData(selectedRow);
+      modalStore.setOperatorId(OperatorId);
+      router.push(`/operators/${slug}`);
     }
 
-    const fullName = `${FirstName} ${LastName || ""}`.trim();
-    const slug = generateSlug(fullName, UserId);
-    modalStore.setSelectedData(selectedRow);
-    router.push(`/users/users-view/${slug}`);
-  }
+    // Only open slug for specific UserTypeId (e.g., 4 = Kubrador)
+    else if (source === "users" && UserTypeId === 1 || UserTypeId === 2) {
+      if (!FirstName || !UserId) {
+        console.warn("[handleOpenViewModal] Missing FirstName or UserId.");
+        return;
+      }
 
-  // fallback (non-slug behavior)
-  else {
-    if (onUpdateClick) {
-      onUpdateClick(selectedRow);
-    } else {
-      modalStore.openModal("view", selectedRow);
+      const fullName = `${FirstName} ${LastName || ""}`.trim();
+      const slug = generateSlug(fullName, UserId);
+      modalStore.setSelectedData(selectedRow);
+      router.push(`/users/users-view/${slug}`);
     }
-  }
 
-  setOpenEditLogModal(false);
-}, [selectedRow, source, router, onUpdateClick, setOpenEditLogModal]);
+    // fallback (non-slug behavior)
+    else {
+      if (onUpdateClick) {
+        onUpdateClick(selectedRow);
+      } else {
+        modalStore.openModal("view", selectedRow);
+      }
+    }
+
+    setOpenEditLogModal(false);
+  }, [selectedRow, source, router, onUpdateClick, setOpenEditLogModal]);
   
   const handleClose = () => {
     setIsVerifyModalOpen(false); // Close the verification modal
@@ -319,7 +319,7 @@ const handleOpenViewModal = useCallback(() => {
                       <MenuItem
                         onClick={() => {
                           resetMenu(); // close menu first
-                          handleOpenViewModal(); // then handle action
+                          handleOpenView(); // then handle action
                         }}
                       >
                         View

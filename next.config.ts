@@ -23,11 +23,11 @@ const nextConfig: NextConfig = {
         destination: '/auth/set-password',
       },
       {
-        source: '/executives',
+        source: '/users/executives',
         destination: '/Protected/users/executive',
       },
       {
-        source: '/managers',
+        source: '/users/managers',
         destination: '/Protected/users/managers',
       },
       {
@@ -83,11 +83,11 @@ const nextConfig: NextConfig = {
         destination: '/Protected/retail-receipt',
       },
       {
-        source: '/kabo',
+        source: '/users/kabo',
         destination: '/Protected/users/kabo',
       },
       {
-        source: '/kubrador',
+        source: '/users/kubrador',
         destination: '/Protected/users/kubrador',
       },
       {

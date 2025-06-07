@@ -71,11 +71,11 @@ const iconMap: Record<string, React.ReactNode> = {
 
 const routeMap: Record<string, string> = {
   Dashboard: "/dashboard",
-  Managers: "/managers",
-  Executive: "/executives",
+  Managers: "/users/managers",
+  Executive: "/users/executives",
   Operators: "/operators",
-  Kabo: "/kabo",
-  Kubrador: "/kubrador",
+  Kabo: "/users/kabo",
+  Kubrador: "/users/kubrador",
   "Betting Summary": "/betting-summary",
   "Winning Summary": "/winning-summary",
   "Draw Summary": "/draw-summary",

@@ -12,8 +12,8 @@ type UpdateUserModalProps = {
   selectedUser?: User | null;
   onViewEditLogs?: (userId: number) => void;
 
-  user: User;
-  slug: string;
+  user?: User;
+  slug?: string;
 };
 
 export default function UpdateUserModal({

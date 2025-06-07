@@ -21,6 +21,7 @@ import { userEditColumns } from "~/config/userEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { fetchPCSOBranch } from "~/utils/api/location";
 import axiosInstance from "~/utils/axiosInstance";
+import UsersViewPage from "./users-view";
 
 const roleMap: Record<
   string,
@@ -115,6 +116,9 @@ const RolePage = () => {
   };
   const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
   const [kaboMap, setKaboMap] = React.useState<User | null>(null);
+
+  const [showUserView, setShowUserView] = useState(false);
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 
   const loadUsers = useCallback(async () => {
     try {
@@ -303,16 +307,26 @@ const RolePage = () => {
           pcsoBranchMap={pcsoBranchMap}
           kaboMap={kaboMap}
         />
+        
+        {isUpdateModalOpen && (
+          <UpdateUserModal
+            open={isUpdateModalOpen}
+            onClose={closeUpdateModal}
+            onSubmit={handleUpdateUser}
+            operatorMap={operatorMap}
+            userTypeId={roleId}
+            selectedUser={selectedUser}
+            onViewEditLogs={() => openEditLogModal(selectedUser!)}
+          />
+        )}
 
-        <UpdateUserModal
-          open={isUpdateModalOpen}
-          onClose={closeUpdateModal}
-          onSubmit={handleUpdateUser}
-          operatorMap={operatorMap}
-          userTypeId={roleId}
-          selectedUser={selectedUser}
-          onViewEditLogs={() => openEditLogModal(selectedUser!)}
-        />
+        {showUserView && selectedSlug && (
+          <UsersViewPage
+            //user={undefined}
+            slug={""}
+            onSubmit={handleUpdateUser}
+          />
+        )}
 
         {selectedUser && showEditLog && (
           <EditModalPage
