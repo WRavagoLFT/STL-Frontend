@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { Device } from "~/types/types";
+import { fetchUsageNotes } from "~/utils/api/device";
+import { handleUpdateDevice } from "../device-information-add/handleUpdateAction";
+import { useLoadDevices } from "..";
+import { useRouter } from "next/router";
 
 type DevicesViewPageProps = {
   slug: string;
@@ -9,11 +13,34 @@ type DevicesViewPageProps = {
   device: Device;
 };
 
+export const getUsageNotes = async (setUsageNotes: (data: any[]) => void) => {
+  const res = await fetchUsageNotes();
+  if (res.success !== false) {
+    setUsageNotes(res.data || res);
+  }
+};
+
 const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
   const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">(
     "kabo"
   );
+
+  const [setDevice] = useState<Device | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const loadData = useLoadDevices(
+    setLoading,
+    () => {}, // define error handler if needed
+    (devices) => {}, // optional: device setter if relevant
+    (deviceInfo) => {} // optional
+  );
   
+  const router = useRouter();
+
+  const onUpdateDeviceSubmit = async (data: Device) => {
+    await handleUpdateDevice(data, loadData, router);
+  };
+
   return (
     <div>
       <div className="flex items-center space-x-4">
@@ -59,9 +86,7 @@ const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
       {activeTab === "kabo" && (
         <UpdateDeviceForm
           device={device}
-          onSubmit={(data) => {
-            console.log("Submitted user:", data);
-          }}
+          onSubmit={onUpdateDeviceSubmit}
         />
       )}
 

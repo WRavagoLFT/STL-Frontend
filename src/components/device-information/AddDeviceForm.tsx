@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Device } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import { useFormik } from "formik";
@@ -6,13 +6,14 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
+import { getUsageNotes } from "~/pages/Protected/device-information/device-information-view";
 
 interface AddDeviceFormProps {
   title?: string;
   onSubmit: (data: Device) => void;
   initialData?: Partial<Device>;
   onClose?: () => void;
-  userid: number;
+  userid?: number;
 }
 
 const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
@@ -22,12 +23,26 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
   userid,
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>({});
+  const [usageNotes, setUsageNotes] = useState<any[]>([]);
+
+  const usageNotesOptions = usageNotes.map((un) => ({
+    value: un.DeviceUsageNotesId.toString(),
+    label: un.DeviceUsageNotes,
+  }));
+
+  //console.log('USAGE NOTES OPTIONS', usageNotesOptions);
+  //console.log('USAGE NOTES IN THE ADD', usageNotes);
+
+  useEffect(() => {
+    getUsageNotes(setUsageNotes);
+  }, []);
+
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
   
-  console.log('USER ID FROM THE KABO/KUBRADOR PAGE', userid);
+  //console.log('USER ID FROM THE KABO/KUBRADOR PAGE', userid);
 
   const handleModalClose = () => {
     // Close the confirm modal and the parent AddUserModal
@@ -41,6 +56,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
       simNumber: initialData.simNumber || "",
       telcoProvider: initialData.telcoProvider || "",
       dataPlan: initialData.dataPlan || "",
+      usageNotes: initialData.usageNotes || "",
 
       issuedBy: initialData.issuedBy || "",
       lastknownGPS: initialData.lastknownGPS || "",
@@ -54,28 +70,50 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
       lastLoginTime: initialData.lastLoginTime || "",
       lastAppUpdated: initialData.lastAppUpdated || "",
     },
-    // validationSchema: toFormikValidationSchema(operatorSchema),
-    onSubmit: async (values) => {
-      const result = await Swal.fire({
-        title: "Add Confirmation",
-        text: "Did you enter the correct details?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Yes, I did",
-        cancelButtonText: "No, let me check",
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      });
 
-      if (result.isConfirmed) {
-        const submittedData: { [key: string]: string | number | string[] } = {
-          ...values,
-        };
-        setFormData(submittedData);
-        openConfirmModal();
+    onSubmit: async (values) => {
+      console.log("Form submitted. Raw values from Formik:", values);
+
+      try {
+        const result = await Swal.fire({
+          title: "Add Confirmation",
+          text: "Did you enter the correct details?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Yes, I did",
+          cancelButtonText: "No, let me check",
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+        });
+
+        if (result.isConfirmed) {
+          console.log("User confirmed submission in SweetAlert dialog.");
+
+          // Remove null, undefined, or empty string values
+          const cleanedData = Object.entries(values).reduce(
+            (acc, [key, value]) => {
+              if (value !== null && value !== undefined && value !== "") {
+                acc[key] = value;
+              }
+              return acc;
+            }, {} as { [key: string]: string | number | string[] }
+          );
+
+          // Add assignedUser separately
+          cleanedData.assignedUser = userid || 0;
+
+          console.log("Data prepared for final submission (cleaned):", cleanedData);
+
+          setFormData(cleanedData);
+          openConfirmModal();
+        } else {
+          console.log("User canceled confirmation dialog. Submission aborted.");
+        }
+      } catch (error) {
+        console.error("Unexpected error during submission confirmation flow:", error);
       }
-      // If canceled, do nothing
     },
+
   });
 
   // Helpers to display errors
@@ -140,12 +178,12 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
             </label>
             <CustomSelect
               name="usageNotes"
-              //options={usageNotesOptions}
-              //   value={
-              //     pcsoBranchOptions.find(
-              //       (opt) => opt.value === formik.values.usageNotes?.toString()
-              //     ) || null
-              //   }
+              options={usageNotesOptions}
+                 value={
+                   usageNotesOptions.find(
+                     (opt) => opt.value === formik.values.usageNotes?.toString()
+                   ) || null
+                 }
               onChange={(e) => {
                 formik.setFieldValue("usageNotes", e.target.value);
               }}

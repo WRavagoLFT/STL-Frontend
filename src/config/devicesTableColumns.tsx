@@ -7,10 +7,10 @@ export const devicesTableColumns = (): Column<Device>[] => [
     key: "IssuedBy",
     label: "Issued By",
     sortable: true,
-    filterable: true,
+    filterable: false,
   },
   {
-    key: "UsageNotes",
+    key: "OperatorName",
     label: "Assigned AAC",
     sortable: true,
     filterable: true,
@@ -26,13 +26,13 @@ export const devicesTableColumns = (): Column<Device>[] => [
     key: "AssignedUser",
     label: "Assigned User",
     sortable: true,
-    filterable: true,
+    filterable: false,
   },
   {
     key: "DeviceId",
     label: "Device Id",
     sortable: true,
-    filterable: true,
+    filterable: false,
   },
   {
     key: "DeviceStatus",

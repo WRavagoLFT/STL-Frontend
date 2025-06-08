@@ -157,7 +157,8 @@ export interface Device {
   telcoProvider: string;
   dataPlan: string;
   assignedUser: number;
-
+  
+  deviceId?: number;
   issuedBy?: string;
   lastknownGPS?: string;
   lastSyncTimestamp?: string;

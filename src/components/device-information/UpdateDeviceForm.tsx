@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Device } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import { useFormik } from "formik";
@@ -7,6 +7,7 @@ import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import dayjs from "dayjs";
+import { getUsageNotes } from "~/pages/Protected/device-information/device-information-view";
 
 interface UpdateDeviceFormProps {
   title?: string;
@@ -16,6 +17,7 @@ interface UpdateDeviceFormProps {
   device?: Device;
   deviceId?: Device;
   slug?: string;
+  userid?: number;
 }
 
 const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
@@ -23,10 +25,24 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
   onClose,
   device,
   deviceId,
+  userid,
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>({});
   //console.log('PASSED DEVICE ID', deviceId);
   //console.log('PASSED DEVICE', device);
+  const [usageNotes, setUsageNotes] = useState<any[]>([]);
+
+  const usageNotesOptions = usageNotes.map((un) => ({
+    value: un.DeviceUsageNotesId.toString(),
+    label: un.DeviceUsageNotes,
+  }));
+
+  useEffect(() => {
+    getUsageNotes(setUsageNotes);
+  }, []);
+
+  console.log('DEVICE', device);
+  //console.log('USAGE NOTES IN THE UPDATE', usageNotes);
 
   const [isDisabled, setIsDisabled] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -50,10 +66,12 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
 
   const formik = useFormik({
     initialValues: {
+      deviceId: device?.DeviceId || "",
       assignmentDate: device?.AssignmentDate || "",
       simNumber: device?.SIMNumber || "",
       telcoProvider: device?.TelcoProvider || "",
       dataPlan: device?.DataPlan || "",
+      usageNotes: device?.UsageNotes || "",
 
       issuedBy: device?.OperatorName || "",
       lastknownGPS: device?.lastknownGPS || "",
@@ -71,25 +89,47 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
     },
     // validationSchema: toFormikValidationSchema(operatorSchema),
     onSubmit: async (values) => {
-      const result = await Swal.fire({
-        title: "Update Confirmation",
-        text: "Did you enter the correct details?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: "Yes, I did",
-        cancelButtonText: "No, let me check",
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-      });
+      console.log("Form submitted. Raw values from Formik:", values);
 
-      if (result.isConfirmed) {
-        const submittedData: { [key: string]: string | number | string[] } = {
-          ...values,
-        };
-        setFormData(submittedData);
-        openConfirmModal();
+      try {
+        const result = await Swal.fire({
+          title: "Update Confirmation",
+          text: "Did you enter the correct details?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Yes, I did",
+          cancelButtonText: "No, let me check",
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+        });
+
+        if (result.isConfirmed) {
+          console.log("User confirmed submission in SweetAlert dialog.");
+
+          // Clean data by removing null, undefined, or empty strings
+          const cleanedData = Object.fromEntries(
+            Object.entries(values).filter(([_, value]) =>
+              value !== null && value !== undefined && value !== ""
+            )
+          );
+
+          if (values.deviceId) {
+            cleanedData.deviceId = values.deviceId;
+          }
+
+          // Add assignedUser if present
+          // cleanedData.assignedUser = userid || 0;
+
+          console.log("Data prepared for final submission (cleaned):", cleanedData);
+
+          setFormData(cleanedData);
+          openConfirmModal();
+        } else {
+          console.log("User canceled confirmation dialog. Submission aborted.");
+        }
+      } catch (error) {
+        console.error("Unexpected error during submission confirmation flow:", error);
       }
-      // If canceled, do nothing
     },
   });
 
@@ -116,14 +156,19 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               className="mt-1"
               value={
                 formik.values.assignmentDate
-                  ? dayjs(formik.values.assignmentDate).format("MM/DD/YYYY hh:mm A")
+                  ? dayjs(formik.values.assignmentDate).format(
+                      "MM/DD/YYYY hh:mm A"
+                    )
                   : ""
               }
               onChange={(e) => {
                 const inputValue = e.target.value;
                 const parsedDate = dayjs(inputValue, "MM/DD/YYYY", true);
                 if (parsedDate.isValid()) {
-                  formik.setFieldValue("assignmentDate", parsedDate.format("YYYY-MM-DD"));
+                  formik.setFieldValue(
+                    "assignmentDate",
+                    parsedDate.format("YYYY-MM-DD")
+                  );
                 } else {
                   formik.setFieldValue("assignmentDate", "");
                 }
@@ -151,11 +196,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               className="mt-1"
               {...formik.getFieldProps("issuedBy")}
               disabled
-              error={
-                !!(
-                  formik.touched.assignmentDate && formik.errors.assignmentDate
-                )
-              }
+              error={!!(formik.touched.issuedBy && formik.errors.issuedBy)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("issuedBy") || "\u00A0"}
@@ -166,21 +207,20 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
             <label htmlFor="usageNotes" className="block text-sm mb-1">
               Usage Notes / Restrictions
             </label>
-            <CustomSelect
-              name="usageNotes"
-              //options={usageNotesOptions}
-              //   value={
-              //     pcsoBranchOptions.find(
-              //       (opt) => opt.value === formik.values.usageNotes?.toString()
-              //     ) || null
-              //   }
-              onChange={(e) => {
-                formik.setFieldValue("usageNotes", e.target.value);
-              }}
-              placeholder="Select Usage Notes"
-              error={!!getError("usageNotes")}
-              disabled
-            />
+              <CustomSelect
+                name="usageNotes"
+                options={usageNotesOptions}
+                value={
+                  usageNotesOptions.find(
+                    (opt) => opt.label === formik.values.usageNotes
+                  ) || null
+                }
+                onChange={(e) => {
+                  formik.setFieldValue("usageNotes", e.target.value);
+                }}
+                disabled
+                error={!!getError("usageNotes")}
+              />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("usageNotes") || "\u00A0"}
             </p>
@@ -218,14 +258,19 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               disabled
               value={
                 formik.values.assignmentDate
-                  ? dayjs(formik.values.assignmentDate).format("MM/DD/YYYY hh:mm A")
+                  ? dayjs(formik.values.assignmentDate).format(
+                      "MM/DD/YYYY hh:mm A"
+                    )
                   : ""
               }
               onChange={(e) => {
                 const inputValue = e.target.value;
                 const parsedDate = dayjs(inputValue, "MM/DD/YYYY", true);
                 if (parsedDate.isValid()) {
-                  formik.setFieldValue("assignmentDate", parsedDate.format("YYYY-MM-DD"));
+                  formik.setFieldValue(
+                    "assignmentDate",
+                    parsedDate.format("YYYY-MM-DD")
+                  );
                 } else {
                   formik.setFieldValue("assignmentDate", "");
                 }
@@ -282,9 +327,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               placeholder="Enter Assigned SIM Number"
               className="mt-1"
               {...formik.getFieldProps("simNumber")}
-              disabled={
-                alwaysDisabledKeys.includes("simNumber") || isDisabled
-              }
+              disabled={alwaysDisabledKeys.includes("simNumber") || isDisabled}
               error={!!(formik.touched.simNumber && formik.errors.simNumber)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
@@ -321,9 +364,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               placeholder="Enter Data Plan"
               className="mt-1"
               {...formik.getFieldProps("dataPlan")}
-              disabled={
-                alwaysDisabledKeys.includes("dataPlan") || isDisabled
-              }
+              disabled={alwaysDisabledKeys.includes("dataPlan") || isDisabled}
               error={!!(formik.touched.dataPlan && formik.errors.dataPlan)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
@@ -341,9 +382,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               id="dataStatus"
               placeholder="-"
               className="mt-1"
-              disabled={
-                alwaysDisabledKeys.includes("dataStatus") || isDisabled
-              }
+              disabled={alwaysDisabledKeys.includes("dataStatus") || isDisabled}
               {...formik.getFieldProps("dataStatus")}
               error={!!(formik.touched.dataStatus && formik.errors.dataStatus)}
             />
@@ -440,14 +479,19 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
             disabled
             value={
               formik.values.assignmentDate
-                ? dayjs(formik.values.assignmentDate).format("MM/DD/YYYY hh:mm A")
+                ? dayjs(formik.values.assignmentDate).format(
+                    "MM/DD/YYYY hh:mm A"
+                  )
                 : ""
             }
             onChange={(e) => {
               const inputValue = e.target.value;
               const parsedDate = dayjs(inputValue, "MM/DD/YYYY", true);
               if (parsedDate.isValid()) {
-                formik.setFieldValue("assignmentDate", parsedDate.format("YYYY-MM-DD"));
+                formik.setFieldValue(
+                  "assignmentDate",
+                  parsedDate.format("YYYY-MM-DD")
+                );
               } else {
                 formik.setFieldValue("assignmentDate", "");
               }
@@ -473,14 +517,19 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
             disabled
             value={
               formik.values.assignmentDate
-                ? dayjs(formik.values.assignmentDate).format("MM/DD/YYYY hh:mm A")
+                ? dayjs(formik.values.assignmentDate).format(
+                    "MM/DD/YYYY hh:mm A"
+                  )
                 : ""
             }
             onChange={(e) => {
               const inputValue = e.target.value;
               const parsedDate = dayjs(inputValue, "MM/DD/YYYY", true);
               if (parsedDate.isValid()) {
-                formik.setFieldValue("assignmentDate", parsedDate.format("YYYY-MM-DD"));
+                formik.setFieldValue(
+                  "assignmentDate",
+                  parsedDate.format("YYYY-MM-DD")
+                );
               } else {
                 formik.setFieldValue("assignmentDate", "");
               }
@@ -505,14 +554,19 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
             disabled
             value={
               formik.values.assignmentDate
-                ? dayjs(formik.values.assignmentDate).format("MM/DD/YYYY hh:mm A")
+                ? dayjs(formik.values.assignmentDate).format(
+                    "MM/DD/YYYY hh:mm A"
+                  )
                 : ""
             }
             onChange={(e) => {
               const inputValue = e.target.value;
               const parsedDate = dayjs(inputValue, "MM/DD/YYYY", true);
               if (parsedDate.isValid()) {
-                formik.setFieldValue("assignmentDate", parsedDate.format("YYYY-MM-DD"));
+                formik.setFieldValue(
+                  "assignmentDate",
+                  parsedDate.format("YYYY-MM-DD")
+                );
               } else {
                 formik.setFieldValue("assignmentDate", "");
               }
@@ -573,20 +627,20 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
           </>
         )}
       </div>
-      
-        <ConfirmUserActionModalPage
-          open={isConfirmModalOpen}
-          onClose={handleModalClose}
-          onConfirm={async () => {
-            try {
-              await onSubmit(formData as unknown as Device); // submit from the parent component handled after password verification
-              closeConfirmModal(); // close confirm modal
-              if (onClose) onClose(); // optionally close the parent modal
-            } catch (err) {
-              console.error("Error during onSubmit:", err);
-            }
-          }}
-        />
+
+      <ConfirmUserActionModalPage
+        open={isConfirmModalOpen}
+        onClose={handleModalClose}
+        onConfirm={async () => {
+          try {
+            await onSubmit(formData as unknown as Device); // submit from the parent component handled after password verification
+            closeConfirmModal(); // close confirm modal
+            if (onClose) onClose(); // optionally close the parent modal
+          } catch (err) {
+            console.error("Error during onSubmit:", err);
+          }
+        }}
+      />
     </form>
   );
 };

@@ -7,25 +7,18 @@ import { devicesTableColumns } from "~/config/devicesTableColumns";
 import { Device } from "~/types/types";
 import { fetchDevices } from "~/utils/api/device";
 
-const DeviceInformationPage = () => {
-  const [devices, setDevices] = useState<Device[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [deviceInfoData, setDeviceInfoData] = useState<{
-    TotalDevices: number;
-    TotalActiveDevices: number;
-    TotalDamagedDevices: number;
-    TotalInactiveDevices: number;
-    TotalNewDevices: number;
-  } | null>(null);
+type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
-  const tableColumns = devicesTableColumns();
-
-  const loadData = useCallback(async () => {
+export const useLoadDevices = (
+  setLoading: SetState<boolean>,
+  setError: SetState<string | null>,
+  setDevices: SetState<Device[]>,
+  setDeviceInfoData: SetState<any>
+) =>
+  useCallback(async () => {
     try {
       setLoading(true);
       const result = await fetchDevices();
-      //console.log(result);
 
       if (result.success === false) {
         setError(result.message || "Failed to fetch devices.");
@@ -36,13 +29,20 @@ const DeviceInformationPage = () => {
 
         setDevices(fetchedDevices);
 
-        // Calculate device summary data
         const summary = {
           TotalDevices: fetchedDevices.length,
-          TotalActiveDevices: fetchedDevices.filter((d: Device) => d.DeviceStatus === "Active").length,
-          TotalDamagedDevices: fetchedDevices.filter((d: Device) => d.DeviceStatus === "Damaged").length,
-          TotalInactiveDevices: fetchedDevices.filter((d: Device) => d.DeviceStatus === "Inactive").length,
-          TotalNewDevices: fetchedDevices.filter((d: Device) => d.DeviceStatus === "New").length,
+          TotalActiveDevices: fetchedDevices.filter(
+            (d: Device) => d.DeviceStatus === "Active"
+          ).length,
+          TotalDamagedDevices: fetchedDevices.filter(
+            (d: Device) => d.DeviceStatus === "Damaged"
+          ).length,
+          TotalInactiveDevices: fetchedDevices.filter(
+            (d: Device) => d.DeviceStatus === "Inactive"
+          ).length,
+          TotalNewDevices: fetchedDevices.filter(
+            (d: Device) => d.DeviceStatus === "New"
+          ).length,
         };
 
         setDeviceInfoData(summary);
@@ -53,7 +53,28 @@ const DeviceInformationPage = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setLoading, setError, setDevices, setDeviceInfoData]);
+
+const DeviceInformationPage = () => {
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [deviceInfoData, setDeviceInfoData] = useState<{
+    TotalDevices: number;
+    TotalActiveDevices: number;
+    TotalDamagedDevices: number;
+    TotalInactiveDevices: number;
+    TotalNewDevices: number;
+  } | null>(null);
+
+  const tableColumns = devicesTableColumns();
+  const loadData = useLoadDevices(
+    setLoading,
+    setError,
+    setDevices,
+    setDeviceInfoData
+  );
 
   // for dashboard data
   const calculatedDevices = useMemo(() => {
@@ -62,11 +83,26 @@ const DeviceInformationPage = () => {
     const formatNumber = (value: number) => value.toLocaleString();
 
     return [
-      { label: "Total Devices", value: formatNumber(deviceInfoData.TotalDevices) },
-      { label: "Total Active Devices", value: formatNumber(deviceInfoData.TotalActiveDevices) },
-      { label: "Total Damaged Devices", value: formatNumber(deviceInfoData.TotalDamagedDevices) },
-      { label: "Total Inactive Devices", value: formatNumber(deviceInfoData.TotalInactiveDevices) },
-      { label: "Total New Devices", value: formatNumber(deviceInfoData.TotalNewDevices) },
+      {
+        label: "Total Devices",
+        value: formatNumber(deviceInfoData.TotalDevices),
+      },
+      {
+        label: "Total Active Devices",
+        value: formatNumber(deviceInfoData.TotalActiveDevices),
+      },
+      {
+        label: "Total Damaged Devices",
+        value: formatNumber(deviceInfoData.TotalDamagedDevices),
+      },
+      {
+        label: "Total Inactive Devices",
+        value: formatNumber(deviceInfoData.TotalInactiveDevices),
+      },
+      {
+        label: "Total New Devices",
+        value: formatNumber(deviceInfoData.TotalNewDevices),
+      },
     ];
   }, [deviceInfoData]);
 
@@ -84,14 +120,15 @@ const DeviceInformationPage = () => {
           ))}
         </div>
         <div>
-          <DetailedTable 
-            data={devices} 
-            columns={tableColumns} 
-            pageType="Device Information" 
-            onAddClick={() => router.push("/device-information/device-information-add")}
+          <DetailedTable
+            data={devices}
+            columns={tableColumns}
+            pageType="Device Information"
+            onAddClick={() =>
+              router.push("/device-information/device-information-add")
+            }
             source="device"
           />
-        
         </div>
       </div>
     </AccessGuard>

@@ -5,6 +5,10 @@ import UpdateUserForm from "~/components/user/UpdateUserForm";
 import { Device, User } from "~/types/types";
 import { fetchAndSetDevice } from "../../device-information/device-information-view/[slug]";
 import AddDeviceForm from "~/components/device-information/AddDeviceForm";
+import { handleAddDevice } from "../../device-information/device-information-add/handleAddAction";
+import { useLoadDevices } from "../../device-information";
+import { useRouter } from "next/router";
+import { handleUpdateDevice } from "../../device-information/device-information-add/handleUpdateAction";
 
 type UsersViewPageProps = {
   user?: User;
@@ -18,6 +22,23 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
 
   const [device, setDevice] = useState<Device | null>(null);
   const [loading, setLoading] = useState(false);
+  
+  const loadData = useLoadDevices(
+    setLoading,
+    () => {}, // define error handler if needed
+    (devices) => {}, // optional: device setter if relevant
+    (deviceInfo) => {} // optional
+  );
+  
+  const router = useRouter();
+
+  const onAddDeviceSubmit = async (data: Device) => {
+    await handleAddDevice(data, loadData, router);
+  };
+
+  const onUpdateDeviceSubmit = async (data: Device) => {
+    await handleUpdateDevice(data, loadData, router);
+  };
 
   const backUrl =
     user?.data.UserTypeId === 1
@@ -27,8 +48,8 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
       : "/";
 
   useEffect(() => {
-    console.log("activeTab changed:", activeTab);
-    console.log("user?.data.DeviceId:", user?.data?.DeviceId);
+    //console.log("activeTab changed:", activeTab);
+    //console.log("user?.data.DeviceId:", user?.data?.DeviceId);
     
     const shouldFetch = activeTab === "device" && !!user?.data?.DeviceId;
     if (shouldFetch) {
@@ -111,13 +132,12 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
           {!device ? (
             <AddDeviceForm
               userid={user?.data?.UserId} // for the user assigned field
-              onSubmit={(data) => {
-                console.log("Submitted user:", data);
-              }}
+              onSubmit={onAddDeviceSubmit} // use wrapper here
             />
           ) : null}
         </div>
       )}
+
       {/* if theres a device id, update */}
       {activeTab === "device" && (
         <div>
@@ -125,9 +145,8 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
             <UpdateDeviceForm
               device={device}
               deviceId={user?.data?.DeviceId}
-              onSubmit={(data) => {
-                console.log("Submitted user:", data);
-              }}
+              userid={user?.data?.UserId}
+              onSubmit={onUpdateDeviceSubmit}
             />
           ) : null}
         </div>
