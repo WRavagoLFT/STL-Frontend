@@ -13,6 +13,9 @@ import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
 import { deviceEditColumns } from "~/config/deviceEditLogTableColumns";
 import { editLogDevice } from "~/utils/api/device";
 import Input from "~/components/ui/inputs/TextInputs";
+import { handleUpdateUser } from "../handleUpdateUserAction";
+import { loadUsers } from "../[role]";
+import useUserStore from "~/store/useUserStore";
 
 type UsersViewPageProps = {
   user?: User;
@@ -21,14 +24,26 @@ type UsersViewPageProps = {
 };
 
 const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">("kabo");
-  //console.log(user);
-  //console.log(slug);
   const [device, setDevice] = useState<Device | null>(null);
   const [loading, setLoading] = useState(false);
   const [editData, setEditData] = useState<any[]>([]);
   const [columns, setColumns] = useState<any[]>([]);
-  
+  const {
+    roleConfig,
+    roleKey,
+    setData,
+    setKaboMap,
+    setOperatorMap,
+    setPscoBranchMap,
+  } = useUserStore();
+
+  //console.log(user);
+  //console.log(slug);
+  //  THIS IS NULL
+  //console.log('ROLE CONFIG', roleConfig); 
+
   const loadData = useLoadDevices(
     setLoading,
     () => {}, // define error handler if needed
@@ -36,8 +51,6 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
     (deviceInfo) => {} // optional
   );
   
-  const router = useRouter();
-
   const onAddDeviceSubmit = async (data: Device) => {
     const redirectPath = `/users/users-view/${slug}`;
     await handleAddDevice(data, loadData, router, redirectPath);
@@ -46,6 +59,13 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const onUpdateDeviceSubmit = async (data: Device) => {
     const redirectPath = `/users/users-view/${slug}`;
     await handleUpdateDevice(data, loadData, router, redirectPath);
+  };
+  
+  const onUserUpdateSubmit = async (formData: User) => {
+    await handleUpdateUser(
+      formData,
+      () => loadUsers(roleConfig, roleKey!, setData, setKaboMap, setOperatorMap, setPscoBranchMap),
+    );
   };
 
   const backUrl =
@@ -149,11 +169,9 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
         <div className="my-6">
           <UpdateUserForm
             operatorMap={{}}
-            onSubmit={(data) => {
-              console.log("Submitted user:", data);
-            }}
             userTypeId={user?.data?.UserTypeId ?? 0}
             selectedUser={user?.data}
+            onSubmit={onUserUpdateSubmit}
           />
         </div>
       )}

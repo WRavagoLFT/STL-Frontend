@@ -241,7 +241,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
                   id="AssignedArea"
                   value={formik.values.AssignedArea || "N/A"}
                   onChange={formik.handleChange}
-                  disabled={alwaysDisabledKeys.includes("AssignedArea") || isDisabled}
+                  disabled
                   //error={!!(formik.touched.AssignedArea && formik.errors.AssignedArea)}
                 />
             </div>

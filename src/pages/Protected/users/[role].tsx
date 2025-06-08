@@ -5,15 +5,9 @@ import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { userTableColumns } from "~/config/userTableColumns";
 import useUserRoleStore from "../../../store/useUserStore";
 import CardsPage from "~/components/user/CardsData";
-import {
-  addUser,
-  editLogUser,
-  fetchOperatorMap,
-  fetchUsersByRole,
-  updateUser,
-} from "~/utils/api/users";
+import { addUser, editLogUser, fetchOperatorMap, fetchUsersByRole } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
-import { User } from "~/types/types";
+import { RoleConfig, User } from "~/types/types";
 import UpdateUserModal from "~/components/user/UpdateUser";
 import Swal from "sweetalert2";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
@@ -21,7 +15,7 @@ import { userEditColumns } from "~/config/userEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { fetchPCSOBranch } from "~/utils/api/location";
 import axiosInstance from "~/utils/axiosInstance";
-import UsersViewPage from "./users-view";
+import { handleUpdateUser } from "./handleUpdateUserAction";
 
 const roleMap: Record<
   string,
@@ -56,6 +50,62 @@ const roleMap: Record<
     roleId: 4,
     permittedUserTypes: [6], // admin ONLY
   },
+};
+
+export const loadUsers = async (
+  roleConfig: RoleConfig | null | undefined,
+  roleKey: string,
+  setData: (users: User[]) => void,
+  setKaboMap: (data: any) => void,
+  setOperatorMap: (data: any) => void,
+  setPscoBranchMap: (data: any) => void
+) => {
+  try {
+    if (!roleConfig?.roleId || !roleKey) {
+      console.warn("Missing roleId or roleKey");
+      return;
+    }
+
+    if (roleKey === "kabo") {
+      await fetchUsersByRole(roleConfig.roleId, null, null, setData);
+      return;
+    }
+
+    if (roleKey === "kubrador") {
+      const response = await axiosInstance.get("/users/getUsers?userType=2");
+      setKaboMap(response.data);
+
+      await fetchUsersByRole(roleConfig.roleId, null, null, setData);
+      return;
+    }
+
+    const operatorMap = await fetchOperatorMap();
+    if (!operatorMap) {
+      console.warn("No operator map found.");
+      setData([]);
+      return;
+    }
+    setOperatorMap(operatorMap);
+
+    const pcsoBranchMap = await fetchPCSOBranch();
+    if (!pcsoBranchMap) {
+      console.warn("No PCSO branch map found.");
+      setData([]);
+      return;
+    }
+    setPscoBranchMap(pcsoBranchMap);
+    //console.log('PCSO BRANCH MAP IN THE USER PAGE', pcsoBranchMap);
+
+    await fetchUsersByRole(
+      roleConfig.roleId,
+      operatorMap,
+      pcsoBranchMap,
+      setData
+    );
+  } catch (error) {
+    console.error("Error in loadUsers:", (error as Error).message);
+    setData([]);
+  }
 };
 
 const RolePage = () => {
@@ -100,8 +150,6 @@ const RolePage = () => {
   const [showEditLog, setShowEditLog] = useState(false);
   const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
   const [kaboMap, setKaboMap] = React.useState<User | null>(null);
-  const [showUserView, setShowUserView] = useState(false);
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
 
   const openCreateModal = () => {
     setIsCreateModalOpen(true);
@@ -126,68 +174,11 @@ const RolePage = () => {
     setShowEditLog(true);
   };
 
-  const loadUsers = useCallback(async () => {
-    try {
-      if (!roleConfig?.roleId || !roleKey) {
-        console.warn("Missing roleId or roleKey");
-        return;
-      }
-
-      //console.log("Loading users for roleKey:", roleKey, "roleId:", roleConfig.roleId);
-
-      // Special roles that skip operator mapping
-      if (roleKey === "kabo") {
-        //console.log(`Skipping operator/branch map for ${roleKey}`);
-        await fetchUsersByRole(roleConfig.roleId, null, null, setData);
-        return;
-      }
-
-      if (roleKey === "kubrador") {
-        const response = await axiosInstance.get("/users/getUsers?userType=2");
-        setKaboMap(response.data);
-
-        await fetchUsersByRole(roleConfig.roleId, null, null, setData);
-        return;
-      }
-
-      //console.log('KABO MAP', kaboMap);
-
-      //console.log("Fetching operator map...");
-      const operatorMap = await fetchOperatorMap();
-      if (!operatorMap) {
-        console.warn("No operator map found.");
-        setData([]);
-        return;
-      }
-      //console.log("Operator map fetched:", operatorMap);
-      setOperatorMap(operatorMap);
-
-      //console.log("Fetching PCSO branch map...");
-      const pcsoBranchMap = await fetchPCSOBranch();
-      if (!pcsoBranchMap) {
-        console.warn("No PCSO branch map found.");
-        setData([]);
-        return;
-      }
-      //console.log("PCSO branch map fetched:", pcsoBranchMap);
-      setPscoBranchMap(pcsoBranchMap);
-
-      //console.log("Fetching users with operator & branch maps...");
-      await fetchUsersByRole(
-        roleConfig.roleId,
-        operatorMap,
-        pcsoBranchMap,
-        setData
-      );
-    } catch (error) {
-      console.error("Error in loadUsers:", (error as Error).message);
-      setData([]);
-    }
-  }, [roleConfig?.roleId, roleKey, setData]);
-
   useEffect(() => {
-    loadUsers();
-  }, [loadUsers]);
+    if (!roleKey) return; // or if (roleKey === undefined) return;
+
+    loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap);
+  }, [roleConfig, roleKey]);
 
   // console.log("DATA USER", data);
   // console.log("operatormappp", operatorMap);
@@ -195,12 +186,14 @@ const RolePage = () => {
   const handleAddUser = async (data: User): Promise<void> => {
     try {
       console.log("Adding user:", data);
-
       const result = await addUser(data);
 
       if (result.success) {
         console.log("User added successfully:", result.data);
-        await loadUsers();
+
+        if (roleKey) {
+          await loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap);
+        }
 
         Swal.fire({
           icon: "success",
@@ -231,44 +224,13 @@ const RolePage = () => {
       });
     }
   };
-
-  const handleUpdateUser = async (data: User): Promise<void> => {
-    try {
-      console.log("Updating user:", data);
-      const result = await updateUser(data);
-
-      if (result.success) {
-        console.log("User updated successfully:", result.data);
-        await loadUsers();
-
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: "User updated successfully.",
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      } else {
-        console.error("Failed to add user:", result.message);
-        Swal.fire({
-          icon: "error",
-          title: "Update Failed",
-          //text: result.message || "Something went wrong while adding the user.",
-        });
-      }
-
-      setIsCreateModalOpen(false);
-    } catch (error) {
-      console.error(
-        "Unexpected error in handleUpdateUser:",
-        (error as Error).message
-      );
-      Swal.fire({
-        icon: "error",
-        title: "Unexpected Error",
-        text: (error as Error).message || "An unexpected error occurred.",
-      });
-    }
+  
+  const onUserUpdateSubmit = async (formData: User) => {
+    await handleUpdateUser(
+      formData,
+      () => loadUsers(roleConfig, roleKey!, setData, setKaboMap, setOperatorMap, setPscoBranchMap),
+      () => setIsCreateModalOpen(false)
+    );
   };
 
   return (
@@ -309,19 +271,11 @@ const RolePage = () => {
           <UpdateUserModal
             open={isUpdateModalOpen}
             onClose={closeUpdateModal}
-            onSubmit={handleUpdateUser}
+            onSubmit={onUserUpdateSubmit}
             operatorMap={operatorMap}
             userTypeId={roleId}
             selectedUser={selectedUser}
             onViewEditLogs={() => openEditLogModal(selectedUser!)}
-          />
-        )}
-
-        {showUserView && selectedSlug && (
-          <UsersViewPage
-            //user={undefined}
-            slug={""}
-            onSubmit={handleUpdateUser}
           />
         )}
 

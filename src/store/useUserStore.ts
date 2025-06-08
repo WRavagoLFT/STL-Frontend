@@ -1,76 +1,104 @@
 import { create } from 'zustand';
-import { Column } from '~/types/interfaces';  // Ensure the `Column` type is correctly defined.
-import { User, Operator } from '~/types/types';
+import { Column } from '~/types/interfaces';
+import { User, Operator, RoleConfig } from '~/types/types';
+
+interface Field {
+  value: any;
+  name: string;
+  label: string;
+  type: string;
+  placeholder: string;
+}
 
 interface UserRoleStore {
   roleId: number | null;
   setRoleId: (roleId: number | null) => void;
+
+  data: User[];
   setData: (data: User[] | ((prev: User[]) => User[])) => void;
+
   columns: Column<User>[];
   setColumns: (columns: Column<User>[]) => void;
+
+  userSummaryColumns: Column<User>[];
+  setUserSummaryColumns: (columns: Column<User>[]) => void;
+
+  editLogColumns: Column<User>[];
   setEditLogColumns: (columns: Column<User>[]) => void;
-  setOperatorMap: (operatorMap: { [key: number]: Operator }) => void;
-  setModalOpen: (modalOpen: boolean) => void;
-  setFieldName: (fieldName: string) => void;
 
-  // State variables
-  data: User[];
-  userSummaryColumns: Column<User>[]; // Separate state for UserSummary columns
-  editLogColumns: Column<User>[]; // Separate state for EditLog columns
   operatorMap: { [key: number]: Operator };
-  modalOpen: boolean;
-  fieldName: string;
-  fields: {
-    value: any;
-    name: string;
-    label: string;
-    type: string;
-    placeholder: string;
-  
-  }[];
+  setOperatorMap: (operatorMap: { [key: number]: Operator }) => void;
 
-  // Modal-related state and setter
+  kaboMap: { [key: number]: any };
+  setKaboMap: (kaboMap: { [key: number]: any }) => void;
+
+  pscoBranchMap: { [key: number]: any };
+  setPscoBranchMap: (pscoBranchMap: { [key: number]: any }) => void;
+
+  modalOpen: boolean;
+  setModalOpen: (modalOpen: boolean) => void;
+
   modalData: any[];
   setModalData: (data: any[]) => void;
 
-  // Fields state and setter
-  setFields: (fields: { name: string; label: string; type: string; placeholder: string; value: string }[]) => void;
+  fieldName: string;
+  setFieldName: (fieldName: string) => void;
+
+  fields: Field[];
+  setFields: (fields: Field[]) => void;
+
+  roleConfig: RoleConfig | null;
+  setRoleConfig: (roleConfig: RoleConfig | null) => void;
+
+  roleKey: string | null;
+  setRoleKey: (roleKey: string | null) => void;
 }
 
-const useUserRoleStore = create<UserRoleStore>((set) => ({
+const useUserRoleStore = create<UserRoleStore>((set, get) => ({
   roleId: null,
   data: [],
-  userSummaryColumns: [], // Initialize separate columns for UserSummary
-  editLogColumns: [], // Initialize separate columns for EditLog
-  modalOpen: false,
-  operatorMap: {},
-  fieldName: "",
-  fields: [],
-  modalData: [],
   columns: [],
+  userSummaryColumns: [],
+  editLogColumns: [],
+  operatorMap: {},
+  kaboMap: {},
+  pscoBranchMap: {},
+  modalOpen: false,
+  modalData: [],
+  fieldName: '',
+  fields: [],
+  roleConfig: null,
+  roleKey: null,
 
-  // Setters for columns
-  setModalData: (data) => set({ modalData: data }),
   setRoleId: (roleId) => set({ roleId }),
-  setData: (dataOrUpdater: User[] | ((prev: User[]) => User[])) =>
-  set((state) => ({
-    data: typeof dataOrUpdater === 'function'
-      ? dataOrUpdater(state.data)
-      : dataOrUpdater,
-  })),
-  setEditLogColumns: (columns: Column<User>[]) => set({ editLogColumns: columns }),
+
+  setData: (dataOrUpdater) =>
+    set((state) => ({
+      data: typeof dataOrUpdater === 'function' ? dataOrUpdater(state.data) : dataOrUpdater,
+    })),
+
   setColumns: (columns) => set({ columns }),
-  setModalOpen: (modalOpen) => set({ modalOpen }),
+  setUserSummaryColumns: (columns) => set({ userSummaryColumns: columns }),
+  setEditLogColumns: (columns) => set({ editLogColumns: columns }),
+
   setOperatorMap: (operatorMap) => set({ operatorMap }),
+  setKaboMap: (kaboMap) => set({ kaboMap }),
+  setPscoBranchMap: (pscoBranchMap) => set({ pscoBranchMap }),
+
+  setModalOpen: (modalOpen) => set({ modalOpen }),
+  setModalData: (modalData) => set({ modalData }),
   setFieldName: (fieldName) => set({ fieldName }),
-  setFields: (fields) => {
+
+  setFields: (fields) =>
     set({
-      fields: fields.map(field => ({
+      fields: fields.map((field) => ({
         ...field,
-        value: field.value || '',
-      }))
-    });
-  }
+        value: field.value ?? '',
+      })),
+    }),
+
+  setRoleConfig: (roleConfig) => set({ roleConfig }),
+  setRoleKey: (roleKey) => set({ roleKey }),
 }));
 
 export default useUserRoleStore;

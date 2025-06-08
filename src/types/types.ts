@@ -194,5 +194,12 @@ export interface Device {
   LastLoginTime?: string;
 }
 
+export type RoleConfig = {
+  label: string;
+  textlabel: string;
+  roleId: number;
+  permittedUserTypes: number[];
+};
+
 
 

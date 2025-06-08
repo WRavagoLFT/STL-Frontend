@@ -39,6 +39,7 @@ export const ChartsDataPage = <T extends RegionUser & { OperatorName?: string }>
   const [statsPerRegion, setStatsPerRegion] = useState<any[]>([]);  // Declare statsPerRegion state
 
   useEffect(() => {
+  console.log("Dashboard data updated:", dashboardData);
     if (!dashboardData || dashboardData.length === 0) return;
 
     const stats = regions.map((regionShort) => {
@@ -123,6 +124,9 @@ export const ChartsDataPage = <T extends RegionUser & { OperatorName?: string }>
         data: stats.map((r) => r.new),
       },
     ];
+
+  console.log("Computed stats per region:", stats);
+  console.log("Chart data set:", newChartData);
 
     setStatsPerRegion(stats);
     setLocalChartData(newChartData);
