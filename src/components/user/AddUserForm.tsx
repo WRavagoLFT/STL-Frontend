@@ -59,7 +59,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       }))
     : [];
 
-  console.log('KABO OPTIONS', kaboOptions);
+  //console.log('KABO OPTIONS', kaboOptions);
 
   const suffixOptions: OptionType[] = [
     { label: "N/A", value: "" },

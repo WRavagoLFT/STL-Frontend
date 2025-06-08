@@ -147,7 +147,6 @@ export interface NetIncomePageProps {
 export type Branch = {
   BranchId: number;
   BranchName: string;
-  // Add more fields if needed
   //branchId: number;
 };
 
@@ -159,8 +158,20 @@ export interface Device {
   dataPlan: string;
   assignedUser: number;
 
-  issuedBy: string;
-
+  issuedBy?: string;
+  lastknownGPS?: string;
+  lastSyncTimestamp?: string;
+  unauthorizedLocationAlerts?: string;
+  dataStatus?: string;
+  lastMaintenance?: string;
+  replacementHistory?: string;
+  applicationVersion?: string;
+  dateInstalled?: string;
+  lastLoginTime?: string;
+  lastAppUpdated?: string;
+  OperatorName?: string;
+  remarks?: string;
+  
   DeviceId?: number;
   AssignmentDate?: string;
   AssignedUser?: string;

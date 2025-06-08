@@ -12,18 +12,22 @@ interface AddDeviceFormProps {
   onSubmit: (data: Device) => void;
   initialData?: Partial<Device>;
   onClose?: () => void;
+  userid: number;
 }
 
 const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
   onSubmit,
   initialData = {},
   onClose,
+  userid,
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
+  
+  console.log('USER ID FROM THE KABO/KUBRADOR PAGE', userid);
 
   const handleModalClose = () => {
     // Close the confirm modal and the parent AddUserModal
@@ -37,6 +41,18 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
       simNumber: initialData.simNumber || "",
       telcoProvider: initialData.telcoProvider || "",
       dataPlan: initialData.dataPlan || "",
+
+      issuedBy: initialData.issuedBy || "",
+      lastknownGPS: initialData.lastknownGPS || "",
+      lastSyncTimestamp: initialData.lastSyncTimestamp || "",
+      unauthorizedLocationAlerts: initialData.unauthorizedLocationAlerts || "",
+      dataStatus: initialData.dataStatus || "",
+      lastMaintenance: initialData.lastMaintenance || "",
+      replacementHistory: initialData.replacementHistory || "",
+      applicationVersion: initialData.applicationVersion || "",
+      dateInstalled: initialData.dateInstalled || "",
+      lastLoginTime: initialData.lastLoginTime || "",
+      lastAppUpdated: initialData.lastAppUpdated || "",
     },
     // validationSchema: toFormikValidationSchema(operatorSchema),
     onSubmit: async (values) => {
@@ -103,9 +119,10 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
             <Input
               type="text"
               id="issuedBy"
-              placeholder="Select Assignment Dat"
+              placeholder="-"
               className="mt-1"
               {...formik.getFieldProps("issuedBy")}
+              disabled
               error={
                 !!(
                   formik.touched.assignmentDate && formik.errors.assignmentDate
@@ -141,65 +158,68 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
           </div>
           <div className="text-md font-bold">Live Tracking</div>
           <div>
-            <label htmlFor="issuedBy" className="block text-sm">
+            <label htmlFor="lastknownGPS" className="block text-sm">
               Last Known GPS Coordinates
             </label>
             <Input
               type="text"
-              id="issuedBy"
-              placeholder="Select Assignment Dat"
+              id="lastknownGPS"
+              placeholder="-"
               className="mt-1"
-              {...formik.getFieldProps("issuedBy")}
+              disabled
+              {...formik.getFieldProps("lastknownGPS")}
               error={
                 !!(
-                  formik.touched.assignmentDate && formik.errors.assignmentDate
+                  formik.touched.lastknownGPS && formik.errors.lastknownGPS
                 )
               }
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("issuedBy") || "\u00A0"}
+              {getError("lastknownGPS") || "\u00A0"}
             </p>
           </div>
 
           <div>
-            <label htmlFor="issuedBy" className="block text-sm">
+            <label htmlFor="lastSyncTimestamp" className="block text-sm">
               Last Sync Timestamp
             </label>
             <Input
               type="text"
-              id="issuedBy"
-              placeholder="Select Assignment Dat"
+              id="lastSyncTimestamp"
+              placeholder="-"
               className="mt-1"
-              {...formik.getFieldProps("issuedBy")}
+              disabled
+              {...formik.getFieldProps("lastSyncTimestamp")}
               error={
                 !!(
-                  formik.touched.assignmentDate && formik.errors.assignmentDate
+                  formik.touched.lastSyncTimestamp && formik.errors.lastSyncTimestamp
                 )
               }
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("issuedBy") || "\u00A0"}
+              {getError("lastSyncTimestamp") || "\u00A0"}
             </p>
           </div>
 
           <div>
-            <label htmlFor="issuedBy" className="block text-sm">
+            <label htmlFor="unauthorizedLocationAlerts" className="block text-sm">
               Unauthorized Location Alerts
             </label>
             <Input
               type="text"
-              id="issuedBy"
-              placeholder="Select Assignment Dat"
+              id="unauthorizedLocationAlerts"
+              placeholder="-"
               className="mt-1"
-              {...formik.getFieldProps("issuedBy")}
+              disabled
+              {...formik.getFieldProps("unauthorizedLocationAlerts")}
               error={
                 !!(
-                  formik.touched.assignmentDate && formik.errors.assignmentDate
+                  formik.touched.unauthorizedLocationAlerts && formik.errors.unauthorizedLocationAlerts
                 )
               }
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("issuedBy") || "\u00A0"}
+              {getError("unauthorizedLocationAlerts") || "\u00A0"}
             </p>
           </div>
         </div>
@@ -261,53 +281,56 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
           <div className="text-md font-bold">Maintenance & Support</div>
 
           <div>
-            <label htmlFor="dataPlan" className="block text-sm">
+            <label htmlFor="dataStatus" className="block text-sm">
               Device Status
             </label>
             <Input
               type="text"
-              id="dataPlan"
-              placeholder="Enter Data Plan"
+              id="dataStatus"
+              placeholder="-"
               className="mt-1"
-              {...formik.getFieldProps("dataPlan")}
-              error={!!(formik.touched.dataPlan && formik.errors.dataPlan)}
+              disabled
+              {...formik.getFieldProps("dataStatus")}
+              error={!!(formik.touched.dataStatus && formik.errors.dataStatus)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("dataPlan") || "\u00A0"}
+              {getError("dataStatus") || "\u00A0"}
             </p>
           </div>
 
           <div>
-            <label htmlFor="dataPlan" className="block text-sm">
+            <label htmlFor="lastMaintenance" className="block text-sm">
               Last Maintenance
             </label>
             <Input
               type="date"
-              id="dataPlan"
-              placeholder="Enter Data Plan"
+              id="lastMaintenance"
+              placeholder="-"
               className="mt-1"
-              {...formik.getFieldProps("dataPlan")}
-              error={!!(formik.touched.dataPlan && formik.errors.dataPlan)}
+              disabled
+              {...formik.getFieldProps("lastMaintenance")}
+              error={!!(formik.touched.lastMaintenance && formik.errors.lastMaintenance)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("dataPlan") || "\u00A0"}
+              {getError("lastMaintenance") || "\u00A0"}
             </p>
           </div>
 
           <div>
-            <label htmlFor="dataPlan" className="block text-sm">
+            <label htmlFor="replacementHistory" className="block text-sm">
               Replacement History
             </label>
             <Input
               type="date"
-              id="dataPlan"
-              placeholder="Enter Data Plan"
+              id="replacementHistory"
+              placeholder="-"
               className="mt-1"
-              {...formik.getFieldProps("dataPlan")}
-              error={!!(formik.touched.dataPlan && formik.errors.dataPlan)}
+              disabled
+              {...formik.getFieldProps("replacementHistory")}
+              error={!!(formik.touched.replacementHistory && formik.errors.replacementHistory)}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("dataPlan") || "\u00A0"}
+              {getError("replacementHistory") || "\u00A0"}
             </p>
           </div>
         </div>
@@ -316,76 +339,80 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
       <div className="text-md font-bold mb-2 my-2">Application Information</div>
       <div className="grid grid-cols-2 gap-x-6 gap-y-2">
         <div>
-          <label htmlFor="issuedBy" className="block text-sm">
+          <label htmlFor="applicationVersion" className="block text-sm">
             Application Version
           </label>
           <Input
             type="text"
-            id="issuedBy"
-            placeholder="Select Assignment Dat"
+            id="applicationVersion"
+            placeholder="-"
             className="mt-1"
-            {...formik.getFieldProps("issuedBy")}
+            disabled
+            {...formik.getFieldProps("applicationVersion")}
             error={
-              !!(formik.touched.assignmentDate && formik.errors.assignmentDate)
+              !!(formik.touched.applicationVersion && formik.errors.applicationVersion)
             }
           />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-            {getError("issuedBy") || "\u00A0"}
+            {getError("applicationVersion") || "\u00A0"}
           </p>
         </div>
         <div>
-          <label htmlFor="assignmentDate" className="block text-sm">
+          <label htmlFor="lastLoginTime" className="block text-sm">
             Last Application Login Time
           </label>
           <Input
             type="text"
-            id="assignmentDate"
-            placeholder="Select Assignment Date"
+            id="lastLoginTime"
+            placeholder="-"
             className="mt-1"
-            {...formik.getFieldProps("assignmentDate")}
+            disabled
+            {...formik.getFieldProps("lastLoginTime")}
             error={
-              !!(formik.touched.assignmentDate && formik.errors.assignmentDate)
+              !!(formik.touched.lastLoginTime && formik.errors.lastLoginTime)
             }
           />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-            {getError("assignmentDate") || "\u00A0"}
+            {getError("lastLoginTime") || "\u00A0"}
           </p>
         </div>
 
         <div>
-          <label htmlFor="assignmentDate" className="block text-sm">
+          <label htmlFor="dateInstalled" className="block text-sm">
             Date Application Installed
           </label>
           <Input
             type="date"
-            id="assignmentDate"
-            placeholder="Select Assignment Date"
+            id="dateInstalled"
+            placeholder="-"
             className="mt-1"
-            {...formik.getFieldProps("assignmentDate")}
+            disabled
+            {...formik.getFieldProps("dateInstalled")}
             error={
-              !!(formik.touched.assignmentDate && formik.errors.assignmentDate)
+              !!(formik.touched.dateInstalled && formik.errors.dateInstalled)
             }
           />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-            {getError("assignmentDate") || "\u00A0"}
+            {getError("dateInstalled") || "\u00A0"}
           </p>
         </div>
         <div>
-          <label htmlFor="assignmentDate" className="block text-sm">
+          <label htmlFor="lastAppUpdated" className="block text-sm">
             Last Application Updated
           </label>
           <Input
             type="date"
-            id="assignmentDate"
-            placeholder="Select Assignment Date"
+            id="lastAppUpdated"
+            placeholder="-"
             className="mt-1"
-            {...formik.getFieldProps("assignmentDate")}
+            disabled
+            {...formik.getFieldProps("lastAppUpdated")}
             error={
-              !!(formik.touched.assignmentDate && formik.errors.assignmentDate)
+              !!(formik.touched.lastAppUpdated && formik.errors.lastAppUpdated)
             }
           />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-            {getError("assignmentDate") || "\u00A0"}
+            {getError("lastAppUpdated") || "\u00A0"}
           </p>
         </div>
       </div>

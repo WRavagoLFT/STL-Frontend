@@ -4,6 +4,7 @@ import BackIconButton from "~/components/ui/icons/BackButton";
 import UpdateUserForm from "~/components/user/UpdateUserForm";
 import { Device, User } from "~/types/types";
 import { fetchAndSetDevice } from "../../device-information/device-information-view/[slug]";
+import AddDeviceForm from "~/components/device-information/AddDeviceForm";
 
 type UsersViewPageProps = {
   user?: User;
@@ -13,7 +14,7 @@ type UsersViewPageProps = {
 
 const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">("kabo");
-  //console.log(user);
+  // console.log(user);
 
   const [device, setDevice] = useState<Device | null>(null);
   const [loading, setLoading] = useState(false);
@@ -104,6 +105,20 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
         />
       )}
 
+      {/* if no device id, add */}
+      {activeTab === "device" && (
+        <div>
+          {!device ? (
+            <AddDeviceForm
+              userid={user?.data?.UserId} // for the user assigned field
+              onSubmit={(data) => {
+                console.log("Submitted user:", data);
+              }}
+            />
+          ) : null}
+        </div>
+      )}
+      {/* if theres a device id, update */}
       {activeTab === "device" && (
         <div>
           {device ? (

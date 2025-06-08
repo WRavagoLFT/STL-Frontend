@@ -1,7 +1,6 @@
 import router from "next/router";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import Card from "~/components/ui/dashboardcards/Cards";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import { devicesTableColumns } from "~/config/devicesTableColumns";
@@ -26,7 +25,7 @@ const DeviceInformationPage = () => {
     try {
       setLoading(true);
       const result = await fetchDevices();
-      console.log(result);
+      //console.log(result);
 
       if (result.success === false) {
         setError(result.message || "Failed to fetch devices.");
