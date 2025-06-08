@@ -12,7 +12,7 @@ const UserSlugPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("UserSlugPage useEffect triggered, slug:", slug);
+    //console.log("UserSlugPage useEffect triggered, slug:", slug);
 
     if (!slug || typeof slug !== "string") {
       console.log("Slug is not ready or not a string yet");
@@ -30,12 +30,12 @@ const UserSlugPage = () => {
       return;
     }
 
-    console.log("Fetching user by ID:", userId);
+    //console.log("Fetching user by ID:", userId);
     setLoading(true);
 
     fetchUserById(userId)
       .then((data) => {
-        console.log("User data fetched:", data);
+        //console.log("User data fetched:", data);
         setUser(data);
       })
       .catch((err) => {
@@ -60,7 +60,7 @@ const UserSlugPage = () => {
     return <p className="text-center text-red-500">No user found.</p>;
   }
 
-  console.log("Rendering UpdateUser for user:", user);
+  //console.log("Rendering UpdateUser for user:", user);
 
   return (
     <AccessGuard allowedUserTypes={[4, 5]}>

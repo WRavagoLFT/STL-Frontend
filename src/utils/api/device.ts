@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import axiosInstance from '../axiosInstance';
 
 const validateRelativeUrl = (url: string) => {
@@ -51,10 +52,10 @@ export const fetchUsageNotes = async () => {
 export const addDevice = async (userData: Record<string, any>) => {
   try {
     const url = validateRelativeUrl("/devices/");
-    console.log("Sending Device Data:", userData);
+    //console.log("Sending Device Data:", userData);
 
     const response = await axiosInstance.post(url, userData, {});
-    console.log("Backend Response:", response.data);
+    //console.log("Backend Response:", response.data);
 
     return response.data;
   } catch (error: any) {
@@ -78,13 +79,11 @@ export const updateDevice = async (
 ) => {
   try {
     const url = validateRelativeUrl(`/devices/${deviceId}`);
-
-    console.log("Sending PATCH request to:", url);
+    //console.log("Sending PATCH request to:", url);
 
     const response = await axiosInstance.patch(url, data);
 
-    console.log("Response data:", response.data);
-
+    //console.log("Response data:", response.data);
     return response.data;
   } catch (error: any) {
     if (error.response) {
@@ -113,4 +112,23 @@ export const updateDevice = async (
   }
 };
 
+export const editLogDevice = async (deviceId: number) => {
+  try {
+    const url = `/devices/${deviceId}/edit-log`; // replaced :deviceId with actual ID
+
+    const response = await axiosInstance.get(url);
+
+    console.log("Edit log response:", response.data);
+
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error("Error fetching edit log:", err.message);
+    return {
+      success: false,
+      message: err.message || "Something went wrong",
+      data: {},
+    };
+  }
+};
 
