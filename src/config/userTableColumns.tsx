@@ -28,6 +28,7 @@ export const userTableColumns = (roleId: number): Column<User>[] => {
       label: "Created By",
       sortable: true,
       filterable: true,
+      render: (log: User) => log.CreatedBy ? log.CreatedBy : "No value",
     },
     {
       key: "Status",

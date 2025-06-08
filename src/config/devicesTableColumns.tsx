@@ -1,6 +1,8 @@
 import dayjs from "dayjs";
 import { Column } from "~/types/interfaces";
 import { Device } from "~/types/types";
+import Button from "@mui/material/Button";
+import { getUserStatus } from "~/utils/dashboarddata";
 
 export const devicesTableColumns = (): Column<Device>[] => [
   {
@@ -39,5 +41,38 @@ export const devicesTableColumns = (): Column<Device>[] => [
     label: "Status",
     sortable: true,
     filterable: true,
+    render: (device: Device) => {
+      const sevenDaysAgo = dayjs().subtract(7, "days");
+      const status = getUserStatus(device, sevenDaysAgo);
+      return (
+        <Button
+          variant="contained"
+          sx={{
+            cursor: "auto",
+            textTransform: "none",
+            borderRadius: "12px",
+            padding: "2px 13px",
+            fontSize: "12px",
+            backgroundColor:
+              status === "Suspended"
+                ? "#FF7A7A"
+                : status === "Inactive"
+                  ? "#FFA726"
+                  : "#046115",
+            color: "#ffff",
+            "&:hover": {
+              backgroundColor:
+                status === "Suspended"
+                  ? "#F05252"
+                  : status === "Inactive"
+                    ? "#FFA726"
+                    : "#046115",
+            },
+          }}
+        >
+          {status}
+        </Button>
+      );
+    },
   },
 ];
