@@ -172,7 +172,9 @@ export interface Device {
   lastAppUpdated?: string;
   OperatorName?: string;
   remarks?: string;
-  
+
+  CreatedAt?: string;
+
   DeviceId?: number;
   AssignmentDate?: string;
   AssignedUser?: string;

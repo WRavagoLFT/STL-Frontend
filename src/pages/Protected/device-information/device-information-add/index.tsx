@@ -16,7 +16,8 @@ export default function AddDevicePage() {
   const router = useRouter();
 
   const onSubmit = async (data: Device) => {
-    await handleAddDevice(data, loadData, router);
+    const redirectPath = `/device-information`;
+    await handleAddDevice(data, loadData, router, redirectPath);
   };
 
   return (

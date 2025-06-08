@@ -6,7 +6,8 @@ import { NextRouter } from "next/router";
 export const handleUpdateDevice = async (
   data: Device,
   loadData: () => Promise<void>,
-  router: NextRouter
+  router: NextRouter,
+  redirectPath: string,
 ): Promise<void> => {
   //console.log("[handleUpdateDevice] - Submitting Device Data:", data);
 
@@ -34,7 +35,7 @@ export const handleUpdateDevice = async (
       });
 
       //console.log("[handleUpdateDevice] - Redirecting to /device-information...");
-      router.push("/device-information");
+      router.push(redirectPath);
     } else {
       console.error("[handleUpdateDevice] - Failed to update device. Message:", result.message);
 

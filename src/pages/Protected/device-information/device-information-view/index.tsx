@@ -2,10 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { Device } from "~/types/types";
-import { fetchUsageNotes } from "~/utils/api/device";
+import { editLogDevice, fetchUsageNotes } from "~/utils/api/device";
 import { handleUpdateDevice } from "../device-information-add/handleUpdateAction";
 import { useLoadDevices } from "..";
 import { useRouter } from "next/router";
+import { deviceEditColumns } from "~/config/deviceEditLogTableColumns";
+import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
+import Input from "~/components/ui/inputs/TextInputs";
 
 type DevicesViewPageProps = {
   slug: string;
@@ -24,10 +27,12 @@ const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
   const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">(
     "kabo"
   );
-
+  console.log(device);
   const [setDevice] = useState<Device | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const [editData, setEditData] = useState<any[]>([]);
+  const [columns, setColumns] = useState<any[]>([]);
+  
   const loadData = useLoadDevices(
     setLoading,
     () => {}, // define error handler if needed
@@ -38,8 +43,31 @@ const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
   const router = useRouter();
 
   const onUpdateDeviceSubmit = async (data: Device) => {
-    await handleUpdateDevice(data, loadData, router);
+    const redirectPath = `/device-information/device-information-view/${slug}`;
+    await handleUpdateDevice(data, loadData, router, redirectPath);
   };
+
+  // for edit logs
+  const fetchLogs = useCallback(async () => {
+    if (activeTab === "history" && device?.DeviceId) {
+      try {
+        const logsResponse = await editLogDevice(device?.DeviceId);
+
+        if (logsResponse?.success) {
+          setEditData(logsResponse.data || []);
+          setColumns(deviceEditColumns());
+        } else {
+          console.error("Failed to fetch edit logs:", logsResponse.message);
+        }
+      } catch (error) {
+        console.error("Error loading edit logs:", error);
+      }
+    }
+  }, [activeTab, device?.DeviceId]);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
 
   return (
     <div>
@@ -84,16 +112,88 @@ const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
 
       {/* Conditionally render content based on activeTab */}
       {activeTab === "kabo" && (
-        <UpdateDeviceForm
-          device={device}
-          onSubmit={onUpdateDeviceSubmit}
-        />
+        <div className="my-6">
+          <UpdateDeviceForm
+            device={device}
+            onSubmit={onUpdateDeviceSubmit}
+          />
+        </div>
       )}
 
       {activeTab === "history" && (
         <div>
-          {/* Future Update History component */}
-          <p>Update History Content Here</p>
+          <div className="my-6">
+            <div className="grid grid-cols-4 gap-6">
+              {/* Created By */}
+              <div className="flex flex-col w-full">
+                <label htmlFor="CreatedBy" className="block text-sm">
+                  Created By
+                </label>
+                <Input
+                  type="text"
+                  name="CreatedBy"
+                  id="CreatedBy"
+                  className="mt-1 w-full"
+                  value={device?.IssuedBy || "N/A"}
+                  disabled
+                />
+              </div>
+
+              {/* Creation Date */}
+              <div className="flex flex-col w-full">
+                <label htmlFor="DateOfRegistration" className="block text-sm">
+                  Creation Date
+                </label>
+                <Input
+                  type="text"
+                  name="DateOfRegistration"
+                  id="DateOfRegistration"
+                  className="mt-1 w-full"
+                  value={
+                    device?.CreatedAt
+                      ? device?.CreatedAt.slice(0, 10)
+                      : "N/A"
+                  }
+                  disabled
+                />
+              </div>
+
+              {/* Last Updated By */}
+              <div className="flex flex-col w-full">
+                <label htmlFor="LastUpdatedBy" className="block text-sm">
+                  Last Updated By
+                </label>
+                <Input
+                  type="text"
+                  name="LastUpdatedBy"
+                  id="LastUpdatedBy"
+                  className="mt-1 w-full"
+                  value={device?.AssignedUser || "N/A"}
+                  disabled
+                />
+              </div>
+
+              {/* Last Updated Date */}
+              <div className="flex flex-col w-full">
+                <label htmlFor="LastUpdatedDate" className="block text-sm">
+                  Last Updated Date
+                </label>
+                <Input
+                  type="text"
+                  name="LastUpdatedDate"
+                  id="LastUpdatedDate"
+                  className="mt-1 w-full"
+                  value={
+                    device?.AssignmentDate
+                      ? device?.AssignmentDate.slice(0, 10)
+                      : "N/A"
+                  }
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+          <EditLogsTablePage data={editData} columns={columns} />
         </div>
       )}
     </div>

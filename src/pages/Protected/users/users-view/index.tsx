@@ -23,6 +23,7 @@ type UsersViewPageProps = {
 const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">("kabo");
   //console.log(user);
+  //console.log(slug);
   const [device, setDevice] = useState<Device | null>(null);
   const [loading, setLoading] = useState(false);
   const [editData, setEditData] = useState<any[]>([]);
@@ -38,11 +39,13 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const router = useRouter();
 
   const onAddDeviceSubmit = async (data: Device) => {
-    await handleAddDevice(data, loadData, router);
+    const redirectPath = `/users/users-view/${slug}`;
+    await handleAddDevice(data, loadData, router, redirectPath);
   };
 
   const onUpdateDeviceSubmit = async (data: Device) => {
-    await handleUpdateDevice(data, loadData, router);
+    const redirectPath = `/users/users-view/${slug}`;
+    await handleUpdateDevice(data, loadData, router, redirectPath);
   };
 
   const backUrl =
@@ -143,19 +146,21 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
 
       {/* Conditionally render content based on activeTab */}
       {activeTab === "kabo" && (
-        <UpdateUserForm
-          operatorMap={{}}
-          onSubmit={(data) => {
-            console.log("Submitted user:", data);
-          }}
-          userTypeId={user?.data?.UserTypeId ?? 0}
-          selectedUser={user?.data}
-        />
+        <div className="my-6">
+          <UpdateUserForm
+            operatorMap={{}}
+            onSubmit={(data) => {
+              console.log("Submitted user:", data);
+            }}
+            userTypeId={user?.data?.UserTypeId ?? 0}
+            selectedUser={user?.data}
+          />
+        </div>
       )}
 
       {/* if no device id, add */}
       {activeTab === "device" && (
-        <div>
+        <div className="my-6">
           {!device ? (
             <AddDeviceForm
               userid={user?.data?.UserId} // for the user assigned field
@@ -167,7 +172,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
 
       {/* if theres a device id, update */}
       {activeTab === "device" && (
-        <div>
+        <div className="my-6">
           {device ? (
             <UpdateDeviceForm
               device={device}
@@ -181,7 +186,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
 
       {activeTab === "history" && (
         <div>
-          <div className="mb-6">
+          <div className="my-6">
             <div className="grid grid-cols-4 gap-6">
               {/* Created By */}
               <div className="flex flex-col w-full">

@@ -6,7 +6,8 @@ import { NextRouter } from "next/router";
 export const handleAddDevice = async (
   data: Device,
   loadData: () => Promise<void>,
-  router: NextRouter
+  router: NextRouter,
+  redirectPath: string
 ): Promise<void> => {
   //console.log("[handleAddDevice] - Submitting Device Data:", data);
 
@@ -30,7 +31,9 @@ export const handleAddDevice = async (
       });
 
       //console.log("[handleAddDevice] - Redirecting to /device-information...");
-      router.push("/device-information");
+      // can i pass as props this one? to make this dynamic.
+      router.push(redirectPath);
+      
     } else {
       console.error("[handleAddDevice] - Failed to add device. Message:", result.message);
 
