@@ -25,6 +25,7 @@ export interface User {
   pcsoBranchId?: number;
   BranchId?: number;
   BranchName?: string;
+  AssignedArea?: string;
 
   cityName?: number;
   kaboId?: number;

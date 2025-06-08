@@ -29,7 +29,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   onClose,
 }) => {
   const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
-  console.log('DYNAMMIC USER TYPE ID', userTypeId);
+  console.log('SELECTED USER', selectedUser);
   
   const sevenDaysAgo = dayjs().subtract(7, "day");
   const [formData, setFormData] = useState<{[key: string]: string | number | string[];}>({});
@@ -84,6 +84,8 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
       null,
     status: getUserStatus(user, sevenDaysAgo),
     remarks: "", // initialize remarks as empty string
+    BranchName: user?.BranchName || "",
+    AssignedArea: user?.AssignedArea || "",
   });
 
   const formik = useFormik({
@@ -198,19 +200,52 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
 
         {/* Column 2 */}
         <div className="flex flex-col gap-x-6 gap-y-3">
-          <div>
-            <label htmlFor="operatorId" className="block text-sm mb-1">
-              Assigned PCSO Branch
-            </label>
-            <CustomSelect
-              name="operatorId"
-              value={formik.values.operatorId}
-              options={operatorOptions}
-              error={false}
-              disabled={true}
-              onChange={() => {}}
-            />
-          </div>
+          {formik.values.userTypeId == 4 && (
+            <div>
+              <label htmlFor="operatorId" className="block text-sm mb-1">
+                Assigned Company
+              </label>
+                <CustomSelect
+                  name="operatorId"
+                  value={formik.values.operatorId}
+                  options={operatorOptions}
+                  error={false}
+                  disabled={true}
+                />
+            </div>
+          )}
+
+          {formik.values.userTypeId == 5 && (
+            <div>
+              <label htmlFor="BranchName" className="block text-sm mb-1">
+                Assigned PCSO Branch
+              </label>
+                <Input
+                  name="BranchName"
+                  id="BranchName"
+                  value={formik.values.BranchName}
+                  onChange={formik.handleChange}
+                  disabled
+                  //error={!!(formik.touched.email && formik.errors.email)}
+                />
+            </div>
+          )}
+
+          {(formik.values.userTypeId === 1 || formik.values.userTypeId === 2) && (
+            <div>
+              <label htmlFor="AssignedArea" className="block text-sm mb-1">
+                Assigned Area / Zone
+              </label>
+                <Input
+                  name="AssignedArea"
+                  id="AssignedArea"
+                  value={formik.values.AssignedArea || "N/A"}
+                  onChange={formik.handleChange}
+                  disabled={alwaysDisabledKeys.includes("AssignedArea") || isDisabled}
+                  //error={!!(formik.touched.AssignedArea && formik.errors.AssignedArea)}
+                />
+            </div>
+          )}
 
           <div>
             <label htmlFor="email" className="block text-sm">
