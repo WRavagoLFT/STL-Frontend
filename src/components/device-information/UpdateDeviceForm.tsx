@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import dayjs from "dayjs";
 import { getUsageNotes } from "~/pages/Protected/device-information/device-information-view";
+import { updateDeviceSchema } from "~/schemas/deviceSchema";
 
 interface UpdateDeviceFormProps {
   title?: string;
@@ -41,7 +42,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
     getUsageNotes(setUsageNotes);
   }, []);
 
-  console.log('DEVICE', device);
+  //console.log('DEVICE', device);
   //console.log('USAGE NOTES IN THE UPDATE', usageNotes);
 
   const [isDisabled, setIsDisabled] = useState(true);
@@ -87,10 +88,9 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
 
       remarks: device?.remarks || "",
     },
-    // validationSchema: toFormikValidationSchema(operatorSchema),
+    validationSchema: toFormikValidationSchema(updateDeviceSchema),
     onSubmit: async (values) => {
-      console.log("Form submitted. Raw values from Formik:", values);
-
+      //console.log("Form submitted. Raw values from Formik:", values);
       try {
         const result = await Swal.fire({
           title: "Update Confirmation",
@@ -104,7 +104,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
         });
 
         if (result.isConfirmed) {
-          console.log("User confirmed submission in SweetAlert dialog.");
+          //console.log("User confirmed submission in SweetAlert dialog.");
 
           // Clean data by removing null, undefined, or empty strings
           const cleanedData = Object.fromEntries(
@@ -116,11 +116,11 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
           if (values.deviceId) {
             cleanedData.deviceId = values.deviceId;
           }
-
+          
           // Add assignedUser if present
           // cleanedData.assignedUser = userid || 0;
 
-          console.log("Data prepared for final submission (cleaned):", cleanedData);
+          //console.log("Data prepared for final submission (cleaned):", cleanedData);
 
           setFormData(cleanedData);
           openConfirmModal();
@@ -132,6 +132,11 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
       }
     },
   });
+
+  useEffect(() => {
+    console.log("Validation Errors:", formik.errors);
+    //console.log("Touched Fields:", formik.touched);
+  }, [formik.errors, formik.touched]);
 
   // Helpers to display errors
   const getError = (field: string) =>
@@ -620,7 +625,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
             <button
               type="submit"
               className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-              disabled={!formik.isValid}
+              //disabled={!formik.isValid}
             >
               Save
             </button>

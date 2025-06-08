@@ -7,6 +7,7 @@ import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { getUsageNotes } from "~/pages/Protected/device-information/device-information-view";
+import { addDeviceSchema } from "~/schemas/deviceSchema";
 
 interface AddDeviceFormProps {
   title?: string;
@@ -71,9 +72,9 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
       lastAppUpdated: initialData.lastAppUpdated || "",
     },
 
+    validationSchema: toFormikValidationSchema(addDeviceSchema),
     onSubmit: async (values) => {
-      console.log("Form submitted. Raw values from Formik:", values);
-
+      //console.log("Form submitted. Raw values from Formik:", values);
       try {
         const result = await Swal.fire({
           title: "Add Confirmation",
@@ -87,7 +88,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
         });
 
         if (result.isConfirmed) {
-          console.log("User confirmed submission in SweetAlert dialog.");
+          //console.log("User confirmed submission in SweetAlert dialog.");
 
           // Remove null, undefined, or empty string values
           const cleanedData = Object.entries(values).reduce(
@@ -102,7 +103,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
           // Add assignedUser separately
           cleanedData.assignedUser = userid || 0;
 
-          console.log("Data prepared for final submission (cleaned):", cleanedData);
+          //console.log("Data prepared for final submission (cleaned):", cleanedData);
 
           setFormData(cleanedData);
           openConfirmModal();
