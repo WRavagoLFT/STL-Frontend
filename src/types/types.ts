@@ -201,5 +201,15 @@ export type RoleConfig = {
   permittedUserTypes: number[];
 };
 
+export type GameCombination = {
+  gameType?: number;
+  provinceId?: number;
+  combinationOne?: number;
+  combinationTwo?: number;
+  combinationThree?: number;
+  combinationFour?: number;
+  gameSchedule?: number;
+}
+
 
 

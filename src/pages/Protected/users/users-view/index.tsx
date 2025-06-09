@@ -17,6 +17,7 @@ import { handleUpdateUser } from "../handleUpdateUserAction";
 import { loadUsers } from "../[role]";
 import useUserStore from "~/store/useUserStore";
 import { useAuthStore } from "~/store/useAuthStore";
+import { FaMobileAlt } from "react-icons/fa";
 
 type UsersViewPageProps = {
   user?: User;
@@ -178,14 +179,21 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
         </div>
       )}
       
-      {currentUserType !== 3 && activeTab === "device" && !device && (
-        <div className="my-6">
-          <AddDeviceForm
-            userid={user?.data?.UserId}
-            onSubmit={onAddDeviceSubmit}
-          />
-        </div>
-      )}
+      {activeTab === "device" && !device ? (
+        currentUserType !== 3 ? (
+          <div className="my-6">
+            <AddDeviceForm
+              userid={user?.data?.UserId}
+              onSubmit={onAddDeviceSubmit}
+            />
+          </div>
+        ) : (
+          <div className="my-12 flex flex-col items-center text-gray-500">
+            <FaMobileAlt size={40} className="mb-3" />
+            <p className="text-lg font-semibold">No Device Information available for this user.</p>
+          </div>
+        )
+      ) : null}
 
       {/* if theres a device id, update */}
       {activeTab === "device" && (

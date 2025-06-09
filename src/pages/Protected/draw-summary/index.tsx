@@ -42,29 +42,32 @@ const DrawSelectedPage = () => {
 
   // fetch data
   const fetchData = async () => {
-    const dataFetch = await fetchDrawSummary(Number(selectedProvince), Number(selectedGameCategory), Number(selectedMonth))
-    setData(dataFetch.data)
+    const dataFetch = await fetchDrawSummary(
+      Number(selectedProvince),
+      Number(selectedGameCategory),
+      Number(selectedMonth)
+    );
+    setData(dataFetch.data);
     //console.log(dataFetch)
-  }
+  };
 
   const loadData = async () => {
-
-    const regionFetch = await fetchRegions()
+    const regionFetch = await fetchRegions();
     //console.log(regionFetch)
-if (regionFetch?.data && Array.isArray(regionFetch.data)) {
-  setRegions(
-    regionFetch.data
-      .filter((region: any) => region?.RegionName && region?.RegionId)
-      .map((region: any) => ({
-        label: region.RegionName,
-        value: region.RegionId.toString()
-      }))
-  );
-}
+    if (regionFetch?.data && Array.isArray(regionFetch.data)) {
+      setRegions(
+        regionFetch.data
+          .filter((region: any) => region?.RegionName && region?.RegionId)
+          .map((region: any) => ({
+            label: region.RegionName,
+            value: region.RegionId.toString(),
+          }))
+      );
+    }
 
-    const provinceFetch = await fetchProvinces()
+    const provinceFetch = await fetchProvinces();
     //console.log(provinceFetch)
-    setProvinces(provinceFetch.data)
+    setProvinces(provinceFetch.data);
 
     if (provinceFetch.data) {
       const filteredProvinces = provinceFetch.data.filter((province: any) => {
@@ -73,28 +76,32 @@ if (regionFetch?.data && Array.isArray(regionFetch.data)) {
 
       setFilteredProvinces(
         filteredProvinces
-          .filter((province: any) => province.ProvinceId && province.ProvinceName)
+          .filter(
+            (province: any) => province.ProvinceId && province.ProvinceName
+          )
           .map((province: any) => ({
             label: province.ProvinceName,
-            value: province.ProvinceId.toString()
+            value: province.ProvinceId.toString(),
           }))
       );
     }
 
     // default region
-    setSelectedRegion("1")
-    setSelectedProvince("1")
+    setSelectedRegion("1");
+    setSelectedProvince("1");
 
-    const gameCategoryFetch = await fetchGameCategories()
+    const gameCategoryFetch = await fetchGameCategories();
     //console.log(gameCategoryFetch)
 
-    setGameCategories(gameCategoryFetch.data.map((gameCategory: any) => {
-      return {
-        label: gameCategory.GameCategory,
-        value: gameCategory.GameCategoryId.toString()
-      }
-    }))
-  }
+    setGameCategories(
+      gameCategoryFetch.data.map((gameCategory: any) => {
+        return {
+          label: gameCategory.GameCategory,
+          value: gameCategory.GameCategoryId.toString(),
+        };
+      })
+    );
+  };
 
   useEffect(() => {
     // Initial Fetch
