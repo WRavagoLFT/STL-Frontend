@@ -12,28 +12,28 @@ export function processShares(
   data: any,
   titles: string[],
   year: number,
-  month: number,
-  shareType: number // no default, must be provided
+  month?: number,
+  shareType?: number
 ): { totalPercentage: number; totalShareAmount: number; breakdown: Share[] } {
-  // console.log("processShares called with:", { year, month, shareType });
-  // console.log("Titles:", titles);
-  // console.log("Data keys:", data ? Object.keys(data) : "No data");
-
+  const st = shareType ?? 1;
   const result: Share[] = titles
     .map((title) => {
       const share = data?.[title];
-      // console.log(`Processing title: ${title}`, share);
-
       if (share && share.ShareType === shareType) {
+
+        // Handle yearly if month is undefined or 0
+        const operationDate = !month || month === 0
+          ? new Date(year, 0, 1).getTime() // Jan 1 of the year
+          : new Date(year, month - 1, 1).getTime();
+
         const processedShare = {
           ShareTitle: title,
           ShareType: share.ShareType,
           Percentage: share.Percentage,
           ShareAmount: share.ShareAmount,
-          OperationDate: new Date(year, month - 1, 1).getTime(),
+          OperationDate: operationDate,
           OperatorBreakdown: share.OperatorBreakdown ?? {},
         };
-        // console.log("Accepted share:", processedShare);
         return processedShare;
       } else {
         if (share) {
@@ -42,7 +42,7 @@ export function processShares(
             share.ShareType
           );
         } else {
-          console.log(`No share data found for title: ${title}`);
+          //console.log(`No share data found for title: ${title}`);
         }
         return null;
       }
@@ -52,16 +52,13 @@ export function processShares(
   const totalPercentage = result.reduce((sum, item) => sum + item.Percentage, 0);
   const totalShareAmount = result.reduce((sum, item) => sum + item.ShareAmount, 0);
 
-  // console.log("Final breakdown:", result);
-  // console.log("Total Percentage:", totalPercentage);
-  // console.log("Total Share Amount:", totalShareAmount);
-
   return {
     totalPercentage,
     totalShareAmount,
     breakdown: result,
   };
 }
+
 
 // function in calculating net income ================
 export function calculateNetIncome(

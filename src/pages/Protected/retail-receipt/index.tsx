@@ -1,5 +1,4 @@
-import { Button } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import AACTaxesPage from "~/components/retail-receipts/ACCSTaxes";
 import GrossAACSharePage from "~/components/retail-receipts/GrossAACShare";
@@ -8,12 +7,15 @@ import NetAACIncomePage from "~/components/retail-receipts/NetAACIncome";
 import NetPSCOIncomePage from "~/components/retail-receipts/NetPSCOIncome";
 import PCSOTaxesPage from "~/components/retail-receipts/PCSOTaxes";
 import { useRetailReceiptProcessor } from "~/components/retail-receipts/useRetailReceiptProcessor";
-import Card from "~/components/ui/dashboardcards/Cards";
-import { buttonStylesretail } from "~/styles/theme";
-import { fetchRetailReceiptsDashboard, fetchRetailReceipts } from "~/utils/api/transactions";
-import CustomSelect, { OptionType } from "~/components/ui/inputs/SelectInputs";
-import QuarterSelector from "~/components/ui/inputs/QuarlyInput";
+import { fetchRetailReceiptsMetrics, fetchRetailReceiptsData } from "~/utils/api/transactions";
+import Select, { ActionMeta, SingleValue } from 'react-select';
+import ReceiptCardsPage from "~/components/retail-receipts/ReceiptsCardPage";
 import Input from "~/components/ui/inputs/TextInputs";
+
+export type OptionType = {
+  label: string;
+  value: string;
+};
 
 const RetailReceiptPage = () => {
   // set default current month
@@ -27,22 +29,27 @@ const RetailReceiptPage = () => {
     { label: "Yearly", value: "Yearly" },
     //{ label: "Quarterly", value: "Quarterly" },
   ];
-  
-  const [filterBy, setFilterBy] = useState<OptionType>(filterOptions[0]); // default to Monthly
-  const [quarter, setQuarter] = useState<OptionType | null>(null);
-  const [year, setYear] = useState<OptionType | null>(null);
-  const [selectedYear, setSelectedYear] = useState<OptionType | null>(null);
 
+  const [receiptData, setReceiptData] = useState<any | null>(null);
+  const [filterBy, setFilterBy] = useState<OptionType>(filterOptions[0]); // default to Monthly
+  const [selectedYear, setSelectedYear] = useState<OptionType | null>(null);
+  const [loading, setLoading] = useState(false);
   const currentYear = new Date().getFullYear();
+
   const yearOptions: OptionType[] = [];
   for (let year = currentYear; year >= 2000; year--) {
     yearOptions.push({ label: String(year), value: String(year) });
   }
 
-  const handleYearChange = (e: { value: any; target: { name: string; value: string } }) => {
-    const selectedValue = e.value;
-    const selectedOption = yearOptions.find(option => option.value === selectedValue) || null;
-    setSelectedYear(selectedOption);
+  const handleYearChange = (
+    newValue: SingleValue<OptionType>,
+    actionMeta: ActionMeta<OptionType>
+  ) => {
+    if (newValue) {
+      setSelectedYear(newValue);
+    } else {
+      setSelectedYear(null);
+    }
   };
 
   const [receiptDataMetrics, setReceiptDataMetrics] = useState<{
@@ -53,56 +60,113 @@ const RetailReceiptPage = () => {
     TotalWinners: number;
   } | null>(null);
 
-  const [receiptData, setReceiptData] = useState<any | null>(null);
-
-  // Fetch dashboard metrics on operationDate change
+  // Fetch dashboard metrics on filterBy, operationDate, or selectedYear change
   useEffect(() => {
-    const [year, month] = operationDate.split("-");
-    fetchRetailReceiptsDashboard(Number(year), Number(month)).then((res) => {
-      if (res?.success) {
-        setReceiptDataMetrics(res.data);
+    const fetchMetrics = async () => {
+      setLoading(true);
+      try {
+        let res;
+        if (filterBy.value === "Monthly") {
+          const [year, month] = operationDate.split("-");
+          res = await fetchRetailReceiptsMetrics(Number(year), Number(month));
+        } else if (filterBy.value === "Yearly" && selectedYear) {
+          res = await fetchRetailReceiptsMetrics(Number(selectedYear.value));
+        }
+        if (res?.success) {
+          setReceiptDataMetrics(res.data);
+        } else {
+          setReceiptDataMetrics(null);
+        }
+      } catch (error) {
+        setReceiptDataMetrics(null);
+      } finally {
+        setLoading(false);
       }
-    });
-  }, [operationDate]);
+    };
+    fetchMetrics();
+  }, [filterBy, operationDate, selectedYear]);
 
-  // calculated total month
-  const calculatedReceipt = useMemo(() => {
-    if (!receiptDataMetrics) return [];
+  React.useEffect(() => {
+    if (filterBy?.value === "Yearly" && selectedYear?.value) {
+      const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, "0");
+      const newOperationDate = `${selectedYear.value}-${currentMonth}`;
 
-    const formatPeso = (amount: number) => `₱ ${amount.toLocaleString()}`;
-    const formatNumber = (value: number) => value.toLocaleString();
-
-    return [
-      { label: "Total Bets", value: formatPeso(receiptDataMetrics.TotalBets) },
-      {
-        label: "Total Bettors",
-        value: formatNumber(receiptDataMetrics.TotalBettors),
-      },
-      {
-        label: "Total Payout",
-        value: formatPeso(receiptDataMetrics.TotalPayout),
-      },
-      {
-        label: "Total Revenue",
-        value: formatPeso(receiptDataMetrics.TotalRevenue),
-      },
-      {
-        label: "Total Winners",
-        value: formatNumber(receiptDataMetrics.TotalWinners),
-      },
-    ];
-  }, [receiptDataMetrics]);
-
-  // /transactions/getRetailReceipts/:year/:month for AAC and PCSO receipts
-  useEffect(() => {
-    const [year, month] = operationDate.split("-");
-    fetchRetailReceipts(Number(year), Number(month)).then((data) => {
-      if (data?.success) {
-        //console.log("[RetailReceipts] Full data:", data.data);
-        setReceiptData(data.data);
+      if (operationDate !== newOperationDate) {
+        console.log(`Resetting operationDate to current month of selected year: ${newOperationDate}`);
+        setOperationDate(newOperationDate);
       }
-    });
-  }, [operationDate]);
+    }
+  }, [filterBy, selectedYear, operationDate]);
+
+  // Fetch data effect
+  React.useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      console.log("Fetching retail receipt data...");
+      console.log("FilterBy:", filterBy);
+      console.log("Operation Date:", operationDate);
+      console.log("Selected Year:", selectedYear);
+
+      try {
+        let data;
+
+        // Ensure we have a valid operationDate before proceeding
+        if (!operationDate) {
+          console.warn("No operationDate provided, skipping fetch");
+          setReceiptData(null);
+          setLoading(false);
+          return;
+        }
+
+        // Updated operationDate to reflect selectedYear if any
+        const yearFromOpDate = operationDate.split("-")[0];
+        const year = selectedYear ? selectedYear.value : yearFromOpDate;
+
+        // Replace year in operationDate with selectedYear if applicable
+        const updatedOperationDate = operationDate.replace(/^\d{4}/, year);
+
+        const [parsedYearStr, parsedMonthStr] = updatedOperationDate.split("-");
+        const parsedYear = Number(parsedYearStr);
+        const parsedMonth = Number(parsedMonthStr);
+
+        if (filterBy.value === "Monthly") {
+          console.log("Using Monthly filter");
+          console.log("Parsed Year:", parsedYear, "Parsed Month:", parsedMonth);
+          data = await fetchRetailReceiptsData(parsedYear, parsedMonth);
+
+        } else if (filterBy.value === "Yearly" && selectedYear) {
+          console.log("Using Yearly filter with selected year:", selectedYear.value);
+          data = await fetchRetailReceiptsData(Number(selectedYear.value));
+          
+        } else {
+          console.warn("Unknown filterBy or missing selectedYear for yearly filter");
+          setReceiptData(null);
+          setLoading(false);
+          return;
+        }
+
+        console.log("Fetch result:", data);
+
+        if (data?.success) {
+          console.log("Setting receipt data...");
+          setReceiptData(data.data);
+        } else {
+          console.warn("Data fetch failed or returned success = false");
+          setReceiptData(null);
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+        setReceiptData(null);
+      } finally {
+        setLoading(false);
+        console.log("Fetch complete");
+      }
+    };
+
+    fetchData();
+  }, [filterBy, operationDate, selectedYear]);
+
+const yearNumber = selectedYear ? Number(selectedYear.value) : undefined;
 
   const {
     aacBreakdown,
@@ -121,7 +185,7 @@ const RetailReceiptPage = () => {
     netAacTotalPercentage,
     netPcsoTotalAmount,
     netPcsoTotalPercentage,
-  } = useRetailReceiptProcessor(operationDate);
+  } = useRetailReceiptProcessor(filterBy.value, operationDate, yearNumber);
 
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
@@ -133,21 +197,40 @@ const RetailReceiptPage = () => {
               <label htmlFor="filterBy" className="text-sm font-medium text-[#0038A8]">
                 Filter by
               </label>
-              <CustomSelect
+              <Select
                 name="filterBy"
                 value={filterBy}
-                onChange={(e) =>
-                  setFilterBy({ label: e.value, value: e.value })
-                }
-                //onChange={(selectedOption) => setFilterBy(selectedOption)}
+                onChange={(selectedOption) => {
+                  if (selectedOption) {
+                    setFilterBy(selectedOption);
+                    // reset selection when filter changes
+                    if (selectedOption.value === "Monthly") {
+                      setSelectedYear(null);
+                    }
+                  }
+                }}
                 options={filterOptions}
+                classNamePrefix="react-select-dashboard"
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    borderRadius: "0.5rem",
+                    color: '#2F2F2F',
+                    padding: "0.25rem",
+                    boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    backgroundColor: "#F8C73F",
+                    zIndex: 10,
+                  }),
+                }}
               />
             </div>
           </div>
           <div className="flex-[1_1_200px]">
             <div>
-              <label
-                htmlFor="operationDate" className="text-sm font-medium text-[#0038A8]">
+              <label htmlFor="operationDate" className="text-sm font-medium text-[#0038A8]">
                 Date of Report
               </label>
               {filterBy?.value === "Monthly" && (
@@ -159,23 +242,29 @@ const RetailReceiptPage = () => {
               )}
 
               {filterBy?.value === "Yearly" && (
-                <CustomSelect
+                <Select
                   name="year"
                   value={selectedYear}
                   options={yearOptions}
                   onChange={handleYearChange}
                   placeholder="Select Year"
+                  classNamePrefix="react-select-dashboard"
+                  styles={{
+                    control: (provided, state) => ({
+                      ...provided,
+                      borderRadius: "0.5rem",
+                      color: '#2F2F2F',
+                      padding: "0.25rem",
+                      boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                    }),
+                    menu: (provided) => ({
+                      ...provided,
+                      backgroundColor: "#F8C73F",
+                      zIndex: 10,
+                    }),
+                  }}
                 />
               )}
-
-              {/* {filterBy?.value === "Quarterly" && (
-                <QuarterSelector
-                  quarterValue={quarter}
-                  yearValue={year}
-                  onChangeQuarter={setQuarter}
-                  onChangeYear={setYear}
-                />
-              )} */}
             </div>
           </div>
           <div className="flex-[1_1_200px]" />
@@ -184,13 +273,10 @@ const RetailReceiptPage = () => {
         </div>
 
         {/* Cards */}
-        {calculatedReceipt.length > 0 && (
-          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-3">
-            {calculatedReceipt.map((item, index) => (
-              <Card key={index} label={item.label} value={item.value} />
-            ))}
-          </div>
-        )}
+        <ReceiptCardsPage
+          receiptDataMetrics={receiptDataMetrics}
+          textlabel="Collection"
+        />
 
         <div className="flex gap-6 mt-8 mb-3">
           <div className="w-1/2">
@@ -225,16 +311,6 @@ const RetailReceiptPage = () => {
                 netAmount={netAacTotalAmount}
                 netPercentage={netAacTotalPercentage}
               />
-            </div>
-
-            {/* Export buttons */}
-            <div className="flex gap-4">
-              <Button sx={buttonStylesretail} variant="contained">
-                Export as CSV
-              </Button>
-              <Button sx={buttonStylesretail} variant="contained">
-                Export as PDF
-              </Button>
             </div>
           </div>
 
