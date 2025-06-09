@@ -164,10 +164,10 @@ const RetailReceiptPage = () => {
                   value={selectedYear}
                   options={yearOptions}
                   onChange={handleYearChange}
-                  placeholder="Select Year" 
+                  placeholder="Select Year"
                 />
               )}
-              
+
               {/* {filterBy?.value === "Quarterly" && (
                 <QuarterSelector
                   quarterValue={quarter}

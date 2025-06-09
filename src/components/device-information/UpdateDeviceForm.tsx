@@ -225,6 +225,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
                 }}
                 disabled
                 error={!!getError("usageNotes")}
+                //placeholder=""
               />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("usageNotes") || "\u00A0"}

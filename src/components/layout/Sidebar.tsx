@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const response = await getCurrentUser({});
-      //console.log("getcurrentuser response", response);
+      console.log("getcurrentuser response", response);
 
       if (response && response.data) {
         setUser({

@@ -103,7 +103,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           : "",
       accountType: 2,
       pcsoBranchId: initialData.pcsoBranchId || "",
-      cityName: initialData.cityName || "",
+      cityName: initialData.cityName || "", // array of cities dapat.
       kaboId: initialData.kaboId || "",
     },
     validate,

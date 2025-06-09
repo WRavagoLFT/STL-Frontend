@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
@@ -36,7 +36,7 @@ const roleMap: Record<
     label: "Kabo",
     textlabel: "Kabo",
     roleId: 2,
-    permittedUserTypes: [3, 4], // managers, exec, admin
+    permittedUserTypes: [3, 4, 5  ], // managers, exec, admin
   },
   executive: {
     label: "Small Town Lottery Executive",
@@ -130,6 +130,7 @@ const RolePage = () => {
   })();
 
   const roleConfig = roleMap[role?.toLowerCase() || ""];
+
   if (!roleConfig) {
     return (
       <div className="container mx-auto px-0 py-1">
@@ -180,8 +181,9 @@ const RolePage = () => {
     loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap);
   }, [roleConfig, roleKey]);
 
-  // console.log("DATA USER", data);
+  console.log("DATA USER", data);
   // console.log("operatormappp", operatorMap);
+  //console.log('ROLE CONFIG IN THE PAGE:', roleConfig);
 
   const handleAddUser = async (data: User): Promise<void> => {
     try {
