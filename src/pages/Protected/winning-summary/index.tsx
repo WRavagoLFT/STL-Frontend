@@ -48,7 +48,6 @@ const WinningSummaryPage = (params: { gameCategoryId?: number }) => {
         <DashboardCardsPage gameCategoryId={params.gameCategoryId} />
         <div className="flex flex-col items-center space-y-4">
           <div className="w-full space-y-4">
-            
             {userTypeId === 6 && (
               <div className="w-full flex flex-col lg:flex-row lg:items-stretch lg:min-h-[500px] space-y-4 lg:space-y-0 lg:space-x-4">
                 {/* Left Column */}
@@ -111,7 +110,6 @@ const WinningSummaryPage = (params: { gameCategoryId?: number }) => {
                 </div>
               </div>
             )}
-
             <div className="mt-0">
               <TableWinningSummary gameCategoryId={params.gameCategoryId} />
             </div>

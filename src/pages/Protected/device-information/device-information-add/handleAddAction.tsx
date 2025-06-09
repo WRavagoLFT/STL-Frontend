@@ -31,7 +31,6 @@ export const handleAddDevice = async (
       });
 
       //console.log("[handleAddDevice] - Redirecting to /device-information...");
-      // can i pass as props this one? to make this dynamic.
       router.push(redirectPath);
       
     } else {

@@ -106,7 +106,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       cityName: initialData.cityName || "",
       kaboId: initialData.kaboId || "",
     },
-    validate,    
+    validate,
     onSubmit: async (values) => {
       console.log("[Form Submit] Submitted Values:", values);
 
@@ -121,61 +121,42 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         cancelButtonColor: "#d33",
       });
 
-      if (result.isConfirmed) {
-        const submittedData: { [key: string]: string | number | string[] } = {
-          ...values,
-        };
+      if (!result.isConfirmed) return;
 
-        // Clean up operatorId
-        if (
-          !values.operatorId ||
-          isNaN(parseInt(values.operatorId)) ||
-          values.userTypeId !== 4
-        ) {
-          delete submittedData.operatorId;
-        } else {
-          submittedData.operatorId = parseInt(values.operatorId);
-        }
+      // Remove null, undefined, or empty string values
+      const cleanedData: { [k: string]: string | number | string[] } = Object.fromEntries(
+        Object.entries(values).filter(
+          ([, value]) =>
+            value !== null &&
+            value !== undefined &&
+            (typeof value === "string" ? value.trim() !== "" : true)
+        )
+      );
 
-        // Clean up pcsoBranchId
-        if (
-          values.userTypeId !== 5 ||
-          values.pcsoBranchId === "" ||
-          values.pcsoBranchId === null ||
-          values.pcsoBranchId === undefined ||
-          isNaN(Number(values.pcsoBranchId))
-        ) {
-          delete submittedData.pcsoBranchId;
-        } else {
-          submittedData.pcsoBranchId = Number(values.pcsoBranchId);
-        }
-
-        // Inside your result.isConfirmed block
-        if (values.kaboId && !isNaN(Number(values.kaboId))) {
-          submittedData.kaboId = Number(values.kaboId);
-        } else {
-          delete submittedData.kaboId;
-        }
-
-        // Cast cityName safely for Kabo
-        if (values.userTypeId === 2) {
-          const cityNameStr = String(values.cityName);
-          submittedData.cityName = cityNameStr
-            ? cityNameStr.split(",").map((s) => s.trim())
-            : [];
-        }
-
-        // Cast cityName safely for Kubrador → rename to barangayName
-        if (values.userTypeId === 1) {
-          const barangayStr = String(values.cityName).trim();
-          submittedData.barangayName = barangayStr ? [barangayStr] : [];
-          delete submittedData.cityName;
-        }
-
-        setFormData(submittedData);
-        openConfirmModal();
+      // Transform cleaned data
+      if (cleanedData.kaboId && !isNaN(Number(cleanedData.kaboId))) {
+        cleanedData.kaboId = Number(cleanedData.kaboId);
+      } else {
+        delete cleanedData.kaboId;
       }
-    }
+
+      if (cleanedData.userTypeId === 2) {
+        // Kabo – cityName becomes array of strings
+        cleanedData.cityName = String(cleanedData.cityName) // 
+          .split(",")
+          .map((s) => s.trim());
+      }
+
+      if (cleanedData.userTypeId === 1) {
+        // Kubrador – cityName becomes barangayName
+        const barangayStr = String(cleanedData.cityName || "").trim();
+        cleanedData.barangayName = barangayStr ? [barangayStr] : [];
+        delete cleanedData.cityName;
+      }
+
+      setFormData(cleanedData);
+      openConfirmModal();
+    },
   });
 
   useEffect(() => {

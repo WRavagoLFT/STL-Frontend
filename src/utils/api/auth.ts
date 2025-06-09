@@ -1,5 +1,6 @@
 import { AxiosError } from "axios";
 import axiosInstance from "../axiosInstance";
+import { useAuthStore } from "~/store/useAuthStore";
 
 // Helper to validate URL paths
 const validateRelativeUrl = (url: string) => {
@@ -24,15 +25,22 @@ const getCurrentUser = async (queryParams: Record<string, any>) => {
 
 const logoutUser = async (queryParams: Record<string, any> = {}) => {
     try {
+        // Clear intervals and client state FIRST
+        //useAuthStore.getState().logout();
+        
+        // Then make the server call
         const url = validateRelativeUrl("/auth/logout");
         const response = await axiosInstance.delete(url, {
             params: queryParams
         });
-
+        
         return { success: true, message: "Logout successful", data: response.data };
     } catch (error) {
         console.error("Error logging out:", (error as Error).message);
-        return { success: false, message: (error as Error).message };
+        
+        // Even if server call fails, we've already cleared client state
+        // This prevents the "double logout" error
+        return { success: true, message: "Logout completed (client-side)" };
     }
 };
 

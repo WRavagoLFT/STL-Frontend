@@ -21,19 +21,17 @@ const Sidebar: React.FC = () => {
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
+
+      // Reset client auth state immediately
+      //useAuthStore.getState().reset();
+
+      // Call server logout to clear cookie/session
       await logoutUser();
-
-      // we need to handle this gracefully (w/o glitch)
-      // this resets the value of the prev user (role)
-      //const authStore = useAuthStore.getState();
-      //const sidebarStore = useSideBarStore.getState();
-
-      //if (typeof authStore.reset === "function") authStore.reset();
-      //if (typeof sidebarStore.reset === "function") sidebarStore.reset();
+      //useAuthStore.getState().reset();
 
       router.push("/auth/login");
     } catch (error) {
-      //setIsLoggingOut(false); 
+      setIsLoggingOut(false);
       console.error("Logout failed:", error);
     }
   };
