@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/router";
+
 import DashboardCardsPage from "~/components/dashboard/DashboardCards";
 import TableBettingActivityToday from "~/components/betting-summary/BettingActivityTodayTable";
 import ChartBettorsvsBetsPlacedSummary from "~/components/betting-summary/BettorsvsBetsPlacedChart";
@@ -11,109 +12,72 @@ import { buttonStyles } from "~/styles/theme";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { useAuthStore } from "~/store/useAuthStore";
 
-const BettingSummaryPage = (params: { gameCategoryId?: number }) => {
+const GAME_TITLES = [
+  "STL",
+  "STL Pares",
+  "STL Swer 2",
+  "STL Swer 3",
+  "STL Swer 4",
+];
+
+const BettingSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number }) => {
   const router = useRouter();
-  //console.log("Game Category: ", params.gameCategoryId);
   const [title, setTitle] = useState("STL");
   const userTypeId = useAuthStore((state) => state.userTypeId);
-  //console.log('USER TYPE ID IN THE BETTING SUMMARY',userTypeId);
 
   useEffect(() => {
-    switch (params.gameCategoryId) {
-      case 0:
-        setTitle("STL");
-        break;
-      case 1:
-        setTitle("STL Pares");
-        break;
-      case 2:
-        setTitle("STL Swer 2");
-        break;
-      case 3:
-        setTitle("STL Swer 3");
-        break;
-      case 4:
-        setTitle("STL Swer 4");
-        break;
-    }
-  }, [params.gameCategoryId]);
+    setTitle(GAME_TITLES[gameCategoryId] || "STL");
+  }, [gameCategoryId]);
 
   const handleViewComparisonClick = () => {
     router.push("/bets-comparisons");
   };
 
+  const ChartSection = (
+    <>
+      <ChartBettorsvsBetsPlacedSummary gameCategoryId={gameCategoryId} />
+      {gameCategoryId > 0 ? (
+        <ChartBettorsBetTypeSummary gameCategoryId={gameCategoryId} />
+      ) : (
+        <ChartBettorsSummary />
+      )}
+    </>
+  );
+
+  const ComparisonButton = (
+    <div className="self-end my-3">
+      <Button variant="contained" sx={buttonStyles} onClick={handleViewComparisonClick}>
+        View Comparison
+      </Button>
+    </div>
+  );
+
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
       <div className="space-y-4 h-full">
         <h1 className="text-3xl font-bold">{title} Betting Summary</h1>
-        <DashboardCardsPage gameCategoryId={params.gameCategoryId} />
+        <DashboardCardsPage gameCategoryId={gameCategoryId} />
         <div className="flex flex-col items-center space-y-4">
           <div className="w-full space-y-4">
-            {userTypeId === 6 && (
-              <div className="w-full flex flex-col lg:flex-row lg:items-stretch lg:min-h-[500px] space-y-4 lg:space-y-0 lg:space-x-4">
-                {/* Left Column */}
-                <div className="w-full lg:w-1/3 h-full flex flex-col">
-                  <div className="flex-1">
-                    <TableBettingActivityToday
-                      gameCategoryId={params.gameCategoryId}
-                    />
-                  </div>
+            {userTypeId === 6 ? (
+              <div className="w-full flex flex-col lg:flex-row lg:min-h-[500px] space-y-4 lg:space-y-0 lg:space-x-4">
+                <div className="w-full lg:w-1/3">
+                  <TableBettingActivityToday gameCategoryId={gameCategoryId} />
                 </div>
-                {/* Right Column */}
-                <div className="w-full lg:w-2/3 h-full flex flex-col">
-                  <div className="flex-1 flex flex-col space-y-5">
-                    <ChartBettorsvsBetsPlacedSummary
-                      gameCategoryId={params.gameCategoryId}
-                    />
-                    {params.gameCategoryId && params.gameCategoryId > 0 ? (
-                      <ChartBettorsBetTypeSummary
-                        gameCategoryId={params.gameCategoryId}
-                      />
-                    ) : (
-                      <ChartBettorsSummary />
-                    )}
-                  </div>
-                  <div className="self-end my-3">
-                    <Button
-                      variant="contained"
-                      sx={buttonStyles}
-                      onClick={handleViewComparisonClick}
-                    >
-                      View Comparison
-                    </Button>
-                  </div>
+                <div className="w-full lg:w-2/3 flex flex-col space-y-5">
+                  {ChartSection}
+                  {ComparisonButton}
                 </div>
               </div>
-            )}
-
-            {(userTypeId === 4 || userTypeId == 5) && (
-              <div className="w-full h-full flex flex-col">
-                <div className="flex-1 flex flex-col space-y-5">
-                  <ChartBettorsvsBetsPlacedSummary
-                    gameCategoryId={params.gameCategoryId}
-                  />
-                  {params.gameCategoryId && params.gameCategoryId > 0 ? (
-                    <ChartBettorsBetTypeSummary
-                      gameCategoryId={params.gameCategoryId}
-                    />
-                  ) : (
-                    <ChartBettorsSummary />
-                  )}
+            ) : (
+              (userTypeId === 3 || userTypeId === 4) && (
+                <div className="w-full flex flex-col space-y-5">
+                  {ChartSection}
+                  {ComparisonButton}
                 </div>
-                <div className="self-end my-3">
-                  <Button
-                    variant="contained"
-                    sx={buttonStyles}
-                    onClick={handleViewComparisonClick}
-                  >
-                    View Comparison
-                  </Button>
-                </div>
-              </div>
+              )
             )}
-            <div className="mt-0">
-              <TableBettingSummary gameCategoryId={params.gameCategoryId} />
-            </div>
+            <TableBettingSummary gameCategoryId={gameCategoryId} />
           </div>
         </div>
       </div>

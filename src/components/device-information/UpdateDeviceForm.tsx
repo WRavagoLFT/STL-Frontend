@@ -9,6 +9,7 @@ import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import dayjs from "dayjs";
 import { getUsageNotes } from "~/pages/Protected/device-information/device-information-view";
 import { updateDeviceSchema } from "~/schemas/deviceSchema";
+import { useAuthStore } from "~/store/useAuthStore";
 
 interface UpdateDeviceFormProps {
   title?: string;
@@ -32,6 +33,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
   //console.log('PASSED DEVICE ID', deviceId);
   //console.log('PASSED DEVICE', device);
   const [usageNotes, setUsageNotes] = useState<any[]>([]);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const usageNotesOptions = usageNotes.map((un) => ({
     value: un.DeviceUsageNotesId.toString(),
@@ -612,27 +614,29 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
 
       {/* Submit Button */}
       {/* Buttons */}
-      <div className="flex justify-end gap-3 mt-2">
-        {isDisabled ? (
-          <button
-            type="button"
-            className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-            onClick={handleDisable}
-          >
-            Update
-          </button>
-        ) : (
-          <>
+      {currentUserType !== 3 && (
+        <div className="flex justify-end gap-3 mt-2">
+          {isDisabled ? (
             <button
-              type="submit"
+              type="button"
               className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-              //disabled={!formik.isValid}
+              onClick={handleDisable}
             >
-              Save
+              Update
             </button>
-          </>
-        )}
-      </div>
+          ) : (
+            <>
+              <button
+                type="submit"
+                className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+                //disabled={!formik.isValid}
+              >
+                Save
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       <ConfirmUserActionModalPage
         open={isConfirmModalOpen}

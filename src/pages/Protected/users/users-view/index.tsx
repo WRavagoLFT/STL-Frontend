@@ -16,6 +16,7 @@ import Input from "~/components/ui/inputs/TextInputs";
 import { handleUpdateUser } from "../handleUpdateUserAction";
 import { loadUsers } from "../[role]";
 import useUserStore from "~/store/useUserStore";
+import { useAuthStore } from "~/store/useAuthStore";
 
 type UsersViewPageProps = {
   user?: User;
@@ -38,6 +39,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
     setOperatorMap,
     setPscoBranchMap,
   } = useUserStore();
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   //console.log(user);
   //console.log(slug);
@@ -175,16 +177,13 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
           />
         </div>
       )}
-
-      {/* if no device id, add */}
-      {activeTab === "device" && (
+      
+      {currentUserType !== 3 && activeTab === "device" && !device && (
         <div className="my-6">
-          {!device ? (
-            <AddDeviceForm
-              userid={user?.data?.UserId} // for the user assigned field
-              onSubmit={onAddDeviceSubmit}
-            />
-          ) : null}
+          <AddDeviceForm
+            userid={user?.data?.UserId}
+            onSubmit={onAddDeviceSubmit}
+          />
         </div>
       )}
 

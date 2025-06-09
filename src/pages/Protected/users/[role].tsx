@@ -181,7 +181,7 @@ const RolePage = () => {
     loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap);
   }, [roleConfig, roleKey]);
 
-  console.log("DATA USER", data);
+  // console.log("DATA USER", data);
   // console.log("operatormappp", operatorMap);
   //console.log('ROLE CONFIG IN THE PAGE:', roleConfig);
 

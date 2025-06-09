@@ -63,7 +63,7 @@ const UserSlugPage = () => {
   //console.log("Rendering UpdateUser for user:", user);
 
   return (
-    <AccessGuard allowedUserTypes={[4, 5]}>
+    <AccessGuard allowedUserTypes={[3, 4, 5]}>
       <UsersViewPage user={user} slug={slug as string} />
     </AccessGuard>
   );

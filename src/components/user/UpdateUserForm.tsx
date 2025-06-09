@@ -8,6 +8,7 @@ import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { updateUserSchema } from "~/schemas/userSchema";
+import { useAuthStore } from "~/store/useAuthStore";
 
 interface UpdateUserFormProps {
   title?: string;
@@ -29,8 +30,9 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   onClose,
 }) => {
   const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
-  console.log('SELECTED USER', selectedUser);
-  
+  //console.log('SELECTED USER', selectedUser);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
+
   const sevenDaysAgo = dayjs().subtract(7, "day");
   const [formData, setFormData] = useState<{[key: string]: string | number | string[];}>({});
   const [isDisabled, setIsDisabled] = useState(true);
@@ -205,13 +207,13 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
               <label htmlFor="operatorId" className="block text-sm mb-1">
                 Assigned Company
               </label>
-                <CustomSelect
-                  name="operatorId"
-                  value={formik.values.operatorId}
-                  options={operatorOptions}
-                  error={false}
-                  disabled={true}
-                />
+              <CustomSelect
+                name="operatorId"
+                value={formik.values.operatorId}
+                options={operatorOptions}
+                error={false}
+                disabled={true}
+              />
             </div>
           )}
 
@@ -220,30 +222,31 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
               <label htmlFor="BranchName" className="block text-sm mb-1">
                 Assigned PCSO Branch
               </label>
-                <Input
-                  name="BranchName"
-                  id="BranchName"
-                  value={formik.values.BranchName}
-                  onChange={formik.handleChange}
-                  disabled
-                  //error={!!(formik.touched.email && formik.errors.email)}
-                />
+              <Input
+                name="BranchName"
+                id="BranchName"
+                value={formik.values.BranchName}
+                onChange={formik.handleChange}
+                disabled
+                //error={!!(formik.touched.email && formik.errors.email)}
+              />
             </div>
           )}
 
-          {(formik.values.userTypeId === 1 || formik.values.userTypeId === 2) && (
+          {(formik.values.userTypeId === 1 ||
+            formik.values.userTypeId === 2) && (
             <div>
               <label htmlFor="AssignedArea" className="block text-sm mb-1">
                 Assigned Area / Zone
               </label>
-                <Input
-                  name="AssignedArea"
-                  id="AssignedArea"
-                  value={formik.values.AssignedArea || "N/A"}
-                  onChange={formik.handleChange}
-                  disabled
-                  //error={!!(formik.touched.AssignedArea && formik.errors.AssignedArea)}
-                />
+              <Input
+                name="AssignedArea"
+                id="AssignedArea"
+                value={formik.values.AssignedArea || "N/A"}
+                onChange={formik.handleChange}
+                disabled
+                //error={!!(formik.touched.AssignedArea && formik.errors.AssignedArea)}
+              />
             </div>
           )}
 
@@ -292,7 +295,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
           </div>
         </div>
       </div>
-      
+
       {formik.values.userTypeId !== 1 && formik.values.userTypeId !== 2 && (
         <>
           <h2 className="font-bold mt-3 mb-1">Update History</h2>
@@ -402,28 +405,33 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
         </div>
       )}
 
-      {/* Buttons */}
-      <div className="flex justify-end gap-3 mt-2">
-        {isDisabled ? (
-          <button
-            type="button"
-            className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-            onClick={handleDisable}
-          >
-            Update
-          </button>
-        ) : (
-          <>
-            <button
-              type="submit"
-              className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-              disabled={!formik.isValid}
-            >
-              Save
-            </button>
-          </>
-        )}
-      </div>
+      {currentUserType !== 3 && (
+        <>
+          {/* Buttons */}
+          <div className="flex justify-end gap-3 mt-2">
+            {isDisabled ? (
+              <button
+                type="button"
+                className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+                onClick={handleDisable}
+              >
+                Update
+              </button>
+            ) : (
+              <>
+                <button
+                  type="submit"
+                  className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+                  disabled={!formik.isValid}
+                >
+                  Save
+                </button>
+              </>
+            )}
+          </div>
+        </>
+      )}
+
       <ConfirmUserActionModalPage
         open={isConfirmModalOpen}
         onClose={handleModalClose}
