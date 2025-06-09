@@ -11,6 +11,9 @@ import { useRetailReceiptProcessor } from "~/components/retail-receipts/useRetai
 import Card from "~/components/ui/dashboardcards/Cards";
 import { buttonStylesretail } from "~/styles/theme";
 import { fetchRetailReceiptsDashboard, fetchRetailReceipts } from "~/utils/api/transactions";
+import CustomSelect, { OptionType } from "~/components/ui/inputs/SelectInputs";
+import QuarterSelector from "~/components/ui/inputs/QuarlyInput";
+import Input from "~/components/ui/inputs/TextInputs";
 
 const RetailReceiptPage = () => {
   // set default current month
@@ -18,6 +21,29 @@ const RetailReceiptPage = () => {
     const today = new Date();
     return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
   });
+
+  const filterOptions: OptionType[] = [
+    { label: "Monthly", value: "Monthly" },
+    { label: "Yearly", value: "Yearly" },
+    //{ label: "Quarterly", value: "Quarterly" },
+  ];
+  
+  const [filterBy, setFilterBy] = useState<OptionType>(filterOptions[0]); // default to Monthly
+  const [quarter, setQuarter] = useState<OptionType | null>(null);
+  const [year, setYear] = useState<OptionType | null>(null);
+  const [selectedYear, setSelectedYear] = useState<OptionType | null>(null);
+
+  const currentYear = new Date().getFullYear();
+  const yearOptions: OptionType[] = [];
+  for (let year = currentYear; year >= 2000; year--) {
+    yearOptions.push({ label: String(year), value: String(year) });
+  }
+
+  const handleYearChange = (e: { value: any; target: { name: string; value: string } }) => {
+    const selectedValue = e.value;
+    const selectedOption = yearOptions.find(option => option.value === selectedValue) || null;
+    setSelectedYear(selectedOption);
+  };
 
   const [receiptDataMetrics, setReceiptDataMetrics] = useState<{
     TotalBets: number;
@@ -104,45 +130,57 @@ const RetailReceiptPage = () => {
         <div className="flex flex-col md:flex-row md:flex-wrap gap-4 mb-4">
           <div className="flex-[1_1_200px]">
             <div>
-              <label
-                htmlFor="operationDate"
-                className="text-sm font-medium text-[#0038A8]"
-              >
-                Filter By
+              <label htmlFor="filterBy" className="text-sm font-medium text-[#0038A8]">
+                Filter by
               </label>
-              <input
-                id="operationDate"
-                type="month"
-                value={operationDate}
-                onChange={(e) => setOperationDate(e.target.value)}
-                className="w-full rounded border border-[#0038A8] bg-[#F8F0E3] px-3 py-2 text-sm"
-                max={new Date().toISOString().slice(0, 7)}
+              <CustomSelect
+                name="filterBy"
+                value={filterBy}
+                onChange={(e) =>
+                  setFilterBy({ label: e.value, value: e.value })
+                }
+                //onChange={(selectedOption) => setFilterBy(selectedOption)}
+                options={filterOptions}
               />
             </div>
           </div>
           <div className="flex-[1_1_200px]">
             <div>
               <label
-                htmlFor="operationDate"
-                className="text-sm font-medium text-[#0038A8]"
-              >
+                htmlFor="operationDate" className="text-sm font-medium text-[#0038A8]">
                 Date of Report
               </label>
-              <input
-                id="operationDate"
-                type="month"
-                value={operationDate}
-                onChange={(e) => setOperationDate(e.target.value)}
-                className="w-full rounded border border-[#0038A8] bg-[#F8F0E3] px-3 py-2 text-sm"
-                max={new Date().toISOString().slice(0, 7)}
-              />
+              {filterBy?.value === "Monthly" && (
+                <Input
+                  type="month"
+                  value={operationDate}
+                  onChange={(e: any) => setOperationDate(e.target.value)}
+                />
+              )}
+
+              {filterBy?.value === "Yearly" && (
+                <CustomSelect
+                  name="year"
+                  value={selectedYear}
+                  options={yearOptions}
+                  onChange={handleYearChange}
+                  placeholder="Select Year" 
+                />
+              )}
+              
+              {/* {filterBy?.value === "Quarterly" && (
+                <QuarterSelector
+                  quarterValue={quarter}
+                  yearValue={year}
+                  onChangeQuarter={setQuarter}
+                  onChangeYear={setYear}
+                />
+              )} */}
             </div>
-          </div>          
+          </div>
           <div className="flex-[1_1_200px]" />
-          <div className="flex-[1_1_200px] content-end">
-          </div>
-          <div className="flex-[1_1_200px] content-end">
-          </div>
+          <div className="flex-[1_1_200px] content-end"></div>
+          <div className="flex-[1_1_200px] content-end"></div>
         </div>
 
         {/* Cards */}
@@ -167,59 +205,59 @@ const RetailReceiptPage = () => {
           </div>
           <div className="w-1/2"></div>
         </div>
-        
-        {/* Accordion content below */}
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Left Column */}
-            <div className="w-full md:w-1/2 flex flex-col justify-between">
-              <div>
-                <GrossAACSharePage
-                  totalPercentage={aacTotalPercentage}
-                  totalShareAmount={aacTotalShareAmount}
-                  breakdown={aacBreakdown}
-                />
-                <AACTaxesPage
-                  totalPercentage={aacTaxTotalPercentage}
-                  totalShareAmount={aacTaxTotalShareAmount}
-                  breakdown={aacTaxBreakdown}
-                />
-                <NetAACIncomePage
-                  netAmount={netAacTotalAmount}
-                  netPercentage={netAacTotalPercentage}
-                />
-              </div>
 
-              {/* Export buttons */}
-              <div className="flex gap-4">
-                <Button sx={buttonStylesretail} variant="contained">
-                  Export as CSV
-                </Button>
-                <Button sx={buttonStylesretail} variant="contained">
-                  Export as PDF
-                </Button>
-              </div>
+        {/* Accordion content below */}
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Left Column */}
+          <div className="w-full md:w-1/2 flex flex-col justify-between">
+            <div>
+              <GrossAACSharePage
+                totalPercentage={aacTotalPercentage}
+                totalShareAmount={aacTotalShareAmount}
+                breakdown={aacBreakdown}
+              />
+              <AACTaxesPage
+                totalPercentage={aacTaxTotalPercentage}
+                totalShareAmount={aacTaxTotalShareAmount}
+                breakdown={aacTaxBreakdown}
+              />
+              <NetAACIncomePage
+                netAmount={netAacTotalAmount}
+                netPercentage={netAacTotalPercentage}
+              />
             </div>
 
-            {/* Right Column */}
-            <div className="w-full md:w-1/2 flex flex-col justify-between">
-              <div>
-                <GrossPSCOSharePage
-                  totalPercentage={pcsoTotalPercentage}
-                  totalShareAmount={pcsoTotalShareAmount}
-                  breakdown={pcsoBreakdown}
-                />
-                <PCSOTaxesPage
-                  totalPercentage={pcsoTaxTotalPercentage}
-                  totalShareAmount={pcsoTaxTotalShareAmount}
-                  breakdown={pcsoTaxBreakdown}
-                />
-                <NetPSCOIncomePage
-                  netAmount={netPcsoTotalAmount}
-                  netPercentage={netPcsoTotalPercentage}
-                />
-              </div>
+            {/* Export buttons */}
+            <div className="flex gap-4">
+              <Button sx={buttonStylesretail} variant="contained">
+                Export as CSV
+              </Button>
+              <Button sx={buttonStylesretail} variant="contained">
+                Export as PDF
+              </Button>
             </div>
           </div>
+
+          {/* Right Column */}
+          <div className="w-full md:w-1/2 flex flex-col justify-between">
+            <div>
+              <GrossPSCOSharePage
+                totalPercentage={pcsoTotalPercentage}
+                totalShareAmount={pcsoTotalShareAmount}
+                breakdown={pcsoBreakdown}
+              />
+              <PCSOTaxesPage
+                totalPercentage={pcsoTaxTotalPercentage}
+                totalShareAmount={pcsoTaxTotalShareAmount}
+                breakdown={pcsoTaxBreakdown}
+              />
+              <NetPSCOIncomePage
+                netAmount={netPcsoTotalAmount}
+                netPercentage={netPcsoTotalPercentage}
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </AccessGuard>
   );

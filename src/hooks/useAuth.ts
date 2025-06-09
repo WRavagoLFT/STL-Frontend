@@ -26,7 +26,7 @@ export function useAuth() {
     }
 
     const handleAuthFailure = () => {
-      router.replace("/auth/login");
+      //router.replace("/auth/login");
     };
 
     const checkAndRefresh = async () => {
