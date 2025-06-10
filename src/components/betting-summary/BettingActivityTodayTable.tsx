@@ -100,11 +100,11 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
         </div>
       </div>
       <div className="h-px bg-[#303030] mb-4" />
-      {isLoading ? (
+      {/* {isLoading ? (
         <div className="flex items-center justify-center">
           <CircularProgress />
         </div>
-      ) : (
+      ) : ( */}
         <div className="mt-2 w-full max-h-[720px] overflow-y-auto">
           {rankedRegions.length === 0 ? (
             <div className="p-8 text-sm text-center text-[#888]">
@@ -148,7 +148,7 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
             ))
           )}
         </div>
-      )}
+      {/* )} */}
     </div>
   );
 };
