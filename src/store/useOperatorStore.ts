@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { Operator } from "../types/types";
-import { Column, Field } from "~/types/interfaces";
+import { Column } from "~/types/interfaces";
 
 export interface OperatorsState {
   data: Operator[];
@@ -10,7 +10,7 @@ export interface OperatorsState {
   loading: boolean;
   error: string | null;
   modalOpen: boolean;
-  fields: Field[];
+  //fields: Field[];
   selectedData: Operator | null;
 
   setData: (data: Operator[]) => void;
@@ -20,7 +20,7 @@ export interface OperatorsState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setModalOpen: (open: boolean) => void;
-  setFields: (fields: Field[]) => void;
+  //setFields: (fields: Field[]) => void;
   setSelectedData: (data: Operator | null) => void;
 }
 
@@ -42,6 +42,6 @@ export const useOperatorsData = create<OperatorsState>((set) => ({
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),
   setModalOpen: (open) => set({ modalOpen: open }),
-  setFields: (fields) => set({ fields }),
+  //setFields: (fields) => set({ fields }),
   setSelectedData: (data) => set({ selectedData: data }),
 }));

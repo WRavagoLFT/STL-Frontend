@@ -113,13 +113,12 @@ const SummaryBettorsBetsPlacedPage = () => {
           </div>
             <GenericCSVExportButton
               data={data}
-              headers={["Game Name", "Bettors", "Bets", "Winners"]}
+              headers={["Game Name", "Bettors", "Bets"]}
               title={`Bettors and Bets Summary`}
               getRowData={(item) => [
                 item.gameName,
                 item.bettors,
                 item.bets,
-                item.winners,
               ]}
             />
         </div>

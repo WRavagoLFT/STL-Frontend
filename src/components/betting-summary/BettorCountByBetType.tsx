@@ -3,6 +3,7 @@ import { CircularProgress, Button, } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchTransactions } from "~/utils/api/transactions";
 import { buttonStyles } from "~/styles/theme";
+import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 // Returns the bet types series for a gameCategoryId
 const getBetTypeSeries = (gameCategoryId?: number) => {
@@ -137,9 +138,17 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
           </p>
           <CustomLegend gameCategoryId={params.gameCategoryId} />
         </div>
-        <Button sx={buttonStyles} variant="contained">
-          Export as CSV
-        </Button>
+          <GenericCSVExportButton
+            data={data}
+            headers={["Draw", ...series.map((s) => s.dataKey)]}
+            title="Summary of Bets By Bet Type"
+            getRowData={(item) => [
+              item.draw,
+              ...series.map(({ dataKey }) =>
+                Number(item[dataKey.toLowerCase()] || 0).toFixed(2)
+              ),
+            ]}
+          />
       </div>
 
       <div className="h-full w-full">
@@ -171,7 +180,8 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100,
+                max: 100000,
+                valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
             series={series.map(({ dataKey, color }) => ({

@@ -4,6 +4,7 @@ import { buttonStyles } from "~/styles/theme";
 import { useEffect, useState } from "react";
 import { fetchWinners } from "~/utils/api/winners";
 import dayjs from "dayjs";
+import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 interface Winner {
   GameCategoryId: number;
@@ -104,9 +105,16 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
           </p>
           <CustomLegend />
         </div>
-        <Button sx={buttonStyles} variant="contained">
-          Export as CSV
-        </Button>
+          <GenericCSVExportButton
+            data={chartData}
+            headers={["Draw", "Winners", "Winnings"]}
+            title="Summary of Winners and Winnings per Draw"
+            getRowData={(item) => [
+              item.draw,
+              item.winners.toString(),
+              item.winnings.toFixed(2),
+            ]}
+          />
       </div>
 
       <div className="h-full w-full">
@@ -132,7 +140,8 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100,
+                max: 100000,
+                valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
             series={[

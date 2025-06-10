@@ -4,6 +4,7 @@ import { BarChart  } from "@mui/x-charts/BarChart";
 import { addLabels } from "./tooltips/dataSet";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import { buttonStyles } from "~/styles/theme";
+import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 // Custom Legend circle
 const CustomLegend = () => (
@@ -51,6 +52,9 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
   //console.log("BettersvsBetsPlacedChart Params:", params);
   //console.log("Chart Data: BETTING SUMMARY", chartData);
 
+  //const maxValue = Math.max(...data.map((item: any) => item.bets));
+  //const safeMax = maxValue < 1000 ? 1000 : maxValue;
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -91,7 +95,7 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
         // setChartData(Object.values(drawMap));
         setChartData(
           Object.values(drawMap).map((item) => {
-            const bettors = item.bettors / 10000;
+            const bettors = item.bettors;
             const bets = item.bets / 10000;
             return {
               draw: item.draw,
@@ -126,9 +130,17 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
             </p>
             <CustomLegend />
           </div>
-          <Button sx={buttonStyles} variant="contained">
-            Export as CSV
-          </Button>
+            <GenericCSVExportButton
+              data={chartData}
+              headers={["Draw", "Bettors (in 10k)", "Bets (in 10k)", "Bet-to-Bettor Ratio"]}
+              title="Summary of Bettors and Bets per Draw"
+              getRowData={(item) => [
+                item.draw,
+                item.bettors.toFixed(2),
+                item.bets.toFixed(2),
+                item.ratio.toFixed(2),
+              ]}
+            />
         </div>
       </div>
       <div className="h-full w-full">
@@ -154,7 +166,8 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100,
+                max: 10000,
+                valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
             series={addLabels([

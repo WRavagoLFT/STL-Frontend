@@ -15,7 +15,7 @@ import { userEditColumns } from "~/config/userEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { fetchPCSOBranch } from "~/utils/api/location";
 import axiosInstance from "~/utils/axiosInstance";
-import { handleUpdateUser } from "./handleUpdateUserAction";
+import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
 
 const roleMap: Record<
   string,

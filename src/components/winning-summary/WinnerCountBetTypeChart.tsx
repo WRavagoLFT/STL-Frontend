@@ -3,6 +3,7 @@ import { Button, CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { buttonStyles } from "~/styles/theme";
 import { fetchWinners } from "~/utils/api/winners";
+import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 interface WinnerItem {
   GameCategoryId: number;
@@ -185,9 +186,17 @@ const ChartWinnersBetTypeSummary = ({
           <p className="text-lg leading-none">Today's Winnings by Game Type</p>
           {getCustomLegend(gameCategoryId)}
         </div>
-        <Button sx={buttonStyles} variant="contained">
-          Export as CSV
-        </Button>
+          <GenericCSVExportButton
+            data={chartData}
+            headers={["Draw", ...betTypeSeries.map((s) => s.dataKey)]}
+            title="Today's Winnings by Game Type"
+            getRowData={(item) => [
+              item.draw,
+              ...betTypeSeries.map(({ dataKey }) =>
+                Number(item[dataKey] || 0).toFixed(2)
+              ),
+            ]}
+          />
       </div>
 
       <div className="h-full w-full">
@@ -213,7 +222,8 @@ const ChartWinnersBetTypeSummary = ({
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100,
+                max: 100000,
+                valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
             series={betTypeSeries}
