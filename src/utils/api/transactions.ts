@@ -113,9 +113,11 @@ export const fetchRetailReceiptsData = async (
       ? `/transactions/getRetailReceipts/${year}/${month}`
       : `/transactions/getRetailReceipts/${year}`;
 
-    const { data } = await axiosInstance.get(url, {
-      params: operatorId ? { operatorId } : {},
-    });
+    // const { data } = await axiosInstance.get(url, {
+    //   params: operatorId ? { operatorId } : {},
+    // });
+    const { data } = await axiosInstance.get(url);
+
     return data;
   } catch (error: any) {
     console.error(

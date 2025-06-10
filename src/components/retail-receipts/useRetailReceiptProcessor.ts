@@ -72,7 +72,6 @@ export const useRetailReceiptProcessor = (
     // Normalize filterBy to lowercase string if it is a string
     const filterByLower = typeof filterBy === "string" ? filterBy.toLowerCase() : null;
 
-    // Check if filterBy is "monthly" or "yearly" (case-insensitive)
     const isMonthly = filterByLower === "monthly";
     const isYearly = filterByLower === "yearly";
 
@@ -85,12 +84,12 @@ export const useRetailReceiptProcessor = (
         ? Number(filterBy)
         : undefined;
 
-    console.log("Using filterBy:", filterBy, "converted param:", filterByParam);
-    console.log("Using yearToUse:", yearToUse, "month:", monthParam ?? "N/A");
+    //console.log("Using filterBy:", filterBy, "converted param:", filterByParam);
+    //console.log("Using yearToUse:", yearToUse, "month:", monthParam ?? "N/A");
 
     // Call fetch function with appropriate params
     fetchRetailReceiptsData(yearToUse, monthParam, filterByParam).then((response) => {
-      console.log("Fetch result:", response);
+     // console.log("Fetch result:", response);
 
       if (!response?.success) {
         console.warn("Failed to fetch retail receipts");

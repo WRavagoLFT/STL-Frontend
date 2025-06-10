@@ -37,10 +37,10 @@ export function processShares(
         return processedShare;
       } else {
         if (share) {
-          console.log(
-            `Skipped share '${title}' due to ShareType mismatch:`,
-            share.ShareType
-          );
+          // console.log(
+          //   `Skipped share '${title}' due to ShareType mismatch:`,
+          //   share.ShareType
+          // );
         } else {
           //console.log(`No share data found for title: ${title}`);
         }
@@ -58,7 +58,6 @@ export function processShares(
     breakdown: result,
   };
 }
-
 
 // function in calculating net income ================
 export function calculateNetIncome(

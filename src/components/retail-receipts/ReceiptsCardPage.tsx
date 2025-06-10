@@ -1,5 +1,3 @@
-// components/cards/ReceiptCardsPage.tsx
-
 import React from "react";
 import Card from "../ui/dashboardcards/Cards";
 
