@@ -3,7 +3,7 @@ import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { Device } from "~/types/types";
 import { editLogDevice, fetchUsageNotes } from "~/utils/api/device";
-import { handleUpdateDevice } from "../device-information-add/handleUpdateAction";
+import { handleUpdateDevice } from "../../../../hooks/handleUpdateDeviceAction";
 import { useLoadDevices } from "..";
 import { useRouter } from "next/router";
 import { deviceEditColumns } from "~/config/deviceEditLogTableColumns";

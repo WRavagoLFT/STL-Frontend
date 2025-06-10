@@ -52,6 +52,9 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
   //console.log("BettersvsBetsPlacedChart Params:", params);
   //console.log("Chart Data: BETTING SUMMARY", chartData);
 
+  //const maxValue = Math.max(...data.map((item: any) => item.bets));
+  //const safeMax = maxValue < 1000 ? 1000 : maxValue;
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -92,7 +95,7 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
         // setChartData(Object.values(drawMap));
         setChartData(
           Object.values(drawMap).map((item) => {
-            const bettors = item.bettors / 10000;
+            const bettors = item.bettors;
             const bets = item.bets / 10000;
             return {
               draw: item.draw,
@@ -163,7 +166,8 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100,
+                max: 10000,
+                valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
             series={addLabels([

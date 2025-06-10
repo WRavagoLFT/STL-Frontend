@@ -140,7 +140,6 @@ export interface ReusableModalPageProps {
   };
   isOpen: boolean;
   onClose: () => void;
-  //fields: Field[];
   onSuccess?: () => void;
   onSubmit?: (formData: Record<string, string>) => Promise<void>;
   children?: (props: { handleSubmit: () => void }) => React.ReactNode;
@@ -167,8 +166,6 @@ export interface ReusableModalPageProps {
 export interface ModalPageProps {
   open?: boolean;
   onClose?: () => void;
-  //fields?: Field[];
-  //pageType?: "manager" | "executive" | "operator";
   additionalPayload?: Record<string, any>;
   onFieldChange?: (name: string, value: string) => void;
   initialUserData?: any;

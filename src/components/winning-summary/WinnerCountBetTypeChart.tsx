@@ -222,7 +222,8 @@ const ChartWinnersBetTypeSummary = ({
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100,
+                max: 100000,
+                valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
             series={betTypeSeries}

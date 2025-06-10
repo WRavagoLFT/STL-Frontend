@@ -4,7 +4,7 @@ import AddDeviceForm from "~/components/device-information/AddDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { Device } from "~/types/types";
 import { useLoadDevices } from "..";
-import { handleAddDevice } from "./handleAddAction";
+import { handleAddDevice } from "../../../../hooks/handleAddDeviceAction";
 
 export default function AddDevicePage() {
   const [devices, setDevices] = useState<Device[]>([]);

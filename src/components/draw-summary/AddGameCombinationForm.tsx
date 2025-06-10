@@ -23,6 +23,12 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
   const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [gameTypes, setGameTypes] = useState();
+
+  // const gameTypesOptions = gameTypes?.map((cat) => ({
+  //   value: cat.GameCategoryId.toString(),
+  //   label: cat.GameCategory,
+  // }));
 
   // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
@@ -95,13 +101,53 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
   return (
     <form
       onSubmit={formik.handleSubmit}
-      className="grid grid-cols-2 gap-4"
+      className="grid grid-cols-1 gap-4"
       noValidate
     >
+      {/* Column 1 */}
+      <div className="flex flex-col gap-x-6 gap-y-2">
+        <div>
+          <label htmlFor="gameType" className="block text-sm mb-1">
+            Game Type
+          </label>
+            <CustomSelect
+              name="gameType"
+              //options={gameTypeOptions}
+              onChange={(e) => {
+                const value = e.target.value;
+                formik.setFieldValue("gameType", value ? Number(value) : null);
+              }}
+              placeholder="Select Game Type"
+              error={!!getError("gameType")}
+            />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("gameType") || "\u00A0"}
+          </p>
+        </div>
+
+        <div>
+          <label htmlFor="drawTime" className="block text-sm mb-1">
+            Draw Time
+          </label>
+            <CustomSelect
+              name="drawTime"
+              //options={drawTimeOptions}
+              onChange={(e) => {
+                const value = e.target.value;
+                formik.setFieldValue("drawTime", value ? Number(value) : null);
+              }}
+              placeholder="Select Draw Time"
+              error={!!getError("drawTime")}
+            />
+          <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+            {getError("drawTime") || "\u00A0"}
+          </p>
+        </div>
 
 
 
-        
+
+      </div>
 
       {/* Submit Button */}
       <div className="col-span-2">

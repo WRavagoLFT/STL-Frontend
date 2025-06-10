@@ -180,7 +180,8 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100,
+                max: 100000,
+                valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
             series={series.map(({ dataKey, color }) => ({

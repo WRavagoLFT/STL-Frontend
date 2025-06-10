@@ -21,4 +21,20 @@ export const fetchGameCategories = async () => {
     }
 }
 
+export const fetchGameSchedule = async () => {
+    try {
+        const url = validateRelativeUrl("/gameTypes/getGameCategories");
+        const response = await axiosInstance.get(url)
+        console.log('RESPONSE:', response);
+
+        return response.data
+    }
+
+    catch (error) {
+        console.error("Error fetching game categories:", (error as Error).message);
+        return { success: false, message: (error as Error).message, data: [] };
+    }
+}
+
+
 
