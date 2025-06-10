@@ -1,14 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { CircularProgress, Button, } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
+import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { buttonStyles } from "~/styles/theme";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 interface WinnerItem {
   DrawOrder: number;
-  GameCategory: string;
-  PayoutAmount: number;
+  GameCategoryId: number;
+  TotalBets: number;
+  TransactionDate: string;
+}
+
+interface ChartData {
+  draw: string;
+  pares: number;
+  swer2: number;
+  swer3: number;
+  swer4: number;
 }
 
 const CustomLegend = () => (
@@ -33,123 +41,83 @@ const CustomLegend = () => (
 );
 
 const ChartWinnersSummary = () => {
-  const [data, setData] = useState<
-    {
-      draw: string;
-      pares: number;
-      swer2: number;
-      swer3: number;
-      swer4: number;
-    }[]
-  >([]);
+  const [data, setData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const response = await fetchWinners({ from: today, to: today });
 
-      try {
-        //const from = "2000-05-01";
-        //const to = "2099-05-30";
-        const today = new Date().toISOString().split("T")[0];
-        const from = today;
-        const to = today;
+      if (response.success && Array.isArray(response.data)) {
+        const filteredData = response.data.filter(
+          (item: WinnerItem) => item.TransactionDate.startsWith(today)
+        );
 
-        const result = await fetchWinners({ from, to });
+        const aggregated: Record<number, Omit<ChartData, 'draw'>> = {};
 
-        //console.log("Raw result from fetchWinners:", result);
-
-        if (!result.success || !Array.isArray(result.data)) {
-          console.warn("Result unsuccessful or data is not an array.");
-          setLoading(false);
-          return;
-        }
-
-        const aggregatedData: Record<
-          number,
-          { pares: number; swer2: number; swer3: number; swer4: number }
-        > = {};
-
-        result.data.forEach((item: WinnerItem) => {
+        filteredData.forEach((item: WinnerItem) => {
           const draw = item.DrawOrder;
-          const category = item.GameCategory;
+          if (!aggregated[draw]) {
+            aggregated[draw] = { pares: 0, swer2: 0, swer3: 0, swer4: 0 };
+          }
 
-          if (!aggregatedData[draw]) {
-            aggregatedData[draw] = {
+          switch (item.GameCategoryId) {
+            case 1:
+              aggregated[draw].pares += item.TotalBets;
+              break;
+            case 2:
+              aggregated[draw].swer2 += item.TotalBets;
+              break;
+            case 3:
+              aggregated[draw].swer3 += item.TotalBets;
+              break;
+            case 4:
+              aggregated[draw].swer4 += item.TotalBets;
+              break;
+            default:
+              break;
+          }
+        });
+
+        const formatted: ChartData[] = ["First Draw", "Second Draw", "Third Draw"].map(
+          (label, index) => {
+            const draw = index + 1;
+            const current = aggregated[draw] || {
               pares: 0,
               swer2: 0,
               swer3: 0,
               swer4: 0,
             };
+            return {
+              draw: label,
+              pares: current.pares / 100000,
+              swer2: current.swer2 / 100000,
+              swer3: current.swer3 / 100000,
+              swer4: current.swer4 / 100000,
+            };
           }
+        );
 
-          switch (category) {
-            case "STL Pares":
-              aggregatedData[draw].pares += item.PayoutAmount || 0;
-              break;
-            case "STL Swer2":
-              aggregatedData[draw].swer2 += item.PayoutAmount || 0;
-              break;
-            case "STL Swer3":
-              aggregatedData[draw].swer3 += item.PayoutAmount || 0;
-              break;
-            case "STL Swer4":
-              aggregatedData[draw].swer4 += item.PayoutAmount || 0;
-              break;
-            default:
-              console.warn(`Unhandled GameCategory: ${category}`, item);
-          }
-        });
-
-        //console.log("Aggregated data by draw and category:", aggregatedData);
-
-        const formattedData = [
-          {
-            draw: "First Draw",
-            pares: aggregatedData[1]?.pares || 0,
-            swer2: aggregatedData[1]?.swer2 || 0,
-            swer3: aggregatedData[1]?.swer3 || 0,
-            swer4: aggregatedData[1]?.swer4 || 0,
-          },
-          {
-            draw: "Second Draw",
-            pares: aggregatedData[2]?.pares || 0,
-            swer2: aggregatedData[2]?.swer2 || 0,
-            swer3: aggregatedData[2]?.swer3 || 0,
-            swer4: aggregatedData[2]?.swer4 || 0,
-          },
-          {
-            draw: "Third Draw",
-            pares: aggregatedData[3]?.pares || 0,
-            swer2: aggregatedData[3]?.swer2 || 0,
-            swer3: aggregatedData[3]?.swer3 || 0,
-            swer4: aggregatedData[3]?.swer4 || 0,
-          },
-        ];
-
-        //console.log("Formatted data before scaling:", formattedData);
-
-        const scaledData = formattedData.map((item) => ({
-           ...item,
-           pares: item.pares / 100000,
-           swer2: item.swer2 / 100000,
-           swer3: item.swer3 / 100000,
-           swer4: item.swer4 / 100000,
-         }));
-
-        //console.log("Final scaled data:", scaledData);
-
-        setData(scaledData);
-      } catch (error) {
-        console.error("Error fetching winners summary:", error);
-      } finally {
-        setLoading(false);
-        console.log("Finished fetching and processing data.");
+        setData(formatted);
       }
-    };
-
-    fetchData();
+    } catch (error) {
+      console.error("Error loading Bettors Summary:", (error as Error).message);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Safely calculate max for scaling
+  const maxValue = Math.max(
+    ...data.flatMap((item) => [item.pares, item.swer2, item.swer3, item.swer4])
+  );
+  const safeMax = maxValue < 1 ? 1 : maxValue;
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
@@ -158,53 +126,59 @@ const ChartWinnersSummary = () => {
           <p className="text-lg leading-none">Today's Winnings by Game Type</p>
           <CustomLegend />
         </div>
-          <GenericCSVExportButton
-            data={data}
-            headers={["Draw", "STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"]}
-            title="Today's Winnings by Game Type"
-            getRowData={(item) => [
-              item.draw,
-              item.pares.toFixed(2),
-              item.swer2.toFixed(2),
-              item.swer3.toFixed(2),
-              item.swer4.toFixed(2),
-            ]}
-          />
+        <GenericCSVExportButton
+          data={data}
+          headers={["Draw", "STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"]}
+          title="Today's Winnings by Game Type"
+          getRowData={(item) => [
+            item.draw,
+            item.pares,
+            item.swer2,
+            item.swer3,
+            item.swer4,
+          ]}
+        />
       </div>
 
       <div className="h-full w-full">
-        {loading ? (
+        {/* {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : (
+        ) : ( */}
           <BarChart
             height={300}
             layout="horizontal"
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
             grid={{ vertical: true }}
+            slotProps={{
+              legend: { hidden: true },
+              noDataOverlay: {
+                message: "Today's Winners and Winnings will be displayed once available.",
+              },
+            }}
             series={[
-              { data: data.map((d) => d.pares), color: "#E5C7FF" },
-              { data: data.map((d) => d.swer2), color: "#D2A7FF" },
-              { data: data.map((d) => d.swer3), color: "#BB86FC" },
-              { data: data.map((d) => d.swer4), color: "#A06FE6" },
+              { data: data.map((d) => d.pares), color: "#E5C7FF", label: "STL Pares" },
+              { data: data.map((d) => d.swer2), color: "#D2A7FF", label: "STL Swer2" },
+              { data: data.map((d) => d.swer3), color: "#BB86FC", label: "STL Swer3" },
+              { data: data.map((d) => d.swer4), color: "#A06FE6", label: "STL Swer4" },
             ]}
             yAxis={[
               {
                 scaleType: "band",
-                data: ["First Draw", "Second Draw", "Third Draw"],
+                data: data.map((d) => d.draw),
               },
             ]}
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100000,
+                max: safeMax,
                 valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
           />
-        )}
+        {/* )} */}
       </div>
     </div>
   );
