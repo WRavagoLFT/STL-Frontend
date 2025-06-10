@@ -14,7 +14,6 @@ import dayjs from "dayjs";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import Swal from 'sweetalert2';
 import router from "next/router";
-import ConfirmSuspendModal from "~/components/shared/ConfirmSuspendModal";
 import { useModalStore } from "~/store/useModalStore";
 import useDetailTableStore from "~/store/useTableStore";
 import { useAuthStore } from "~/store/useAuthStore";
@@ -399,7 +398,7 @@ const DetailedTable = <T extends User | Operator | Device>({
           />
         </div>
 
-        {isVerifySuspendModalOpen && (
+        {/* {isVerifySuspendModalOpen && (
           <ConfirmSuspendModal
             formData={formData}
             setFormData={setFormData}
@@ -410,7 +409,7 @@ const DetailedTable = <T extends User | Operator | Device>({
             //endpoint={endpoint ?? { create: '', update: '' }}
             onClose={handleClose}
           />
-        )}
+        )} */}
       </TableContainer>
       <div className="flex justify-end pt-2">
         <CSVExportButtonTable

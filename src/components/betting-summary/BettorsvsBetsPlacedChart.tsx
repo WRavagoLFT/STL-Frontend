@@ -4,6 +4,7 @@ import { BarChart  } from "@mui/x-charts/BarChart";
 import { addLabels } from "./tooltips/dataSet";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import { buttonStyles } from "~/styles/theme";
+import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 // Custom Legend circle
 const CustomLegend = () => (
@@ -126,9 +127,17 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
             </p>
             <CustomLegend />
           </div>
-          <Button sx={buttonStyles} variant="contained">
-            Export as CSV
-          </Button>
+            <GenericCSVExportButton
+              data={chartData}
+              headers={["Draw", "Bettors (in 10k)", "Bets (in 10k)", "Bet-to-Bettor Ratio"]}
+              title="Summary of Bettors and Bets per Draw"
+              getRowData={(item) => [
+                item.draw,
+                item.bettors.toFixed(2),
+                item.bets.toFixed(2),
+                item.ratio.toFixed(2),
+              ]}
+            />
         </div>
       </div>
       <div className="h-full w-full">

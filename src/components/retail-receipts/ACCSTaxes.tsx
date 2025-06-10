@@ -44,8 +44,6 @@ const AACTaxesPage: React.FC<ShareBreakdownPageProps> = ({
             <span className="text-sm font-bold">{title} Details</span>
 
             {/* Breakdown List */}
-            
-            
             {breakdownToShow.length > 0 ? (
               breakdownToShow.map((item, index) => (
               <div

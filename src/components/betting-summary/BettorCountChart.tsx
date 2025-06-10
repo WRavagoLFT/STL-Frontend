@@ -4,6 +4,7 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import { addLabelsGameTypes } from "./tooltips/dataSet";
 import { buttonStyles } from "~/styles/theme";
+import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 // Custom Legend (Dynamically Handles Bet Types)
 const CustomLegend = () => (
@@ -159,9 +160,18 @@ const ChartBettorsSummary = () => {
           </p>
           <CustomLegend />
         </div>
-        <Button sx={buttonStyles} variant="contained">
-          Export as CSV
-        </Button>
+          <GenericCSVExportButton
+            data={data}
+            headers={["Draw", "STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"]}
+            title="Summary of Bettors and Bets per Draw"
+            getRowData={(item) => [
+              item.draw,
+              item.pares.toFixed(2),
+              item.swer2.toFixed(2),
+              item.swer3.toFixed(2),
+              item.swer4.toFixed(2),
+            ]}
+          />
       </div>
 
       <div className="h-full w-full">
