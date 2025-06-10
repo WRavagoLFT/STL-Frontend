@@ -128,7 +128,7 @@ const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: numbe
           getRowData={(item) => [
             item.draw,
             ...series.map(({ dataKey }) =>
-              Number(item[dataKey.toLowerCase()] || 0)
+              Number(item[dataKey.toLowerCase()] || 0).toFixed(3)
             ),
           ]}
         />

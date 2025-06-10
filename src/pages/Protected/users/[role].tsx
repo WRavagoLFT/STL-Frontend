@@ -1,21 +1,34 @@
+// React & Next
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+
+// Stores & Hooks
+import useUserRoleStore from "~/store/useUserStore";
+import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
+
+// Components
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
-import { userTableColumns } from "~/config/userTableColumns";
-import useUserRoleStore from "../../../store/useUserStore";
 import CardsPage from "~/components/user/CardsData";
-import { addUser, editLogUser, fetchOperatorMap, fetchUsersByRole } from "~/utils/api/users";
 import AddUserModal from "~/components/user/AddUser";
-import { RoleConfig, User } from "~/types/types";
 import UpdateUserModal from "~/components/user/UpdateUser";
-import Swal from "sweetalert2";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
-import { userEditColumns } from "~/config/userEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import { fetchPCSOBranch } from "~/utils/api/location";
-import axiosInstance from "~/utils/axiosInstance";
-import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
+
+// Configs & Types
+import { userTableColumns } from "~/config/userTableColumns";
+import { userEditColumns } from "~/config/userEditLogTableColumns";
+import { User } from "~/types/types";
+
+// Utils
+import {
+  addUser,
+  editLogUser
+} from "~/utils/api/users";
+
+// Libs
+import Swal from "sweetalert2";
+import { loadUsers } from "~/hooks/useLoadUsers";
 
 const roleMap: Record<
   string,
@@ -50,62 +63,6 @@ const roleMap: Record<
     roleId: 4,
     permittedUserTypes: [6], // admin ONLY
   },
-};
-
-export const loadUsers = async (
-  roleConfig: RoleConfig | null | undefined,
-  roleKey: string,
-  setData: (users: User[]) => void,
-  setKaboMap: (data: any) => void,
-  setOperatorMap: (data: any) => void,
-  setPscoBranchMap: (data: any) => void
-) => {
-  try {
-    if (!roleConfig?.roleId || !roleKey) {
-      console.warn("Missing roleId or roleKey");
-      return;
-    }
-
-    if (roleKey === "kabo") {
-      await fetchUsersByRole(roleConfig.roleId, null, null, setData);
-      return;
-    }
-
-    if (roleKey === "kubrador") {
-      const response = await axiosInstance.get("/users/getUsers?userType=2");
-      setKaboMap(response.data);
-
-      await fetchUsersByRole(roleConfig.roleId, null, null, setData);
-      return;
-    }
-
-    const operatorMap = await fetchOperatorMap();
-    if (!operatorMap) {
-      console.warn("No operator map found.");
-      setData([]);
-      return;
-    }
-    setOperatorMap(operatorMap);
-
-    const pcsoBranchMap = await fetchPCSOBranch();
-    if (!pcsoBranchMap) {
-      console.warn("No PCSO branch map found.");
-      setData([]);
-      return;
-    }
-    setPscoBranchMap(pcsoBranchMap);
-    //console.log('PCSO BRANCH MAP IN THE USER PAGE', pcsoBranchMap);
-
-    await fetchUsersByRole(
-      roleConfig.roleId,
-      operatorMap,
-      pcsoBranchMap,
-      setData
-    );
-  } catch (error) {
-    console.error("Error in loadUsers:", (error as Error).message);
-    setData([]);
-  }
 };
 
 const RolePage = () => {
@@ -245,7 +202,10 @@ const RolePage = () => {
           textlabel={textlabel}
         />
 
-        <ChartsDataPage pageType={roleKey} dashboardData={data} />
+        <ChartsDataPage 
+          pageType={roleKey} 
+          dashboardData={data} 
+        />
 
         <DetailedTable
           data={data}

@@ -186,7 +186,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
           />
         </div>
       </TableContainer>
-      <div className="flex justify-end pt-2">
+      <div className="flex justify-end pt-1">
         <CSVExportButtonTable
           pageType={pageType}
           columns={columns}

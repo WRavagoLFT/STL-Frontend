@@ -26,7 +26,7 @@ const DashboardCardsPage = ({ gameCategoryId }: { gameCategoryId?: number }) => 
           }),
         ]);
 
-        console.log(winnersResponse);
+        //console.log(winnersResponse);
 
         if (summaryResponse.success) {
           let filteredData = summaryResponse.data;
@@ -55,7 +55,7 @@ const DashboardCardsPage = ({ gameCategoryId }: { gameCategoryId?: number }) => 
             }
           );
 
-          // Fix: count number of winning entries
+          // Count number of winning entries
           if (winnersResponse.success && Array.isArray(winnersResponse.data)) {
             totals.totalWinners = winnersResponse.data.length;
           } else {

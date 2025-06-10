@@ -103,7 +103,7 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
           getRowData={(item) => [
             item.draw,
             item.winners.toString(),
-            item.winnings.toFixed(2),
+            item.winnings,
           ]}
         />
       </div>

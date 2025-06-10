@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchWinners } from "~/utils/api/winners";
-import { Button } from "@mui/material";
-import { buttonStyles } from "~/styles/theme";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 type DrawNumber = 1 | 2 | 3;
@@ -34,55 +32,49 @@ const SummaryWinnersDrawTimePage = () => {
     { draw: string; winners: number; winnings: number }[]
   >([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      //const from = "2000-05-01";
-      //const to = "2099-05-30"; // temporarily set date for debugging
-      
-      const today = new Date().toISOString().split("T")[0];
+  const fetchAndProcessData = useCallback(async () => {
+    setLoading(true);
+    const today = new Date().toISOString().split("T")[0];
 
-      const result = await fetchWinners({
-        from: today,
-        to: today,
-      });
+    const result = await fetchWinners({ from: today, to: today });
 
-      if (!result.success || !Array.isArray(result.data)) {
-        setLoading(false);
-        return;
-      }
-
-      const filteredData: Winner[] = result.data as Winner[];
-
-      const drawSummary: Record<DrawNumber, { winners: number; winnings: number }> = {
-        1: { winners: 0, winnings: 0 },
-        2: { winners: 0, winnings: 0 },
-        3: { winners: 0, winnings: 0 },
-      };
-
-      for (const item of filteredData) {
-        const draw = item.DrawOrder as DrawNumber;
-        if (drawSummary[draw]) {
-          drawSummary[draw].winners += 1;
-          drawSummary[draw].winnings += item.PayoutAmount || 0;
-        }
-      }
-
-      const finalChartData = [1, 2, 3].map((draw) => {
-        const drawNum = draw as DrawNumber;
-        return {
-          draw: drawLabelMap[drawNum] || `Draw ${drawNum}`,
-          winners: drawSummary[drawNum].winners,
-          winnings: drawSummary[drawNum].winnings / 100000,
-        };
-      });
-
-      setChartData(finalChartData);
+    if (!result.success || !Array.isArray(result.data)) {
       setLoading(false);
+      return;
+    }
+
+    const filteredData: Winner[] = result.data;
+
+    const drawSummary: Record<DrawNumber, { winners: number; winnings: number }> = {
+      1: { winners: 0, winnings: 0 },
+      2: { winners: 0, winnings: 0 },
+      3: { winners: 0, winnings: 0 },
     };
 
-    fetchData();
+    for (const item of filteredData) {
+      const draw = item.DrawOrder as DrawNumber;
+      if (drawSummary[draw]) {
+        drawSummary[draw].winners += 1;
+        drawSummary[draw].winnings += item.PayoutAmount || 0;
+      }
+    }
+
+    const finalChartData = [1, 2, 3].map((draw) => {
+      const drawNum = draw as DrawNumber;
+      return {
+        draw: drawLabelMap[drawNum] || `Draw ${drawNum}`,
+        winners: drawSummary[drawNum].winners,
+        winnings: drawSummary[drawNum].winnings / 100000,
+      };
+    });
+
+    setChartData(finalChartData);
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    fetchAndProcessData();
+  }, [fetchAndProcessData]);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
@@ -91,12 +83,12 @@ const SummaryWinnersDrawTimePage = () => {
           <p className="text-lg leading-none">Summary of Winners</p>
           <CustomLegend />
         </div>
-          <GenericCSVExportButton
-            data={chartData}
-            headers={["Draw", "Winners", "Winnings (in 100k)"]}
-            title="Summary of Winners per Draw"
-            getRowData={(item) => [item.draw, item.winners, item.winnings.toFixed(2)]}
-          />
+        <GenericCSVExportButton
+          data={chartData}
+          headers={["Draw", "Winners", "Winnings (in 100k)"]}
+          title="Summary of Winners per Draw"
+          getRowData={(item) => [item.draw, item.winners, item.winnings.toFixed(2)]}
+        />
       </div>
       <div>
         <BarChart
@@ -129,7 +121,7 @@ const SummaryWinnersDrawTimePage = () => {
               label: "Total Winners",
               scaleType: "linear",
               min: 0,
-              max: Math.max(...chartData.map((item) => item.winners), 70),
+              max: Math.max(...chartData.map((item) => item.winners), 1000),
               valueFormatter: (value: number) => `${value}`,
               tickSize: 8,
               barCategoryGap: 0.7,
