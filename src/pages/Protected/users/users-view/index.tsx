@@ -10,14 +10,14 @@ import { useLoadDevices } from "../../device-information";
 import { useRouter } from "next/router";
 import { handleUpdateDevice } from "../../device-information/device-information-add/handleUpdateAction";
 import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
-import { deviceEditColumns } from "~/config/deviceEditLogTableColumns";
-import { editLogDevice } from "~/utils/api/device";
+import { userEditColumns } from "~/config/userEditLogTableColumns";
 import Input from "~/components/ui/inputs/TextInputs";
 import { handleUpdateUser } from "../handleUpdateUserAction";
 import { loadUsers } from "../[role]";
 import useUserStore from "~/store/useUserStore";
 import { useAuthStore } from "~/store/useAuthStore";
 import { FaMobileAlt } from "react-icons/fa";
+import { editLogUser } from "~/utils/api/users";
 
 type UsersViewPageProps = {
   user?: User;
@@ -90,27 +90,32 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
     }
   }, [activeTab, user?.data?.DeviceId]);
 
-  // for edit logs
   const fetchLogs = useCallback(async () => {
-    if (activeTab === "history" && user?.data?.DeviceId) {
+    const userId = user?.data?.UserId;
+
+    if (activeTab === "history" && userId) {
       try {
-        const logsResponse = await editLogDevice(user.data.DeviceId);
+        const logsResponse = await editLogUser(userId);
 
         if (logsResponse?.success) {
           setEditData(logsResponse.data || []);
-          setColumns(deviceEditColumns());
+          setColumns(userEditColumns());
         } else {
-          console.error("Failed to fetch edit logs:", logsResponse.message);
+          console.error("[ERROR] Failed to fetch edit logs:", logsResponse.message);
         }
       } catch (error) {
-        console.error("Error loading edit logs:", error);
+        console.error("[ERROR] Error loading edit logs:", error);
       }
+    } else {
+      console.warn("[WARN] Skipping fetchLogs: either not in 'history' tab or UserId is missing.");
     }
-  }, [activeTab, user?.data?.DeviceId]);
+  }, [activeTab, user?.data?.UserId]);
 
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
+
+  console.log('', editData);
 
   return (
     <div>

@@ -4,6 +4,7 @@ import { fetchHistoricalSummary } from "../../utils/api/transactions";
 import { useRouter } from "next/navigation";
 import { Button } from "@mui/material";
 import { buttonStyles } from "~/styles/theme";
+import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 // Custom Legend circle
 const CustomLegend = () => (
@@ -110,9 +111,17 @@ const SummaryBettorsBetsPlacedPage = () => {
             </p>
             <CustomLegend />
           </div>
-          <Button sx={buttonStyles} variant="contained">
-            Export as CSV
-          </Button>
+            <GenericCSVExportButton
+              data={data}
+              headers={["Game Name", "Bettors", "Bets", "Winners"]}
+              title={`Bettors and Bets Summary`}
+              getRowData={(item) => [
+                item.gameName,
+                item.bettors,
+                item.bets,
+                item.winners,
+              ]}
+            />
         </div>
       </div>
       <div className="h-full w-full">

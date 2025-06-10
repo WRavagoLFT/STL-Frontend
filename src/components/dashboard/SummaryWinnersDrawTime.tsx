@@ -3,6 +3,7 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchWinners } from "~/utils/api/winners";
 import { Button } from "@mui/material";
 import { buttonStyles } from "~/styles/theme";
+import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 type DrawNumber = 1 | 2 | 3;
 
@@ -90,11 +91,13 @@ const SummaryWinnersDrawTimePage = () => {
           <p className="text-lg leading-none">Summary of Winners</p>
           <CustomLegend />
         </div>
-        <Button sx={buttonStyles} variant="contained">
-          Export as CSV
-        </Button>
+          <GenericCSVExportButton
+            data={chartData}
+            headers={["Draw", "Winners", "Winnings (in 100k)"]}
+            title="Summary of Winners per Draw"
+            getRowData={(item) => [item.draw, item.winners, item.winnings.toFixed(2)]}
+          />
       </div>
-
       <div>
         <BarChart
           height={300}
