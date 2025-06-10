@@ -77,8 +77,9 @@ const ChartWinnersBetTypeSummary = ({
       //console.log("Using gameCategoryId:", gameCategoryId);
 
       try {
-        const from = "2000-01-01";
-        const to = "2999-01-01";
+        const today = new Date().toISOString().split("T")[0];
+        const from = today;
+        const to = today;
         const response = await fetchWinners({ from, to, gameCategoryId });
 
         //console.log("Response received:", response);

@@ -19,9 +19,10 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
 
   const getWinningRegions = async () => {
     try {
+      const today = new Date().toISOString().split("T")[0];
       const response = await fetchWinners({
-        from: "2000-01-01",
-        to: "2099-12-31",
+        from: today,
+        to: today,
       });
 
       if (!response.success || !response.data || response.data.length === 0) {

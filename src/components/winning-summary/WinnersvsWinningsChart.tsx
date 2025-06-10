@@ -42,14 +42,14 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      const from = "2000-05-01";
-      const to = "2099-05-30";
-      //const today = new Date().toISOString().split("T")[0];
+      //const from = "2000-05-01";
+      //const to = "2099-05-30";
+      const today = new Date().toISOString().split("T")[0];
       //console.log("Fetching winners with params:", { gameCategoryId, from: today, to: today });
 
       const result = await fetchWinners({
-        from,
-        to,
+        from: today,
+        to: today,
         gameCategoryId,
       });
 

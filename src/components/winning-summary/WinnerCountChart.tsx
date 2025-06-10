@@ -49,9 +49,11 @@ const ChartWinnersSummary = () => {
       setLoading(true);
 
       try {
-        const from = "2000-05-01";
-        const to = "2099-05-30";
-        //console.log(`Date range: from ${from} to ${to}`);
+        //const from = "2000-05-01";
+        //const to = "2099-05-30";
+        const today = new Date().toISOString().split("T")[0];
+        const from = today;
+        const to = today;
 
         const result = await fetchWinners({ from, to });
 
