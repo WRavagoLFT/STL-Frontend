@@ -105,18 +105,20 @@ export const fetchRetailReceiptsMetrics = async (
 export const fetchRetailReceiptsData = async (
   year: number,
   month?: number,
+  filterByParam?: number, // if still needed
   operatorId?: number
 ) => {
   try {
-    // Choose endpoint based on presence of month param
-    const url = month
+    const baseUrl = month
       ? `/transactions/getRetailReceipts/${year}/${month}`
       : `/transactions/getRetailReceipts/${year}`;
 
-    // const { data } = await axiosInstance.get(url, {
-    //   params: operatorId ? { operatorId } : {},
-    // });
-    const { data } = await axiosInstance.get(url);
+    const params: Record<string, any> = {};
+
+    if (operatorId) params.operatorId = operatorId;
+    if (filterByParam) params.filterBy = filterByParam; // only if relevant to your backend
+
+    const { data } = await axiosInstance.get(baseUrl, { params });
 
     return data;
   } catch (error: any) {
@@ -131,6 +133,8 @@ export const fetchRetailReceiptsData = async (
     };
   }
 };
+
+
 
 export const fetchCompareHistoricalDate = async (
   urlPath: string,

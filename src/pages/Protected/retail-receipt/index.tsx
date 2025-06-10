@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import AACTaxesPage from "~/components/retail-receipts/ACCSTaxes";
 import GrossAACSharePage from "~/components/retail-receipts/GrossAACShare";
@@ -8,7 +8,7 @@ import NetPSCOIncomePage from "~/components/retail-receipts/NetPSCOIncome";
 import PCSOTaxesPage from "~/components/retail-receipts/PCSOTaxes";
 import { useRetailReceiptProcessor } from "~/components/retail-receipts/useRetailReceiptProcessor";
 import { fetchRetailReceiptsMetrics, fetchRetailReceiptsData } from "~/utils/api/transactions";
-import Select, { ActionMeta, SingleValue } from 'react-select';
+import Select, { ActionMeta, SingleValue } from "react-select";
 import ReceiptCardsPage from "~/components/retail-receipts/ReceiptsCardPage";
 import Input from "~/components/ui/inputs/TextInputs";
 
@@ -65,92 +65,84 @@ const RetailReceiptPage = () => {
     if (newValue) {
       setSelectedYear(newValue);
     } else {
-      setSelectedYear({ label: currentYearOption.toString(), value: currentYearOption.toString() });
+      setSelectedYear({
+        label: currentYearOption.toString(),
+        value: currentYearOption.toString(),
+      });
     }
   };
 
-  // Fetch dashboard metrics on filterBy, operationDate, or selectedYear change
-  useEffect(() => {
-    const fetchMetrics = async () => {
-      setLoading(true);
-      try {
-        let res;
-        if (filterBy.value === "Monthly") {
-          const [year, month] = operationDate.split("-");
-          res = await fetchRetailReceiptsMetrics(Number(year), Number(month));
-        } else if (filterBy.value === "Yearly" && selectedYear) {
-          res = await fetchRetailReceiptsMetrics(Number(selectedYear.value));
-        }
-        if (res?.success) {
-          setReceiptDataMetrics(res.data);
-        } else {
-          setReceiptDataMetrics(null);
-        }
-      } catch (error) {
-        setReceiptDataMetrics(null);
-      } finally {
-        setLoading(false);
+  // Fetch metrics callback
+  const fetchMetrics = useCallback(async () => {
+    setLoading(true);
+    try {
+      let res;
+      if (filterBy.value === "Monthly") {
+        const [year, month] = operationDate.split("-");
+        res = await fetchRetailReceiptsMetrics(Number(year), Number(month));
+      } else if (filterBy.value === "Yearly" && selectedYear) {
+        res = await fetchRetailReceiptsMetrics(Number(selectedYear.value));
       }
-    };
-    fetchMetrics();
+
+      if (res?.success) {
+        setReceiptDataMetrics(res.data);
+      } else {
+        setReceiptDataMetrics(null);
+      }
+    } catch (error) {
+      setReceiptDataMetrics(null);
+    } finally {
+      setLoading(false);
+    }
   }, [filterBy, operationDate, selectedYear]);
 
-  // metrics
-  React.useEffect(() => {
-    if (filterBy?.value === "Yearly" && selectedYear?.value) {
-      const currentMonth = (new Date().getMonth() + 1).toString().padStart(2, "0");
-      const newOperationDate = `${selectedYear.value}-${currentMonth}`;
-
-      if (operationDate !== newOperationDate) {
-        console.log(`Resetting operationDate to current month of selected year: ${newOperationDate}`);
-        setOperationDate(newOperationDate);
-      }
-    }
-  }, [filterBy, selectedYear, operationDate]);
+  useEffect(() => {
+    fetchMetrics();
+  }, [fetchMetrics]);
 
   // Fetch retail data
-  React.useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const fetchRetailData = useCallback(async () => {
+    setLoading(true);
 
-      if (!operationDate) {
-        console.warn("No operationDate provided, skipping fetch");
-        setReceiptData(null);
-        setLoading(false);
-        return;
+    if (!operationDate) {
+      console.warn("No operationDate provided, skipping fetch");
+      setReceiptData(null);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      let data;
+      const yearFromOpDate = operationDate.split("-")[0];
+      const year = selectedYear ? selectedYear.value : yearFromOpDate;
+      const updatedOperationDate = operationDate.replace(/^\d{4}/, year);
+      const [parsedYearStr, parsedMonthStr] = updatedOperationDate.split("-");
+      const parsedYear = Number(parsedYearStr);
+      const parsedMonth = Number(parsedMonthStr);
+
+      if (filterBy.value === "Monthly") {
+        data = await fetchRetailReceiptsData(parsedYear, parsedMonth);
+
+      } else if (filterBy.value === "Yearly" && selectedYear) {
+        data = await fetchRetailReceiptsData(Number(selectedYear.value));
       }
 
-      try {
-        let data;
-        const yearFromOpDate = operationDate.split("-")[0];
-        const year = selectedYear ? selectedYear.value : yearFromOpDate;
-        const updatedOperationDate = operationDate.replace(/^\d{4}/, year);
-        const [parsedYearStr, parsedMonthStr] = updatedOperationDate.split("-");
-        const parsedYear = Number(parsedYearStr);
-        const parsedMonth = Number(parsedMonthStr);
-
-        if (filterBy.value === "Monthly") {
-          data = await fetchRetailReceiptsData(parsedYear, parsedMonth);
-
-        } else if (filterBy.value === "Yearly" && selectedYear) {
-          data = await fetchRetailReceiptsData(Number(selectedYear.value));
-        }
-
-        if (data?.success) {
-          setReceiptData(data.data);
-        } else {
-          setReceiptData(null);
-        }
-      } catch (error) {
-        console.error("Fetch error:", error);
+      if (data?.success) {
+        setReceiptData(data.data);
+      } else {
         setReceiptData(null);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchData();
+    } catch (error) {
+      console.error("Fetch error:", error);
+      setReceiptData(null);
+    } finally {
+      setLoading(false);
+    }
   }, [filterBy, operationDate, selectedYear]);
+
+  useEffect(() => {
+    fetchRetailData();
+  }, [fetchRetailData]);
 
   const yearNumber = selectedYear ? Number(selectedYear.value) : undefined;
 
@@ -180,7 +172,10 @@ const RetailReceiptPage = () => {
         <div className="flex flex-col md:flex-row md:flex-wrap gap-4 mb-4">
           <div className="flex-[1_1_200px]">
             <div>
-              <label htmlFor="filterBy" className="text-sm font-medium text-[#0038A8]">
+              <label
+                htmlFor="filterBy"
+                className="text-sm font-medium text-[#0038A8]"
+              >
                 Filter by
               </label>
               <Select
@@ -201,7 +196,7 @@ const RetailReceiptPage = () => {
                   control: (provided, state) => ({
                     ...provided,
                     borderRadius: "0.5rem",
-                    color: '#2F2F2F',
+                    color: "#2F2F2F",
                     padding: "0.25rem",
                     boxShadow: state.isFocused ? "none" : provided.boxShadow,
                   }),
@@ -216,7 +211,10 @@ const RetailReceiptPage = () => {
           </div>
           <div className="flex-[1_1_200px]">
             <div>
-              <label htmlFor="operationDate" className="text-sm font-medium text-[#0038A8]">
+              <label
+                htmlFor="operationDate"
+                className="text-sm font-medium text-[#0038A8]"
+              >
                 Date of Report
               </label>
               {filterBy?.value === "Monthly" && (
@@ -239,7 +237,7 @@ const RetailReceiptPage = () => {
                     control: (provided, state) => ({
                       ...provided,
                       borderRadius: "0.5rem",
-                      color: '#2F2F2F',
+                      color: "#2F2F2F",
                       padding: "0.25rem",
                       boxShadow: state.isFocused ? "none" : provided.boxShadow,
                     }),
