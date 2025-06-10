@@ -10,7 +10,7 @@ import { editLogOperator } from "~/utils/api/operators";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { operatorEditColumns } from "~/config/operatorEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import { fetchFormOptionsData } from "..";
+import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
 
 export interface OperatorViewPageProps {
   slug: string;

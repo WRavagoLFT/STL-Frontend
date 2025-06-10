@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const response = await getCurrentUser({});
-      console.log("getcurrentuser response", response);
+      //console.log("getcurrentuser response", response);
 
       if (response && response.data) {
         setUser({
@@ -127,8 +127,7 @@ const Sidebar: React.FC = () => {
       {!collapsed && (
         <div
           onClick={handleLogout}
-          className="flex items-center mt-2 px-4 py-2 cursor-pointer rounded-md text-sm transition-colors hover:bg-blue-700"
-        >
+          className="flex items-center mt-2 px-4 py-2 cursor-pointer rounded-md text-sm transition-colors hover:bg-blue-700">
           <FaSignOutAlt size={20} />
           {!collapsed && <span className="ml-2">Logout</span>}
         </div>

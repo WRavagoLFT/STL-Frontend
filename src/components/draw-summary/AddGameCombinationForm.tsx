@@ -154,10 +154,10 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
       );
 
       identifiedGameTypeIdRef.current = foundGameType?.GameTypeId;
-      console.log("Identified GameTypeId (via useEffect):", identifiedGameTypeIdRef.current);
+      //console.log("Identified GameTypeId (via useEffect):", identifiedGameTypeIdRef.current);
     } else {
       identifiedGameTypeIdRef.current = undefined;
-      console.log("Could not identify GameTypeId: Missing Game Category ID or Game Schedule ID.");
+      //console.log("Could not identify GameTypeId: Missing Game Category ID or Game Schedule ID.");
     }
 
     const isCurrentScheduleValid = drawTimeOptions.some(

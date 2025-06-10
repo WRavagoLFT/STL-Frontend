@@ -25,21 +25,18 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
   onViewEditLogs,
   selectedUser,
 }) => {
-  const { user, setUser, errors, setErrors, handleManagerChange } =
-    useUpdateModalState();
-
+  const { user, setUser, errors, setErrors, handleManagerChange } = useUpdateModalState();
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isDisabled, setIsDisabled] = useState(true);
   const [showEditButton, setShowEditButton] = useState(true);
   const [selectedGameTypes, setSelectedGameTypes] = useState([]);
-
   const [selectedProvince, setSelectedProvince] = useState([]);
   const [area, setArea] = useState<string | null>(null);
 
   // console.log("hihihh", areaofoperations);
-  console.log("SELECTED USERRR:", selectedUser);
-  console.log("initialUserData:", initialUserOperatorData);
-  console.log("provinces:", provinces);
+  //console.log("SELECTED USERRR:", selectedUser);
+  //console.log("initialUserData:", initialUserOperatorData);
+  //console.log("provinces:", provinces);
   const handleDisable = () => {
     setIsDisabled(false);
     setShowEditButton(false);
@@ -68,7 +65,7 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
   }));
 
   useEffect(() => {
-    console.log("initialUserDatass:", initialUserOperatorData);
+    //console.log("initialUserDatass:", initialUserOperatorData);
 
     if (initialUserOperatorData && Object.keys(initialUserOperatorData).length > 0) {
       const operatorData = initialUserOperatorData.data;
@@ -89,21 +86,21 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
           })
         );
 
-        console.log("Mapped GameTypes for Select:", mappedGameTypes);
-        console.log("cities", mappedCities);
-        console.log(mappedGameTypes);
+        //console.log("Mapped GameTypes for Select:", mappedGameTypes);
+        //console.log("cities", mappedCities);
+        //console.log(mappedGameTypes);
         setSelectedGameTypes(mappedGameTypes);
       } else {
         setSelectedGameTypes([]);
-        console.log("No GameTypes found. Resetting selected game types.");
+        //console.log("No GameTypes found. Resetting selected game types.");
       }
 
       setFormData(operatorData);
-      console.log("Form data set:", operatorData);
+      //console.log("Form data set:", operatorData);
     } else {
       setFormData({});
       setSelectedGameTypes([]);
-      console.log("No initialUserData found. Resetting form and game types.");
+      //console.log("No initialUserData found. Resetting form and game types.");
     }
   }, [initialUserOperatorData]);
 
@@ -123,9 +120,9 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
       ? selectedOptions.map((option) => option.value)
       : [];
 
-    console.log(`Field Name: ${fieldName}`);
-    console.log(`Selected Options:`, selectedOptions);
-    console.log(`Selected Values:`, selectedValues);
+    //console.log(`Field Name: ${fieldName}`);
+    //console.log(`Selected Options:`, selectedOptions);
+    //console.log(`Selected Values:`, selectedValues);
 
     setFormData({
       ...formData, // Merge the existing user object
