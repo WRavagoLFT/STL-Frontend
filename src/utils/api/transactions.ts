@@ -75,17 +75,22 @@ export const fetchDrawSummary = async (
   }
 };
 
-export const fetchRetailReceiptsDashboard = async (
+// Fetch metrics for Monthly or Yearly depending on params
+export const fetchRetailReceiptsMetrics = async (
   year: number,
-  month: number
+  month?: number
 ) => {
   try {
-    const url = `/transactions/getRetailReceipts/metrics/${year}/${month}`;
+    // Choose endpoint based on presence of month param
+    const url = month
+      ? `/transactions/getRetailReceipts/metrics/${year}/${month}`
+      : `/transactions/getRetailReceipts/metrics/${year}`;
+
     const { data } = await axiosInstance.get(url);
     return data;
   } catch (error: any) {
     console.error(
-      "Error fetching retail receipts:",
+      "Error fetching retail receipts metrics:",
       error?.response?.data || error.message
     );
     return {
@@ -96,20 +101,29 @@ export const fetchRetailReceiptsDashboard = async (
   }
 };
 
-export const fetchRetailReceipts = async (
+// Fetch retail receipts data for Monthly or Yearly depending on params
+export const fetchRetailReceiptsData = async (
   year: number,
-  month: number,
+  month?: number,
+  filterByParam?: number, // if still needed
   operatorId?: number
 ) => {
   try {
-    const url = `/transactions/getRetailReceipts/${year}/${month}`;
-    const { data } = await axiosInstance.get(url, {
-      params: operatorId ? { operatorId } : {}, // Add query param only if operatorId exists
-    });
+    const baseUrl = month
+      ? `/transactions/getRetailReceipts/${year}/${month}`
+      : `/transactions/getRetailReceipts/${year}`;
+
+    const params: Record<string, any> = {};
+
+    if (operatorId) params.operatorId = operatorId;
+    if (filterByParam) params.filterBy = filterByParam;
+
+    const { data } = await axiosInstance.get(baseUrl, { params });
+
     return data;
   } catch (error: any) {
     console.error(
-      "Error fetching retail receipts:",
+      "Error fetching retail receipts data:",
       error?.response?.data || error.message
     );
     return {

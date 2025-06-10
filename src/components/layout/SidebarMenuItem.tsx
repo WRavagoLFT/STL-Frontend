@@ -51,7 +51,7 @@ const MENU_VISIBILITY: Record<string, number[]> = {
   "Betting Summary": [3, 4, 6],
   "Winning Summary": [3, 4, 6],
   "Draw Summary": [3, 4, 5, 6,],
-  "Device Information": [5, 6],
+  "Device Information": [5],
   "Retail Receipt": [3, 4, 6],
 };
 
@@ -71,11 +71,11 @@ const iconMap: Record<string, React.ReactNode> = {
 
 const routeMap: Record<string, string> = {
   Dashboard: "/dashboard",
-  Managers: "/managers",
-  Executive: "/executives",
+  Managers: "/users/managers",
+  Executive: "/users/executives",
   Operators: "/operators",
-  Kabo: "/kabo",
-  Kubrador: "/kubrador",
+  Kabo: "/users/kabo",
+  Kubrador: "/users/kubrador",
   "Betting Summary": "/betting-summary",
   "Winning Summary": "/winning-summary",
   "Draw Summary": "/draw-summary",
@@ -93,6 +93,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
 }) => {
   const router = useRouter();
   const currentPath = router.asPath;
+
   if (!MENU_VISIBILITY[label]?.includes(userTypeId)) return null;
 
   const submenu =

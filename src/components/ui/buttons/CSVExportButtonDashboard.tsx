@@ -1,60 +1,52 @@
 import React from "react";
 import { Button } from "@mui/material";
 import { buttonStyles } from "~/styles/theme";
-import { CSVExportButtonProps } from "~/types/interfaces";
-import { getRoleName } from "~/utils/dashboarddata";
+import * as XLSX from "xlsx";
 
-const convertToCSV = (data: any[], title: string) => {
-  const headers = ["Region", "Total", "Active", "Inactive", "Deleted", "New"];
+interface GenericExportButtonProps {
+  data: any[];
+  headers: string[];
+  title: string;
+  getRowData: (item: any) => (string | number)[];
+  filename?: string;
+}
 
-  const createRow = (item: any, isHeader: boolean = false) => {
-    return headers.map(header => {
-      const value = isHeader ? header : (item[header.toLowerCase()] ?? "");
-      // If value contains spaces or commas, wrap with quotes
-      const stringValue = String(value);
-      if (stringValue.includes(",") || stringValue.includes(" ")) {
-        return `"${stringValue}"`;
-      }
-      return stringValue;
-    }).join(",");
-  };
+const GenericCSVExportButton: React.FC<GenericExportButtonProps> = ({
+  data,
+  headers,
+  title,
+  getRowData,
+  filename
+}) => {
+  const exportToExcel = () => {
+    const worksheetData = [
+      [title],
+      [],
+      headers,
+      ...data.map(getRowData),
+    ];
 
-  const titleRow = title + "\n";
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+    worksheet["!merges"] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } }];
 
-  const csvContent = [
-    titleRow,
-    createRow({}, true), // Header row
-    ...data.map(item => createRow(item)) // Data rows
-  ].join("\n");
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Export");
 
-  return csvContent;
-};
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
 
-const CSVExportButtonDashboard: React.FC<CSVExportButtonProps> = ({ statsPerRegion, pageType, roleId }) => {
-  const downloadCSV = (data: any[], pageType: string) => {
-    
-  const baseRole = getRoleName(roleId ?? 0);
-  const pluralRole = baseRole.endsWith("s") ? baseRole : baseRole + "s";
-  const pageTitle = `${pluralRole} Dashboard Page`;
-
-    const csvContent = convertToCSV(data, pageTitle);
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
-
+    const file = `${(filename ?? title).replace(/\s+/g, "_").toLowerCase()}.xlsx`;
     link.href = URL.createObjectURL(blob);
-    link.download = `${pageType}_dashboard_data.csv`;
+    link.download = file;
     link.click();
   };
 
   return (
-    <Button
-      sx={buttonStyles}
-      variant="contained"
-      onClick={() => downloadCSV(statsPerRegion ?? [],  pageType)}
-    >
+    <Button sx={buttonStyles} variant="contained" onClick={exportToExcel}>
       Export as CSV
     </Button>
   );
 };
 
-export default CSVExportButtonDashboard;
+export default GenericCSVExportButton;

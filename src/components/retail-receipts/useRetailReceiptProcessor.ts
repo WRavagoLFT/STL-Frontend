@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { Share } from "~/types/types";
-import { fetchRetailReceipts } from "~/utils/api/transactions";
+import { fetchRetailReceiptsData } from "~/utils/api/transactions";
 import { calculateNetIncome, processShares } from "./calculateShareTotals";
 
-// reusable function for calculation
 export const useRetailReceiptProcessor = (
+  filterBy: string,
   operationDate: string,
+  selectedYear?: number,
   operatorId?: number
 ) => {
   const [aacBreakdown, setAacBreakdown] = useState<Share[]>([]);
@@ -59,92 +60,73 @@ export const useRetailReceiptProcessor = (
   ];
 
 useEffect(() => {
-  // console.log("useRetailReceiptProcessor useEffect triggered");
-  // console.log("operationDate:", operationDate);
-  // console.log("Retail receipts for operator", JSON.stringify(operatorId));
+  if (!operationDate) {
+    console.log("Missing operationDate, skipping fetch.");
+    return;
+  }
 
-  const [year, month] = operationDate.split("-").map(Number);
- // console.log("Parsed year and month:", year, month);
+  //console.log('OPERATOR ID IN THE PROCESS FUNCTION:', operatorId);
 
-  fetchRetailReceipts(year, month, operatorId).then((response) => {
-    // console.log("fetchRetailReceipts response:", response);
+  const [parsedYear, parsedMonth] = operationDate.split("-").map(Number);
+  const yearToUse = selectedYear ?? parsedYear;
 
+  const filterByLower = typeof filterBy === "string" ? filterBy.toLowerCase() : null;
+
+  const isMonthly = filterByLower === "monthly";
+  const isYearly = filterByLower === "yearly";
+
+  const monthParam: number | undefined = isMonthly ? parsedMonth : undefined;
+
+  const filterByParam: number | undefined =
+    !isMonthly && !isYearly && typeof filterBy !== "undefined"
+      ? Number(filterBy)
+      : undefined;
+
+  fetchRetailReceiptsData(yearToUse, monthParam, filterByParam, operatorId).then((response) => {
     if (!response?.success) {
       console.warn("Failed to fetch retail receipts");
       return;
     }
 
-    const aac = processShares(
-      response?.data?.Receipts?.AAC,
-      AAC_GROSS_TITLES,
-      year,
-      month,
-      1
-    );
-    // console.log("AAC processed shares:", aac);
+    const aac = processShares(response.data?.Receipts?.AAC, AAC_GROSS_TITLES, yearToUse, monthParam, 1);
     setAacBreakdown(aac.breakdown);
     setAacTotalPercentage(aac.totalPercentage);
     setAacTotalShareAmount(aac.totalShareAmount);
 
-    const pcso = processShares(
-      response?.data?.Receipts?.PCSO,
-      PCSO_TITLES,
-      year,
-      month,
-      1
-    );
-    // console.log("PCSO processed shares:", pcso);
+    const pcso = processShares(response.data?.Receipts?.PCSO, PCSO_TITLES, yearToUse, monthParam, 1);
     setPcsoBreakdown(pcso.breakdown);
     setPcsoTotalPercentage(pcso.totalPercentage);
     setPcsoTotalShareAmount(pcso.totalShareAmount);
 
-    const aacTax = processShares(
-      response?.data?.Receipts?.PCSO,
-      AAC_TAX_TITLES,
-      year,
-      month,
-      2
-    );
-    // console.log("AAC Tax processed shares:", aacTax);
+    const aacTax = processShares(response.data?.Receipts?.PCSO, AAC_TAX_TITLES, yearToUse, monthParam, 2);
     setAacTaxBreakdown(aacTax.breakdown);
     setAacTaxTotalPercentage(aacTax.totalPercentage);
     setAacTaxTotalShareAmount(aacTax.totalShareAmount);
 
-    const pcsoTax = processShares(
-      response?.data?.Receipts?.PCSO,
-      PCSO_TAX_TITLES,
-      year,
-      month,
-      2
-    );
-    // console.log("PCSO Tax processed shares:", pcsoTax);
+    const pcsoTax = processShares(response.data?.Receipts?.PCSO, PCSO_TAX_TITLES, yearToUse, monthParam, 2);
     setPcsoTaxBreakdown(pcsoTax.breakdown);
     setPcsoTaxTotalPercentage(pcsoTax.totalPercentage);
     setPcsoTaxTotalShareAmount(pcsoTax.totalShareAmount);
 
-    const { netAmount: netAacAmount, netPercentage: netAacPercentage } =
-      calculateNetIncome(
-        aac.totalShareAmount,
-        aac.totalPercentage,
-        aacTax.totalShareAmount,
-        aacTax.totalPercentage
-      );
-    // console.log("Net AAC totals:", netAacAmount, netAacPercentage);
+    const { netAmount: netAacAmount, netPercentage: netAacPercentage } = calculateNetIncome(
+      aac.totalShareAmount,
+      aac.totalPercentage,
+      aacTax.totalShareAmount,
+      aacTax.totalPercentage
+    );
     setNetAacTotalAmount(netAacAmount);
     setNetAacTotalPercentage(netAacPercentage);
 
-    const { netAmount: netPcsoAmount, netPercentage: netPcsoPercentage } =
-      calculateNetIncome(
-        pcso.totalShareAmount,
-        pcso.totalPercentage,
-        pcsoTax.totalShareAmount,
-        pcsoTax.totalPercentage
-      );
-    // console.log("Net PCSO totals:", netPcsoAmount, netPcsoPercentage);
+    const { netAmount: netPcsoAmount, netPercentage: netPcsoPercentage } = calculateNetIncome(
+      pcso.totalShareAmount,
+      pcso.totalPercentage,
+      pcsoTax.totalShareAmount,
+      pcsoTax.totalPercentage
+    );
     setNetPcsoTotalAmount(netPcsoAmount);
     setNetPcsoTotalPercentage(netPcsoPercentage);
   });
-}, [operationDate, operatorId]);
+}, [filterBy, operationDate, selectedYear, operatorId]);
 
   return {
     aacBreakdown,

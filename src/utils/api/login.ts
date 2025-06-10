@@ -7,12 +7,7 @@ export const loginUser = async (
   router: any
 ) => {
   try {
-    console.log("[loginUser] Attempting login with payload:", payload);
-
     const loginResponse = await axiosInstance.post("/auth/login", payload);
-    console.log("[loginUser] Login successful:", loginResponse.status);
-
-    console.log("[loginUser] Calling handleRouter for role-based redirect...");
     await handleRouter(router);
 
   } catch (error: unknown) {

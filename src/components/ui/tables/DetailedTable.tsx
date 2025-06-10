@@ -51,10 +51,15 @@ const DetailedTable = <T extends User | Operator | Device>({
       .filter((key): key is string => !!key);
 
     const enrichedData = data.map((item) => {
-      const operatorId = item.OperatorId;
+      let operatorId: number | undefined;
+
+      // Narrow the type safely to access OperatorId
+      if ("OperatorId" in item && typeof item.OperatorId === "number") {
+        operatorId = item.OperatorId;
+      }
 
       const operator =
-        typeof operatorId === "number" ? operatorMap?.[operatorId] : undefined;
+        operatorId !== undefined ? operatorMap?.[operatorId] : undefined;
 
       return {
         ...item,
@@ -101,14 +106,27 @@ const DetailedTable = <T extends User | Operator | Device>({
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")}`;
 
-  const handleOpenViewModal = useCallback(() => {
-    if (!selectedRow) {
+  const handleOpenView = useCallback((row?: T) => {
+    const targetRow = row || selectedRow;
+
+    if (!targetRow) {
       console.warn("[handleOpenViewModal] No selected row available.");
       return;
     }
 
-    const { OperatorName, OperatorId } = selectedRow;
+    const {
+      OperatorName,
+      OperatorId,
+      FirstName,
+      LastName,
+      UserId,
+      UserTypeId,
+      DeviceName,
+      DeviceId,
+      AssignedUser,
+    } = targetRow;
 
+    // Same logic, replace selectedRow with targetRow
     if (source === "operators") {
       if (!OperatorName || !OperatorId) {
         console.warn("[handleOpenViewModal] Missing OperatorName or OperatorId.");
@@ -116,23 +134,38 @@ const DetailedTable = <T extends User | Operator | Device>({
       }
 
       const slug = generateSlug(OperatorName, OperatorId);
-
-      modalStore.setSelectedData(selectedRow);
+      modalStore.setSelectedData(targetRow);
       modalStore.setOperatorId(OperatorId);
-
       router.push(`/operators/${slug}`);
+    } else if (source === "users" && (UserTypeId === 1 || UserTypeId === 2 || UserTypeId === 3)) {
+      if (!FirstName || !UserId) {
+        console.warn("[handleOpenViewModal] Missing FirstName or UserId.");
+        return;
+      }
+
+      const fullName = `${FirstName} ${LastName || ""}`.trim();
+      const slug = generateSlug(fullName, UserId);
+      modalStore.setSelectedData(targetRow);
+      router.push(`/users/users-view/${slug}`);
+    } else if (source === "device") {
+      if (!AssignedUser || !DeviceId) {
+        console.warn("[handleOpenViewModal] Missing AssignedUser or DeviceId.");
+        return;
+      }
+
+      const slug = generateSlug(AssignedUser, DeviceId);
+      modalStore.setSelectedData(targetRow);
+      router.push(`/device-information/device-information-view/${slug}`);
     } else {
-      // If you're opening a modal for update instead of view
       if (onUpdateClick) {
-        onUpdateClick(selectedRow); // e.g., for users // 
+        onUpdateClick(targetRow);
       } else {
-        modalStore.openModal("view", selectedRow); // fallback
+        modalStore.openModal("view", targetRow);
       }
     }
 
     setOpenEditLogModal(false);
   }, [selectedRow, source, router, onUpdateClick, setOpenEditLogModal]);
-
   
   const handleClose = () => {
     setIsVerifyModalOpen(false); // Close the verification modal
@@ -197,7 +230,10 @@ const DetailedTable = <T extends User | Operator | Device>({
                 <SearchIcon style={{ fontSize: 20 }} />
               </div>
             </div>
-            <IconButton onClick={() => setIsFilterActive(!isFilterActive)} className="ml-2">
+            <IconButton
+              onClick={() => setIsFilterActive(!isFilterActive)}
+              className="ml-2"
+            >
               {isFilterActive ? (
                 <FilterListOffIcon sx={{ color: "#ACA993" }} />
               ) : (
@@ -205,27 +241,33 @@ const DetailedTable = <T extends User | Operator | Device>({
               )}
             </IconButton>
           </div>
-          {userTypeId !== null && [4, 5, 6].includes(userTypeId) && pageType && ( // not show when executive
-              <Button variant="contained" onClick={onAddClick} sx={buttonStyles}>
+          {userTypeId !== null &&
+            [4, 5, 6].includes(userTypeId) &&
+            pageType && ( // not show when executive
+              <Button
+                variant="contained"
+                onClick={onAddClick}
+                sx={buttonStyles}
+              >
                 {pageType === "manager"
                   ? "Add Manager"
                   : pageType === "executive"
-                  ? "Add Executive"
-                  : pageType === "kubrador"
-                  ? "Add Kubrador"
-                  : pageType === "operator"
-                  ? "Add Operator"
-                  : pageType === "kabo"
-                  ? "Add Kabo"
-                  : pageType === "Device Information"
-                  ? "Add Device"
-                  : "Add"}
+                    ? "Add Executive"
+                    : pageType === "kubrador"
+                      ? "Add Kubrador"
+                      : pageType === "operator"
+                        ? "Add Operator"
+                        : pageType === "kabo"
+                          ? "Add Kabo"
+                          : pageType === "Device Information"
+                            ? "Add Device"
+                            : "Add"}
               </Button>
             )}
         </div>
         <Table size="small">
           <TableHead>
-            <TableRow sx={{ '&:hover': { backgroundColor: '#F08060' } }}>
+            <TableRow sx={{ "&:hover": { backgroundColor: "#F08060" } }}>
               {columns.map((col) =>
                 col.sortable || col.filterable ? (
                   <SortableTableCell
@@ -244,21 +286,25 @@ const DetailedTable = <T extends User | Operator | Device>({
           <TableBody>
             {paginatedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length + (actionsRender ? 1 : 1)} align="center" className="!p-2">
+                <TableCell
+                  colSpan={columns.length + (actionsRender ? 1 : 1)}
+                  align="center"
+                  className="!p-2"
+                >
                   <div className="flex flex-col items-center py-7 text-[#0038A8]">
                     <PersonOffIcon style={{ fontSize: 50 }} />
                     <h6 className="mt-2 font-sm text-lg">
-                        {pageType === "manager"
-                          ? "No Manager available"
-                          : pageType === "executive"
+                      {pageType === "manager"
+                        ? "No Manager available"
+                        : pageType === "executive"
                           ? "No Executive available"
                           : pageType === "kubrador"
-                          ? "No Kubrador available"
-                          : pageType === "operator"
-                          ? "No Operator available"
-                          : pageType === "Device Information"
-                          ? "No Device Information available"
-                          : "No data available"}
+                            ? "No Kubrador available"
+                            : pageType === "operator"
+                              ? "No Operator available"
+                              : pageType === "Device Information"
+                                ? "No Device Information available"
+                                : "No data available"}
                     </h6>
                   </div>
                 </TableCell>
@@ -270,53 +316,71 @@ const DetailedTable = <T extends User | Operator | Device>({
                     const key = String(col.key);
                     const value = (row as any)[key];
                     return (
-                      <TableCell key={key} style={{ padding: '0.5rem' }}>
+                      <TableCell key={key} style={{ padding: "0.5rem" }}>
                         {col.render
                           ? col.render(row as T)
                           : col.filterValue
                             ? typeof col.filterValue === "function"
                               ? col.filterValue(row as T)
                               : col.filterValue
-                            : typeof value === "string" || typeof value === "number"
+                            : typeof value === "string" ||
+                                typeof value === "number"
                               ? value.toString()
                               : Array.isArray(value)
-                                ? value.map((v: any) => v?.CityName ?? v?.toString()).join(", ")
+                                ? value
+                                    .map(
+                                      (v: any) => v?.CityName ?? v?.toString()
+                                    )
+                                    .join(", ")
                                 : ""}
                       </TableCell>
                     );
                   })}
                   <TableCell>
-                    <IconButton
-                      onClick={(e) => {
-                        setAnchorEl(e.currentTarget);
-                        setSelectedRow(row as T);
-                      }}
-                    >
-                      <MoreHorizIcon sx={{ color: "#0038A8" }} />
-                    </IconButton>
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={Boolean(anchorEl)}
-                      onClose={resetMenu}
-                    >
-                      <MenuItem
+                    {userTypeId === 3 ? (
+                      <span
+                        className="text-[#0038A8] cursor-pointer hover:underline"
                         onClick={() => {
-                          resetMenu(); // close menu first
-                          handleOpenViewModal(); // then handle action
+                          setSelectedRow(row as T);
+                          handleOpenView(row as T);
                         }}
                       >
                         View
-                      </MenuItem>
-                      <MenuItem
-                        onClick={() => {
-                          if (selectedRow) handleSuspend(selectedRow);
-                          resetMenu(); // close menu after delete
-                        }}
-                      >
-                        Delete
-                      </MenuItem>
-                    </Menu>
-
+                      </span>
+                    ) : (
+                      <>
+                        <IconButton
+                          onClick={(e) => {
+                            setAnchorEl(e.currentTarget);
+                            setSelectedRow(row as T);
+                          }}
+                        >
+                          <MoreHorizIcon sx={{ color: "#0038A8" }} />
+                        </IconButton>
+                        <Menu
+                          anchorEl={anchorEl}
+                          open={Boolean(anchorEl)}
+                          onClose={resetMenu}
+                        >
+                          <MenuItem
+                            onClick={() => {
+                              resetMenu();
+                              handleOpenView();
+                            }}
+                          >
+                            View
+                          </MenuItem>
+                          <MenuItem
+                            onClick={() => {
+                              if (selectedRow) handleSuspend(selectedRow);
+                              resetMenu();
+                            }}
+                          >
+                            Delete
+                          </MenuItem>
+                        </Menu>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -340,14 +404,13 @@ const DetailedTable = <T extends User | Operator | Device>({
             formData={formData}
             setFormData={setFormData}
             //errors={errors}
-            actionType='suspend'
+            actionType="suspend"
             setErrors={setErrors}
             open={isVerifySuspendModalOpen}
             //endpoint={endpoint ?? { create: '', update: '' }}
             onClose={handleClose}
           />
         )}
-
       </TableContainer>
       <div className="flex justify-end pt-2">
         <CSVExportButtonTable

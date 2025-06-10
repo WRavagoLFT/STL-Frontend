@@ -94,7 +94,7 @@ export interface DetailedTableProps<T> {
     update: string;
   };
   shouldOpenAsPage?: boolean;
-  source?: 'users' | 'operators';
+  source?: 'users' | 'operators' | 'device';
   onAddClick?: () => void;
   onUpdateClick?: (row: T) => void; // for update modal
 }
@@ -210,7 +210,10 @@ export const defaultValues: UserFormData = {
   email: "",
   password: "",
   phoneNumber: "",
+
   operatorId: 0,
+  userTypeId: 0,
+  accountType: 0
 };
 
 export interface ShareBreakdownPageProps {

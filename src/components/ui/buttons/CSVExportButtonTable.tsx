@@ -4,79 +4,82 @@ import { buttonStyles } from "~/styles/theme";
 import { CSVExportButtonProps } from "~/types/interfaces";
 import { getRoleName, getUserStatus } from "~/utils/dashboarddata";
 import dayjs from "dayjs";
+import * as XLSX from "xlsx";
 
-// Function to convert the data to CSV format
-const convertToCSV = (data: any[], columns: any[], title: string, operatorMap: any[]) => {
-  const headers = columns.map((col) => col.label);
+const convertToExcelData = (data: any[], columns: any[], operatorMap: any[]) => {
+  return data.map((item) => {
+    const row: Record<string, any> = {};
 
-  // Function to create each row of the CSV
-  const createRow = (item: any, isHeader: boolean = false) => {
-    return headers.map((header, index) => {
-      const columnKey = columns[index].key;
+    columns.forEach((col) => {
+      const { key, label } = col;
 
-      if (isHeader) return header; // No formatting for headers
-
-      if (columnKey === "OperatorDetails.OperatorName") {
-        const name = operatorMap[item.OperatorId]?.OperatorName ?? "No operator assigned";
-        return name;
-      }
-
-      if (columnKey === "Status") {
+      if (key === "OperatorDetails.OperatorName") {
+        row[label] = operatorMap[item.OperatorId]?.OperatorName ?? "No operator assigned";
+      } else if (key === "Status") {
         const sevenDaysAgo = dayjs().subtract(7, "days");
-        const status = getUserStatus(item, sevenDaysAgo);
-        return status;
-      }
-
-      if (columnKey === "Cities") {
-        const cityNames = Array.isArray(item.Cities)
+        row[label] = getUserStatus(item, sevenDaysAgo);
+      } else if (key === "Cities") {
+        row[label] = Array.isArray(item.Cities)
           ? item.Cities.map((c: any) => c.CityName).join(", ")
           : "No cities";
-        return cityNames;
-      }
-
-      if (columnKey === "DateOfRegistration") {
-        const formattedDate = item.DateOfRegistration
-          ? dayjs(item.DateOfRegistration).format("MMMM D, YYYY h:mm A")
+      } else if (key === "DateOfRegistration") {
+        row[label] = item.DateOfRegistration
+          ? dayjs(item.DateOfRegistration).format("YYYY/MM/DD HH:mm:ss")
           : "";
-        return formattedDate;
+      } else if (key === "DateOfOperation") {
+        row[label] = item.DateOfOperation
+          ? dayjs(item.DateOfOperation).format("YYYY/MM/DD HH:mm:ss")
+          : "";
+      } else {
+        const value = key.split(".").reduce((obj: any, k: string) => obj?.[k], item);
+        row[label] = value ?? "";
       }
+    });
 
-      const value = columnKey.split('.').reduce((obj: any, key: string) => obj?.[key], item);
-      return String(value ?? "");
-    }).join(",");
-  };
-
-  const titleRow = `${title}\n\n`; // Add title with a newline
-  const headerRow = createRow({}, true); // Create header row
-  const dataRows = data.map(item => createRow(item)).join("\n"); // Create data rows
-
-  return `${titleRow}${headerRow}\n${dataRows}`; // Combine everything
+    return row;
+  });
 };
 
-const CSVExportButtonTable: React.FC<CSVExportButtonProps> = ({ statsPerRegion, pageType, roleId, columns, operatorMap }) => {
-  const downloadCSV = (data: any[], columns: any[], pageType: string, operatorMap: any[]) => {
-    const baseRole = getRoleName(roleId ?? 0); // Get role name based on roleId
-    const pluralRole = baseRole.endsWith("s") ? baseRole : baseRole + "s"; // Make the role plural
-    const pageTitle = `${pluralRole} Dashboard Page`; // Define the title for the CSV
+const CSVExportButtonTable: React.FC<CSVExportButtonProps> = ({
+  statsPerRegion,
+  pageType,
+  roleId,
+  columns,
+  operatorMap,
+}) => {
+  const downloadExcel = () => {
+    const baseRole = getRoleName(roleId ?? 0);
+    const pluralRole = baseRole.endsWith("s") ? baseRole : baseRole + "s";
 
-    // Generate CSV content
-    const csvContent = convertToCSV(data, columns, pageTitle, operatorMap);
+    const readablePageType = pageType ?? "Summary";
+    //const capitalizedPageType = readablePageType.charAt(0).toUpperCase() + readablePageType.slice(1);
 
-    // Create a Blob with the CSV content and trigger download
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
+    const title = `${pluralRole} Data Table Summary`;
+    const sheetTitle = `${pluralRole} Dashboard`;
 
-    link.href = URL.createObjectURL(blob);
-    link.download = `${pageType}_summary_data.csv`; // Set the file name dynamically
-    link.click(); // Trigger the file download
+    const excelData = convertToExcelData(
+      statsPerRegion ?? [],
+      columns ?? [],
+      operatorMap ?? []
+    );
+
+    // Create worksheet with title in A1
+    const worksheet = XLSX.utils.aoa_to_sheet([[title]]); // Title row
+
+    // Add data starting at A3 (skip title and headers)
+    XLSX.utils.sheet_add_json(worksheet, excelData, {
+      origin: "A3", // start adding data here
+      skipHeader: false,
+    });
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetTitle);
+
+    XLSX.writeFile(workbook, `${title.replace(/\s+/g, "_").toLowerCase()}.xlsx`);
   };
 
   return (
-    <Button
-      sx={buttonStyles}
-      variant="contained"
-      onClick={() => downloadCSV(statsPerRegion ?? [], columns ?? [], pageType, operatorMap ?? [])}
-    >
+    <Button sx={buttonStyles} variant="contained" onClick={downloadExcel}>
       Export as CSV
     </Button>
   );

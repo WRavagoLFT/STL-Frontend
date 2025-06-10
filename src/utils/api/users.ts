@@ -1,4 +1,4 @@
-import { Operator, User } from "~/types/types";
+import { Branch, Operator, User } from "~/types/types";
 import axiosInstance from "../axiosInstance";
 
 // Helper to validate URL paths
@@ -12,8 +12,8 @@ const validateRelativeUrl = (url: string) => {
 // fetching of users and operator map
 export const fetchUsersByRole = async (
   roleId: number,
-  operatorMap: any | null,
-  pscoBranchMap: any | null,
+  operatorMap: Record<number, Operator> | null,
+  pscoBranchMap: Record<number, Branch> | null,
   setData: (data: User[]) => void
 ): Promise<void> => {
   if (!roleId) {
@@ -87,7 +87,7 @@ export const fetchOperatorMap = async (): Promise<Record<number, Operator> | nul
 };
 
 // Add user function
-const addUser = async (userData: Record<string, any>) => {
+export const addUser = async (userData: Record<string, any>) => {
   try {
     const url = validateRelativeUrl("/users/addUser");
     const response = await axiosInstance.post(url, userData, {
@@ -108,7 +108,7 @@ const addUser = async (userData: Record<string, any>) => {
 };
 
 // Fetch user by ID function
-const fetchUserById = async (userId: string | number, ) => {
+export const fetchUserById = async (userId: string | number, ) => {
     try {
         const url = validateRelativeUrl("/users/getUsers");
         const response = await axiosInstance.get(url, {
@@ -143,25 +143,18 @@ const fetchUserById = async (userId: string | number, ) => {
 };
 
 // Update user function
-const updateUser = async (userData: Record<string, any>) => {
+export const updateUser = async (userData: Record<string, any>) => {
   try {
     const url = validateRelativeUrl("/users/edituser");
-
-    console.log("Sending PATCH request to:", url);
-    console.log("Payload:", JSON.stringify(userData, null, 2));
-
     const response = await axiosInstance.patch(
       url,
-      userData  // <-- send userData directly, NOT wrapped inside { userData }
+      userData
     );
-
-    console.log("Response data:", response.data);
 
     return response.data;
   } catch (error: any) {
     // More detailed error logging
     if (error.response) {
-      // Server responded with status code outside 2xx
       console.error("Error response status:", error.response.status);
       console.error("Error response data:", error.response.data);
       return {
@@ -189,15 +182,13 @@ const updateUser = async (userData: Record<string, any>) => {
   }
 };
 
-
 // Get user edit log function
-const editLogUser = async (userId: number) => {
+export const editLogUser = async (userId: number) => {
     try {
         const url = validateRelativeUrl("/users/getEditLog");
         const response = await axiosInstance.get(url, {
             params: { userId },
         });
-
         console.log("Edit log response:", response.data);
 
         return response.data;
@@ -207,4 +198,3 @@ const editLogUser = async (userId: number) => {
     }
 };
 
-export { addUser, updateUser, fetchUserById, editLogUser };

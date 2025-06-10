@@ -28,6 +28,7 @@ export const userTableColumns = (roleId: number): Column<User>[] => {
       label: "Created By",
       sortable: true,
       filterable: true,
+      render: (log: User) => log.CreatedBy ? log.CreatedBy : "No value",
     },
     {
       key: "Status",
@@ -86,12 +87,12 @@ export const userTableColumns = (roleId: number): Column<User>[] => {
   // to be adjusted
   if (roleId === 5) {
     columns.splice(1, 0, {
-      key: "OperatorDetails.OperatorName",
+      key: "BranchName",
       label: "PSCO Branch",
       sortable: true,
       filterable: false,
       render: (user) =>
-        user.OperatorDetails?.OperatorName ?? "No operator assigned",
+        user?.BranchName ?? "No branch name assigned",
     });
   }
 

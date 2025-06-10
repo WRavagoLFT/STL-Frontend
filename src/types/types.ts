@@ -1,6 +1,7 @@
 import { ZodSchema } from "zod";
 
 export interface User {
+  data?: any;
   userId?: number;
   firstName: string;
   lastName: string;
@@ -21,8 +22,13 @@ export interface User {
   OperatorId?: number;
   UserTypeId?: number;
   
+  pcsoBranchId?: number;
   BranchId?: number;
   BranchName?: string;
+  AssignedArea?: string;
+
+  cityName?: number;
+  kaboId?: number;
 
   fullName?: string;
   DateOfRegistration?: string;
@@ -142,7 +148,7 @@ export interface NetIncomePageProps {
 export type Branch = {
   BranchId: number;
   BranchName: string;
-  // Add more fields if needed
+  //branchId: number;
 };
 
 export interface Device {
@@ -152,9 +158,27 @@ export interface Device {
   telcoProvider: string;
   dataPlan: string;
   assignedUser: number;
+  
+  deviceId?: number;
+  issuedBy?: string;
+  lastknownGPS?: string;
+  lastSyncTimestamp?: string;
+  unauthorizedLocationAlerts?: string;
+  dataStatus?: string;
+  lastMaintenance?: string;
+  replacementHistory?: string;
+  applicationVersion?: string;
+  dateInstalled?: string;
+  lastLoginTime?: string;
+  lastAppUpdated?: string;
+  OperatorName?: string;
+  remarks?: string;
+
+  CreatedAt?: string;
 
   DeviceId?: number;
   AssignmentDate?: string;
+  AssignedUser?: string;
   IssuedBy?: string;
   UsageNotes?: string;
   SIMNumber?: string;
@@ -168,6 +192,23 @@ export interface Device {
   DateApplicationInstalled?: string | null;
   DateApplicationUpdated?: string | null;
   LastLoginTime?: string;
+}
+
+export type RoleConfig = {
+  label: string;
+  textlabel: string;
+  roleId: number;
+  permittedUserTypes: number[];
+};
+
+export type GameCombination = {
+  gameType?: number;
+  provinceId?: number;
+  combinationOne?: number;
+  combinationTwo?: number;
+  combinationThree?: number;
+  combinationFour?: number;
+  gameSchedule?: number;
 }
 
 

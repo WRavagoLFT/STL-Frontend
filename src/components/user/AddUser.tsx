@@ -10,9 +10,10 @@ type AddUserModalProps = {
   operatorMap: Record<number, Operator>;
   userTypeId: number;
   pcsoBranchMap: { data: Branch[] };
+  kaboMap: User | null;
 };
 
-export default function AddUserModal({ open, onClose, operatorMap, onSubmit, userTypeId, pcsoBranchMap }: AddUserModalProps) {
+export default function AddUserModal({ open, onClose, operatorMap, onSubmit, userTypeId, pcsoBranchMap, kaboMap }: AddUserModalProps) {
   const title =
   userTypeId === 1 ? "Add Kubrador"
     : userTypeId === 2 ? "Add Kabo"
@@ -28,6 +29,7 @@ export default function AddUserModal({ open, onClose, operatorMap, onSubmit, use
         onSubmit={onSubmit}
         userTypeId={userTypeId}
         pcsoBranchMap={pcsoBranchMap}
+        kaboMap={kaboMap}
       />
     </ModalWrapper>
   );

@@ -18,6 +18,7 @@ interface AddUserFormProps {
   userTypeId: number;
   onClose?: () => void;
   pcsoBranchMap: { data: Branch[] };
+  kaboMap: User | null;
 }
 
 const AddUserForm: React.FC<AddUserFormProps> = ({
@@ -26,8 +27,10 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
   onSubmit,
   userTypeId,
   onClose,
-  pcsoBranchMap
+  pcsoBranchMap,
+  kaboMap
 }) => {
+  
   const operatorOptions: OptionType[] = Object.values(operatorMap).map(
     (operator) => ({
       value:
@@ -38,10 +41,25 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
     })
   );
 
-  const pcsoBranchOptions: OptionType[] = (pcsoBranchMap?.data || []).map((branch) => ({
-    value: branch.BranchId?.toString() ?? "0",
-    label: branch.BranchName ?? "Unknown",
-  }));
+  const pcsoBranchOptions: OptionType[] = Object.values(pcsoBranchMap?.data || {}).map(
+    (branch) => ({
+      value:
+        branch.BranchId !== undefined
+          ? branch.BranchId.toString()
+          : "0",
+      label: branch.BranchName ?? "Unknown",
+    })
+  );
+
+  //console.log("kaboMap:", kaboMap);
+  const kaboOptions = Array.isArray(kaboMap?.data)
+    ? kaboMap.data.map(user => ({
+        value: user.UserId !== undefined ? user.UserId.toString() : "0",
+        label: user.FirstName ?? "Unknown",
+      }))
+    : [];
+
+  //console.log('KABO OPTIONS', kaboOptions);
 
   const suffixOptions: OptionType[] = [
     { label: "N/A", value: "" },
@@ -84,11 +102,13 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           ? initialData.operatorId.toString()
           : "",
       accountType: 2,
-      BranchId: initialData.BranchId || "",
+      pcsoBranchId: initialData.pcsoBranchId || "",
+      cityName: initialData.cityName || "", // array of cities dapat.
+      kaboId: initialData.kaboId || "",
     },
-    validate,    
+    validate,
     onSubmit: async (values) => {
-    console.log("[Form Submit] Submitted Values:", values);
+      console.log("[Form Submit] Submitted Values:", values);
 
       const result = await Swal.fire({
         title: "Add Confirmation",
@@ -101,15 +121,41 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         cancelButtonColor: "#d33",
       });
 
-      if (result.isConfirmed) {
-        const submittedData: { [key: string]: string | number | string[] } = {
-          ...values,
-          operatorId: parseInt(values.operatorId),
-        };
-        setFormData(submittedData);
-        openConfirmModal();
+      if (!result.isConfirmed) return;
+
+      // Remove null, undefined, or empty string values
+      const cleanedData: { [k: string]: string | number | string[] } = Object.fromEntries(
+        Object.entries(values).filter(
+          ([, value]) =>
+            value !== null &&
+            value !== undefined &&
+            (typeof value === "string" ? value.trim() !== "" : true)
+        )
+      );
+
+      // Transform cleaned data
+      if (cleanedData.kaboId && !isNaN(Number(cleanedData.kaboId))) {
+        cleanedData.kaboId = Number(cleanedData.kaboId);
+      } else {
+        delete cleanedData.kaboId;
       }
-      // Do nothing if user cancels
+
+      if (cleanedData.userTypeId === 2) {
+        // Kabo – cityName becomes array of strings
+        cleanedData.cityName = String(cleanedData.cityName) // 
+          .split(",")
+          .map((s) => s.trim());
+      }
+
+      if (cleanedData.userTypeId === 1) {
+        // Kubrador – cityName becomes barangayName
+        const barangayStr = String(cleanedData.cityName || "").trim();
+        cleanedData.barangayName = barangayStr ? [barangayStr] : [];
+        delete cleanedData.cityName;
+      }
+
+      setFormData(cleanedData);
+      openConfirmModal();
     },
   });
 
@@ -226,13 +272,9 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
             <CustomSelect
               name="operatorId"
               options={operatorOptions}
-              value={
-                operatorOptions.find(
-                  (opt) => opt.value === formik.values.operatorId
-                ) || null
-              }
               onChange={(e) => {
-                formik.setFieldValue("operatorId", e.target.value);
+                const value = e.target.value;
+                formik.setFieldValue("operatorId", value ? Number(value) : null);
               }}
               placeholder="Select Assigned Company"
               error={!!getError("operatorId")}
@@ -246,46 +288,72 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         {/* FOR EXECUTIVE - PROVINCIAL ADMIN ONLY */}
         {formik.values.userTypeId === 5 && (
           <div>
-            <label htmlFor="BranchId" className="block text-sm mb-1">
+            <label htmlFor="pcsoBranchId" className="block text-sm mb-1">
               Assigned PCSO Branch
             </label>
             <CustomSelect
-              name="BranchId"
+              name="pcsoBranchId"
               options={pcsoBranchOptions}
               value={
                 pcsoBranchOptions.find(
-                  (opt) => opt.value === formik.values.BranchId?.toString()
+                  (opt) => opt.value === formik.values.pcsoBranchId?.toString()
                 ) || null
               }
               onChange={(e) => {
-                formik.setFieldValue("BranchId", e.target.value);
+                formik.setFieldValue("pcsoBranchId", e.target.value);
               }}
               placeholder="Select Assigned PCSO Branch"
-              error={!!getError("BranchId")}
+              error={!!getError("pcsoBranchId")}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("BranchId") || "\u00A0"}
+              {getError("pcsoBranchId") || "\u00A0"}
             </p>
           </div>
         )}
 
         {/* this still needs adjustments if text input or select input */}
-        {/* FOR KABO ONLY */}
-        {formik.values.userTypeId === 2 && (
+        {/* FOR KABO AND KUBRADOR ONLY */}
+        {[1, 2].includes(formik.values.userTypeId) && (
           <div>
-            <label htmlFor="areaZone" className="block text-sm">
+            <label htmlFor="cityName" className="block text-sm">
               Assigned Area / Zone
             </label>
               <Input
-                type="areaZone"
-                id="areaZone"
-                placeholder="Enter Assigned Area / Zone"
+                type="cityName"
+                id="cityName"
+                placeholder="Enter Barangay, City/Municipality, Province"
                 className="mt-1"
-                {...formik.getFieldProps("areaZone")}
+                {...formik.getFieldProps("cityName")}
                 error={!!(formik.touched.email && formik.errors.email)}
               />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("areaZone") || "\u00A0"}
+              {getError("cityName") || "\u00A0"}
+            </p>
+          </div>
+        )}
+
+        {/* FOR KUBRADOR ONLY */}
+        {formik.values.userTypeId === 1 && (
+          <div>
+            <label htmlFor="kaboId" className="block text-sm mb-1">
+              Assigned Kabo
+            </label>
+            <CustomSelect
+              name="kaboId"
+              options={kaboOptions}
+              value={
+                kaboOptions.find(
+                  (opt) => opt.value === formik.values.kaboId?.toString()
+                ) || null
+              }
+              onChange={(e) => {
+                formik.setFieldValue("kaboId", e.target.value);
+              }}
+              placeholder="Select Assigned Kabo"
+              error={!!getError("kaboId")}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("kaboId") || "\u00A0"}
             </p>
           </div>
         )}

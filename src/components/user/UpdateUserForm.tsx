@@ -8,6 +8,7 @@ import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { updateUserSchema } from "~/schemas/userSchema";
+import { useAuthStore } from "~/store/useAuthStore";
 
 interface UpdateUserFormProps {
   title?: string;
@@ -29,6 +30,8 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   onClose,
 }) => {
   const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
+  //console.log('SELECTED USER', selectedUser);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const sevenDaysAgo = dayjs().subtract(7, "day");
   const [formData, setFormData] = useState<{[key: string]: string | number | string[];}>({});
@@ -83,6 +86,8 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
       null,
     status: getUserStatus(user, sevenDaysAgo),
     remarks: "", // initialize remarks as empty string
+    BranchName: user?.BranchName || "",
+    AssignedArea: user?.AssignedArea || "",
   });
 
   const formik = useFormik({
@@ -197,19 +202,53 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
 
         {/* Column 2 */}
         <div className="flex flex-col gap-x-6 gap-y-3">
-          <div>
-            <label htmlFor="operatorId" className="block text-sm mb-1">
-              Assigned PCSO Branch
-            </label>
-            <CustomSelect
-              name="operatorId"
-              value={formik.values.operatorId}
-              options={operatorOptions}
-              error={false}
-              disabled={true}
-              onChange={() => {}}
-            />
-          </div>
+          {formik.values.userTypeId == 4 && (
+            <div>
+              <label htmlFor="operatorId" className="block text-sm mb-1">
+                Assigned Company
+              </label>
+              <CustomSelect
+                name="operatorId"
+                value={formik.values.operatorId}
+                options={operatorOptions}
+                error={false}
+                disabled={true}
+              />
+            </div>
+          )}
+
+          {formik.values.userTypeId == 5 && (
+            <div>
+              <label htmlFor="BranchName" className="block text-sm mb-1">
+                Assigned PCSO Branch
+              </label>
+              <Input
+                name="BranchName"
+                id="BranchName"
+                value={formik.values.BranchName}
+                onChange={formik.handleChange}
+                disabled
+                //error={!!(formik.touched.email && formik.errors.email)}
+              />
+            </div>
+          )}
+
+          {(formik.values.userTypeId === 1 ||
+            formik.values.userTypeId === 2) && (
+            <div>
+              <label htmlFor="AssignedArea" className="block text-sm mb-1">
+                Assigned Area / Zone
+              </label>
+              <Input
+                name="AssignedArea"
+                id="AssignedArea"
+                value={formik.values.AssignedArea || "N/A"}
+                onChange={formik.handleChange}
+                disabled
+                //error={!!(formik.touched.AssignedArea && formik.errors.AssignedArea)}
+              />
+            </div>
+          )}
 
           <div>
             <label htmlFor="email" className="block text-sm">
@@ -257,87 +296,91 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
         </div>
       </div>
 
-      <h2 className="font-bold mt-3 mb-1">Update History</h2>
-      <div className="grid grid-cols-2 gap-6">
-        {/* Column 1 */}
-        <div className="flex flex-col gap-x-6 gap-y-3">
-          <div>
-            <label htmlFor="CreatedBy" className="block text-sm">
-              Created By
-            </label>
-            <Input
-              type="text"
-              name="CreatedBy"
-              id="CreatedBy"
-              className="mt-1"
-              value={selectedUser?.CreatedBy || ""}
-              disabled
-            />
-          </div>
+      {formik.values.userTypeId !== 1 && formik.values.userTypeId !== 2 && (
+        <>
+          <h2 className="font-bold mt-3 mb-1">Update History</h2>
+          <div className="grid grid-cols-2 gap-6">
+            {/* Column 1 */}
+            <div className="flex flex-col gap-x-6 gap-y-3">
+              <div>
+                <label htmlFor="CreatedBy" className="block text-sm">
+                  Created By
+                </label>
+                <Input
+                  type="text"
+                  name="CreatedBy"
+                  id="CreatedBy"
+                  className="mt-1"
+                  value={selectedUser?.CreatedBy || ""}
+                  disabled
+                />
+              </div>
 
-          <div>
-            <label htmlFor="DateOfRegistration" className="block text-sm">
-              Creation Date
-            </label>
-            <Input
-              type="date"
-              name="DateOfRegistration"
-              id="DateOfRegistration"
-              className="mt-1"
-              value={
-                selectedUser?.DateOfRegistration
-                  ? selectedUser.DateOfRegistration.slice(0, 10)
-                  : ""
-              }
-              disabled
-            />
-          </div>
-        </div>
-
-        {/* Column 2 */}
-        <div className="flex flex-col gap-x-6 gap-y-3">
-          <div>
-            <label htmlFor="LastUpdatedBy" className="block text-sm">
-              Last Updated By
-            </label>
-            <Input
-              type="text"
-              name="LastUpdatedBy"
-              id="LastUpdatedBy"
-              className="mt-1"
-              value={selectedUser?.LastUpdatedBy || "N/A"}
-              disabled
-            />
-          </div>
-
-          <div>
-            <label htmlFor="LastUpdatedDate" className="block text-sm">
-              Last Updated Date
-            </label>
-            <Input
-              type="date"
-              name="LastUpdatedDate"
-              id="LastUpdatedDate"
-              className="mt-1"
-              value={
-                selectedUser?.LastUpdatedDate
-                  ? selectedUser.LastUpdatedDate.slice(0, 10)
-                  : "N/A"
-              }
-              disabled
-            />
-          </div>
-          {/* View Edit Logs button */}
-          {selectedUser && (
-            <div
-              className="text-sm cursor-pointer hover:none flex justify-end leading-none"
-              onClick={() => onViewEditLogs(selectedUser.UserId as number)}
-            >
-              View Update History
+              <div>
+                <label htmlFor="DateOfRegistration" className="block text-sm">
+                  Creation Date
+                </label>
+                <Input
+                  type="date"
+                  name="DateOfRegistration"
+                  id="DateOfRegistration"
+                  className="mt-1"
+                  value={
+                    selectedUser?.DateOfRegistration
+                      ? selectedUser.DateOfRegistration.slice(0, 10)
+                      : ""
+                  }
+                  disabled
+                />
+              </div>
             </div>
-          )}
-        </div>
-      </div>
+
+            {/* Column 2 */}
+            <div className="flex flex-col gap-x-6 gap-y-3">
+              <div>
+                <label htmlFor="LastUpdatedBy" className="block text-sm">
+                  Last Updated By
+                </label>
+                <Input
+                  type="text"
+                  name="LastUpdatedBy"
+                  id="LastUpdatedBy"
+                  className="mt-1"
+                  value={selectedUser?.LastUpdatedBy || "N/A"}
+                  disabled
+                />
+              </div>
+
+              <div>
+                <label htmlFor="LastUpdatedDate" className="block text-sm">
+                  Last Updated Date
+                </label>
+                <Input
+                  type="date"
+                  name="LastUpdatedDate"
+                  id="LastUpdatedDate"
+                  className="mt-1"
+                  value={
+                    selectedUser?.LastUpdatedDate
+                      ? selectedUser.LastUpdatedDate.slice(0, 10)
+                      : "N/A"
+                  }
+                  disabled
+                />
+              </div>
+              {/* View Edit Logs button */}
+              {selectedUser && (
+                <div
+                  className="text-sm cursor-pointer hover:none flex justify-end leading-none"
+                  onClick={() => onViewEditLogs(selectedUser.UserId as number)}
+                >
+                  View Update History
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Remarks input shown only when editing */}
       {!isDisabled && (
@@ -362,28 +405,33 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
         </div>
       )}
 
-      {/* Buttons */}
-      <div className="flex justify-end gap-3 mt-2">
-        {isDisabled ? (
-          <button
-            type="button"
-            className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-            onClick={handleDisable}
-          >
-            Update
-          </button>
-        ) : (
-          <>
-            <button
-              type="submit"
-              className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-              disabled={!formik.isValid}
-            >
-              Save
-            </button>
-          </>
-        )}
-      </div>
+      {currentUserType !== 3 && (
+        <>
+          {/* Buttons */}
+          <div className="flex justify-end gap-3 mt-2">
+            {isDisabled ? (
+              <button
+                type="button"
+                className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+                onClick={handleDisable}
+              >
+                Update
+              </button>
+            ) : (
+              <>
+                <button
+                  type="submit"
+                  className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+                  disabled={!formik.isValid}
+                >
+                  Save
+                </button>
+              </>
+            )}
+          </div>
+        </>
+      )}
+
       <ConfirmUserActionModalPage
         open={isConfirmModalOpen}
         onClose={handleModalClose}

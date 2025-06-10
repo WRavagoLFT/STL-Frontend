@@ -3,7 +3,7 @@
 import { BarChart } from "@mui/x-charts/BarChart";
 import React from "react";
 import { ChartCardProps } from "~/types/interfaces";
-import CSVExportButtonDashboard from "../buttons/CSVExportButtonDashboard";
+import GenericCSVExportButton from "../buttons/CSVExportButtonDashboard";
 
 const getLegendItems = (pageType: string) => {
   const labelMap: Record<string, string> = {
@@ -56,6 +56,16 @@ export const ChartCard = <T,>({
   title,
   statsPerRegion,
 }: Omit<ChartCardProps<T>, "label">) => {
+
+const pluralRole = (() => {
+  const map: Record<string, string> = {
+    manager: "Managers",
+    executive: "Executives",
+    operator: "Operators",
+  };
+  return map[pageType ?? ""] || "Users";
+})();
+
   return (
     <div className="mt-3 mb-5">
       <div className="p-4 bg-[transparent] rounded-lg border border-[#0038A8]">
@@ -65,12 +75,24 @@ export const ChartCard = <T,>({
             <CustomLegend pageType={pageType ?? ""} />
           </div>
           <div className="flex items-center">
-            <CSVExportButtonDashboard statsPerRegion={statsPerRegion} pageType={pageType} />
+          <GenericCSVExportButton
+            data={statsPerRegion}
+            headers={["Region", "Total", "Active", "Inactive", "Deleted", "New"]}
+            title={`${pluralRole} Dashboard Summary`}
+            getRowData={(item) => [
+              item.regionName ?? "",
+              item.total ?? 0,
+              item.active ?? 0,
+              item.inactive ?? 0,
+              item.deleted ?? 0,
+              item.new ?? 0,
+            ]}
+          />
           </div>
         </div>
         <div className="h-[270px] w-full min-w-0">
           <BarChart
-            xAxis={[{ scaleType: "band", data: regions }]}
+            xAxis={[{ scaleType: "band", label: "Regions", data: regions }]}
             yAxis={[{ label: "Number of Users" }]}
             series={chartData.map(({ label, color, data }) => ({
               data,

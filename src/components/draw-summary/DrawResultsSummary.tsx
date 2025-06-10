@@ -1,10 +1,23 @@
-import React from "react";
+import React, { useState } from "react";
+import { useAuthStore } from "~/store/useAuthStore";
+import AddGameCombinationModal from "./AddGameCobination";
 
 const DrawResultsSummaryPage = (data: {
-  firstDraw?: string[];  // made optional for safety
+  firstDraw?: string[];
   secondDraw?: string[];
   thirdDraw?: string[];
 }) => {
+  const currentUserType = useAuthStore((state) => state.userTypeId);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
+
+  const handleSubmit = (data: any) => {
+    // Replace `any` with `User` if you have strict typing
+    console.log("Submitted combination:", data);
+    handleCloseModal(); // close modal after submission
+  };
 
   const renderDrawNumbers = (drawData?: string[]) => {
     if (!drawData || drawData.length === 0) {
@@ -44,14 +57,25 @@ const DrawResultsSummaryPage = (data: {
         </div>
       </div>
 
-      <div className="">
-        <div className="w-full flex justify-end mt-5">
-          {/* supposed to be modal */}
-          <button className="bg-[#0038A8] hover:bg-blue-700 text-sm text-white py-3 px-6 rounded-md">
-            Input Draw Combination
-          </button>
+      {currentUserType !== 3 && (
+        <div>
+          <div className="w-full flex justify-end mt-5">
+            <button
+              onClick={handleOpenModal}
+              className="bg-[#0038A8] hover:bg-blue-700 text-sm text-white py-3 px-6 rounded-md"
+            >
+              Input Draw Combination
+            </button>
+          </div>
+
+          {/* Modal */}
+          <AddGameCombinationModal
+            open={isModalOpen}
+            onClose={handleCloseModal}
+            onSubmit={handleSubmit}
+          />
         </div>
-      </div>
+      )}
     </React.Fragment>
   );
 };
