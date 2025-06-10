@@ -14,7 +14,7 @@ const DrawListSummaryPage = (data: {
   values: {firstDraw: string[], secondDraw: string[], thirdDraw: string[]}[]
 }) => {
 
-  console.log("Transformed data: ", data.values)
+  //console.log("Transformed data: ", data.values)
   const today = new Date()
 
   return (

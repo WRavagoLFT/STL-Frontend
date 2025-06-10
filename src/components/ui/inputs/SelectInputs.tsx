@@ -3,7 +3,7 @@ import Select, { SingleValue, ActionMeta } from "react-select";
 
 export type OptionType = {
   label: string;
-  value: string;
+  value: string | number; // Allow both
 };
 
 type Props = {
@@ -28,19 +28,19 @@ const SelectInput: React.FC<Props> = ({
   error,
   disabled = false,
 }) => {
-  const handleChange = (
-    selectedOption: SingleValue<OptionType>,
-    _actionMeta: ActionMeta<OptionType>
-  ) => {
-    const event = {
-      value: selectedOption?.value || "",
-      target: {
-        name,
-        value: selectedOption?.value || "",
-      },
-    };
-    onChange?.(event);
+const handleChange = (
+  selectedOption: SingleValue<OptionType>,
+  _actionMeta: ActionMeta<OptionType>
+) => {
+  const event = {
+    value: selectedOption?.value?.toString() || "",
+    target: {
+      name,
+      value: selectedOption?.value?.toString() || "", // Convert to string
+    },
   };
+  onChange?.(event);
+};
 
   return (
     <Select

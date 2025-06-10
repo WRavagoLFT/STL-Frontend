@@ -145,12 +145,12 @@ const RolePage = () => {
   const { data, setData } = useUserRoleStore();
   const tableColumns = userTableColumns(roleId);
   const editLogtableColumns = userEditColumns();
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showEditLog, setShowEditLog] = useState(false);
   const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
   const [kaboMap, setKaboMap] = React.useState<User | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const openCreateModal = () => {
     setIsCreateModalOpen(true);
