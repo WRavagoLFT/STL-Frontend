@@ -116,7 +116,7 @@ export const fetchRetailReceiptsData = async (
     const params: Record<string, any> = {};
 
     if (operatorId) params.operatorId = operatorId;
-    if (filterByParam) params.filterBy = filterByParam; // only if relevant to your backend
+    if (filterByParam) params.filterBy = filterByParam;
 
     const { data } = await axiosInstance.get(baseUrl, { params });
 
@@ -133,8 +133,6 @@ export const fetchRetailReceiptsData = async (
     };
   }
 };
-
-
 
 export const fetchCompareHistoricalDate = async (
   urlPath: string,

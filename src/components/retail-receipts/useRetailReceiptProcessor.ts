@@ -3,7 +3,6 @@ import { Share } from "~/types/types";
 import { fetchRetailReceiptsData } from "~/utils/api/transactions";
 import { calculateNetIncome, processShares } from "./calculateShareTotals";
 
-// Updated reusable function for calculation with new parameters
 export const useRetailReceiptProcessor = (
   filterBy: string,
   operationDate: string,
@@ -61,8 +60,8 @@ export const useRetailReceiptProcessor = (
   ];
 
 useEffect(() => {
-  if (!operationDate || !operatorId) {
-    console.log("Missing operationDate or operatorId, skipping fetch.");
+  if (!operationDate) {
+    console.log("Missing operationDate, skipping fetch.");
     return;
   }
 
@@ -87,7 +86,7 @@ useEffect(() => {
     if (!response?.success) {
       console.warn("Failed to fetch retail receipts");
       return;
-    } // Expected 1-3 arguments, but got 4.ts(2554) (parameter) operatorId: number
+    }
 
     const aac = processShares(response.data?.Receipts?.AAC, AAC_GROSS_TITLES, yearToUse, monthParam, 1);
     setAacBreakdown(aac.breakdown);
@@ -128,7 +127,6 @@ useEffect(() => {
     setNetPcsoTotalPercentage(netPcsoPercentage);
   });
 }, [filterBy, operationDate, selectedYear, operatorId]);
-
 
   return {
     aacBreakdown,

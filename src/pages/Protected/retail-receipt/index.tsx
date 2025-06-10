@@ -191,19 +191,29 @@ const RetailReceiptPage = () => {
                   }
                 }}
                 options={filterOptions}
-                classNamePrefix="react-select-dashboard"
+                classNamePrefix="react-select"
                 styles={{
-                  control: (provided, state) => ({
+                  control: (provided) => ({
                     ...provided,
-                    borderRadius: "0.5rem",
-                    color: "#2F2F2F",
-                    padding: "0.25rem",
-                    boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                    borderColor: "#0038A8 !important", // Default blue border
+                    fontSize: "0.875rem",
+                    padding: "2px",
+                    color: "inherit",
+                    backgroundColor: "white",
+                    cursor: "default",
+                    "&:hover": {
+                      borderColor: "#0038A8",
+                    },
+                    boxShadow: "none",
+                  }),
+                  menuPortal: (base) => ({
+                    ...base,
+                    zIndex: 1000000,
                   }),
                   menu: (provided) => ({
                     ...provided,
-                    backgroundColor: "#F8C73F",
-                    zIndex: 10,
+                    maxHeight: 400,
+                    overflowY: "auto",
                   }),
                 }}
               />
@@ -232,21 +242,31 @@ const RetailReceiptPage = () => {
                   options={yearOptions}
                   onChange={handleYearChange}
                   placeholder="Select Year"
-                  classNamePrefix="react-select-dashboard"
-                  styles={{
-                    control: (provided, state) => ({
-                      ...provided,
-                      borderRadius: "0.5rem",
-                      color: "#2F2F2F",
-                      padding: "0.25rem",
-                      boxShadow: state.isFocused ? "none" : provided.boxShadow,
-                    }),
-                    menu: (provided) => ({
-                      ...provided,
-                      backgroundColor: "#F8C73F",
-                      zIndex: 10,
-                    }),
-                  }}
+                classNamePrefix="react-select"
+                styles={{
+                  control: (provided) => ({
+                    ...provided,
+                    borderColor: "#0038A8 !important", // Default blue border
+                    fontSize: "0.875rem",
+                    padding: "2px",
+                    color: "inherit",
+                    backgroundColor: "white",
+                    cursor: "default",
+                    "&:hover": {
+                      borderColor: "#0038A8",
+                    },
+                    boxShadow: "none",
+                  }),
+                  menuPortal: (base) => ({
+                    ...base,
+                    zIndex: 1000000,
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    maxHeight: 400,
+                    overflowY: "auto",
+                  }),
+                }}
                 />
               )}
             </div>
