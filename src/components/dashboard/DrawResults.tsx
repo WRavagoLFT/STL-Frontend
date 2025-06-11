@@ -68,6 +68,8 @@ const DrawResultsPage = () => {
       label: province.ProvinceName,
     }));
 
+    console.log('SELECTED PROVINCE:', filteredProvinceOptions);
+
   // Find selected options
   const selectedGameCategoryOption = gameCategoryOptions.find(
     (option) => option.value === Number(selectedGameCategory)
@@ -85,6 +87,8 @@ const DrawResultsPage = () => {
       if (regionsRes.success) setRegions(regionsRes.data);
 
       const provincesRes = await fetchProvinces();
+      console.log('Fetched province:',provincesRes);
+      
       if (provincesRes.success)
         setProvinces(provincesRes.data.filter((p: any) => p.RegionId !== 0));
 
