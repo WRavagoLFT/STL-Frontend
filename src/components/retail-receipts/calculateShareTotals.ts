@@ -64,11 +64,20 @@ export function calculateNetIncome(
   grossAmount: number,
   grossPercentage: number,
   taxAmount: number,
-  taxPercentage: number
-) {
-  return {
-    netAmount: grossAmount + taxAmount,
-    netPercentage: grossPercentage + taxPercentage,
-  };
+  taxPercentage: number,
+  mode: "AAC" | "PCSO" = "AAC"
+): { netAmount: number; netPercentage: number } {
+  if (mode === "AAC") {
+    return {
+      netAmount: grossAmount - taxAmount,
+      netPercentage: grossPercentage + taxPercentage,
+    };
+  } else {
+    // PCSO case
+    return {
+      netAmount: grossAmount + taxAmount,
+      netPercentage: grossPercentage + taxPercentage,
+    };
+  }
 }
 

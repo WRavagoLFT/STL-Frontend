@@ -123,8 +123,7 @@ export const userSchema = z
       }
     }
   });
-
-
+  
 export const updateUserSchema = z.object({
   phoneNumber: z
     .string({ required_error: "Phone Number is required" })

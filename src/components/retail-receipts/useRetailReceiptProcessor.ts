@@ -112,7 +112,8 @@ export const useRetailReceiptProcessor = (
         aac.totalShareAmount,
         aac.totalPercentage,
         aacTax.totalShareAmount,
-        aacTax.totalPercentage
+        aacTax.totalPercentage,
+        "AAC"
       );
       setNetAacTotalAmount(netAacAmount);
       setNetAacTotalPercentage(netAacPercentage);
@@ -121,7 +122,8 @@ export const useRetailReceiptProcessor = (
         pcso.totalShareAmount,
         pcso.totalPercentage,
         pcsoTax.totalShareAmount,
-        pcsoTax.totalPercentage
+        pcsoTax.totalPercentage,
+        "PCSO"
       );
       setNetPcsoTotalAmount(netPcsoAmount);
       setNetPcsoTotalPercentage(netPcsoPercentage);

@@ -88,6 +88,7 @@ const TableWinningSummary = (params: { gameCategoryId?: number }) => {
           }));
 
           setTransactions(transformedData);
+          console.log('WINNING TABLE SUMMARY:', transformedData);
         } else {
           console.error("API returned failure:", response.message);
           setError(response.message || "Failed to fetch transactions");

@@ -288,9 +288,9 @@ const RetailReceiptPage = () => {
               <div className="flex flex-col">
                 <span className="text-sm font-bold">STL Collections</span>
               </div>
-              <div className="flex justify-center md:justify-end text-base font-semibold">
-                ₱ {receiptData?.Collections?.toLocaleString() || "0.00"}
-              </div>
+                <div className="flex justify-center md:justify-end text-base font-semibold">
+                  ₱ {receiptData?.Collections?.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || "0.00"}
+                </div>
             </div>
           </div>
           <div className="w-1/2"></div>
