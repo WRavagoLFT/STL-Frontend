@@ -4,6 +4,7 @@ import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { fetchDrawSummary } from "~/utils/api/transactions";
 import Select from 'react-select';
 import { AccessGuard } from "~/components/auth/AccessGuard";
+import { useAuthStore } from "~/store/useAuthStore";
 
 const DrawListSummaryPage = React.lazy(() => import("~/components/draw-summary/DrawListSummary"));
 const HotNumberPage = React.lazy(() => import("~/components/draw-summary/HotNumbers"));
@@ -16,14 +17,16 @@ const DrawSelectedPage = () => {
   const [provinces, setProvinces] = useState<any[]> ([]);
   const [gameCategories, setGameCategories] = useState<{label: string, value: string}[]> ([]);
   const [filteredProvinces, setFilteredProvinces] = useState<{label: string, value: string}[]> ([]);
-
   const [selectedRegion, setSelectedRegion] = useState("1");
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedGameCategory, setSelectedGameCategory] = useState("1");
   const [selectedMonth, setSelectedMonth] = useState((new Date()).getMonth() + 1);
+
   const [data, setData] = useState<any>({});
   const todayDate = new Date().getDate()
   const [gameCategoryMap, setGameCategoryMap] = useState<Map<string, string>>(new Map());
+  const [isViewing, setIsViewing] = useState(false);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const monthOptions = [
     { value: "", label: "Select Month" },

@@ -5,6 +5,8 @@ import { useFormik } from "formik";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import Input from "../ui/inputs/TextInputs";
+import { addGameCombination } from "~/schemas/gameCombinationSchema";
+import { toFormikValidationSchema } from "~/utils/formikHelpers";
 
 interface AddGameCombinationFormProps {
   title?: string;
@@ -75,6 +77,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
       combinationFour: initialData.combinationFour || "",
       gameSchedule: initialData.gameSchedule ? String(initialData.gameSchedule) : "",
     },
+    // validationSchema: toFormikValidationSchema(addGameCombination),
     onSubmit: async (values) => {
       console.log("[Form Submit] Submitted Values (before conversion):", values);
 
@@ -318,6 +321,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
             </p>
           </div>
         )}
+        
       </div>
 
       {/* Submit Button */}

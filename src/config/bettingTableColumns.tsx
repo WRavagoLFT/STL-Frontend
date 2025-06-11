@@ -20,7 +20,7 @@ export const bettingTableColumns = (): Column<Transactions>[] => [
   },
   {
     key: "drawTime",
-    label: "Draw Order",
+    label: "Draw Time",
     sortable: true,
     filterable: true,
   },

@@ -202,7 +202,7 @@ export type RoleConfig = {
 };
 
 export type GameCombination = {
-  gameType?: number;
+  gameType?: number; 
   provinceId?: number;
   combinationOne?: number;
   combinationTwo?: number;
