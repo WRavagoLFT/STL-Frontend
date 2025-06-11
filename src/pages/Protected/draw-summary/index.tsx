@@ -23,6 +23,7 @@ const DrawSelectedPage = () => {
   const [selectedMonth, setSelectedMonth] = useState((new Date()).getMonth() + 1);
   const [data, setData] = useState<any>({});
   const todayDate = new Date().getDate()
+  const [gameCategoryMap, setGameCategoryMap] = useState<Map<string, string>>(new Map());
 
   const monthOptions = [
     { value: "", label: "Select Month" },
@@ -90,17 +91,20 @@ const DrawSelectedPage = () => {
     setSelectedRegion("1");
     setSelectedProvince("1");
 
+    // Replace your existing game category code with this:
     const gameCategoryFetch = await fetchGameCategories();
-    //console.log(gameCategoryFetch)
-
-    setGameCategories(
-      gameCategoryFetch.data.map((gameCategory: any) => {
-        return {
-          label: gameCategory.GameCategory,
-          value: gameCategory.GameCategoryId.toString(),
-        };
-      })
-    );
+    if (gameCategoryFetch?.data) {
+      const options = gameCategoryFetch.data.map((gameCategory: any) => ({
+        label: gameCategory.GameCategory,
+        value: gameCategory.GameCategoryId.toString(),
+      }));
+      const gameMap = new Map<string, string>();
+      gameCategoryFetch.data.forEach((gc: any) => {
+        gameMap.set(gc.GameCategoryId.toString(), gc.GameCategory);
+      });
+      setGameCategories(options);  // for Select dropdown
+      setGameCategoryMap(gameMap); // for ID-name mapping
+    }
   };
 
   useEffect(() => {
@@ -137,7 +141,7 @@ const DrawSelectedPage = () => {
   }, [selectedRegion, selectedProvince, selectedGameCategory, selectedMonth])
 
   useEffect(() => {
-    console.log(filteredProvinces)
+    //console.log(filteredProvinces)
   }, [filteredProvinces])
 
   const getTodayResults = (drawOrder: number) => {
@@ -145,7 +149,7 @@ const DrawSelectedPage = () => {
       
       if(drawOrder == 1){
         const filtered = data.ResultSummary[todayDate-1].FirstDraw
-        console.log(`accessing data.ResultSummary[${todayDate-1}][${todayDate}].FirstDraw`)
+        //console.log(`accessing data.ResultSummary[${todayDate-1}][${todayDate}].FirstDraw`)
         const numbers = [filtered.NumberOne || "-", filtered.NumberTwo || "-"]
         if(Number(selectedGameCategory) > 2) numbers.push(filtered.NumberThree || "-") 
         if(Number(selectedGameCategory) > 3) numbers.push(filtered.NumberFour || "-")
@@ -386,6 +390,7 @@ const DrawSelectedPage = () => {
                     firstDraw={getTodayResults(1) || []}
                     secondDraw={getTodayResults(2) || []}
                     thirdDraw={getTodayResults(3) || []}
+                    gameCategoryMap={gameCategoryMap}
                   />
                 )}
                 <div className="flex gap-3">

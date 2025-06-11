@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { operatorTableColumns } from "~/config/operatorTableColumns";
@@ -14,40 +14,13 @@ import {
   fetchRegions,
 } from "~/utils/api/location";
 import { useOperatorFormStore } from "~/store/useOperatorFormStore";
-
-export const fetchFormOptionsData = async () => {
-  try {
-    const {
-      setGameTypes,
-      setRegions,
-      setProvinces,
-      setCities,
-      setAreaOfOperations,
-      setData,
-    } = useOperatorFormStore.getState();
-
-    const gameTypesResponse = await fetchGameCategories();
-    const regionsRes = await fetchRegions();
-    const provincesRes = await fetchProvinces();
-    const citiesRes = await fetchCities({ availableOnly: true });
-    const areaOpsRes = await fetchAreaOfOperations();
-    const operators = await fetchOperators();
-
-    setData(operators.data);
-    setGameTypes(gameTypesResponse.data);
-    setRegions(regionsRes.data);
-    setProvinces(provincesRes.data);
-    setCities(citiesRes.data);
-    setAreaOfOperations(areaOpsRes.data);
-  } catch (error) {
-    console.error("Error fetching form options:", error);
-  }
-};
+import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
 
 const OperatorsPage = () => {
   const { data } = useOperatorFormStore();
   const textlabel = "Operators";
   const tableColumns = operatorTableColumns();
+  const [hasFetched, setHasFetched] = useState(false);
 
   const dashboardData = data.map((op) => ({
     ...op,
@@ -55,8 +28,10 @@ const OperatorsPage = () => {
   }));
 
   useEffect(() => {
-    fetchFormOptionsData();
-  }, []);
+    if (!hasFetched) {
+      fetchFormOptionsData().then(() => setHasFetched(true));
+    }
+  }, [hasFetched]);
 
   return (
     <AccessGuard allowedUserTypes={[6]}>

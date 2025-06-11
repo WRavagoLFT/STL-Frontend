@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { CircularProgress, Button, } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
+import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { buttonStyles } from "~/styles/theme";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
@@ -13,22 +12,17 @@ interface WinnerItem {
 
 const CustomLegend = () => (
   <div className="flex flex-row text-sm space-x-5 justify-start mt-0.5 mr-4">
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#E57CFF] mr-2" />
-      <p className="text-sm">STL Pares</p>
-    </div>
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#D2A7FF] mr-2" />
-      <p className="text-sm">STL Swer2</p>
-    </div>
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#BB86FC] mr-2" />
-      <p className="text-sm">STL Swer3</p>
-    </div>
-    <div className="flex items-center">
-      <div className="w-3.5 h-3.5 rounded-full bg-[#A06FE6] mr-2" />
-      <p className="text-sm">STL Swer4</p>
-    </div>
+    {[
+      { label: "STL Pares", color: "#E57CFF" },
+      { label: "STL Swer2", color: "#D2A7FF" },
+      { label: "STL Swer3", color: "#BB86FC" },
+      { label: "STL Swer4", color: "#A06FE6" },
+    ].map(({ label, color }) => (
+      <div className="flex items-center" key={label}>
+        <div className="w-3.5 h-3.5 rounded-full mr-2" style={{ backgroundColor: color }} />
+        <p className="text-sm">{label}</p>
+      </div>
+    ))}
   </div>
 );
 
@@ -44,110 +38,103 @@ const ChartWinnersSummary = () => {
   >([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const from = today
+      const to = today;
+      const result = await fetchWinners({ from, to });
 
-      try {
-        const from = "2000-05-01";
-        const to = "2099-05-30";
-        //console.log(`Date range: from ${from} to ${to}`);
+      if (!result.success || !Array.isArray(result.data)) {
+        console.warn("Result unsuccessful or data is not an array.");
+        return;
+      }
 
-        const result = await fetchWinners({ from, to });
+      const aggregatedData: Record<
+        number,
+        { pares: number; swer2: number; swer3: number; swer4: number }
+      > = {};
 
-        //console.log("Raw result from fetchWinners:", result);
+      result.data.forEach((item: WinnerItem) => {
+        const draw = item.DrawOrder;
+        const category = item.GameCategory;
 
-        if (!result.success || !Array.isArray(result.data)) {
-          console.warn("Result unsuccessful or data is not an array.");
-          setLoading(false);
-          return;
+        if (!aggregatedData[draw]) {
+          aggregatedData[draw] = {
+            pares: 0,
+            swer2: 0,
+            swer3: 0,
+            swer4: 0,
+          };
         }
 
-        const aggregatedData: Record<
-          number,
-          { pares: number; swer2: number; swer3: number; swer4: number }
-        > = {};
+        switch (category) {
+          case "STL Pares":
+            aggregatedData[draw].pares += item.PayoutAmount || 0;
+            break;
+          case "STL Swer2":
+            aggregatedData[draw].swer2 += item.PayoutAmount || 0;
+            break;
+          case "STL Swer3":
+            aggregatedData[draw].swer3 += item.PayoutAmount || 0;
+            break;
+          case "STL Swer4":
+            aggregatedData[draw].swer4 += item.PayoutAmount || 0;
+            break;
+          default:
+            console.warn(`Unhandled GameCategory: ${category}`, item);
+        }
+      });
 
-        result.data.forEach((item: WinnerItem) => {
-          const draw = item.DrawOrder;
-          const category = item.GameCategory;
+      const formattedData = [
+        {
+          draw: "First Draw",
+          pares: aggregatedData[1]?.pares || 0,
+          swer2: aggregatedData[1]?.swer2 || 0,
+          swer3: aggregatedData[1]?.swer3 || 0,
+          swer4: aggregatedData[1]?.swer4 || 0,
+        },
+        {
+          draw: "Second Draw",
+          pares: aggregatedData[2]?.pares || 0,
+          swer2: aggregatedData[2]?.swer2 || 0,
+          swer3: aggregatedData[2]?.swer3 || 0,
+          swer4: aggregatedData[2]?.swer4 || 0,
+        },
+        {
+          draw: "Third Draw",
+          pares: aggregatedData[3]?.pares || 0,
+          swer2: aggregatedData[3]?.swer2 || 0,
+          swer3: aggregatedData[3]?.swer3 || 0,
+          swer4: aggregatedData[3]?.swer4 || 0,
+        },
+      ];
 
-          if (!aggregatedData[draw]) {
-            aggregatedData[draw] = {
-              pares: 0,
-              swer2: 0,
-              swer3: 0,
-              swer4: 0,
-            };
-          }
+      // Scale values and compute safeMax
+      const scaledData = formattedData.map((item) => ({
+        ...item,
+        pares: item.pares / 100000,
+        swer2: item.swer2 / 100000,
+        swer3: item.swer3 / 100000,
+        swer4: item.swer4 / 100000,
+      }));
 
-          switch (category) {
-            case "STL Pares":
-              aggregatedData[draw].pares += item.PayoutAmount || 0;
-              break;
-            case "STL Swer2":
-              aggregatedData[draw].swer2 += item.PayoutAmount || 0;
-              break;
-            case "STL Swer3":
-              aggregatedData[draw].swer3 += item.PayoutAmount || 0;
-              break;
-            case "STL Swer4":
-              aggregatedData[draw].swer4 += item.PayoutAmount || 0;
-              break;
-            default:
-              console.warn(`Unhandled GameCategory: ${category}`, item);
-          }
-        });
-
-        //console.log("Aggregated data by draw and category:", aggregatedData);
-
-        const formattedData = [
-          {
-            draw: "First Draw",
-            pares: aggregatedData[1]?.pares || 0,
-            swer2: aggregatedData[1]?.swer2 || 0,
-            swer3: aggregatedData[1]?.swer3 || 0,
-            swer4: aggregatedData[1]?.swer4 || 0,
-          },
-          {
-            draw: "Second Draw",
-            pares: aggregatedData[2]?.pares || 0,
-            swer2: aggregatedData[2]?.swer2 || 0,
-            swer3: aggregatedData[2]?.swer3 || 0,
-            swer4: aggregatedData[2]?.swer4 || 0,
-          },
-          {
-            draw: "Third Draw",
-            pares: aggregatedData[3]?.pares || 0,
-            swer2: aggregatedData[3]?.swer2 || 0,
-            swer3: aggregatedData[3]?.swer3 || 0,
-            swer4: aggregatedData[3]?.swer4 || 0,
-          },
-        ];
-
-        //console.log("Formatted data before scaling:", formattedData);
-
-        const scaledData = formattedData.map((item) => ({
-           ...item,
-           pares: item.pares / 100000,
-           swer2: item.swer2 / 100000,
-           swer3: item.swer3 / 100000,
-           swer4: item.swer4 / 100000,
-         }));
-
-        //console.log("Final scaled data:", scaledData);
-
-        setData(scaledData);
-      } catch (error) {
-        console.error("Error fetching winners summary:", error);
-      } finally {
-        setLoading(false);
-        console.log("Finished fetching and processing data.");
-      }
-    };
-
-    fetchData();
+      setData(scaledData);
+    } catch (error) {
+      console.error("Error fetching winners summary:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Compute safeMax from scaled values
+  const allValues = data.flatMap((item) => [item.pares, item.swer2, item.swer3, item.swer4]);
+  const safeMax = Math.max(1000, ...allValues);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
@@ -156,53 +143,60 @@ const ChartWinnersSummary = () => {
           <p className="text-lg leading-none">Today's Winnings by Game Type</p>
           <CustomLegend />
         </div>
-          <GenericCSVExportButton
-            data={data}
-            headers={["Draw", "STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"]}
-            title="Today's Winnings by Game Type"
-            getRowData={(item) => [
-              item.draw,
-              item.pares.toFixed(2),
-              item.swer2.toFixed(2),
-              item.swer3.toFixed(2),
-              item.swer4.toFixed(2),
-            ]}
-          />
+        <GenericCSVExportButton
+          data={data}
+          headers={["Draw", "STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"]}
+          title="Today's Winnings by Game Type"
+          getRowData={(item) => [
+            item.draw,
+            item.pares.toFixed(3),
+            item.swer2.toFixed(3),
+            item.swer3.toFixed(3),
+            item.swer4.toFixed(3),
+          ]}
+        />
       </div>
 
       <div className="h-full w-full">
-        {loading ? (
+        {/* {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : (
+        ) : ( */}
           <BarChart
+            dataset={data}
             height={300}
             layout="horizontal"
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+            slotProps={{
+              legend: { hidden: true },
+              noDataOverlay: {
+                message: "Today's Winnings by Game Type will be displayed once available.",
+              },
+            }}
             grid={{ vertical: true }}
             series={[
-              { data: data.map((d) => d.pares), color: "#E5C7FF" },
-              { data: data.map((d) => d.swer2), color: "#D2A7FF" },
-              { data: data.map((d) => d.swer3), color: "#BB86FC" },
-              { data: data.map((d) => d.swer4), color: "#A06FE6" },
+              { dataKey: "pares", label: "STL Pares", color: "#E5C7FF" },
+              { dataKey: "swer2", label: "STL Swer2", color: "#D2A7FF" },
+              { dataKey: "swer3", label: "STL Swer3", color: "#BB86FC" },
+              { dataKey: "swer4", label: "STL Swer4", color: "#A06FE6" },
             ]}
             yAxis={[
               {
                 scaleType: "band",
-                data: ["First Draw", "Second Draw", "Third Draw"],
+                dataKey: "draw",
               },
             ]}
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100000,
+                max: safeMax,
                 valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
           />
-        )}
+        {/* )} */}
       </div>
     </div>
   );

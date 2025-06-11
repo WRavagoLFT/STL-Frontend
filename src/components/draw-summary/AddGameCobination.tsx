@@ -7,9 +7,17 @@ type AddGameCombinationModalProps = {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: GameCombination) => void;
+  gameCategoryMap: Map<string, string>;
+  gameScheduleOptions: { value: number; label: string; }[]; // Change from 'number | undefined' to 'string'
+  gameTypes: {
+    GameTypeId: number;
+    GameType: string;
+    GameCategoryId: number;
+    GameScheduleId: number;
+  }[];
 };
 
-export default function AddGameCombinationModal({ open, onClose, onSubmit }: AddGameCombinationModalProps) {
+export default function AddGameCombinationModal({ open, onClose, onSubmit, gameCategoryMap, gameScheduleOptions, gameTypes }: AddGameCombinationModalProps) {
   const title = "Input Draw Combination";
 
   return (
@@ -17,7 +25,10 @@ export default function AddGameCombinationModal({ open, onClose, onSubmit }: Add
       <AddGameCombinationForm 
         onClose={onClose}
         onSubmit={onSubmit}
-      />
+        gameCategoryMap={gameCategoryMap}
+        gameScheduleOptions={gameScheduleOptions}
+        gameTypes={gameTypes}
+       />
     </ModalWrapper>
   );
 }

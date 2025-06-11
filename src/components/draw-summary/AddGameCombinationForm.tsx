@@ -1,57 +1,82 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { GameCombination } from "~/types/types";
-import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { useFormik } from "formik";
-import { userSchema } from "~/schemas/userSchema";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
-import { toFormikValidationSchema } from "~/utils/formikHelpers";
+import Input from "../ui/inputs/TextInputs";
 
 interface AddGameCombinationFormProps {
   title?: string;
   onSubmit: (data: GameCombination) => void;
   initialData?: Partial<GameCombination>;
   onClose?: () => void;
+  gameCategoryMap: Map<string, string>;
+  gameScheduleOptions: { value: number; label: string }[];
+  gameTypes: {
+    GameTypeId: number;
+    GameType: string;
+    GameCategoryId: number;
+    GameScheduleId: number;
+  }[];
 }
 
 const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
   initialData = {},
   onSubmit,
   onClose,
+  gameCategoryMap,
+  gameScheduleOptions,
+  gameTypes,
 }) => {
   const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [gameTypes, setGameTypes] = useState();
 
-  // const gameTypesOptions = gameTypes?.map((cat) => ({
-  //   value: cat.GameCategoryId.toString(),
-  //   label: cat.GameCategory,
-  // }));
+  const identifiedGameTypeIdRef = useRef<number | undefined>(undefined);
 
-  // Open the confirm modal after submit
+  const gameCategorySelectOptions: OptionType[] = useMemo(() => {
+    if (!Array.isArray(gameTypes)) {
+      console.warn("gameTypes prop is not an array for gameCategorySelectOptions:", gameTypes);
+      return [];
+    }
+
+    const uniqueCategoryIds = new Set<number>();
+    const options: OptionType[] = [];
+
+    gameTypes.forEach(gameType => {
+      if (!uniqueCategoryIds.has(gameType.GameCategoryId)) {
+        uniqueCategoryIds.add(gameType.GameCategoryId);
+        const categoryName = gameCategoryMap.get(String(gameType.GameCategoryId));
+        if (categoryName) {
+          options.push({
+            value: String(gameType.GameCategoryId),
+            label: categoryName,
+          });
+        }
+      }
+    });
+    return options;
+  }, [gameTypes, gameCategoryMap]);
+
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
   const handleModalClose = () => {
     closeConfirmModal();
     if (onClose) onClose();
   };
-  const validate = toFormikValidationSchema(userSchema);
 
   const formik = useFormik({
     initialValues: {
-        gameType: initialData.gameType || "",
-        provinceId: initialData.provinceId || "",
-        combinationOne: initialData.combinationOne || "",
-        combinationTwo: initialData.combinationTwo || "",
-        combinationThree: initialData.combinationThree || "",
-        combinationFour: initialData.combinationFour || "",
-        gameSchedule: initialData.gameSchedule || ""
+      gameType: initialData.gameType ? String(initialData.gameType) : "",
+      provinceId: initialData.provinceId || "",
+      combinationOne: initialData.combinationOne || "",
+      combinationTwo: initialData.combinationTwo || "",
+      combinationThree: initialData.combinationThree || "",
+      combinationFour: initialData.combinationFour || "",
+      gameSchedule: initialData.gameSchedule ? String(initialData.gameSchedule) : "",
     },
-    validate,
     onSubmit: async (values) => {
-      console.log("[Form Submit] Submitted Values:", values);
+      console.log("[Form Submit] Submitted Values (before conversion):", values);
 
       const result = await Swal.fire({
         title: "Add Confirmation",
@@ -66,37 +91,98 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
 
       if (!result.isConfirmed) return;
 
-      // Remove null, undefined, or empty string values
-      const cleanedData: { [k: string]: string | number | string[] } = Object.fromEntries(
-        Object.entries(values).filter(
-          ([, value]) =>
-            value !== null &&
-            value !== undefined &&
-            (typeof value === "string" ? value.trim() !== "" : true)
-        )
-      );
+      const submittedGameCategoryId: number | undefined = values.gameType
+        ? Number(values.gameType)
+        : undefined;
 
-      setFormData(cleanedData);
+      const submittedGameScheduleId: number | undefined = values.gameSchedule
+        ? Number(values.gameSchedule)
+        : undefined;
+
+      const finalIdentifiedGameTypeId = identifiedGameTypeIdRef.current;
+      console.log("Final Identified GameTypeId for submission:", finalIdentifiedGameTypeId);
+
+      const finalData: GameCombination = {
+        gameType: submittedGameCategoryId,
+        provinceId: values.provinceId ? Number(values.provinceId) : undefined,
+        combinationOne: values.combinationOne ? Number(values.combinationOne) : undefined,
+        combinationTwo: values.combinationTwo ? Number(values.combinationTwo) : undefined,
+        combinationThree: values.combinationThree ? Number(values.combinationThree) : undefined,
+        combinationFour: values.combinationFour ? Number(values.combinationFour) : undefined,
+        gameSchedule: submittedGameScheduleId,
+      };
+
+      setFormData(finalData);
       openConfirmModal();
     },
   });
 
+  const drawTimeOptions: OptionType[] = useMemo(() => {
+    const selectedGameCategoryId = formik.values.gameType;
+
+    if (!Array.isArray(gameTypes) || !selectedGameCategoryId) {
+      return [];
+    }
+
+    const relevantScheduleIds = new Set<number>();
+    gameTypes.forEach(type => {
+      if (String(type.GameCategoryId) === selectedGameCategoryId) {
+        relevantScheduleIds.add(type.GameScheduleId);
+      }
+    });
+
+    const filteredOptions = gameScheduleOptions.filter(schedule =>
+      relevantScheduleIds.has(schedule.value)
+    );
+
+    return filteredOptions.map(schedule => ({
+      value: String(schedule.value),
+      label: schedule.label,
+    }));
+  }, [formik.values.gameType, gameTypes, gameScheduleOptions]);
+
   useEffect(() => {
-    console.log("Validation Errors:", formik.errors);
-    //console.log("Touched Fields:", formik.touched);
-  }, [formik.errors, formik.touched]);
-  
-  // Helpers to display errors
+    const { gameType, gameSchedule } = formik.values;
+
+    if (gameType && gameSchedule) {
+      const submittedGameCategoryId = Number(gameType);
+      const submittedGameScheduleId = Number(gameSchedule);
+
+      const foundGameType = gameTypes.find(type =>
+        type.GameCategoryId === submittedGameCategoryId &&
+        type.GameScheduleId === submittedGameScheduleId
+      );
+
+      identifiedGameTypeIdRef.current = foundGameType?.GameTypeId;
+      //console.log("Identified GameTypeId (via useEffect):", identifiedGameTypeIdRef.current);
+    } else {
+      identifiedGameTypeIdRef.current = undefined;
+      //console.log("Could not identify GameTypeId: Missing Game Category ID or Game Schedule ID.");
+    }
+
+    const isCurrentScheduleValid = drawTimeOptions.some(
+      option => option.value === gameSchedule
+    );
+    if (!isCurrentScheduleValid) {
+      formik.setFieldValue("gameSchedule", "");
+    }
+  }, [formik.values.gameType, formik.values.gameSchedule, gameTypes, drawTimeOptions, formik.setFieldValue]);
+
   const getError = (field: string) => {
     const error = formik.errors[field as keyof typeof formik.errors];
     const touched = formik.touched[field as keyof typeof formik.touched];
-    
+
     if (touched && error && typeof error === "string") {
-      return error.split("|")[0].trim();  // show only the first error message
+      return error.split("|")[0].trim();
     }
-    
+
     return null;
   };
+
+  // Determine how many combination inputs to show based on gameType
+  const selectedGameType = Number(formik.values.gameType);
+  const showCombinationThree = selectedGameType === 3 || selectedGameType === 4;
+  const showCombinationFour = selectedGameType === 4;
 
   return (
     <form
@@ -104,53 +190,138 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
       className="grid grid-cols-1 gap-4"
       noValidate
     >
-      {/* Column 1 */}
-      <div className="flex flex-col gap-x-6 gap-y-2">
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4"> {/* Changed to a 2-column grid */}
         <div>
           <label htmlFor="gameType" className="block text-sm mb-1">
             Game Type
           </label>
-            <CustomSelect
-              name="gameType"
-              //options={gameTypeOptions}
-              onChange={(e) => {
-                const value = e.target.value;
-                formik.setFieldValue("gameType", value ? Number(value) : null);
-              }}
-              placeholder="Select Game Type"
-              error={!!getError("gameType")}
-            />
+          <CustomSelect
+            name="gameType"
+            options={gameCategorySelectOptions}
+            //value={formik.values.gameType}
+            onChange={(e) => {
+              const value = e.target.value;
+              console.log("Selected Game Category ID (as string):", value);
+              formik.setFieldValue("gameType", value);
+              // Clear combination fields when gameType changes to prevent stale data
+              formik.setFieldValue("combinationOne", "");
+              formik.setFieldValue("combinationTwo", "");
+              formik.setFieldValue("combinationThree", "");
+              formik.setFieldValue("combinationFour", "");
+            }}
+            placeholder="Select Game Type"
+            error={!!getError("gameType")}
+          />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {getError("gameType") || "\u00A0"}
           </p>
         </div>
 
         <div>
-          <label htmlFor="drawTime" className="block text-sm mb-1">
+          <label htmlFor="gameSchedule" className="block text-sm mb-1">
             Draw Time
           </label>
-            <CustomSelect
-              name="drawTime"
-              //options={drawTimeOptions}
-              onChange={(e) => {
-                const value = e.target.value;
-                formik.setFieldValue("drawTime", value ? Number(value) : null);
-              }}
-              placeholder="Select Draw Time"
-              error={!!getError("drawTime")}
-            />
+          <CustomSelect
+            name="gameSchedule"
+            options={drawTimeOptions}
+            //value={formik.values.gameSchedule}
+            onChange={(e) => {
+              const value = e.target.value;
+              console.log("Selected Game Schedule ID (as string):", value);
+              formik.setFieldValue("gameSchedule", value);
+            }}
+            placeholder="Select Draw Time"
+            error={!!getError("gameSchedule")}
+            disabled={!formik.values.gameType}
+          />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-            {getError("drawTime") || "\u00A0"}
+            {getError("gameSchedule") || "\u00A0"}
           </p>
         </div>
+        
+        {/* Combination One (always shown for gameType 1, 2, 3, 4) */}
+        {(selectedGameType === 1 || selectedGameType === 2 || selectedGameType === 3 || selectedGameType === 4) && (
+          <div>
+            <label htmlFor="combinationOne" className="block text-sm">
+              First Drawn Number
+            </label>
+            <Input
+              type="text"
+              id="combinationOne"
+              placeholder="Enter First Drawn Number"
+              className="mt-1"
+              {...formik.getFieldProps("combinationOne")}
+              error={!!(formik.touched.combinationOne && formik.errors.combinationOne)}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("combinationOne") || "\u00A0"}
+            </p>
+          </div>
+        )}
 
+        {/* Combination Two (always shown for gameType 1, 2, 3, 4) */}
+        {(selectedGameType === 1 || selectedGameType === 2 || selectedGameType === 3 || selectedGameType === 4) && (
+          <div>
+            <label htmlFor="combinationTwo" className="block text-sm">
+              Second Drawn Number
+            </label>
+            <Input
+              type="text"
+              id="combinationTwo"
+              placeholder="Enter Second Drawn Number"
+              className="mt-1"
+              {...formik.getFieldProps("combinationTwo")}
+              error={!!(formik.touched.combinationTwo && formik.errors.combinationTwo)}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("combinationTwo") || "\u00A0"}
+            </p>
+          </div>
+        )}
 
+        {/* Combination Three (shown for gameType 3 and 4) */}
+        {showCombinationThree && (
+          <div>
+            <label htmlFor="combinationThree" className="block text-sm">
+              Third Drawn Number
+            </label>
+            <Input
+              type="text"
+              id="combinationThree"
+              placeholder="Enter Third Drawn Number"
+              className="mt-1"
+              {...formik.getFieldProps("combinationThree")}
+              error={!!(formik.touched.combinationThree && formik.errors.combinationThree)}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("combinationThree") || "\u00A0"}
+            </p>
+          </div>
+        )}
 
-
+        {/* Combination Four (shown for gameType 4) */}
+        {showCombinationFour && (
+          <div>
+            <label htmlFor="combinationFour" className="block text-sm">
+              Fourth Drawn Number
+            </label>
+            <Input
+              type="text"
+              id="combinationFour"
+              placeholder="Enter Fourth Drawn Number"
+              className="mt-1"
+              {...formik.getFieldProps("combinationFour")}
+              error={!!(formik.touched.combinationFour && formik.errors.combinationFour)}
+            />
+            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+              {getError("combinationFour") || "\u00A0"}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Submit Button */}
-      <div className="col-span-2">
+      <div className="col-span-full">
         <button
           type="submit"
           className="w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2 mt-1"
@@ -164,9 +335,13 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
           onClose={handleModalClose}
           onConfirm={async () => {
             try {
-              await onSubmit(formData as unknown as GameCombination); // submit from the parent component handled after password verification
-              closeConfirmModal(); // close confirm modal
-              if (onClose) onClose(); // optionally close the parent modal
+              const dataToSubmit = {
+                ...(formData as GameCombination),
+                identifiedGameTypeId: identifiedGameTypeIdRef.current,
+              };
+              await onSubmit(dataToSubmit);
+              closeConfirmModal();
+              if (onClose) onClose();
             } catch (err) {
               console.error("Error during onSubmit:", err);
             }

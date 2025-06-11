@@ -32,14 +32,26 @@ const TableBettingSummary = (params: { gameCategoryId?: number }) => {
       return;
     }
 
-    // Create a filtered copy if gameCategoryId exists
+    const today = new Date();
+    const todayFormatted = today.toISOString().split('T')[0];
+
+    // filter by today's date
+    const transactionsToday = response.data.filter(
+      (item: { DateOfTransaction: string }) => {
+        // Assuming DateOfTransaction is also in "YYYY-MM-DD" format or can be converted
+        const transactionDate = new Date(item.DateOfTransaction).toISOString().split('T')[0];
+        return transactionDate === todayFormatted;
+      }
+    );
+
+    // Then, apply gameCategoryId filter if it exists
     const filteredData =
       params.gameCategoryId && params.gameCategoryId > 0
-        ? response.data.filter(
+        ? transactionsToday.filter(
             (item: { GameCategoryId: number }) =>
               item.GameCategoryId === params.gameCategoryId
           )
-        : response.data;
+        : transactionsToday; // Use transactionsToday here
 
     const formattedData: Transactions[] = filteredData.map(
       (transaction: any) => ({

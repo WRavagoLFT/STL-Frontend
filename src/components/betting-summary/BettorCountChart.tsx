@@ -45,111 +45,104 @@ const ChartBettorsSummary = () => {
     95, 100,
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const today = new Date().toISOString().split("T")[0];
-        const response = await fetchHistoricalSummary({
-          from: today,
-          to: today,
-        });
+  const fetchBettorsVsBetsData = async (setData: Function, setLoading: Function) => {
+    setLoading(true);
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const response = await fetchHistoricalSummary({
+        from: today,
+        to: today,
+      });
 
-        // Add query params if needed
-        //console.log(today);
-        //console.log(response);
-        // Filter Data for Today's Date
-        const res = response.data.filter((item: { TransactionDate: string }) =>
-          item.TransactionDate.startsWith(today)
+      const res = response.data.filter((item: { TransactionDate: string }) =>
+        item.TransactionDate.startsWith(today)
+      );
+
+      if (response.success && Array.isArray(res)) {
+        const aggregatedData: Record<
+          number,
+          { pares: number; swer2: number; swer3: number; swer4: number }
+        > = {};
+
+        response.data.forEach(
+          (item: {
+            DrawOrder: number;
+            TotalBettors: number;
+            TotalBets: number;
+            GameCategoryId: number;
+          }) => {
+            if (!aggregatedData[item.DrawOrder]) {
+              aggregatedData[item.DrawOrder] = {
+                pares: 0,
+                swer2: 0,
+                swer3: 0,
+                swer4: 0,
+              };
+            }
+
+            aggregatedData[item.DrawOrder].pares +=
+              item.GameCategoryId == 1 ? item.TotalBets : 0;
+            aggregatedData[item.DrawOrder].swer2 +=
+              item.GameCategoryId == 2 ? item.TotalBets : 0;
+            aggregatedData[item.DrawOrder].swer3 +=
+              item.GameCategoryId == 3 ? item.TotalBets : 0;
+            aggregatedData[item.DrawOrder].swer4 +=
+              item.GameCategoryId == 4 ? item.TotalBets : 0;
+          }
         );
 
-        // console.log(
-        //   "Result Data from BettorsvsBetsPlacedChart: " +
-        //     JSON.stringify(res.data, null, 2)
-        // );
+        const formattedData = [
+          {
+            draw: "First Draw",
+            pares: aggregatedData[1]?.pares || 0,
+            swer2: aggregatedData[1]?.swer2 || 0,
+            swer3: aggregatedData[1]?.swer3 || 0,
+            swer4: aggregatedData[1]?.swer4 || 0,
+          },
+          {
+            draw: "Second Draw",
+            pares: aggregatedData[2]?.pares || 0,
+            swer2: aggregatedData[2]?.swer2 || 0,
+            swer3: aggregatedData[2]?.swer3 || 0,
+            swer4: aggregatedData[2]?.swer4 || 0,
+          },
+          {
+            draw: "Third Draw",
+            pares: aggregatedData[3]?.pares || 0,
+            swer2: aggregatedData[3]?.swer2 || 0,
+            swer3: aggregatedData[3]?.swer3 || 0,
+            swer4: aggregatedData[3]?.swer4 || 0,
+          },
+        ];
 
-        if (response.success && Array.isArray(res)) {
-          // Aggregate data by GameTypeId
-          const aggregatedData: Record<
-            number,
-            { pares: number; swer2: number; swer3: number; swer4: number }
-          > = {};
-
-          response.data.forEach(
-            (item: {
-              DrawOrder: number;
-              TotalBettors: number;
-              TotalBets: number;
-              GameCategoryId: number;
-            }) => {
-              if (!aggregatedData[item.DrawOrder]) {
-                aggregatedData[item.DrawOrder] = {
-                  pares: 0,
-                  swer2: 0,
-                  swer3: 0,
-                  swer4: 0,
-                };
-              }
-
-              aggregatedData[item.DrawOrder].pares +=
-                item.GameCategoryId == 1 ? item.TotalBets : 0;
-              aggregatedData[item.DrawOrder].swer2 +=
-                item.GameCategoryId == 2 ? item.TotalBets : 0;
-              aggregatedData[item.DrawOrder].swer3 +=
-                item.GameCategoryId == 3 ? item.TotalBets : 0;
-              aggregatedData[item.DrawOrder].swer4 +=
-                item.GameCategoryId == 4 ? item.TotalBets : 0;
-            }
-          );
-
-          // Convert aggregated data into the required format
-          const formattedData = [
-            {
-              draw: "First Draw",
-              pares: aggregatedData[1]?.pares || 0,
-              swer2: aggregatedData[1]?.swer2 || 0,
-              swer3: aggregatedData[1]?.swer3 || 0,
-              swer4: aggregatedData[1]?.swer4 || 0,
-            },
-            {
-              draw: "Second Draw",
-              pares: aggregatedData[2]?.pares || 0,
-              swer2: aggregatedData[2]?.swer2 || 0,
-              swer3: aggregatedData[2]?.swer3 || 0,
-              swer4: aggregatedData[2]?.swer4 || 0,
-            },
-            {
-              draw: "Third Draw",
-              pares: aggregatedData[3]?.pares || 0,
-              swer2: aggregatedData[3]?.swer2 || 0,
-              swer3: aggregatedData[3]?.swer3 || 0,
-              swer4: aggregatedData[3]?.swer4 || 0,
-            },
-          ];
-
-          setData(
-            formattedData.map((item) => ({
-              ...item,
-              pares: item.pares / 100000,
-              swer2: item.swer2 / 100000,
-              swer3: item.swer3 / 100000,
-              swer4: item.swer4 / 100000,
-            }))
-          );
-          //console.log(formattedData);
-          setLoading(false);
-        }
-      } catch (error) {
-        console.log(
-          "Error loading BettorsvsBetsPlacedSummary: " +
-            (error as Error).message
+        setData(
+          formattedData.map((item) => ({
+            ...item,
+            pares: item.pares / 100000,
+            swer2: item.swer2 / 100000,
+            swer3: item.swer3 / 100000,
+            swer4: item.swer4 / 100000,
+          }))
         );
       }
-    };
+    } catch (error) {
+      console.log(
+        "Error loading BettorsvsBetsPlacedSummary: " +
+          (error as Error).message
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchData();
-    //console.log(`Bettors vs Bets Placed Summary Data: ${data}`);
+  useEffect(() => {
+    fetchBettorsVsBetsData(setData, setLoading);
   }, []);
+
+  const safeMax = Math.max(
+    1000,
+    ...data.map((item) => item.pares + item.swer2 + item.swer3 + item.swer4)
+  );
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
@@ -166,27 +159,32 @@ const ChartBettorsSummary = () => {
             title="Summary of Bettors and Bets per Draw"
             getRowData={(item) => [
               item.draw,
-              item.pares.toFixed(2),
-              item.swer2.toFixed(2),
-              item.swer3.toFixed(2),
-              item.swer4.toFixed(2),
+              item.pares.toFixed(3),
+              item.swer2.toFixed(3),
+              item.swer3.toFixed(3),
+              item.swer4.toFixed(3),
             ]}
           />
       </div>
 
       <div className="h-full w-full">
-        {loading ? (
+        {/* {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : (
+        ) : ( */}
           <BarChart
             height={300}
             // width={{100%}}
             grid={{ vertical: true }}
-            slotProps={{ legend: { hidden: true } }}
             layout="horizontal"
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+            slotProps={{
+              noDataOverlay: {
+                message: "Today's Bettor Count by Game Type data will be displayed once available.",
+              },
+              legend: { hidden: true },
+            }}
             dataset={data}
             series={addLabelsGameTypes([
               {
@@ -214,20 +212,20 @@ const ChartBettorsSummary = () => {
               {
                 scaleType: "band",
                 data: ["First Draw", "Second Draw", "Third Draw"],
-              } as any,
+              }
             ]}
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100000,
+                max: safeMax,
                 valueFormatter: (value: number) => `${value.toLocaleString()}`,
                 tickValues: xAxisTicks,
                 tickSpacing: 1,
               } as any,
             ]}
           />
-        )}
+        {/* )} */}
       </div>
     </div>
   );

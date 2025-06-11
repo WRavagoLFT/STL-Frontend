@@ -13,11 +13,11 @@ import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
 import Input from "~/components/ui/inputs/TextInputs";
 import { handleUpdateUser } from "../../../../hooks/handleUpdateUserAction";
-import { loadUsers } from "../[role]";
 import useUserStore from "~/store/useUserStore";
 import { useAuthStore } from "~/store/useAuthStore";
 import { FaMobileAlt } from "react-icons/fa";
 import { editLogUser } from "~/utils/api/users";
+import { loadUsers } from "~/hooks/useLoadUsers";
 
 type UsersViewPageProps = {
   user?: User;

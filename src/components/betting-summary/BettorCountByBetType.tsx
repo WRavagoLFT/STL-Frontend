@@ -129,6 +129,16 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
   // Get series for rendering BarChart series
   const series = getBetTypeSeries(params.gameCategoryId);
 
+  const safeMax = Math.max(
+    1000,
+    ...data.map((item) =>
+      series.reduce((sum, { dataKey }) => {
+        const key = dataKey.toLowerCase();
+        return sum + (typeof item[key] === "number" ? (item[key] as number) : 0);
+      }, 0)
+    )
+  );
+
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
       <div className="flex justify-between items-center w-full mb-4">
@@ -152,11 +162,11 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
       </div>
 
       <div className="h-full w-full">
-        {loading ? (
+        {/* {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : (
+        ) : ( */}
           <BarChart
             height={300}
             grid={{ vertical: true }}
@@ -180,7 +190,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 100000,
+                max: safeMax,
                 valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
@@ -190,7 +200,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
               color,
             }))}
           />
-        )}
+        {/* )} */}
       </div>
     </div>
   );

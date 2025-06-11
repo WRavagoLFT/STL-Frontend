@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { CircularProgress, Button, } from "@mui/material";
-import { BarChart  } from "@mui/x-charts/BarChart";
+import { CircularProgress, Button } from "@mui/material";
+import { BarChart } from "@mui/x-charts/BarChart";
 import { addLabels } from "./tooltips/dataSet";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
-import { buttonStyles } from "~/styles/theme";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 
 // Custom Legend circle
@@ -44,117 +43,143 @@ interface TransactionData {
   CombinationFour: string | null;
 }
 
+const summary: Record<
+  number,
+  { gameName: string; bettors: number; bets: number; winners: number }
+> = {
+  1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
+  2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
+  3: { gameName: "Third Draw", bettors: 0, bets: 0, winners: 0 },
+};
+
 const ChartBettorsvsBetsPlacedSummary = (params: {
   gameCategoryId?: number;
 }) => {
   const [loading, setLoading] = useState(true);
-  const [chartData, setChartData] = useState<{ draw: string; bettors: number; bets: number }[]>([]);
-  //console.log("BettersvsBetsPlacedChart Params:", params);
-  //console.log("Chart Data: BETTING SUMMARY", chartData);
+  const [chartData, setChartData] = useState<
+    { draw: string; bettors: number; bets: number; ratio: number }[]
+  >([]);
+  const [data, setData] = useState<
+    { gameName: string; bettors: number; bets: number; winners: number }[]
+  >([]);
 
-  //const maxValue = Math.max(...data.map((item: any) => item.bets));
-  //const safeMax = maxValue < 1000 ? 1000 : maxValue;
+  const maxValue = Math.max(...data.map((item) => item.bets));
+  const safeMax = maxValue < 1000 ? 1000 : maxValue;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
+  const fetchData = async () => {
+    try {
+      const response = await fetchHistoricalSummary();
 
-        //setChartData(Object.values(drawMap));
+      if (response.success) {
         const today = new Date().toISOString().split("T")[0];
-        const response = await fetchHistoricalSummary({
-          from: today,
-          to: today,
-        });
 
-        //console.log("Bettors Bets", response);
+        // 1. Filter by today's date
+        let filteredData = response.data.filter((item: TransactionData) =>
+          item.TransactionDate.startsWith(today)
+        );
 
-        let data = response.data as TransactionData[];
-
-        if (params.gameCategoryId && params.gameCategoryId > 0) {
-          data = data.filter(
-            (item: { GameCategoryId: number }) =>
+        // 2. Filter by gameCategoryId if provided
+        if (params.gameCategoryId) {
+          filteredData = filteredData.filter(
+            (item: TransactionData) =>
               item.GameCategoryId === params.gameCategoryId
           );
         }
 
-        const drawMap = {
-          1: { draw: "First Draw", bettors: 0, bets: 0 },
-          2: { draw: "Second Draw", bettors: 0, bets: 0 },
-          3: { draw: "Third Draw", bettors: 0, bets: 0 },
+        // 3. Local summary object to avoid mutating global one
+        const localSummary: typeof summary = {
+          1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
+          2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
+          3: { gameName: "Third Draw", bettors: 0, bets: 0, winners: 0 },
         };
 
-        data.forEach((item) => {
-          const drawOrder = item.DrawOrder as 1 | 2 | 3;
-          if (drawMap[drawOrder]) {
-            drawMap[drawOrder].bettors += item.TotalBettors ?? 0;
-            drawMap[drawOrder].bets += item.TotalBetAmount ?? 0;
+        filteredData.forEach(
+          (item: {
+            DrawOrder: number;
+            TotalBettors: number;
+            TotalBetAmount: number;
+            TotalWinners: number;
+          }) => {
+            if (localSummary[item.DrawOrder]) {
+              localSummary[item.DrawOrder].bettors += item.TotalBettors || 0;
+              localSummary[item.DrawOrder].bets += item.TotalBetAmount || 0;
+              localSummary[item.DrawOrder].winners += item.TotalWinners || 0;
+            }
           }
-        });
-
-        // setChartData(Object.values(drawMap));
-        setChartData(
-          Object.values(drawMap).map((item) => {
-            const bettors = item.bettors;
-            const bets = item.bets / 10000;
-            return {
-              draw: item.draw,
-              bettors,
-              bets,
-              ratio: bettors ? bets / bettors : 0,
-            };
-          })
         );
 
-        //console.log("BettorsvsBetsPlacedSummary chart: ", data);
-      } catch (error) {
-        console.error(
-          "Error loading BettorsvsBetsPlacedSummary:",
-          (error as Error).message
-        );
-      } finally {
-        setLoading(false);
+        const formattedData = Object.values(localSummary);
+
+        // Optionally scale bets if needed (e.g., to 100,000s)
+        const scaledData = formattedData.map((item) => ({
+          ...item,
+          bets: item.bets / 100000,
+          ratio: item.bettors === 0 ? 0 : item.bets / item.bettors,
+        }));
+
+        setData(scaledData);
+
+        const transformedChartData = scaledData.map((item) => ({
+          draw: item.gameName,
+          bettors: item.bettors,
+          bets: item.bets,
+          ratio: item.ratio,
+        }));
+
+        setChartData(transformedChartData);
+      } else {
+        console.error("API Request Failed:", response.message);
       }
-    };
+    } catch (error) {
+      console.error("Error Fetching Data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }, [params.gameCategoryId]);
+  }, [params.gameCategoryId]); // Re-fetch if gameCategoryId changes
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
-      <div>
-        <div className="flex justify-between items-center w-full">
-          <div className="flex flex-col leading-none">
-            <p className="text-lg leading-none">
-              Summary of Bettors and Bets Placed Today
-            </p>
-            <CustomLegend />
-          </div>
-            <GenericCSVExportButton
-              data={chartData}
-              headers={["Draw", "Bettors (in 10k)", "Bets (in 10k)", "Bet-to-Bettor Ratio"]}
-              title="Summary of Bettors and Bets per Draw"
-              getRowData={(item) => [
-                item.draw,
-                item.bettors.toFixed(2),
-                item.bets.toFixed(2),
-                item.ratio.toFixed(2),
-              ]}
-            />
+      <div className="flex justify-between items-center w-full">
+        <div className="flex flex-col leading-none">
+          <p className="text-lg leading-none">
+            Summary of Bettors and Bets Placed Today
+          </p>
+          <CustomLegend />
         </div>
+        <GenericCSVExportButton
+          data={chartData}
+          headers={["Draw", "Bettors (in 10k)", "Bets (in 10k)", "Bet-to-Bettor Ratio"]}
+          title="Summary of Bettors and Bets per Draw"
+          getRowData={(item) => [
+            item.draw,
+            item.bettors,
+            item.bets,
+            item.ratio,
+          ]}
+        />
       </div>
-      <div className="h-full w-full">
-        {loading ? (
+
+      <div className="h-full w-full mt-4">
+        {/* {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : (
+        ) : ( */}
           <BarChart
-            slotProps={{ legend: { hidden: true } }}
             height={300}
             grid={{ vertical: true }}
             layout="horizontal"
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+            slotProps={{
+              legend: { hidden: true },
+              noDataOverlay: {
+                message: "Summary of Bets data will be displayed once available.",
+              },
+            }}
             dataset={chartData}
             yAxis={[
               {
@@ -165,18 +190,21 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
             xAxis={[
               {
                 label: "Amount (in 100,000 units)",
+                scaleType: "linear",
                 min: 0,
-                max: 10000,
+                max: safeMax,
                 valueFormatter: (value: number) => `${value.toLocaleString()}`,
-              },
+                tickSize: 2,
+                barCategoryGap: 0.2,
+                tickLabelProps: { style: { fontSize: "12px" } },
+              } as any,
             ]}
             series={addLabels([
               { dataKey: "bettors", color: "#E5C7FF" },
               { dataKey: "bets", color: "#D2A7FF" },
-              { dataKey: "ratio", color: 'none' }
             ])}
           />
-        )}
+        {/* )} */}
       </div>
     </div>
   );
