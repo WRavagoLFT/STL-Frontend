@@ -33,8 +33,13 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-
   const identifiedGameTypeIdRef = useRef<number | undefined>(undefined);
+  const openConfirmModal = () => setIsConfirmModalOpen(true);
+  const closeConfirmModal = () => setIsConfirmModalOpen(false);
+  const handleModalClose = () => {
+    closeConfirmModal();
+    if (onClose) onClose();
+  };
 
   const gameCategorySelectOptions: OptionType[] = useMemo(() => {
     if (!Array.isArray(gameTypes)) {
@@ -59,17 +64,12 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
     });
     return options;
   }, [gameTypes, gameCategoryMap]);
-
-  const openConfirmModal = () => setIsConfirmModalOpen(true);
-  const closeConfirmModal = () => setIsConfirmModalOpen(false);
-  const handleModalClose = () => {
-    closeConfirmModal();
-    if (onClose) onClose();
-  };
+  
+  const validate = toFormikValidationSchema(addGameCombination);
 
   const formik = useFormik({
     initialValues: {
-      gameType: initialData.gameType ? String(initialData.gameType) : "",
+      gameType: initialData.gameType || "",
       provinceId: initialData.provinceId || "",
       combinationOne: initialData.combinationOne || "",
       combinationTwo: initialData.combinationTwo || "",
@@ -77,7 +77,8 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
       combinationFour: initialData.combinationFour || "",
       gameSchedule: initialData.gameSchedule ? String(initialData.gameSchedule) : "",
     },
-    // validationSchema: toFormikValidationSchema(addGameCombination),
+    validate,
+    //validationSchema: toFormikValidationSchema(addGameCombination),
     onSubmit: async (values) => {
       console.log("[Form Submit] Submitted Values (before conversion):", values);
 
@@ -103,10 +104,10 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
         : undefined;
 
       const finalIdentifiedGameTypeId = identifiedGameTypeIdRef.current;
-      console.log("Final Identified GameTypeId for submission:", finalIdentifiedGameTypeId);
+      //console.log("Final Identified GameTypeId for submission:", finalIdentifiedGameTypeId);
 
       const finalData: GameCombination = {
-        gameType: submittedGameCategoryId,
+        gameType: finalIdentifiedGameTypeId,
         provinceId: values.provinceId ? Number(values.provinceId) : undefined,
         combinationOne: values.combinationOne ? Number(values.combinationOne) : undefined,
         combinationTwo: values.combinationTwo ? Number(values.combinationTwo) : undefined,
@@ -323,7 +324,6 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
         )}
         
       </div>
-
       {/* Submit Button */}
       <div className="col-span-full">
         <button

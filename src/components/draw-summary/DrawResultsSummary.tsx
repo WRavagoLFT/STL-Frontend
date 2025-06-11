@@ -71,12 +71,9 @@ const DrawResultsSummaryPage = ({
 
   const handleAddGameCombinationSubmit = async (data: GameCombination): Promise<void> => {
     try {
-      console.log("Adding user:", data);
       const result = await addWinningCombination(data);
 
       if (result.success) {
-        console.log("User added successfully:", result.data);
-
         Swal.fire({
           icon: "success",
           title: "Success!",
@@ -84,21 +81,29 @@ const DrawResultsSummaryPage = ({
           timer: 2000,
           showConfirmButton: false,
         });
+        setIsCreateModalOpen(false); // close modal only on success
       } else {
         console.error("Failed to add user:", result.message);
+
+        let htmlMessage = result.message || "Something went wrong.";
+
+        // If backend validation errors exist, format them into a list
+        if (result.errors && Array.isArray(result.errors)) {
+          htmlMessage += `<ul class="text-left" style="margin-top: 10px;">`;
+          for (const err of result.errors) {
+            htmlMessage += `<li>• <strong>${err.field}</strong>: ${err.message}</li>`;
+          }
+          htmlMessage += `</ul>`;
+        }
+
         Swal.fire({
           icon: "error",
           title: "Add Failed",
           text: result.message || "Something went wrong while adding the user.",
         });
       }
-
-      setIsCreateModalOpen(false);
     } catch (error) {
-      console.error(
-        "Unexpected error in handleAddUser:",
-        (error as Error).message
-      );
+      console.error("Unexpected error in handleAddUser:", (error as Error).message);
       Swal.fire({
         icon: "error",
         title: "Unexpected Error",
@@ -145,7 +150,7 @@ const DrawResultsSummaryPage = ({
         </div>
       </div>
 
-      {currentUserType !== 3 && (
+      {(currentUserType !== 3 && currentUserType !== 6) && (
         <div>
           <div className="w-full flex justify-end mt-5">
             <button
@@ -155,8 +160,6 @@ const DrawResultsSummaryPage = ({
               Input Draw Combination
             </button>
           </div>
-
-          {/* Modal */}
           <AddGameCombinationModal
             open={isModalOpen}
             onClose={handleCloseModal}

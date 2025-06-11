@@ -209,6 +209,7 @@ export type GameCombination = {
   combinationThree?: number;
   combinationFour?: number;
   gameSchedule?: number;
+  //gameTypeId?: number;
 }
 
 

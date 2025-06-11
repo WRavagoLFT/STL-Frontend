@@ -29,6 +29,7 @@ import {
 // Libs
 import Swal from "sweetalert2";
 import { loadUsers } from "~/hooks/useLoadUsers";
+import { useAuthStore } from "~/store/useAuthStore";
 
 const roleMap: Record<
   string,
@@ -95,7 +96,7 @@ const RolePage = () => {
       </div>
     );
   }
-
+  const currentUserType = useAuthStore((state) => state.userTypeId);
   const { roleId, label, textlabel } = roleConfig;
   const operatorMap = useUserRoleStore((state) => state.operatorMap);
   const setOperatorMap = useUserRoleStore((state) => state.setOperatorMap);
@@ -202,10 +203,11 @@ const RolePage = () => {
           textlabel={textlabel}
         />
 
-        <ChartsDataPage 
-          pageType={roleKey} 
-          dashboardData={data} 
-        />
+        {currentUserType !== 3 ? (
+          <ChartsDataPage pageType={roleKey} dashboardData={data} />
+        ) : (
+          <div className="my-4" /> 
+        )}
 
         <DetailedTable
           data={data}

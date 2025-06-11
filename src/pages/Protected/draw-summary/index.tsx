@@ -129,10 +129,10 @@ const DrawSelectedPage = () => {
 
       setFilteredProvinces(mappedProvinces);
 
-      if (filteredProvinces.length > 0) {
-        setSelectedProvince(filteredProvinces[0].ProvinceId);
+      if (mappedProvinces.length > 0) {
+        setSelectedProvince(mappedProvinces[0].value); // use mapped value here
       } else {
-        setSelectedProvince(""); // or null or undefined depending on your default
+        setSelectedProvince(""); // fallback
       }
     }
   }, [selectedRegion, provinces]);
@@ -235,14 +235,16 @@ const DrawSelectedPage = () => {
               }}
               options={regions}
               placeholder="Select a Region"
-              classNamePrefix="react-select-dashboard"
+              isDisabled={currentUserType === 5}
+              classNamePrefix="react-select"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
                   borderRadius: "0.5rem",
-                  color: "#2F2F2F",
+                  color: "#212121 !important",
                   padding: "0.25rem",
                   boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                  backgroundColor: "#ACA993 !important",
                 }),
                 menu: (provided) => ({
                   ...provided,
