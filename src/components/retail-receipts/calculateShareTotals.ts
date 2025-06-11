@@ -70,7 +70,7 @@ export function calculateNetIncome(
   if (mode === "AAC") {
     return {
       netAmount: grossAmount - taxAmount,
-      netPercentage: grossPercentage + taxPercentage,
+      netPercentage: grossPercentage - taxPercentage,
     };
   } else {
     // PCSO case

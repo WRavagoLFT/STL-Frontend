@@ -76,9 +76,6 @@ const GrossAACSharePage: React.FC<ShareBreakdownPageProps> = ({
                 No share breakdown available.
               </div>
             )}
-
-
-            
           </div>
         )}
       </div>
