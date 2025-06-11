@@ -21,23 +21,42 @@ export const fetchRegions = async () => {
     }
 }
 
-export const fetchProvinces = async(filters?: {regionId: number}) => {
-    try {
-        const url = validateRelativeUrl("/location/getProvinces");
-        const response = await axiosInstance.get(url, {
-            params: {
-                regionId: filters?.regionId
-            }
-        })
+export const fetchProvinces = async (filters?: { regionId: number }) => {
+  const timestamp = new Date().toISOString();
 
-        return response.data
+  try {
+    const url = validateRelativeUrl("/location/getProvinces");
+
+    console.log(`[${timestamp}] [fetchProvinces] Sending request to: ${url}`);
+    if (filters?.regionId) {
+      console.log(`[${timestamp}] [fetchProvinces] Using regionId: ${filters.regionId}`);
+    } else {
+      console.log(`[${timestamp}] [fetchProvinces] No regionId provided`);
     }
 
-    catch (error) {
-        console.error("Error fetching provinces:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: [] };
-    }
-}
+    const response = await axiosInstance.get(url, {
+      params: {
+        regionId: filters?.regionId,
+      },
+    });
+
+    console.log(`[${timestamp}] [fetchProvinces] Response received:`, {
+      success: response.data?.success,
+      provincesCount: response.data?.data?.length,
+    });
+
+    return response.data;
+  } catch (error) {
+    const errorMessage = (error as Error).message;
+    console.error(`[${timestamp}] [fetchProvinces] Error occurred: ${errorMessage}`);
+
+    return {
+      success: false,
+      message: errorMessage,
+      data: [],
+    };
+  }
+};
 
 export const fetchCities = async(filters?: { availableOnly?: boolean }) => {
     try {

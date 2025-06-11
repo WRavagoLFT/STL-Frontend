@@ -59,74 +59,74 @@ export const useRetailReceiptProcessor = (
     "Documentary stamp tax"
   ];
 
-useEffect(() => {
-  if (!operationDate) {
-    console.log("Missing operationDate, skipping fetch.");
-    return;
-  }
-
-  //console.log('OPERATOR ID IN THE PROCESS FUNCTION:', operatorId);
-
-  const [parsedYear, parsedMonth] = operationDate.split("-").map(Number);
-  const yearToUse = selectedYear ?? parsedYear;
-
-  const filterByLower = typeof filterBy === "string" ? filterBy.toLowerCase() : null;
-
-  const isMonthly = filterByLower === "monthly";
-  const isYearly = filterByLower === "yearly";
-
-  const monthParam: number | undefined = isMonthly ? parsedMonth : undefined;
-
-  const filterByParam: number | undefined =
-    !isMonthly && !isYearly && typeof filterBy !== "undefined"
-      ? Number(filterBy)
-      : undefined;
-
-  fetchRetailReceiptsData(yearToUse, monthParam, filterByParam, operatorId).then((response) => {
-    if (!response?.success) {
-      console.warn("Failed to fetch retail receipts");
+  useEffect(() => {
+    if (!operationDate) {
+      console.log("Missing operationDate, skipping fetch.");
       return;
     }
 
-    const aac = processShares(response.data?.Receipts?.AAC, AAC_GROSS_TITLES, yearToUse, monthParam, 1);
-    setAacBreakdown(aac.breakdown);
-    setAacTotalPercentage(aac.totalPercentage);
-    setAacTotalShareAmount(aac.totalShareAmount);
+    //console.log('OPERATOR ID IN THE PROCESS FUNCTION:', operatorId);
 
-    const pcso = processShares(response.data?.Receipts?.PCSO, PCSO_TITLES, yearToUse, monthParam, 1);
-    setPcsoBreakdown(pcso.breakdown);
-    setPcsoTotalPercentage(pcso.totalPercentage);
-    setPcsoTotalShareAmount(pcso.totalShareAmount);
+    const [parsedYear, parsedMonth] = operationDate.split("-").map(Number);
+    const yearToUse = selectedYear ?? parsedYear;
 
-    const aacTax = processShares(response.data?.Receipts?.PCSO, AAC_TAX_TITLES, yearToUse, monthParam, 2);
-    setAacTaxBreakdown(aacTax.breakdown);
-    setAacTaxTotalPercentage(aacTax.totalPercentage);
-    setAacTaxTotalShareAmount(aacTax.totalShareAmount);
+    const filterByLower = typeof filterBy === "string" ? filterBy.toLowerCase() : null;
 
-    const pcsoTax = processShares(response.data?.Receipts?.PCSO, PCSO_TAX_TITLES, yearToUse, monthParam, 2);
-    setPcsoTaxBreakdown(pcsoTax.breakdown);
-    setPcsoTaxTotalPercentage(pcsoTax.totalPercentage);
-    setPcsoTaxTotalShareAmount(pcsoTax.totalShareAmount);
+    const isMonthly = filterByLower === "monthly";
+    const isYearly = filterByLower === "yearly";
 
-    const { netAmount: netAacAmount, netPercentage: netAacPercentage } = calculateNetIncome(
-      aac.totalShareAmount,
-      aac.totalPercentage,
-      aacTax.totalShareAmount,
-      aacTax.totalPercentage
-    );
-    setNetAacTotalAmount(netAacAmount);
-    setNetAacTotalPercentage(netAacPercentage);
+    const monthParam: number | undefined = isMonthly ? parsedMonth : undefined;
 
-    const { netAmount: netPcsoAmount, netPercentage: netPcsoPercentage } = calculateNetIncome(
-      pcso.totalShareAmount,
-      pcso.totalPercentage,
-      pcsoTax.totalShareAmount,
-      pcsoTax.totalPercentage
-    );
-    setNetPcsoTotalAmount(netPcsoAmount);
-    setNetPcsoTotalPercentage(netPcsoPercentage);
-  });
-}, [filterBy, operationDate, selectedYear, operatorId]);
+    const filterByParam: number | undefined =
+      !isMonthly && !isYearly && typeof filterBy !== "undefined"
+        ? Number(filterBy)
+        : undefined;
+
+    fetchRetailReceiptsData(yearToUse, monthParam, filterByParam, operatorId).then((response) => {
+      if (!response?.success) {
+        console.warn("Failed to fetch retail receipts");
+        return;
+      }
+
+      const aac = processShares(response.data?.Receipts?.AAC, AAC_GROSS_TITLES, yearToUse, monthParam, 1);
+      setAacBreakdown(aac.breakdown);
+      setAacTotalPercentage(aac.totalPercentage);
+      setAacTotalShareAmount(aac.totalShareAmount);
+
+      const pcso = processShares(response.data?.Receipts?.PCSO, PCSO_TITLES, yearToUse, monthParam, 1);
+      setPcsoBreakdown(pcso.breakdown);
+      setPcsoTotalPercentage(pcso.totalPercentage);
+      setPcsoTotalShareAmount(pcso.totalShareAmount);
+
+      const aacTax = processShares(response.data?.Receipts?.PCSO, AAC_TAX_TITLES, yearToUse, monthParam, 2);
+      setAacTaxBreakdown(aacTax.breakdown);
+      setAacTaxTotalPercentage(aacTax.totalPercentage);
+      setAacTaxTotalShareAmount(aacTax.totalShareAmount);
+
+      const pcsoTax = processShares(response.data?.Receipts?.PCSO, PCSO_TAX_TITLES, yearToUse, monthParam, 2);
+      setPcsoTaxBreakdown(pcsoTax.breakdown);
+      setPcsoTaxTotalPercentage(pcsoTax.totalPercentage);
+      setPcsoTaxTotalShareAmount(pcsoTax.totalShareAmount);
+
+      const { netAmount: netAacAmount, netPercentage: netAacPercentage } = calculateNetIncome(
+        aac.totalShareAmount,
+        aac.totalPercentage,
+        aacTax.totalShareAmount,
+        aacTax.totalPercentage
+      );
+      setNetAacTotalAmount(netAacAmount);
+      setNetAacTotalPercentage(netAacPercentage);
+
+      const { netAmount: netPcsoAmount, netPercentage: netPcsoPercentage } = calculateNetIncome(
+        pcso.totalShareAmount,
+        pcso.totalPercentage,
+        pcsoTax.totalShareAmount,
+        pcsoTax.totalPercentage
+      );
+      setNetPcsoTotalAmount(netPcsoAmount);
+      setNetPcsoTotalPercentage(netPcsoPercentage);
+    });
+  }, [filterBy, operationDate, selectedYear, operatorId]);
 
   return {
     aacBreakdown,

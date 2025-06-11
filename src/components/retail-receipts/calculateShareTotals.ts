@@ -67,8 +67,8 @@ export function calculateNetIncome(
   taxPercentage: number
 ) {
   return {
-    netAmount: grossAmount - taxAmount,
-    netPercentage: grossPercentage - taxPercentage,
+    netAmount: grossAmount + taxAmount,
+    netPercentage: grossPercentage + taxPercentage,
   };
 }
 
