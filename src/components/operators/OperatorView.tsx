@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { ReusableModalPageProps } from "~/types/interfaces";
 import Select from "react-select";
 import useUpdateModalState from "../../store/useUpdateModalStore";
 import Input from "../ui/inputs/TextInputs";
@@ -143,7 +142,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
     if (!initialUserOperatorData || !initialUserOperatorData.data) return {};
 
     const data = initialUserOperatorData.data;
-    //console.log(initialUserOperatorData.data);
+    console.log(initialUserOperatorData.data);
 
     return {
       operatorId: data.OperatorId || '', 
@@ -162,6 +161,9 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       creationDate: data.CreatedAt || '',
       lastUpdatedDate: data.LastUpdatedDate || '',
       lastUpdatedBy: data.LastUpdatedBy || '',
+
+      execFirstName: data.Executive || '',
+      //execLastName: data. 
 
       regionId: data.Region?.RegionId || null,
       regionName: data.Region?.RegionName || '',
@@ -322,7 +324,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
             <Input
               id="lastUpdatedBy"
               name="lastUpdatedBy"
-              //value={formik.values.lastUpdatedBy || "N/A"}
+              value={formik.values.lastUpdatedBy || "N/A"}
               disabled
             />
           </div>
@@ -358,7 +360,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
             <Input
               id="lastUpdatedDate"
               name="lastUpdatedDate"
-              //value={formik.values.lastUpdatedDate || "N/A"}
+              value={formik.values.lastUpdatedDate || "N/A"}
               disabled
             />
           </div>
@@ -380,7 +382,61 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
             )}
         </div>
       </div>
+      
+      {/* Owner Information */}
+      <div className="mt-3">
+        <div className="text-base font-bold mb-2">Owner Information</div>
+        <div className="grid grid-cols-2 gap-4">
+          {/* Operator Name */}
+          <div className="col-span-2">
+            <label
+              htmlFor="execFirstName"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Given Name
+            </label>
+            <Input
+              id="execFirstName"
+              value={formik.values.execFirstName || "N/A"}
+              //{...formik.getFieldProps("execFirstName")}
+              disabled
+            />
+          </div>
 
+          {/* Contact Number */}
+          <div>
+            <label
+              htmlFor="contactNo"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Operator's Phone Number
+            </label>
+            <Input
+              id="contactNo"
+              type="text"
+              {...formik.getFieldProps("contactNo")}
+              disabled={isDisabled}
+            />
+          </div>
+
+          {/* Address */}
+          <div>
+            <label
+              htmlFor="operatorAddress"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Operator's Address
+            </label>
+            <Input
+              id="operatorAddress"
+              {...formik.getFieldProps("operatorAddress")}
+              disabled
+            />
+          </div>
+
+        </div>
+      </div>
+      
       {/* AAC Information */}
       <div className="mt-5">
         <div className="text-base font-bold mb-2">AAC Information</div>
@@ -388,14 +444,14 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
           {/* Operator Name */}
           <div>
             <label
-              htmlFor="name"
+              htmlFor="operatorName"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Name
             </label>
             <Input
-              id="name"
-              {...formik.getFieldProps("name")}
+              id="operatorName"
+              {...formik.getFieldProps("operatorName")}
               disabled={isDisabled}
             />
           </div>
