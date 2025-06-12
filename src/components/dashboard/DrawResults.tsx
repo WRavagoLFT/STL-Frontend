@@ -55,6 +55,8 @@ const DrawResultsPage = () => {
     label: cat.GameCategory,
   }));
 
+  //console.log(gameCategoryOptions);
+
   const regionOptions = regions.map((region) => ({
     value: region.RegionId,
     label: region.RegionName,
@@ -68,7 +70,7 @@ const DrawResultsPage = () => {
       label: province.ProvinceName,
     }));
 
-    console.log('SELECTED PROVINCE:', filteredProvinceOptions);
+    //console.log('SELECTED PROVINCE:', filteredProvinceOptions);
 
   // Find selected options
   const selectedGameCategoryOption = gameCategoryOptions.find(
@@ -78,7 +80,7 @@ const DrawResultsPage = () => {
     (option) => option.value === Number(selectedRegion)
   );
   const selectedProvinceOption = filteredProvinceOptions.find(
-    (option) => option.value === Number(selectedProvince)
+    (opt) => String(opt.value) === String(selectedProvince)
   );
 
   useEffect(() => {
@@ -87,7 +89,7 @@ const DrawResultsPage = () => {
       if (regionsRes.success) setRegions(regionsRes.data);
 
       const provincesRes = await fetchProvinces();
-      console.log('Fetched province:',provincesRes);
+      //console.log('Fetched province:',provincesRes);
       
       if (provincesRes.success)
         setProvinces(provincesRes.data.filter((p: any) => p.RegionId !== 0));
@@ -143,14 +145,6 @@ const DrawResultsPage = () => {
   }, [provinces, regions, gameCategories]);
 
   useEffect(() => {
-    const regionId = selectedRegion ? Number(selectedRegion) : null;
-
-    if (regionId !== null) {
-      fetchProvinces({ regionId });
-    }
-  }, [selectedRegion]);
-
-  useEffect(() => {
     let filtered = winningCombinations;
 
     const regionId = selectedRegion ? Number(selectedRegion) : null;
@@ -178,6 +172,19 @@ const DrawResultsPage = () => {
     selectedGameCategory,
     winningCombinations,
   ]);
+
+  useEffect(() => {
+    const regionId = selectedRegion ? Number(selectedRegion) : null;
+
+    if (regionId !== null) {
+      fetchProvinces({ regionId }).then((res) => {
+        if (res.success) {
+          setProvinces(res.data);
+          setSelectedProvince(""); // Reset selection when region changes
+        }
+      });
+    }
+  }, [selectedRegion]);
 
   // Helper
   const displayValue = (value: string | number) => {
@@ -303,66 +310,70 @@ const DrawResultsPage = () => {
                   )
                 : null;
 
-            // Determine boxes count; fallback to 2 if no item or invalid state
-            const gameCategoryId = item?.GameCategoryId ?? 0;
+            // Determine boxes based on selectedGameCategory
             const totalBoxes =
-              gameCategoryId >= 4 ? 4 : gameCategoryId >= 3 ? 3 : 2;
+              Number(selectedGameCategory) === 4
+                ? 4
+                : Number(selectedGameCategory) === 3
+                ? 3
+                : 2;
+
             const displayInGrid = totalBoxes > 2;
 
             return (
-            <div key={gameTypeId} className="flex-1 min-w-0">
-              <p className="text-sm font-light mb-1">
-                {gameTypeId === 1
-                  ? "First Draw"
-                  : gameTypeId === 2
-                  ? "Second Draw"
-                  : "Third Draw"}
-              </p>
+              <div key={gameTypeId} className="flex-1 min-w-0">
+                <p className="text-sm font-light mb-1">
+                  {gameTypeId === 1
+                    ? "First Draw"
+                    : gameTypeId === 2
+                    ? "Second Draw"
+                    : "Third Draw"}
+                </p>
 
-              <div
-                className={`flex flex-wrap gap-2 w-full ${
-                  displayInGrid ? "" : "sm:flex-nowrap"
-                }`}
-              >
-                {/* Box 1 */}
                 <div
-                  className={`bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center 
-                    ${displayInGrid ? "w-[calc(50%-4px)]" : "w-full sm:flex-1"}`}
+                  className={`flex flex-wrap gap-2 w-full ${
+                    displayInGrid ? "" : "sm:flex-nowrap"
+                  }`}
                 >
-                  <p className="font-bold text-2xl text-center break-words">
-                    {displayValue(item?.WinningCombinationOne ?? "-")}
-                  </p>
-                </div>
-
-                {/* Box 2 */}
-                <div
-                  className={`bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center 
-                    ${displayInGrid ? "w-[calc(50%-4px)]" : "w-full sm:flex-1"}`}
-                >
-                  <p className="font-bold text-2xl text-center break-words">
-                    {displayValue(item?.WinningCombinationTwo ?? "-")}
-                  </p>
-                </div>
-
-                {/* Box 3 */}
-                {totalBoxes >= 3 && (
-                  <div className="bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center w-full sm:w-[calc(50%-4px)]">
+                  {/* Box 1 */}
+                  <div
+                    className={`bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center 
+                      ${displayInGrid ? "w-[calc(50%-4px)]" : "w-full sm:flex-1"}`}
+                  >
                     <p className="font-bold text-2xl text-center break-words">
-                      {displayValue(item?.WinningCombinationThree ?? "-")}
+                      {displayValue(item?.WinningCombinationOne ?? "-")}
                     </p>
                   </div>
-                )}
 
-                {/* Box 4 */}
-                {totalBoxes >= 4 && (
-                  <div className="bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center w-full sm:w-[calc(50%-4px)]">
+                  {/* Box 2 */}
+                  <div
+                    className={`bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center 
+                      ${displayInGrid ? "w-[calc(50%-4px)]" : "w-full sm:flex-1"}`}
+                  >
                     <p className="font-bold text-2xl text-center break-words">
-                      {displayValue(item?.WinningCombinationFour ?? "-")}
+                      {displayValue(item?.WinningCombinationTwo ?? "-")}
                     </p>
                   </div>
-                )}
+
+                  {/* Box 3 */}
+                  {totalBoxes >= 3 && (
+                    <div className="bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center w-full sm:w-[calc(50%-4px)]">
+                      <p className="font-bold text-2xl text-center break-words">
+                        {displayValue(item?.WinningCombinationThree ?? "-")}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Box 4 */}
+                  {totalBoxes >= 4 && (
+                    <div className="bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center w-full sm:w-[calc(50%-4px)]">
+                      <p className="font-bold text-2xl text-center break-words">
+                        {displayValue(item?.WinningCombinationFour ?? "-")}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
             );
           })}
         </div>

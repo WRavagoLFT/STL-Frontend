@@ -1,5 +1,5 @@
 // React & Next
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
 // Stores & Hooks
@@ -8,8 +8,8 @@ import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
 
 // Components
 import DetailedTable from "~/components/ui/tables/DetailedTable";
-import ChartsDataPage from "~/components/ui/charts/UserChartsData";
-import CardsPage from "~/components/user/CardsData";
+const ChartsDataPage = React.lazy(() => import("~/components/ui/charts/UserChartsData"));
+const CardsPage = React.lazy(() => import("~/components/user/CardsData"));
 import AddUserModal from "~/components/user/AddUser";
 import UpdateUserModal from "~/components/user/UpdateUser";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
@@ -30,6 +30,7 @@ import {
 import Swal from "sweetalert2";
 import { loadUsers } from "~/hooks/useLoadUsers";
 import { useAuthStore } from "~/store/useAuthStore";
+import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
 
 const roleMap: Record<
   string,
@@ -140,7 +141,7 @@ const RolePage = () => {
     loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading);
   }, [roleConfig, roleKey]);
 
-  console.log("DATA USER", data);
+  //console.log("DATA USER", data);
   // console.log("operatormappp", operatorMap);
   //console.log('ROLE CONFIG IN THE PAGE:', roleConfig);
 
@@ -196,66 +197,72 @@ const RolePage = () => {
 
   return (
     <AccessGuard allowedUserTypes={roleConfig.permittedUserTypes}>
-      <div className="mx-auto px-0 py-1">
-        <h1 className="text-3xl font-bold mb-3">{label}</h1>
-        <CardsPage
-          dashboardData={data}
-          roleLabel={label}
-          textlabel={textlabel}
-        />
+      {loading ? (
+        <UsersSkeletonPage />
+      ) : (
+        <Suspense fallback={<UsersSkeletonPage />}>
+          <div className="mx-auto px-0 py-1">
+            <h1 className="text-3xl font-bold mb-3">{label}</h1>
+            <CardsPage
+              dashboardData={data}
+              roleLabel={label}
+              textlabel={textlabel}
+            />
 
-        {currentUserType !== 3 ? (
-          <ChartsDataPage pageType={roleKey} dashboardData={data} />
-        ) : (
-          <div className="my-4" /> 
-        )}
+            {currentUserType !== 3 ? (
+              <ChartsDataPage pageType={roleKey} dashboardData={data} />
+            ) : (
+              <div className="my-4" /> 
+            )}
 
-        <DetailedTable
-          data={data}
-          columns={tableColumns}
-          pageType={roleKey}
-          operatorMap={operatorMap}
-          roleId={roleId}
-          statsPerRegion={data}
-          source="users"
-          onAddClick={openCreateModal}
-          onUpdateClick={openUpdateModal}
-        />
+            <DetailedTable<User>
+              data={data}
+              columns={tableColumns}
+              pageType={roleKey}
+              operatorMap={operatorMap}
+              roleId={roleId}
+              statsPerRegion={data}
+              source="users"
+              onAddClick={openCreateModal}
+              onUpdateClick={openUpdateModal}
+            />
 
-        <AddUserModal
-          open={isCreateModalOpen}
-          onClose={closeCreateModal}
-          onSubmit={handleAddUser}
-          operatorMap={operatorMap}
-          userTypeId={roleId}
-          pcsoBranchMap={pcsoBranchMap}
-          kaboMap={kaboMap}
-        />
+            <AddUserModal
+              open={isCreateModalOpen}
+              onClose={closeCreateModal}
+              onSubmit={handleAddUser}
+              operatorMap={operatorMap}
+              userTypeId={roleId}
+              pcsoBranchMap={pcsoBranchMap}
+              kaboMap={kaboMap}
+            />
 
-        {isUpdateModalOpen && (
-          <UpdateUserModal
-            open={isUpdateModalOpen}
-            onClose={closeUpdateModal}
-            onSubmit={onUserUpdateSubmit}
-            operatorMap={operatorMap}
-            userTypeId={roleId}
-            selectedUser={selectedUser}
-            onViewEditLogs={() => openEditLogModal(selectedUser!)}
-          />
-        )}
+            {isUpdateModalOpen && (
+              <UpdateUserModal
+                open={isUpdateModalOpen}
+                onClose={closeUpdateModal}
+                onSubmit={onUserUpdateSubmit}
+                operatorMap={operatorMap}
+                userTypeId={roleId}
+                selectedUser={selectedUser}
+                onViewEditLogs={() => openEditLogModal(selectedUser!)}
+              />
+            )}
 
-        {selectedUser && showEditLog && (
-          <EditModalPage
-            open={showEditLog}
-            id={selectedUser.UserId!}
-            fetchData={editLogUser}
-            columns={editLogtableColumns}
-            onClose={() => setShowEditLog(false)}
-            userTypeId={roleId}
-            selectedUser={selectedUser}
-          />
-        )}
-      </div>
+            {selectedUser && showEditLog && (
+              <EditModalPage
+                open={showEditLog}
+                id={selectedUser.UserId!}
+                fetchData={editLogUser}
+                columns={editLogtableColumns}
+                onClose={() => setShowEditLog(false)}
+                userTypeId={roleId}
+                selectedUser={selectedUser}
+              />
+            )}
+          </div>
+      </Suspense>
+      )}
     </AccessGuard>
   );
 };

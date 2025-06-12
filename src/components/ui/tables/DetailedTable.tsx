@@ -18,7 +18,7 @@ import { useModalStore } from "~/store/useModalStore";
 import useDetailTableStore from "~/store/useTableStore";
 import { useAuthStore } from "~/store/useAuthStore";
 
-const DetailedTable = <T extends User | Operator | Device>({
+const DetailedTable = function <T extends User | Operator | Device>({
   data,
   columns,
   actionsRender,
@@ -29,7 +29,7 @@ const DetailedTable = <T extends User | Operator | Device>({
   source,
   onAddClick,
   onUpdateClick,
-}: DetailedTableProps<T>) => {
+}: DetailedTableProps<T>) {
   const { searchQuery, setIsFilterActive, isFilterActive, page, rowsPerPage, sortConfig, filters, handleChangePage, handleChangeRowsPerPage, setSearchQuery, anchorEl, selectedRow, setAnchorEl, setSelectedRow, resetMenu } = useDetailTableStore();
   const [openEditLogModal, setOpenEditLogModal] = useState(false);
   const sevenDaysAgo = useMemo(() => dayjs().subtract(7, "day"), []);

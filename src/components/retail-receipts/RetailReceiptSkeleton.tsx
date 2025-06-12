@@ -16,7 +16,7 @@ export default function RetailReceiptSkeleton() {
           {[...Array(1)].map((_, idx) => (
             <div className="flex-[1_1_200px]" key={idx}>
               <SkeletonBox height="h-5" width="w-24 mb-2" />
-              <SkeletonBox height="h-10" width="w-[34.5rem] mb-2" />
+              <SkeletonBox height="h-8" width="w-[34.5rem] mb-2" />
             </div>
           ))}
         </div>
@@ -29,7 +29,7 @@ export default function RetailReceiptSkeleton() {
               className="bg-gray-100 p-4 rounded-lg shadow-sm animate-pulse"
             >
               <SkeletonBox height="h-4" width="w-1/2 mb-2" />
-              <SkeletonBox height="h-6" width="w-2/3" />
+              <SkeletonBox height="h-8" width="w-2/3" />
             </div>
           ))}
         </div>
