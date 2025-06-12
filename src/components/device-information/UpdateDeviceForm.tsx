@@ -135,11 +135,6 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
     },
   });
 
-  useEffect(() => {
-    console.log("Validation Errors:", formik.errors);
-    //console.log("Touched Fields:", formik.touched);
-  }, [formik.errors, formik.touched]);
-
   // Helpers to display errors
   const getError = (field: string) =>
     formik.touched[field as keyof typeof formik.touched] &&
@@ -163,9 +158,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               className="mt-1"
               value={
                 formik.values.assignmentDate
-                  ? dayjs(formik.values.assignmentDate).format(
-                      "MM/DD/YYYY hh:mm A"
-                    )
+                  ? dayjs(formik.values.assignmentDate).format("YYYY/MM/DD HH:mm:ss")
                   : ""
               }
               onChange={(e) => {
@@ -265,10 +258,8 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               className="mt-1"
               disabled
               value={
-                formik.values.assignmentDate
-                  ? dayjs(formik.values.assignmentDate).format(
-                      "MM/DD/YYYY hh:mm A"
-                    )
+                formik.values.lastSyncTimestamp
+                  ? dayjs(formik.values.lastSyncTimestamp).format("YYYY/MM/DD HH:mm:ss")
                   : ""
               }
               onChange={(e) => {
@@ -488,7 +479,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
             value={
               formik.values.assignmentDate
                 ? dayjs(formik.values.assignmentDate).format(
-                    "MM/DD/YYYY hh:mm A"
+                    "YYYY/MM/DD HH:mm:ss"
                   )
                 : ""
             }
@@ -498,7 +489,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               if (parsedDate.isValid()) {
                 formik.setFieldValue(
                   "assignmentDate",
-                  parsedDate.format("YYYY-MM-DD")
+                  parsedDate.format("YYYY/MM/DD HH:mm:ss")
                 );
               } else {
                 formik.setFieldValue("assignmentDate", "");
@@ -526,7 +517,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
             value={
               formik.values.assignmentDate
                 ? dayjs(formik.values.assignmentDate).format(
-                    "MM/DD/YYYY hh:mm A"
+                    "YYYY/MM/DD HH:mm:ss"
                   )
                 : ""
             }
@@ -536,7 +527,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               if (parsedDate.isValid()) {
                 formik.setFieldValue(
                   "assignmentDate",
-                  parsedDate.format("YYYY-MM-DD")
+                  parsedDate.format("YYYY/MM/DD HH:mm:ss")
                 );
               } else {
                 formik.setFieldValue("assignmentDate", "");
@@ -563,7 +554,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
             value={
               formik.values.assignmentDate
                 ? dayjs(formik.values.assignmentDate).format(
-                    "MM/DD/YYYY hh:mm A"
+                    "YYYY/MM/DD HH:mm:ss"
                   )
                 : ""
             }
@@ -573,7 +564,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               if (parsedDate.isValid()) {
                 formik.setFieldValue(
                   "assignmentDate",
-                  parsedDate.format("YYYY-MM-DD")
+                  parsedDate.format("YYYY/MM/DD HH:mm:ss")
                 );
               } else {
                 formik.setFieldValue("assignmentDate", "");

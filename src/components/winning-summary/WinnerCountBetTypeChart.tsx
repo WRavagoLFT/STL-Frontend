@@ -3,6 +3,7 @@ import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { fetchWinners } from "~/utils/api/winners";
+import { useAuthStore } from "~/store/useAuthStore";
 
 // Define bet type series per GameCategory
 const getBetTypeSeries = (gameCategoryId?: number) => {
@@ -44,6 +45,7 @@ const CustomLegend = ({ gameCategoryId }: { gameCategoryId?: number }) => {
 const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: number }) => {
   const [data, setData] = useState<Array<{ draw: string; [key: string]: number | string }>>([]);
   const [loading, setLoading] = useState(false);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const series = useMemo(() => getBetTypeSeries(gameCategoryId), [gameCategoryId]);
 
@@ -120,18 +122,19 @@ const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: numbe
           <p className="text-lg leading-none">Today's Winnings by Game Type</p>
           <CustomLegend gameCategoryId={gameCategoryId} />
         </div>
-
-        <GenericCSVExportButton
-          data={data}
-          headers={["Draw", ...series.map((s) => s.dataKey)]}
-          title="Summary of Bets By Bet Type"
-          getRowData={(item) => [
-            item.draw,
-            ...series.map(({ dataKey }) =>
-              Number(item[dataKey.toLowerCase()] || 0).toFixed(3)
-            ),
-          ]}
-        />
+        {currentUserType !== 3 && (
+          <GenericCSVExportButton
+            data={data}
+            headers={["Draw", ...series.map((s) => s.dataKey)]}
+            title="Summary of Bets By Bet Type"
+            getRowData={(item) => [
+              item.draw,
+              ...series.map(({ dataKey }) =>
+                Number(item[dataKey.toLowerCase()] || 0).toFixed(3)
+              ),
+            ]}
+          />
+        )}
       </div>
 
       <div className="h-full w-full">
@@ -140,38 +143,39 @@ const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: numbe
             <CircularProgress />
           </div>
         ) : ( */}
-          <BarChart
-            height={300}
-            grid={{ vertical: true }}
-            layout="horizontal"
-            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-            slotProps={{
-              legend: { hidden: true },
-              noDataOverlay: {
-                message: "Today's Winnings by Game Type will be displayed once available.",
-              },
-            }}
-            dataset={data}
-            yAxis={[
-              {
-                scaleType: "band",
-                data: data.map((item) => item.draw),
-              },
-            ]}
-            xAxis={[
-              {
-                label: "Amount (in 100,000 units)",
-                min: 0,
-                max: safeMax,
-                valueFormatter: (value: number) => `${value.toLocaleString()}`,
-              },
-            ]}
-            series={series.map(({ dataKey, color }) => ({
-              dataKey: dataKey.toLowerCase(),
-              label: dataKey,
-              color,
-            }))}
-          />
+        <BarChart
+          height={300}
+          grid={{ vertical: true }}
+          layout="horizontal"
+          margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+          slotProps={{
+            legend: { hidden: true },
+            noDataOverlay: {
+              message:
+                "Today's Winnings by Game Type will be displayed once available.",
+            },
+          }}
+          dataset={data}
+          yAxis={[
+            {
+              scaleType: "band",
+              data: data.map((item) => item.draw),
+            },
+          ]}
+          xAxis={[
+            {
+              label: "Amount (in 100,000 units)",
+              min: 0,
+              max: safeMax,
+              valueFormatter: (value: number) => `${value.toLocaleString()}`,
+            },
+          ]}
+          series={series.map(({ dataKey, color }) => ({
+            dataKey: dataKey.toLowerCase(),
+            label: dataKey,
+            color,
+          }))}
+        />
         {/* )} */}
       </div>
     </div>

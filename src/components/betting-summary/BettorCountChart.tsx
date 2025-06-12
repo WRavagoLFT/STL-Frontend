@@ -5,6 +5,7 @@ import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import { addLabelsGameTypes } from "./tooltips/dataSet";
 import { buttonStyles } from "~/styles/theme";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
+import { useAuthStore } from "~/store/useAuthStore";
 
 // Custom Legend (Dynamically Handles Bet Types)
 const CustomLegend = () => (
@@ -39,6 +40,7 @@ const ChartBettorsSummary = () => {
     }[]
   >([]);
   const [loading, setLoading] = useState(false);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const xAxisTicks = [
     0, 1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90,
@@ -153,6 +155,7 @@ const ChartBettorsSummary = () => {
           </p>
           <CustomLegend />
         </div>
+        {currentUserType !== 3 && (
           <GenericCSVExportButton
             data={data}
             headers={["Draw", "STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"]}
@@ -165,6 +168,7 @@ const ChartBettorsSummary = () => {
               item.swer4.toFixed(3),
             ]}
           />
+        )}
       </div>
 
       <div className="h-full w-full">

@@ -5,6 +5,7 @@ import { Button } from "@mui/material";
 import { buttonStyles } from "~/styles/theme";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { TransactionData } from "~/types/types";
+import { useAuthStore } from "~/store/useAuthStore";
 
 // Custom Legend circle
 const CustomLegend = () => (
@@ -15,7 +16,7 @@ const CustomLegend = () => (
     </div>
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#5050A5] mr-2" />
-      <p className="text-sm">Bets</p>
+      <p className="text-sm">Bets Placed Today</p>
     </div>
   </div>
 );
@@ -35,6 +36,7 @@ const SummaryBettorsBetsPlacedPage = () => {
   >([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const maxValue = Math.max(...data.map((item) => item.bets));
   const safeMax = maxValue < 1000 ? 1000 : maxValue;
@@ -107,12 +109,15 @@ const SummaryBettorsBetsPlacedPage = () => {
           </p>
           <CustomLegend />
         </div>
-        <GenericCSVExportButton
-          data={data}
-          headers={["Game Name", "Bettors", "Bets"]}
-          title={`Bettors and Bets Summary`}
-          getRowData={(item) => [item.gameName, item.bettors, item.bets]}
-        />
+
+        {currentUserType !== 3 && (
+          <GenericCSVExportButton
+            data={data}
+            headers={["Game Name", "Bettors", "Bets Placed Today"]}
+            title="Bettors and Bets Summary"
+            getRowData={(item) => [item.gameName, item.bettors, item.bets]}
+          />
+        )}
       </div>
 
       <div className="h-full w-full">
@@ -137,7 +142,7 @@ const SummaryBettorsBetsPlacedPage = () => {
             {
               data: data.map((item) => item.bets),
               color: "#5050A5",
-              label: "Bets",
+              label: "Bets Placed Today",
             },
           ]}
           yAxis={[
@@ -149,7 +154,7 @@ const SummaryBettorsBetsPlacedPage = () => {
           ]}
           xAxis={[
             {
-              label: "Amount (in 100,000 units)",
+              label: "Total (x 100,000)",
               scaleType: "linear",
               min: 0,
               max: safeMax,

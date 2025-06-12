@@ -133,7 +133,7 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
   return (
     <div className="flex flex-col">
       <div className="text-base font-bold mb-2">Retail Receipts</div>
-      <div className="flex flex-wrap gap-x-4 mb-4">
+      <div className="flex flex-wrap gap-x-4 mb-5">
         {/* Filter By */}
         <div className="flex-1 min-w-[200px]">
           <label
@@ -196,7 +196,7 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
               options={yearOptions}
               onChange={handleYearChange}
               placeholder="Select Year"
-              classNamePrefix="react-select-dashboard"
+              classNamePrefix="react-select"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -207,7 +207,7 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
                 }),
                 menu: (provided) => ({
                   ...provided,
-                  backgroundColor: "#F8C73F",
+                  //backgroundColor: "#F8C73F",
                   zIndex: 10,
                 }),
               }}

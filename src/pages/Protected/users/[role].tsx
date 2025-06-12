@@ -109,6 +109,7 @@ const RolePage = () => {
   const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
   const [kaboMap, setKaboMap] = React.useState<User | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const openCreateModal = () => {
     setIsCreateModalOpen(true);
@@ -136,10 +137,10 @@ const RolePage = () => {
   useEffect(() => {
     if (!roleKey) return; // or if (roleKey === undefined) return;
 
-    loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap);
+    loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading);
   }, [roleConfig, roleKey]);
 
-  // console.log("DATA USER", data);
+  console.log("DATA USER", data);
   // console.log("operatormappp", operatorMap);
   //console.log('ROLE CONFIG IN THE PAGE:', roleConfig);
 
@@ -152,7 +153,7 @@ const RolePage = () => {
         console.log("User added successfully:", result.data);
 
         if (roleKey) {
-          await loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap);
+          await loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading);
         }
 
         Swal.fire({
@@ -188,7 +189,7 @@ const RolePage = () => {
   const onUserUpdateSubmit = async (formData: User) => {
     await handleUpdateUser(
       formData,
-      () => loadUsers(roleConfig, roleKey!, setData, setKaboMap, setOperatorMap, setPscoBranchMap),
+      () => loadUsers(roleConfig, roleKey!, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading),
       () => setIsCreateModalOpen(false)
     );
   };

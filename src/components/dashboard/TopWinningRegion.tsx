@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { fetchWinners } from "~/utils/api/winners";
 import { FaMoneyBillAlt } from "react-icons/fa";
 import router from "next/router";
+import { useAuthStore } from "~/store/useAuthStore";
 
 // Define RegionData type
 interface RegionData {
@@ -17,6 +18,8 @@ const TopWinningRegionPage = () => {
   const [rankedRegions, setRankedRegions] = useState<
     { region: RegionData; rank: number; trend: number }[]
   >([]);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
+  const winningLabel = currentUserType === 3 ? "Top Winning Area Today" : "Top Winning Regions Today";
 
   const getWinningRegions = async () => {
     try {
@@ -86,7 +89,7 @@ const TopWinningRegionPage = () => {
           <FaMoneyBillAlt size={20} color={"#F6BA12"} />
         </div>
         <div className="flex items-center justify-between flex-1 ml-3">
-          <p className="text-base">Top Winning Regions Today</p>
+          <p className="text-base">{winningLabel}</p>
           <button
             onClick={() => router.push("/winning-summary/dashboard")}
             className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"

@@ -111,32 +111,6 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
     { label: "Inactive", value: "inactive" },
   ];
 
-  const operator = formData?.data || {};
-
-  // FOR SELECT FIELDS
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleMultiSelect = (fieldName: string, selectedOptions: any[]) => {
-    const selectedValues = Array.isArray(selectedOptions)
-      ? selectedOptions.map((option) => option.value)
-      : [];
-
-    //console.log(`Field Name: ${fieldName}`);
-    //console.log(`Selected Options:`, selectedOptions);
-    //console.log(`Selected Values:`, selectedValues);
-
-    setFormData({
-      ...formData, // Merge the existing user object
-      [fieldName]: selectedValues,
-    });
-  };
-
   // 1. Define this first so it can be used below
   const mapSelectedOperatorToFormData = (initialUserOperatorData: any) => {
     if (!initialUserOperatorData || !initialUserOperatorData.data) return {};
@@ -146,12 +120,14 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
 
     return {
       operatorId: data.OperatorId || '', 
-      operatorName: data.OperatorName || '',
+      name: data.OperatorName || '',
       operatorAddress: data.OperatorAddress || '',
-      operatorContactNos: data.OperatorContactNos || '',
       operatorEmail: data.OperatorEmail || '',
       operatorRepresentative: data.OperatorRepresentative || '',
+
+      operatorContactNos: data.OperatorContactNos || '',
       contactNo: data.ContactNo || '',
+
       email: data.Email || '',
       dateOfOperation: data.DateOfOperation || '',
       areaOfOperations: data.AreaOfOperations || '',
@@ -409,13 +385,13 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               htmlFor="contactNo"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Operator's Phone Number
+              Phone Number
             </label>
             <Input
               id="contactNo"
               type="text"
               {...formik.getFieldProps("contactNo")}
-              disabled={isDisabled}
+              disabled
             />
           </div>
 
@@ -444,29 +420,30 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
           {/* Operator Name */}
           <div>
             <label
-              htmlFor="operatorName"
+              htmlFor="name"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Name
             </label>
             <Input
-              id="operatorName"
-              {...formik.getFieldProps("operatorName")}
+              id="name"
+              {...formik.getFieldProps("name")}
               disabled={isDisabled}
             />
           </div>
-          {/* Contact Number */}
+          
+          {/* Exec Contact Number */}
           <div>
             <label
-              htmlFor="contactNo"
+              htmlFor="operatorContactNos"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Phone Number
             </label>
             <Input
-              id="contactNo"
+              id="operatorContactNos"
               type="text"
-              {...formik.getFieldProps("contactNo")}
+              {...formik.getFieldProps("operatorContactNos")}
               disabled={isDisabled}
             />
           </div>

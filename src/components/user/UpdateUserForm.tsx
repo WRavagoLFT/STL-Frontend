@@ -29,19 +29,25 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   onViewEditLogs = () => {},
   onClose,
 }) => {
-  const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
+  const title =
+    userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
   //console.log('SELECTED USER', selectedUser);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const sevenDaysAgo = dayjs().subtract(7, "day");
-  const [formData, setFormData] = useState<{[key: string]: string | number | string[];}>({});
+  const [formData, setFormData] = useState<{
+    [key: string]: string | number | string[];
+  }>({});
   const [isDisabled, setIsDisabled] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
-  const handleModalClose = () => { closeConfirmModal(); if (onClose) onClose();};
+  const handleModalClose = () => {
+    closeConfirmModal();
+    if (onClose) onClose();
+  };
   const handleDisable = () => setIsDisabled(false);
 
   const alwaysDisabledKeys = ["name", "LastName"];
@@ -88,6 +94,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
     remarks: "", // initialize remarks as empty string
     BranchName: user?.BranchName || "",
     AssignedArea: user?.AssignedArea || "",
+    SupervisorName: user?.SupervisorName || "",
   });
 
   const formik = useFormik({
@@ -106,6 +113,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
         OperatorId: values.operatorId?.value
           ? Number(values.operatorId.value)
           : null,
+        SupervisorName: values.SupervisorName,
         remarks: values.remarks,
       };
 
@@ -194,10 +202,36 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
                 !!(formik.touched.phoneNumber && formik.errors.phoneNumber)
               }
             />
-            <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-              {getError("phoneNumber") || "\u00A0"}
-            </p>
+            {formik.values.userTypeId !== 1 && (
+              <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
+                {getError("phoneNumber") || "\u00A0"}
+              </p>
+            )}
           </div>
+
+          {formik.values.userTypeId === 1 && (
+            <div>
+              <label htmlFor="status" className="block text-sm mb-1">
+                Status
+              </label>
+              <CustomSelect
+                name="status"
+                value={{
+                  label: formik.values.status,
+                  value: formik.values.status,
+                }}
+                options={[
+                  { label: "Active", value: "Active" },
+                  { label: "Inactive", value: "Inactive" },
+                  { label: "Suspended", value: "Suspended" },
+                  { label: "New", value: "New" },
+                ]}
+                error={false}
+                disabled
+                onChange={() => {}}
+              />
+            </div>
+          )}
         </div>
 
         {/* Column 2 */}
@@ -250,6 +284,22 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
             </div>
           )}
 
+          {formik.values.userTypeId === 1 && (
+            <div>
+              <label htmlFor="SupervisorName" className="block text-sm mb-1">
+                Assigned Kabo
+              </label>
+              <Input
+                name="SupervisorName"
+                id="SupervisorName"
+                value={formik.values.SupervisorName || "N/A"}
+                onChange={formik.handleChange}
+                disabled
+                //error={!!(formik.touched.AssignedArea && formik.errors.AssignedArea)}
+              />
+            </div>
+          )}
+
           <div>
             <label htmlFor="email" className="block text-sm">
               Email Address
@@ -272,27 +322,29 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
             )}
           </div>
 
-          <div>
-            <label htmlFor="status" className="block text-sm mb-1">
-              Status
-            </label>
-            <CustomSelect
-              name="status"
-              value={{
-                label: formik.values.status,
-                value: formik.values.status,
-              }}
-              options={[
-                { label: "Active", value: "Active" },
-                { label: "Inactive", value: "Inactive" },
-                { label: "Suspended", value: "Suspended" },
-                { label: "New", value: "New" },
-              ]}
-              error={false}
-              disabled
-              onChange={() => {}}
-            />
-          </div>
+          {formik.values.userTypeId !== 1 && (
+            <div>
+              <label htmlFor="status" className="block text-sm mb-1">
+                Status
+              </label>
+              <CustomSelect
+                name="status"
+                value={{
+                  label: formik.values.status,
+                  value: formik.values.status,
+                }}
+                options={[
+                  { label: "Active", value: "Active" },
+                  { label: "Inactive", value: "Inactive" },
+                  { label: "Suspended", value: "Suspended" },
+                  { label: "New", value: "New" },
+                ]}
+                error={false}
+                disabled
+                onChange={() => {}}
+              />
+            </div>
+          )}
         </div>
       </div>
 

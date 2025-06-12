@@ -26,6 +26,7 @@ export interface User {
   BranchId?: number;
   BranchName?: string;
   AssignedArea?: string;
+  SupervisorName?: string;
 
   cityName?: number;
   kaboId?: number;
