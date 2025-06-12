@@ -4,6 +4,7 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { addLabels } from "./tooltips/dataSet";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
+import { TransactionData } from "~/types/types";
 
 // Custom Legend circle
 const CustomLegend = () => (
@@ -18,30 +19,6 @@ const CustomLegend = () => (
     </div>
   </div>
 );
-
-interface TransactionData {
-  TransactionDate: string;
-  RegionId: number;
-  Region: string;
-  ProvinceId: number;
-  Province: string;
-  GameCategoryId: number;
-  GameCategory: string;
-  DrawOrder: 1 | 2 | 3;
-  TotalBets: number;
-  TotalBettors: number;
-  TotalWinners: number;
-  TotalBetAmount: number;
-  TotalTumbok: number;
-  TotalSahod: number;
-  TotalRamble: number;
-  TotalPayout: number;
-  TotalEarnings: number;
-  CombinationOne: string | null;
-  CombinationTwo: string | null;
-  CombinationThree: string | null;
-  CombinationFour: string | null;
-}
 
 const summary: Record<
   number,
@@ -139,7 +116,7 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
 
   useEffect(() => {
     fetchData();
-  }, [params.gameCategoryId]); // Re-fetch if gameCategoryId changes
+  }, [params.gameCategoryId]);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">

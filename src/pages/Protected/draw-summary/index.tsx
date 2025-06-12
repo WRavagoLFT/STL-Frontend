@@ -236,7 +236,7 @@ const DrawSelectedPage = () => {
               options={regions}
               placeholder="Select a Region"
               isDisabled={currentUserType === 5}
-              classNamePrefix="react-select"
+              classNamePrefix="react-select-dashboard"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -244,7 +244,7 @@ const DrawSelectedPage = () => {
                   color: "#212121 !important",
                   padding: "0.25rem",
                   boxShadow: state.isFocused ? "none" : provided.boxShadow,
-                  backgroundColor: "#ACA993 !important",
+                  backgroundColor: state.isDisabled ? "#ACA993 !important" : "#F8C73F !important",
                 }),
                 menu: (provided) => ({
                   ...provided,

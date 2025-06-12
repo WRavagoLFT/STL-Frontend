@@ -1,9 +1,34 @@
-import { LoginSectionData } from "~/data/LoginSectionData";
 import React from "react";
-import { handleRouter } from "~/utils/routerHandlers";
-import router from "next/router";
+import { useRouter } from "next/router";
+import { useAuthStore } from "~/store/useAuthStore";
+import { LoginSectionData } from "~/data/LoginSectionData";
 
 const Error404Page = () => {
+  const router = useRouter();
+  const currentUserType = useAuthStore((state) => state.userTypeId);
+
+  const handleRedirect = () => {
+    let targetPath = "";
+
+    switch (currentUserType) {
+      case 3:
+      case 4:
+      case 6:
+        targetPath = "/dashboard";
+        break;
+      case 5:
+        targetPath = "/draw-summary";
+        break;
+      default:
+        console.warn("Unrecognized userTypeId:", currentUserType);
+        return;
+    }
+
+    if (targetPath) {
+      router.push(targetPath);
+    }
+  };
+
   return (
     <>
       <div className="container mx-auto flex items-center gap-4 mt-8">
@@ -33,7 +58,7 @@ const Error404Page = () => {
             </div>
 
             <button
-              onClick={() => handleRouter(router)}
+              onClick={handleRedirect}
               className={`
                 mt-4
                 w-full

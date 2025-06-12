@@ -1,9 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { ReusableModalPageProps } from "~/types/interfaces";
 import Select from "react-select";
 import useUpdateModalState from "../../store/useUpdateModalStore";
 import Input from "../ui/inputs/TextInputs";
 import dayjs from "dayjs";
+import { Operator } from "~/types/types";
+import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
+import Swal from "sweetalert2";
+import { useFormik } from "formik";
 
 type GameTypeOption = {
   value: number;
@@ -15,7 +19,26 @@ type ProvinceTypeOptions = {
   label: string;
 };
 
-const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
+type AreaOfOperationsTypeOptions = {
+  value: number;
+  label: string;
+};
+
+type OperatorUpdatePageProps = {
+  open?: boolean;
+  onClose?: () => void;
+  onSubmit: (data: Operator) => void;
+  gameTypes: any[];
+  regions: any[];
+  provinces: any[];
+  cities: any[];
+  areaofoperations?: any[];
+  initialUserOperatorData?: any;
+  onViewEditLogs?: (operatorId: number) => void;
+  selectedUser?: any;
+};
+
+const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
   initialUserOperatorData,
   gameTypes,
   regions,
@@ -24,85 +47,70 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
   areaofoperations,
   onViewEditLogs,
   selectedUser,
+  onClose,
+  onSubmit,
 }) => {
   const { user, setUser, errors, setErrors, handleManagerChange } = useUpdateModalState();
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isDisabled, setIsDisabled] = useState(true);
   const [showEditButton, setShowEditButton] = useState(true);
   const [selectedGameTypes, setSelectedGameTypes] = useState([]);
+  const [selectedAreaOfOperations, setselectedAreaOfOperations] = useState<any>(null);
   const [selectedProvince, setSelectedProvince] = useState([]);
   const [area, setArea] = useState<string | null>(null);
 
-  // console.log("hihihh", areaofoperations);
-  //console.log("SELECTED USERRR:", selectedUser);
-  //console.log("initialUserData:", initialUserOperatorData);
-  //console.log("provinces:", provinces);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  // Open the confirm modal after submit
+  const openConfirmModal = () => setIsConfirmModalOpen(true);
+  const closeConfirmModal = () => setIsConfirmModalOpen(false);
+
+  const handleModalClose = () => {
+    // Close the confirm modal and the parent AddUserModal
+    closeConfirmModal();
+    if (onClose) onClose();
+  };
+  
   const handleDisable = () => {
     setIsDisabled(false);
     setShowEditButton(false);
   };
 
-  const gameTypeOptions: GameTypeOption[] =
-    gameTypes?.map((type) => ({
-      value: type.GameCategoryId!,
-      label: `${type.GameCategory}`,
-    })) || [];
+  // console.log("hihihh", areaofoperations);
+  //console.log("SELECTED USERRR:", selectedUser);
+  //console.log("initialUserData:", initialUserOperatorData);
+  //console.log("provinces:", provinces);
 
-  const provincesOptions: ProvinceTypeOptions[] =
-    provinces?.map((province) => ({
-      value: province.ProvinceId,
-      label: province.ProvinceName,
-    })) || [];
+  const gameTypeOptions: GameTypeOption[] = useMemo(() => {
+    return (
+      gameTypes?.map((type) => ({
+        value: type.GameCategoryId!,
+        label: `${type.GameCategory}`,
+      })) || []
+    );
+  }, [gameTypes]);
+
+  const provincesOptions: ProvinceTypeOptions[] = useMemo(() => {
+    return (
+      provinces?.map((province) => ({
+        value: province.ProvinceId,
+        label: province.ProvinceName,
+      })) || []
+    );
+  }, [provinces]);  
+
+  const areaOfOperationsOptions: AreaOfOperationsTypeOptions[] = useMemo(() => {
+    return (
+      areaofoperations?.map((areaOfOperations) => ({
+        label: areaOfOperations.AreaOfOperations,
+        value: areaOfOperations.AreaOfOperationsOptionsId,
+      })) || []
+    );
+  }, [areaofoperations]);
 
   const statusOptions = [
-    { value: 1, label: "Active" },
-    { value: 0, label: "Inactive" },
+    { label: "Active", value: "active" },
+    { label: "Inactive", value: "inactive" },
   ];
-
-  const areaOfOperationsOptions = areaofoperations?.map((item: any) => ({
-    label: item.AreaOfOperations,
-    value: item.AreaOfOperationsOptionsId,
-  }));
-
-  useEffect(() => {
-    //console.log("initialUserDatass:", initialUserOperatorData);
-
-    if (initialUserOperatorData && Object.keys(initialUserOperatorData).length > 0) {
-      const operatorData = initialUserOperatorData.data;
-
-      if (operatorData && operatorData.GameTypes && operatorData.Cities) {
-        const mappedGameTypes = operatorData.GameTypes.map(
-          (gt: { GameCategory: any; GameCategoryId: any }) => ({
-            label: gt.GameCategory,
-            value: gt.GameCategoryId,
-          })
-        );
-
-        // fetching of cities to get the province
-        const mappedCities = operatorData.Cities.map(
-          (pv: { CityId: any; CityName: any }) => ({
-            label: pv.CityId,
-            value: pv.CityName,
-          })
-        );
-
-        //console.log("Mapped GameTypes for Select:", mappedGameTypes);
-        //console.log("cities", mappedCities);
-        //console.log(mappedGameTypes);
-        setSelectedGameTypes(mappedGameTypes);
-      } else {
-        setSelectedGameTypes([]);
-        //console.log("No GameTypes found. Resetting selected game types.");
-      }
-
-      setFormData(operatorData);
-      //console.log("Form data set:", operatorData);
-    } else {
-      setFormData({});
-      setSelectedGameTypes([]);
-      //console.log("No initialUserData found. Resetting form and game types.");
-    }
-  }, [initialUserOperatorData]);
 
   const operator = formData?.data || {};
 
@@ -130,25 +138,176 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
     });
   };
 
+  // 1. Define this first so it can be used below
+  const mapSelectedOperatorToFormData = (initialUserOperatorData: any) => {
+    if (!initialUserOperatorData || !initialUserOperatorData.data) return {};
+
+    const data = initialUserOperatorData.data;
+    //console.log(initialUserOperatorData.data);
+
+    return {
+      operatorId: data.OperatorId || '', 
+      operatorName: data.OperatorName || '',
+      operatorAddress: data.OperatorAddress || '',
+      operatorContactNos: data.OperatorContactNos || '',
+      operatorEmail: data.OperatorEmail || '',
+      operatorRepresentative: data.OperatorRepresentative || '',
+      contactNo: data.ContactNo || '',
+      email: data.Email || '',
+      dateOfOperation: data.DateOfOperation || '',
+      areaOfOperations: data.AreaOfOperations || '',
+      status: data.Status === 1 ? 'active' : 'inactive',
+      createdAt: data.CreatedAt || '',
+      createdBy: data.CreatedBy || '',
+      creationDate: data.CreatedAt || '',
+      lastUpdatedDate: data.LastUpdatedDate || '',
+      lastUpdatedBy: data.LastUpdatedBy || '',
+
+      regionId: data.Region?.RegionId || null,
+      regionName: data.Region?.RegionName || '',
+      regionFull: data.Region?.RegionFull || '',
+      psgc: data.Region?.PSGC || '',
+
+      gameTypes: data.GameTypes?.map((g: any) => ({
+        label: g.GameCategory || g.GameCategoryName || '',
+        value: g.GameCategoryId,
+      })) || [],
+
+      provinces: data.Provinces?.map((p: any) => ({
+        label: p.ProvinceName,
+        value: p.ProvinceId,
+      })) || [],
+    };
+  };
+
+  // 2. Main load function
+  const operatorFormData = useCallback(() => {
+    if (initialUserOperatorData && initialUserOperatorData.data) {
+      const operatorData = initialUserOperatorData.data;
+
+      const mappedGameTypes = operatorData.GameTypes?.map(
+        (gt: { GameCategory: any; GameCategoryId: any }) => ({
+          label: gt.GameCategory,
+          value: gt.GameCategoryId,
+        })
+      ) || [];
+
+      const mappedCities = operatorData.Cities?.map(
+        (pv: { CityId: any; CityName: any }) => ({
+          label: pv.CityName,
+          value: pv.CityId,
+        })
+      ) || [];
+
+      setSelectedGameTypes(mappedGameTypes);
+
+      if (operatorData.AreaOfOperationsOptionsId && areaOfOperationsOptions) {
+        const matchedOption = areaOfOperationsOptions.find(
+          (opt: any) => opt.value === operatorData.AreaOfOperationsOptionsId
+        );
+        if (matchedOption) {
+          setselectedAreaOfOperations(matchedOption);
+        }
+      }
+
+      const formattedData = mapSelectedOperatorToFormData(initialUserOperatorData);
+      setFormData(formattedData);
+    } else {
+      setFormData({});
+      setSelectedGameTypes([]);
+      setselectedAreaOfOperations(null);
+    }
+  }, [initialUserOperatorData, areaOfOperationsOptions]);
+
+  // 3. Effect to load when data is ready
+  useEffect(() => {
+    if (initialUserOperatorData?.data) {
+      operatorFormData();
+    }
+  }, [operatorFormData]);
+
+  // 4. Formik setup (NOTE: selectedUser should already be loaded before this runs)
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: {
+      ...mapSelectedOperatorToFormData(initialUserOperatorData),
+      remarks: '',
+    },
+    onSubmit: async (values) => {
+      console.log("[Form Submit] Raw Submitted Values:", values);
+
+      const result = await Swal.fire({
+        title: "Update Confirmation",
+        text: "Did you enter the correct details?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: "Yes, I did",
+        cancelButtonText: "No, let me check",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+      });
+
+      if (!result.isConfirmed) return;
+
+      // Clean and transform values for backend
+      const cleanedData = Object.fromEntries(
+        Object.entries(values).filter(
+          ([, value]) =>
+            value !== null &&
+            value !== undefined &&
+            (typeof value === "string" ? value.trim() !== "" : true)
+        )
+      );
+
+      const transformedData = {
+        ...cleanedData,
+        status: cleanedData.status === "active" ? 1 : 0,
+        gameTypes: Array.isArray(cleanedData.gameTypes)
+          ? cleanedData.gameTypes.map((gt: any) => gt.value)
+          : [],
+      };
+
+      console.log("[Form Submit] Transformed Payload:", transformedData);
+
+      setFormData(transformedData);
+      openConfirmModal();
+    },
+  });
+
+  useEffect(() => {
+    console.log("Validation Errors:", formik.errors);
+    //console.log("Touched Fields:", formik.touched);
+  }, [formik.errors, formik.touched]);
+  
+  // Helpers to display errors
+  const getError = (field: string) => {
+    const error = formik.errors[field as keyof typeof formik.errors];
+    const touched = formik.touched[field as keyof typeof formik.touched];
+    
+    if (touched && error && typeof error === "string") {
+      return error.split("|")[0].trim();  // show only the first error message
+    }
+    
+    return null;
+  };
+
   return (
-    <div>
+    <form onSubmit={formik.handleSubmit}>
       {/* History */}
-      <div className="">
+      <div>
         <div className="text-base font-bold mb-2">History</div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label
               htmlFor="createdBy"
-              className="block text-sm font-medium text-gray-700 mb-1" // #212121 to hindi gray 700
-              // TINGNAN MO KASI YUNG UI!
+              className="block text-sm font-medium text-gray-700 mb-1"
             >
               Created By
             </label>
             <Input
               id="createdBy"
               name="createdBy"
-              value={formData.CreatedBy || "N/A"}
-              onChange={handleChange}
+              value={formik.values.createdBy || "N/A"}
               disabled
             />
           </div>
@@ -163,11 +322,11 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             <Input
               id="lastUpdatedBy"
               name="lastUpdatedBy"
-              value={formData.CreatedBy || "N/A"}
-              onChange={handleChange}
+              //value={formik.values.lastUpdatedBy || "N/A"}
               disabled
             />
           </div>
+
           <div>
             <label
               htmlFor="creationDate"
@@ -176,14 +335,15 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
               Creation Date
             </label>
             <Input
-              id="creationDate"
-              name="creationDate"
+              id="createdAt"
+              name="createdAt"
               value={
-                formData.CreatedAt
-                  ? dayjs(formData.CreatedAt).format("YYYY-MM-DD")
+                formik.values.createdAt
+                  ? dayjs(formik.values.createdAt).format(
+                      "MMMM DD, YYYY hh:mm A"
+                    )
                   : "N/A"
               }
-              onChange={handleChange}
               disabled
             />
           </div>
@@ -198,24 +358,26 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             <Input
               id="lastUpdatedDate"
               name="lastUpdatedDate"
-              value={formData.lastUpdatedDate || "N/A"}
-              onChange={handleChange}
+              //value={formik.values.lastUpdatedDate || "N/A"}
               disabled
             />
           </div>
         </div>
-        
+
         {/* Edit log modal */}
         <div className="w-full flex justify-end items-center mt-3">
-          {initialUserOperatorData?.data?.OperatorId && typeof onViewEditLogs === "function" && (
-            <button
-              type="button"
-              onClick={() => onViewEditLogs(initialUserOperatorData.data.OperatorId)}
-              className="bg-[#0038A8] py-2.5 px-4 text-white rounded-lg text-xs cursor-pointer hover:bg-[#004ccf]"
-            >
-              View Update History
-            </button>
-          )}
+          {initialUserOperatorData?.data?.OperatorId &&
+            typeof onViewEditLogs === "function" && (
+              <button
+                type="button"
+                onClick={() =>
+                  onViewEditLogs(initialUserOperatorData.data.OperatorId)
+                }
+                className="bg-[#0038A8] py-2.5 px-4 text-white rounded-lg text-xs hover:bg-[#004ccf]"
+              >
+                View Update History
+              </button>
+            )}
         </div>
       </div>
 
@@ -223,87 +385,87 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
       <div className="mt-5">
         <div className="text-base font-bold mb-2">AAC Information</div>
         <div className="grid grid-cols-2 gap-4">
+          {/* Operator Name */}
           <div>
             <label
-              htmlFor="operatorName"
+              htmlFor="name"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Name
             </label>
             <Input
-              id="operatorName"
-              name="OperatorName"
+              id="name"
+              {...formik.getFieldProps("name")}
               disabled={isDisabled}
-              value={formData.OperatorName || ""}
-              onChange={handleChange}
             />
           </div>
+          {/* Contact Number */}
           <div>
             <label
-              htmlFor="ContactNo"
+              htmlFor="contactNo"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Phone Number
             </label>
             <Input
-              id="ContactNo"
-              name="ContactNo"
+              id="contactNo"
               type="text"
+              {...formik.getFieldProps("contactNo")}
               disabled={isDisabled}
-              value={formData.ContactNo || ""}
-              onChange={handleChange}
             />
           </div>
+
+          {/* Address */}
           <div className="col-span-2">
             <label
-              htmlFor="OperatorAddress"
+              htmlFor="operatorAddress"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Address
             </label>
             <Input
-              id="OperatorAddress"
-              name="OperatorAddress"
-              value={formData.OperatorAddress || ""}
-              onChange={handleChange}
+              id="operatorAddress"
+              {...formik.getFieldProps("operatorAddress")}
               disabled
             />
           </div>
 
+          {/* Email */}
           <div>
             <label
-              htmlFor="Email"
+              htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Email Address
             </label>
             <Input
-              id="Email"
-              name="Email"
+              id="email"
+              {...formik.getFieldProps("email")}
               disabled={isDisabled}
-              value={formData.Email || ""}
-              onChange={handleChange}
             />
           </div>
 
+          {/* Date of Operation */}
           <div>
             <label
-              htmlFor="DateOfOperation"
+              htmlFor="dateOfOperation"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Date of Operations
             </label>
             <Input
-              id="DateOfOperation"
-              name="DateOfOperation"
+              id="dateOfOperation"
+              name="dateOfOperation"
               type="date"
-              disabled={isDisabled}
               value={
-                formData.DateOfOperation
-                  ? dayjs(formData.DateOfOperation).format("YYYY-MM-DD")
+                formik.values.dateOfOperation
+                  ? dayjs(formik.values.dateOfOperation).format("YYYY-MM-DD")
                   : ""
               }
-              onChange={handleChange}
+              onChange={(e) =>
+                formik.setFieldValue("DateOfOperation", e.target.value)
+              }
+              disabled={isDisabled}
             />
           </div>
 
@@ -315,76 +477,51 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
             >
               Games Provided
             </label>
-            <Select<GameTypeOption, true> // true = isMulti 
+            <Select
               id="gameTypes"
               name="gameTypes"
               isMulti
               options={gameTypeOptions}
-              value={selectedGameTypes}
-              className="react-select-container"
+              value={formik.values.gameTypes}
+              onChange={(selected) =>
+                formik.setFieldValue("gameTypes", selected)
+              }
               classNamePrefix="react-select"
               placeholder="Select Games Provided"
-              onChange={(selectedOptions) =>
-                handleMultiSelect(
-                  "gameTypes",
-                  Array.isArray(selectedOptions) ? selectedOptions : []
-                )
-              }
               menuPortalTarget={
                 typeof window !== "undefined" ? document.body : null
               }
-              styles={{
-                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-              }}
+              styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
             />
           </div>
 
-          {/* Area of Operator */}
+          {/* Area Of Operations */}
           <div className="w-full">
             <label
-              htmlFor="Status"
+              htmlFor="areaOfOperations"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Status
+              Area Of Operations
             </label>
             <Select
-              id="Status"
-              name="Status"
-              options={statusOptions}
-              className="react-select-container"
-              classNamePrefix="react-select"
-              placeholder="Select Status"
+              id="areaOfOperations"
+              name="areaOfOperations"
+              options={areaOfOperationsOptions}
               value={
-                statusOptions.find((opt) => opt.value === formData.Status) ||
-                null
+                areaOfOperationsOptions.find(
+                  (opt) => opt.value === formik.values.areaOfOperations
+                ) || null
               }
-              onChange={(selectedOption) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  Status: selectedOption ? selectedOption.value : null,
-                }));
-              }}
-              menuPortalTarget={
-                typeof window !== "undefined" ? document.body : null
+              isDisabled={isDisabled}
+              onChange={(selected) =>
+                formik.setFieldValue("areaOfOperations", selected?.value)
               }
-              styles={{
-                menuPortal: (base) => ({
-                  ...base,
-                  zIndex: 1000000,
-                }),
-                menu: (provided) => ({
-                  ...provided,
-                  maxHeight: 400,
-                  overflowY: "auto",
-                }),
-              }}
-              classNames={{
-                control: () => "rounded text-sm",
-              }}
+              classNamePrefix="react-select"
+              placeholder="Select Area of Operations"
             />
           </div>
 
-          {/* Provincial Operations */}
+          {/* Provinces */}
           <div>
             <label
               htmlFor="provinces"
@@ -397,96 +534,92 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
               name="provinces"
               isMulti
               options={provincesOptions}
-              className="react-select-container"
+              value={formik.values.provinces}
+              onChange={(selected) =>
+                formik.setFieldValue("provinces", selected)
+              }
               classNamePrefix="react-select"
               placeholder="Select Provinces"
-              onChange={(selectedOptions) =>
-                handleMultiSelect(
-                  "provinces",
-                  Array.isArray(selectedOptions) ? selectedOptions : []
-                )
-              }
               menuPortalTarget={
                 typeof window !== "undefined" ? document.body : null
               }
-              styles={{
-                menuPortal: (base) => ({ ...base, zIndex: 9999 }),
-              }}
+              styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
             />
           </div>
 
           {/* Status */}
           <div className="w-full">
             <label
-              htmlFor="Status"
+              htmlFor="status"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Area Of Operations
+              Status
             </label>
             <Select
-              id="AreaOfOperations"
-              name="AreaOfOperations"
-              options={areaOfOperationsOptions}
+              id="status"
+              name="status"
+              options={statusOptions}
               value={
-                areaOfOperationsOptions?.find(
-                  (opt) => opt.value === formData.AreaOfOperations
+                statusOptions.find(
+                  (opt) => opt.value === formik.values.status
                 ) || null
               }
+              onChange={(selected) =>
+                formik.setFieldValue("status", selected?.value)
+              }
               isDisabled={isDisabled}
-              onChange={(selected) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  AreaOfOperations: selected?.value || null,
-                }));
-              }}
-              placeholder="Select Area of Operations"
+              placeholder="Select Status"
               classNamePrefix="react-select"
+              menuPortalTarget={
+                typeof window !== "undefined" ? document.body : null
+              }
+              styles={{
+                menuPortal: (base) => ({ ...base, zIndex: 1000000 }),
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 400,
+                  overflowY: "auto",
+                }),
+              }}
             />
           </div>
         </div>
       </div>
 
-      {/* Remarks Field */}
+      {/* Remarks */}
       {!isDisabled && (
-        <div className="w-full !mt-4">
-          <label
-            htmlFor="remarks"
-            className="block text-sm font-medium text-gray-700 mb-1"
-          >
+        <div className="col-span-2 my-2">
+          <label htmlFor="remarks" className="block text-sm">
             Remarks
           </label>
-          <textarea
-            id="remarks"
+          <Input
+            type="text"
             name="remarks"
-            placeholder="Enter Remarks"
-            value={typeof user.remarks === "string" ? user.remarks : ""}
-            onChange={handleManagerChange}
-            className={`w-full border !border-[#0038A8] rounded px-3 py-2 text-sm bg-transparent ${
-              errors.remarks
-                ? "border-red-600 focus:ring-red-600"
-                : "border-gray-300 focus:ring-blue-500"
-            }`}
-            rows={3}
+            id="remarks"
+            className="mt-1"
+            value={formik.values.remarks}
+            onChange={formik.handleChange}
+            error={!!(formik.touched.remarks && formik.errors.remarks)}
           />
-          {errors.remarks && (
-            <p className="text-red-600 text-xs mt-1">{errors.remarks}</p>
+          {formik.touched.remarks && formik.errors.remarks && (
+            <p className="text-[#CE1126] text-xs mt-1">
+              {formik.errors.remarks}
+            </p>
           )}
         </div>
       )}
 
-      {/* Show only when `showEditButton` is true */}
+      {/* Action Buttons */}
       {showEditButton && (
-        <form onSubmit={handleDisable}>
-          <div className="w-full flex justify-end items-center my-2">
-            <button
-              type={isDisabled ? "button" : "submit"}
-              onClick={isDisabled ? handleDisable : undefined} // Only handleDisable gets onClick
-              className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-            >
-              {isDisabled ? "Update" : "Save"}
-            </button>
-          </div>
-        </form>
+        <div className="w-full flex justify-end items-center my-2">
+          <button
+            type={isDisabled ? "button" : "submit"}
+            onClick={isDisabled ? handleDisable : undefined}
+            className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
+          >
+            {isDisabled ? "Update" : "Save"}
+          </button>
+        </div>
       )}
 
       {!isDisabled && (
@@ -497,7 +630,20 @@ const OperatorViewPage: React.FC<ReusableModalPageProps> = ({
           Save
         </button>
       )}
-    </div>
+      <ConfirmUserActionModalPage
+        open={isConfirmModalOpen}
+        onClose={handleModalClose}
+        onConfirm={async () => {
+          try {
+            await onSubmit(formData as unknown as Operator); // submit from the parent component handled after password verification
+            closeConfirmModal(); // close confirm modal
+            if (onClose) onClose(); // optionally close the parent modal
+          } catch (err) {
+            console.error("Error during onSubmit:", err);
+          }
+        }}
+      />
+    </form>
   );
 };
 

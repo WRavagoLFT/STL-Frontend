@@ -91,6 +91,30 @@ export interface Operator {
   IsActive?: number;
 }
 
+export interface TransactionData {
+  TransactionDate: string;
+  RegionId: number;
+  Region: string;
+  ProvinceId: number;
+  Province: string;
+  GameCategoryId: number;
+  GameCategory: string;
+  DrawOrder: 1 | 2 | 3;
+  TotalBets: number;
+  TotalBettors: number;
+  TotalWinners: number;
+  TotalBetAmount: number;
+  TotalTumbok: number;
+  TotalSahod: number;
+  TotalRamble: number;
+  TotalPayout: number;
+  TotalEarnings: number;
+  CombinationOne: string | null;
+  CombinationTwo: string | null;
+  CombinationThree: string | null;
+  CombinationFour: string | null;
+}
+
 // for dashboard cards
 export type DashboardData = {
   totalUsers: number;

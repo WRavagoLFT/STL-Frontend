@@ -80,7 +80,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
     validate,
     //validationSchema: toFormikValidationSchema(addGameCombination),
     onSubmit: async (values) => {
-      console.log("[Form Submit] Submitted Values (before conversion):", values);
+      //console.log("[Form Submit] Submitted Values (before conversion):", values);
 
       const result = await Swal.fire({
         title: "Add Confirmation",
@@ -194,7 +194,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
       className="grid grid-cols-1 gap-4"
       noValidate
     >
-      <div className="grid grid-cols-2 gap-x-6 gap-y-4"> {/* Changed to a 2-column grid */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4">
         <div>
           <label htmlFor="gameType" className="block text-sm mb-1">
             Game Type
@@ -205,7 +205,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
             //value={formik.values.gameType}
             onChange={(e) => {
               const value = e.target.value;
-              console.log("Selected Game Category ID (as string):", value);
+              //console.log("Selected Game Category ID (as string):", value);
               formik.setFieldValue("gameType", value);
               // Clear combination fields when gameType changes to prevent stale data
               formik.setFieldValue("combinationOne", "");
@@ -231,7 +231,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
             //value={formik.values.gameSchedule}
             onChange={(e) => {
               const value = e.target.value;
-              console.log("Selected Game Schedule ID (as string):", value);
+              //console.log("Selected Game Schedule ID (as string):", value);
               formik.setFieldValue("gameSchedule", value);
             }}
             placeholder="Select Draw Time"

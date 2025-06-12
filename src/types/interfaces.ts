@@ -141,7 +141,7 @@ export interface ReusableModalPageProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  onSubmit?: (formData: Record<string, string>) => Promise<void>;
+  onSubmit: (data: Operator) => void;
   children?: (props: { handleSubmit: () => void }) => React.ReactNode;
   loading?: boolean;
   formData?: Record<string, string>;
