@@ -8,7 +8,7 @@ export interface ExportRetailDataToExcelProps {
   receiptDataMetrics: any;
   filterBy: { value: string };
   operationDate: string;
-  yearNumber: number;
+  yearNumber?: number;
 }
 
 // Title descriptions

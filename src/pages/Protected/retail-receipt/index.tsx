@@ -1,21 +1,29 @@
-import React, { useCallback, useEffect, useMemo, useState, Suspense } from "react";
+import React, { useCallback, useEffect, useMemo, useState, Suspense, lazy } from "react";
+// Guards
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import PCSOTaxesPage from "~/components/retail-receipts/PCSOTaxes";
+
+// Components - Retail Receipts
 import { useRetailReceiptProcessor } from "~/components/retail-receipts/useRetailReceiptProcessor";
-import { fetchRetailReceiptsMetrics, fetchRetailReceiptsData } from "~/utils/api/transactions";
+import RetailReceiptSkeleton from "~/components/retail-receipts/RetailReceiptSkeleton";
+import PCSOTaxesPage from "~/components/retail-receipts/PCSOTaxes";
+import ExportRetailDataToExcel from "~/components/retail-receipts/ExportReceiptsCSV";
+
+// Components - Lazy Loaded (for performance)
+const ReceiptCardsPage = lazy(() => import("~/components/retail-receipts/ReceiptsCardPage"));
+const GrossAACSharePage = lazy(() => import("~/components/retail-receipts/GrossAACShare"));
+const GrossPSCOSharePage = lazy(() => import("~/components/retail-receipts/GrossPSCOShare"));
+const AACTaxesPage = lazy(() => import("~/components/retail-receipts/ACCSTaxes"));
+const NetAACIncomePage = lazy(() => import("~/components/retail-receipts/NetAACIncome"));
+const NetPSCOIncomePage = lazy(() => import("~/components/retail-receipts/NetPSCOIncome"));
+
+// UI & Styling
 import Select, { ActionMeta, SingleValue } from "react-select";
 import Input from "~/components/ui/inputs/TextInputs";
-
-import RetailReceiptSkeleton from "~/components/retail-receipts/RetailReceiptSkeleton";
-import { buttonStylesretail } from "~/styles/theme";
 import { Button } from "@mui/material";
-import ExportRetailDataToExcel from "~/components/retail-receipts/ExportReceiptsCSV";
-const ReceiptCardsPage = React.lazy(() => import("~/components/retail-receipts/ReceiptsCardPage"));
-const GrossAACSharePage = React.lazy(() => import("~/components/retail-receipts/GrossAACShare"));
-const GrossPSCOSharePage = React.lazy(() => import("~/components/retail-receipts/GrossPSCOShare"));
-const AACTaxesPage = React.lazy(() => import("~/components/retail-receipts/ACCSTaxes"));
-const NetAACIncomePage = React.lazy(() => import("~/components/retail-receipts/NetAACIncome"));
-const NetPSCOIncomePage = React.lazy(() => import("~/components/retail-receipts/NetPSCOIncome"));
+import { buttonStylesretail } from "~/styles/theme";
+
+// API
+import { fetchRetailReceiptsMetrics, fetchRetailReceiptsData } from "~/utils/api/transactions";
 
 export type OptionType = {
   label: string;
@@ -24,9 +32,10 @@ export type OptionType = {
 
 const RetailReceiptPage = () => {
   const [operationDate, setOperationDate] = useState(() => {
-    const today = new Date();
-    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
-  });
+     const today = new Date();
+     return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+   });
+  //const [operationDate, setOperationDate] = useState("");
 
   const filterOptions: OptionType[] = [
     { label: "Monthly", value: "Monthly" },
@@ -58,28 +67,23 @@ const RetailReceiptPage = () => {
     });
   }, [currentYearOption]);
 
-  const [appliedFilterBy, setAppliedFilterBy] = useState<OptionType>(filterOptions[0]);
-  const [appliedSelectedYear, setAppliedSelectedYear] = useState<OptionType | null>(currentYearOption);
-
-  useEffect(() => {
-    if (filterBy?.value === "Yearly" && !selectedYear) {
-      setSelectedYear(currentYearOption);
-    }
-  }, [filterBy, selectedYear, currentYearOption]);
-
   const handleYearChange = (
     newValue: SingleValue<OptionType>,
     actionMeta: ActionMeta<OptionType>
   ) => {
     if (newValue) {
       setSelectedYear(newValue);
+      setOperationDate(""); // Clear month when year is selected
     } else {
-      setSelectedYear({
-        label: currentYearOption.toString(),
-        value: currentYearOption.toString(),
-      });
+      setSelectedYear(null);
     }
   };
+  const yearNumber: number | undefined =
+    filterBy.value === "Monthly" && operationDate
+      ? Number(operationDate.split("-")[0])
+      : filterBy.value === "Yearly" && selectedYear
+      ? Number(selectedYear.value)
+      : undefined;
 
   const fetchAllRetailData = useCallback(async () => {
     setLoading(true);
@@ -87,27 +91,25 @@ const RetailReceiptPage = () => {
     try {
       let metricsRes, dataRes;
 
-      if (!operationDate) {
-        console.warn("No operationDate provided, skipping fetch");
-        setReceiptData(null);
-        setReceiptDataMetrics(null);
-        return;
-      }
-
-      const yearFromOpDate = operationDate.split("-")[0];
-      const year = selectedYear ? selectedYear.value : yearFromOpDate;
-      const updatedOperationDate = operationDate.replace(/^\d{4}/, year);
-      const [parsedYearStr, parsedMonthStr] = updatedOperationDate.split("-");
-      const parsedYear = Number(parsedYearStr);
-      const parsedMonth = Number(parsedMonthStr);
-
       if (filterBy.value === "Monthly") {
+        if (!operationDate) {
+          console.warn("No operationDate provided, skipping monthly fetch");
+          setReceiptData(null);
+          setReceiptDataMetrics(null);
+          return;
+        }
+
+        const [parsedYearStr, parsedMonthStr] = operationDate.split("-");
+        const parsedYear = Number(parsedYearStr);
+        const parsedMonth = Number(parsedMonthStr);
+
         [metricsRes, dataRes] = await Promise.all([
           fetchRetailReceiptsMetrics(parsedYear, parsedMonth),
           fetchRetailReceiptsData(parsedYear, parsedMonth),
         ]);
       } else if (filterBy.value === "Yearly" && selectedYear) {
         const selectedYearVal = Number(selectedYear.value);
+
         [metricsRes, dataRes] = await Promise.all([
           fetchRetailReceiptsMetrics(selectedYearVal),
           fetchRetailReceiptsData(selectedYearVal),
@@ -124,13 +126,7 @@ const RetailReceiptPage = () => {
       setLoading(false);
     }
   }, [filterBy, operationDate, selectedYear]);
-
-  useEffect(() => {
-    fetchAllRetailData();
-  }, [fetchAllRetailData]);
-
-    const yearNumber = Number(selectedYear?.value ?? new Date().getFullYear());
-
+  
   const {
     aacBreakdown,
     aacTotalPercentage,
@@ -154,6 +150,16 @@ const RetailReceiptPage = () => {
     operationDate,
     yearNumber
   );
+
+  useEffect(() => {
+    if (filterBy?.value === "Monthly" && operationDate) {
+      fetchAllRetailData();
+    }
+
+    if (filterBy?.value === "Yearly" && selectedYear) {
+      fetchAllRetailData();
+    }
+  }, [filterBy, operationDate, selectedYear, fetchAllRetailData]);
 
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
@@ -226,7 +232,10 @@ const RetailReceiptPage = () => {
                     <Input
                       type="month"
                       value={operationDate}
-                      onChange={(e: any) => setOperationDate(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        setOperationDate(e.target.value);
+                        setSelectedYear(null); // Clear year when month is selected
+                      }}
                     />
                   )}
 
@@ -323,7 +332,7 @@ const RetailReceiptPage = () => {
                     yearNumber={yearNumber}
 
                   />
-                  <Button sx={buttonStylesretail} variant="contained">
+                  <Button sx={buttonStylesretail} disabled variant="contained">
                     Export as PDF
                   </Button>
                 </div>
