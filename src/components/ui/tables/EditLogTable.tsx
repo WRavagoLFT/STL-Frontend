@@ -14,14 +14,14 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
-import { SortableTableCell } from "../../../utils/sortPaginationSearch";
+import { SortableTableCell } from "../../../hooks/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import {
   filterDataEditLog,
   sortDataEditLog,
-} from "~/utils/sortPaginationSearch";
+} from "~/hooks/sortPaginationSearch";
 
 const EditLogsTablePage = <T extends Transactions>({
   data,

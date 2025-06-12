@@ -82,7 +82,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const onUserUpdateSubmit = async (formData: User) => {
     await handleUpdateUser(
       formData,
-      () => loadUsers(roleConfig, roleKey!, setData, setKaboMap, setOperatorMap, setPscoBranchMap),
+      () => loadUsers(roleConfig, roleKey!, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading),
     );
   };
 

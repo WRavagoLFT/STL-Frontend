@@ -136,8 +136,8 @@ export function sortData<T extends User | Operator>(
 
     // Custom logic for fullName
     if (sortConfig.key === "fullName") {
-      valueA = `${(a as User).firstName} ${(a as User).lastName} ${(a as User).suffix || ""}`.trim().toLowerCase();
-      valueB = `${(b as User).firstName} ${(b as User).lastName} ${(b as User).suffix || ""}`.trim().toLowerCase();
+      valueA = `${(a as User).FirstName} ${(a as User).FirstName} ${(a as User).Suffix || ""}`.trim().toLowerCase();
+      valueB = `${(b as User).LastName} ${(b as User).LastName} ${(b as User).Suffix || ""}`.trim().toLowerCase();
     } else {
       valueA = getNestedValue(a, sortConfig.key as string);
       valueB = getNestedValue(b, sortConfig.key as string);

@@ -18,7 +18,7 @@ import {
   SortableTableCell,
   filterData,
   sortData,
-} from "../../../utils/sortPaginationSearch";
+} from "../../../hooks/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { User, Operator, SortConfig } from "~/types/types";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";

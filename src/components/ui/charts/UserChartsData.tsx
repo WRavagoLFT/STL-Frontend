@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { ChartBarItem, ChartsDataPageProps, RegionUser } from "~/types/interfaces";
 import useDashboardStore from "../../../store/useDashboardStore";
 import ChartCard from "./UserCharts";
-import { getUserStatus } from "~/utils/dashboarddata";
+import { getUserStatus } from "~/hooks/dashboarddata";
 import { fetchRegions } from "~/utils/api/location";
 
 const regionMap: Record<string, string> = {

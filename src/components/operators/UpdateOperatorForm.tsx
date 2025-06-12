@@ -398,14 +398,14 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
           {/* Address */}
           <div>
             <label
-              htmlFor="operatorAddress"
+              htmlFor="email"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Operator's Address
+              Email Address
             </label>
             <Input
-              id="operatorAddress"
-              {...formik.getFieldProps("operatorAddress")}
+              id="email"
+              {...formik.getFieldProps("email")}
               disabled
             />
           </div>
