@@ -85,7 +85,7 @@ const TableBettingSummary = (params: { gameCategoryId?: number }) => {
     );
 
     setTransactions(formattedData);
-    console.log('IN THE SUMMARY TABLE:', formattedData);
+    //console.log('IN THE SUMMARY TABLE:', formattedData);
   };
 
   useEffect(() => {

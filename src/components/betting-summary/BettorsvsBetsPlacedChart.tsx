@@ -170,7 +170,7 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
             ]}
             xAxis={[
               {
-                label: "Amount (in 100,000 units)",
+                label: "Total (x 100,000)",
                 scaleType: "linear",
                 min: 0,
                 max: safeMax,
