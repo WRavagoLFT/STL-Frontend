@@ -193,7 +193,7 @@ const ChartWinnersSummary = () => {
             ]}
             xAxis={[
               {
-                label: "Amount (in 100,000 units)",
+                label: "Total (x 100,000)",
                 min: 0,
                 max: safeMax,
                 valueFormatter: (value: number) => `${value.toLocaleString()}`,
