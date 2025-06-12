@@ -63,6 +63,59 @@ const addOperator = async (userData: Record<string, any>) => {
         return { success: false, message: (error as Error).message, data: {} };
     }
 };
+export const updateOperator = async (userData: Record<string, any>) => {
+  try {
+    const url = validateRelativeUrl("/operators/editOperator");
+
+    // Log the URL and payload before sending
+    console.log("[updateOperator] URL:", url);
+    console.log("[updateOperator] Payload:", userData);
+    console.log("[updateOperator] Stringified Payload:", JSON.stringify(userData, null, 2));
+
+    const response = await axiosInstance.patch(url, userData);
+
+    // Log response details
+    console.log("[updateOperator] Response status:", response.status);
+    console.log("[updateOperator] Response data:", response.data);
+
+    return response.data;
+  } catch (error: any) {
+    console.error("[updateOperator] ❌ Error occurred during PATCH request");
+
+    if (error.response) {
+      // Backend responded with a status code outside 2xx
+      console.error("[updateOperator] Response status:", error.response.status);
+      console.error("[updateOperator] Response data:", error.response.data);
+      console.error("[updateOperator] Response headers:", error.response.headers);
+
+      return {
+        success: false,
+        message: error.response.data?.message || "Server returned an error",
+        data: error.response.data || {},
+      };
+    } else if (error.request) {
+      // Request was made but no response
+      console.error("[updateOperator] Request made but no response received");
+      console.error("[updateOperator] Request details:", error.request);
+
+      return {
+        success: false,
+        message: "No response received from server",
+        data: {},
+      };
+    } else {
+      // Something else happened
+      console.error("[updateOperator] Error setting up request:", error.message);
+
+      return {
+        success: false,
+        message: error.message,
+        data: {},
+      };
+    }
+  }
+};
+
 
 // Get user edit log function
 const editLogOperator = async (

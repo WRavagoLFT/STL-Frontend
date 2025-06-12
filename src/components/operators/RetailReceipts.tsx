@@ -133,67 +133,29 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
   return (
     <div className="flex flex-col">
       <div className="text-base font-bold mb-2">Retail Receipts</div>
-      <div>
-        <label
-          htmlFor="filterBy"
-          className="text-sm font-medium text-[#0038A8]"
-        >
-          Filter by
-        </label>
-        <Select
-          name="filterBy"
-          value={filterBy}
-          onChange={(selectedOption) => {
-            if (selectedOption) {
-              setFilterBy(selectedOption);
-              // reset selection when filter changes
-              if (selectedOption.value === "Monthly") {
-                setSelectedYear(null);
-              }
-            }
-          }}
-          options={filterOptions}
-          classNamePrefix="react-select-dashboard"
-          styles={{
-            control: (provided, state) => ({
-              ...provided,
-              borderRadius: "0.5rem",
-              color: "#2F2F2F",
-              padding: "0.25rem",
-              boxShadow: state.isFocused ? "none" : provided.boxShadow,
-            }),
-            menu: (provided) => ({
-              ...provided,
-              backgroundColor: "#F8C73F",
-              zIndex: 10,
-            }),
-          }}
-        />
-      </div>
-
-      <div className="mt-2 mb-4">
-        <label
-          htmlFor="operationDate"
-          className="text-sm font-medium text-[#0038A8]"
-        >
-          Date of Report
-        </label>
-        {filterBy?.value === "Monthly" && (
-          <Input
-            type="month"
-            value={operationDate}
-            onChange={(e: any) => setOperationDate(e.target.value)}
-          />
-        )}
-
-        {filterBy?.value === "Yearly" && (
+      <div className="flex flex-wrap gap-x-4 mb-5">
+        {/* Filter By */}
+        <div className="flex-1 min-w-[200px]">
+          <label
+            htmlFor="filterBy"
+            className="text-sm font-medium text-[#0038A8]"
+          >
+            Filter by
+          </label>
           <Select
-            name="year"
-            value={selectedYear}
-            options={yearOptions}
-            onChange={handleYearChange}
-            placeholder="Select Year"
-            classNamePrefix="react-select-dashboard"
+            name="filterBy"
+            value={filterBy}
+            onChange={(selectedOption) => {
+              if (selectedOption) {
+                setFilterBy(selectedOption);
+                // reset selection when filter changes
+                if (selectedOption.value === "Monthly") {
+                  setSelectedYear(null);
+                }
+              }
+            }}
+            options={filterOptions}
+            classNamePrefix="react-select"
             styles={{
               control: (provided, state) => ({
                 ...provided,
@@ -204,14 +166,55 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
               }),
               menu: (provided) => ({
                 ...provided,
-                backgroundColor: "#F8C73F",
                 zIndex: 10,
               }),
             }}
           />
-        )}
-      </div>
+        </div>
 
+        {/* Date of Report */}
+        <div className="flex-1 min-w-[200px]">
+          <label
+            htmlFor="operationDate"
+            className="text-sm font-medium text-[#0038A8]"
+          >
+            Date of Report
+          </label>
+
+          {filterBy?.value === "Monthly" && (
+            <Input
+              type="month"
+              value={operationDate}
+              onChange={(e: any) => setOperationDate(e.target.value)}
+            />
+          )}
+
+          {filterBy?.value === "Yearly" && (
+            <Select
+              name="year"
+              value={selectedYear}
+              options={yearOptions}
+              onChange={handleYearChange}
+              placeholder="Select Year"
+              classNamePrefix="react-select"
+              styles={{
+                control: (provided, state) => ({
+                  ...provided,
+                  borderRadius: "0.5rem",
+                  color: "#2F2F2F",
+                  padding: "0.25rem",
+                  boxShadow: state.isFocused ? "none" : provided.boxShadow,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  //backgroundColor: "#F8C73F",
+                  zIndex: 10,
+                }),
+              }}
+            />
+          )}
+        </div>
+      </div>
       <div className="flex gap-4 mb-1">
         <div className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 md:grid-cols-2 items-center gap-2 text-left">
           <div className="flex flex-col">

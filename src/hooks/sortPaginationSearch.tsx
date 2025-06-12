@@ -3,8 +3,6 @@ import dayjs, { Dayjs } from 'dayjs';
 import TableCell from '@mui/material/TableCell';
 import TextField from '@mui/material/TextField';
 import { Tooltip } from '@mui/material';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -12,6 +10,7 @@ import useDetailTableStore from '../store/useTableStore';
 import { SortableTableCellProps } from '../types/interfaces';
 import { User, Operator, SortConfig, EditLogFields } from '~/types/types';
 import { filterStyles } from '~/styles/theme';
+import { FaAngleDoubleDown, FaAngleDoubleUp } from "react-icons/fa";
 
 // SORTING + FILTERING COMPONENT
 export const SortableTableCell: React.FC<SortableTableCellProps> = ({
@@ -58,19 +57,25 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
   const isActive = sortConfig.key === sortKey;
   const icon = sortConfig.key === sortKey
     ? (sortConfig.direction === "asc"
-        ? <KeyboardArrowUpIcon sx={{ fontSize: 16, marginRight: 1, color: 'primary.main' }} />
-        : <KeyboardArrowDownIcon sx={{ fontSize: 16, marginRight: 1, color: 'primary.main' }} />)
-    : <KeyboardArrowDownIcon sx={{ fontSize: 16, marginRight: 1, opacity: 0.3 }} />;
+        ? <FaAngleDoubleUp style={{ fontSize: 16, marginRight: 4, color: '#FFFFFF' }} />
+        : <FaAngleDoubleDown style={{ fontSize: 16, marginRight: 4, color: '#FFFFFF' }} />)
+    : <FaAngleDoubleDown style={{ fontSize: 16, marginRight: 4, opacity: 0.3 }} />;
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <TableCell sx={{ cursor: 'pointer', userSelect: 'none' }} onClick={handleSort}>
-        <Tooltip title={isActive ? `Sort ${label} ${sortConfig.direction === 'asc' ? 'Ascending' : 'Descending'}` : `Sort by ${label}`}>
-          <span>
-            {icon}
+        <Tooltip
+          title={
+            isActive
+              ? `Sort ${label} ${sortConfig.direction === 'asc' ? 'Ascending' : 'Descending'}`
+              : `Sort by ${label}`
+          }
+        >
+          <span className="inline-flex items-center cursor-pointer">
+            <span className="ml-1">{icon}</span>
+            {label}
           </span>
         </Tooltip>
-        {label}
         {isFilterVisible && (
           <div>
             {(sortKey === 'DateOfRegistration' || sortKey === 'DateOfOperation') ? (
@@ -131,8 +136,8 @@ export function sortData<T extends User | Operator>(
 
     // Custom logic for fullName
     if (sortConfig.key === "fullName") {
-      valueA = `${(a as User).firstName} ${(a as User).lastName} ${(a as User).suffix || ""}`.trim().toLowerCase();
-      valueB = `${(b as User).firstName} ${(b as User).lastName} ${(b as User).suffix || ""}`.trim().toLowerCase();
+      valueA = `${(a as User).FirstName} ${(a as User).FirstName} ${(a as User).Suffix || ""}`.trim().toLowerCase();
+      valueB = `${(b as User).LastName} ${(b as User).LastName} ${(b as User).Suffix || ""}`.trim().toLowerCase();
     } else {
       valueA = getNestedValue(a, sortConfig.key as string);
       valueB = getNestedValue(b, sortConfig.key as string);

@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from "react";
-import OperatorViewPage from "~/components/operators/OperatorView";
+import OperatorViewPage from "~/components/operators/UpdateOperatorForm";
 import { useOperatorFormStore } from "../../../../store/useOperatorFormStore";
 import { operatorSchema } from "~/schemas/operatorSchema";
 import { Operator } from "~/types/types";
 import RetailReceiptOperatorsPage from "~/components/operators/RetailReceipts";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import router from "next/router";
-import { editLogOperator } from "~/utils/api/operators";
+import { editLogOperator, updateOperator } from "~/utils/api/operators";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { operatorEditColumns } from "~/config/operatorEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
+import Swal from "sweetalert2";
 
 export interface OperatorViewPageProps {
   slug: string;
@@ -43,6 +44,63 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
     fetchFormOptionsData();
   }, []);
 
+const handleUpdateOperator = async (data: Operator): Promise<void> => {
+  try {
+    console.log("[handleUpdateOperator] Called with data:", data);
+
+    if (!data.operatorId) {
+      console.warn("[handleUpdateOperator] Missing operatorId in data:", data);
+      throw new Error("Operator ID is required to update operator.");
+    }
+
+    console.log("[handleUpdateOperator] Sending update request to backend with operatorId:", data.operatorId);
+    const result = await updateOperator(data);
+
+    console.log("[handleUpdateOperator] Response from updateOperator:", result);
+
+    if (result.success) {
+      // Optional: log exactly what was updated
+      console.log("[handleUpdateOperator] Operator updated successfully:", {
+        operatorId: data.operatorId,
+        updatedFields: data,
+      });
+
+      Swal.fire({
+        icon: "success",
+        title: "Success!",
+        text: "User updated successfully.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      // Optional: reload or re-fetch data here
+      // await loadData();
+
+    } else {
+      console.error("[handleUpdateOperator] Update failed. Message:", result.message);
+      console.error("[handleUpdateOperator] Response data:", result.data);
+
+      Swal.fire({
+        icon: "error",
+        title: "Update Failed",
+        text: result.message || "Something went wrong while updating the user.",
+      });
+    }
+
+  } catch (error) {
+    const err = error as Error;
+
+    console.error("[handleUpdateOperator] Unexpected error occurred:", err);
+    console.error("[handleUpdateOperator] Stack Trace:", err.stack);
+
+    Swal.fire({
+      icon: "error",
+      title: "Unexpected Error",
+      text: err.message || "An unexpected error occurred.",
+    });
+  }
+};
+
   return (
     <AccessGuard allowedUserTypes={[6]}>
       <div className="w-full flex flex-col gap-4">
@@ -72,10 +130,10 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
               regions={regions}
               cities={cities}
               areaofoperations={areaOfOperations}
-              schema={operatorSchema}
-              isOpen={true}
               onClose={() => router.push("/operators")}
               onViewEditLogs={(operatorId) => handleViewEditLogs(operatorId)}
+              onSubmit={handleUpdateOperator}
+
             />
 
             {selectedOperatorId !== null && showEditLog && (

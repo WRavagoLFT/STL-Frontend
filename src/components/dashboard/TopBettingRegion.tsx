@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaDiceSix } from "react-icons/fa";
 import { fetchHistoricalRegion } from "~/utils/api/transactions";
 import router from "next/router";
+import { useAuthStore } from "~/store/useAuthStore";
 
 interface RegionData {
   RegionId?: number;
@@ -17,6 +18,8 @@ const TopBettingRegionPage = () => {
   const [rankedRegions, setRankedRegions] = useState<
     { region: RegionData; rank: number; trend: number }[]
   >([]);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
+  const bettingLabel = currentUserType === 3 ? "Top Betting Area Today" : "Top Betting Regions Today";
 
   const getBettingRegions = async () => {
     try {
@@ -93,9 +96,9 @@ const TopBettingRegionPage = () => {
           <FaDiceSix size={20} color={"#F6BA12"} />
         </div>
         <div className="flex items-center justify-between flex-1 ml-3">
-          <p className="text-base">Top Betting Regions Today</p>
+          <p className="text-base">{bettingLabel}</p>
           <button
-            onClick={() => router.push("/winning-summary/dashboard")}
+            onClick={() => router.push("/betting-summary/dashboard")}
             className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
           >
             View Bettors

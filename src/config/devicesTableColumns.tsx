@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import { Column } from "~/types/interfaces";
 import { Device } from "~/types/types";
 import Button from "@mui/material/Button";
-import { getUserStatus } from "~/utils/dashboarddata";
+import { getUserStatus } from "~/hooks/dashboarddata";
 
 export const devicesTableColumns = (): Column<Device>[] => [
   {

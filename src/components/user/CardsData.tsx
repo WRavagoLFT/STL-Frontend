@@ -4,7 +4,7 @@
 
 import React from "react";
 import { CardsPageProps } from "~/types/interfaces";
-import { getUserStatus } from "~/utils/dashboarddata";
+import { getUserStatus } from "~/hooks/dashboarddata";
 import dayjs from "dayjs";
 import Card from "../ui/dashboardcards/Cards";
 

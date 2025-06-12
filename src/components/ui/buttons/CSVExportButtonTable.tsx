@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@mui/material";
 import { buttonStyles } from "~/styles/theme";
 import { CSVExportButtonProps } from "~/types/interfaces";
-import { getRoleName, getUserStatus } from "~/utils/dashboarddata";
+import { getRoleName, getUserStatus } from "~/hooks/dashboarddata";
 import dayjs from "dayjs";
 import * as XLSX from "xlsx";
 

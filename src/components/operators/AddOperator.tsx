@@ -3,7 +3,6 @@ import { Operator } from "~/types/types";
 import AddOperatorForm from "./AddOperatorForm";
 
 type AddOperatorPageProps = {
-  open?: boolean;
   onClose?: () => void;
   onSubmit: (data: Operator) => void;
   gameTypes: any[];
@@ -14,7 +13,6 @@ type AddOperatorPageProps = {
 };
 
 export default function AddOperatorPage({
-  open,
   onClose,
   onSubmit,
   gameTypes,
@@ -24,14 +22,16 @@ export default function AddOperatorPage({
   areaOfOperations,
 }: AddOperatorPageProps) {
   return (
-    <AddOperatorForm
-      onSubmit={onSubmit}
-      gameTypes={gameTypes}
-      regions={regions}
-      provinces={provinces}
-      cities={cities}
-      areaOfOperations={areaOfOperations}
-      onClose={onClose}
-    />
+    <div className="pb-40">
+      <AddOperatorForm
+        onSubmit={onSubmit}
+        gameTypes={gameTypes}
+        regions={regions}
+        provinces={provinces}
+        cities={cities}
+        areaOfOperations={areaOfOperations}
+        onClose={onClose}
+      />
+    </div>
   );
 }

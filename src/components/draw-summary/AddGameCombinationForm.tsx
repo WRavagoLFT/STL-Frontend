@@ -33,8 +33,13 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-
   const identifiedGameTypeIdRef = useRef<number | undefined>(undefined);
+  const openConfirmModal = () => setIsConfirmModalOpen(true);
+  const closeConfirmModal = () => setIsConfirmModalOpen(false);
+  const handleModalClose = () => {
+    closeConfirmModal();
+    if (onClose) onClose();
+  };
 
   const gameCategorySelectOptions: OptionType[] = useMemo(() => {
     if (!Array.isArray(gameTypes)) {
@@ -59,17 +64,12 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
     });
     return options;
   }, [gameTypes, gameCategoryMap]);
-
-  const openConfirmModal = () => setIsConfirmModalOpen(true);
-  const closeConfirmModal = () => setIsConfirmModalOpen(false);
-  const handleModalClose = () => {
-    closeConfirmModal();
-    if (onClose) onClose();
-  };
+  
+  const validate = toFormikValidationSchema(addGameCombination);
 
   const formik = useFormik({
     initialValues: {
-      gameType: initialData.gameType ? String(initialData.gameType) : "",
+      gameType: initialData.gameType || "",
       provinceId: initialData.provinceId || "",
       combinationOne: initialData.combinationOne || "",
       combinationTwo: initialData.combinationTwo || "",
@@ -77,9 +77,10 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
       combinationFour: initialData.combinationFour || "",
       gameSchedule: initialData.gameSchedule ? String(initialData.gameSchedule) : "",
     },
-    // validationSchema: toFormikValidationSchema(addGameCombination),
+    validate,
+    //validationSchema: toFormikValidationSchema(addGameCombination),
     onSubmit: async (values) => {
-      console.log("[Form Submit] Submitted Values (before conversion):", values);
+      //console.log("[Form Submit] Submitted Values (before conversion):", values);
 
       const result = await Swal.fire({
         title: "Add Confirmation",
@@ -103,10 +104,10 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
         : undefined;
 
       const finalIdentifiedGameTypeId = identifiedGameTypeIdRef.current;
-      console.log("Final Identified GameTypeId for submission:", finalIdentifiedGameTypeId);
+      //console.log("Final Identified GameTypeId for submission:", finalIdentifiedGameTypeId);
 
       const finalData: GameCombination = {
-        gameType: submittedGameCategoryId,
+        gameType: finalIdentifiedGameTypeId,
         provinceId: values.provinceId ? Number(values.provinceId) : undefined,
         combinationOne: values.combinationOne ? Number(values.combinationOne) : undefined,
         combinationTwo: values.combinationTwo ? Number(values.combinationTwo) : undefined,
@@ -193,7 +194,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
       className="grid grid-cols-1 gap-4"
       noValidate
     >
-      <div className="grid grid-cols-2 gap-x-6 gap-y-4"> {/* Changed to a 2-column grid */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4">
         <div>
           <label htmlFor="gameType" className="block text-sm mb-1">
             Game Type
@@ -204,7 +205,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
             //value={formik.values.gameType}
             onChange={(e) => {
               const value = e.target.value;
-              console.log("Selected Game Category ID (as string):", value);
+              //console.log("Selected Game Category ID (as string):", value);
               formik.setFieldValue("gameType", value);
               // Clear combination fields when gameType changes to prevent stale data
               formik.setFieldValue("combinationOne", "");
@@ -230,7 +231,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
             //value={formik.values.gameSchedule}
             onChange={(e) => {
               const value = e.target.value;
-              console.log("Selected Game Schedule ID (as string):", value);
+              //console.log("Selected Game Schedule ID (as string):", value);
               formik.setFieldValue("gameSchedule", value);
             }}
             placeholder="Select Draw Time"
@@ -323,7 +324,6 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
         )}
         
       </div>
-
       {/* Submit Button */}
       <div className="col-span-full">
         <button

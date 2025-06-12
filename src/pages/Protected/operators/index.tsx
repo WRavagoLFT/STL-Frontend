@@ -3,16 +3,8 @@ import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { operatorTableColumns } from "~/config/operatorTableColumns";
 import CardsPage from "~/components/user/CardsData";
-import { fetchOperators } from "~/utils/api/operators";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import router from "next/router";
-import { fetchGameCategories } from "~/utils/api/gamecategories";
-import {
-  fetchAreaOfOperations,
-  fetchCities,
-  fetchProvinces,
-  fetchRegions,
-} from "~/utils/api/location";
 import { useOperatorFormStore } from "~/store/useOperatorFormStore";
 import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
 

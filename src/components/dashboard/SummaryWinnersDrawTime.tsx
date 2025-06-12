@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
+import { useAuthStore } from "~/store/useAuthStore";
 
 type DrawNumber = 1 | 2 | 3;
 
@@ -31,6 +32,7 @@ const SummaryWinnersDrawTimePage = () => {
   const [chartData, setChartData] = useState<
     { draw: string; winners: number; winnings: number }[]
   >([]);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const fetchAndProcessData = useCallback(async () => {
     setLoading(true);
@@ -83,19 +85,21 @@ const SummaryWinnersDrawTimePage = () => {
           <p className="text-lg leading-none">Summary of Winners</p>
           <CustomLegend />
         </div>
-        <GenericCSVExportButton
-          data={chartData}
-          headers={["Draw", "Winners", "Winnings (in 100k)"]}
-          title="Summary of Winners per Draw"
-          getRowData={(item) => [item.draw, item.winners, item.winnings.toFixed(2)]}
-        />
+        {currentUserType !== 3 && (
+          <GenericCSVExportButton
+            data={chartData}
+            headers={["Draw", "Winners", "Winnings (in 100k)"]}
+            title="Summary of Winners per Draw"
+            getRowData={(item) => [item.draw, item.winners, item.winnings.toFixed(2)]}
+          />
+        )}
       </div>
-      <div>
+      <div className="h-full w-full">
         <BarChart
           height={300}
           grid={{ vertical: true }}
           layout="horizontal"
-          margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+          margin={{ left: 90, right: 20, top: 20, bottom: 45 }}
           slotProps={{
             noDataOverlay: {
               message: "Summary of Winners data will be displayed once available.",
@@ -118,12 +122,13 @@ const SummaryWinnersDrawTimePage = () => {
           ]}
           xAxis={[
             {
-              label: "Total Winners",
+              label: "Total (x 100,000)",
               scaleType: "linear",
               min: 0,
               max: Math.max(...chartData.map((item) => item.winners), 1000),
               valueFormatter: (value: number) => `${value}`,
               tickSize: 8,
+              tickLabelProps: { style: { fontSize: "12px" } },
               barCategoryGap: 0.7,
             } as any,
           ]}

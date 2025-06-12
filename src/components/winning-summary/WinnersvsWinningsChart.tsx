@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import dayjs from "dayjs";
+import { useAuthStore } from "~/store/useAuthStore";
 
 interface Winner {
   GameCategoryId: number;
@@ -37,6 +38,7 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
   const [chartData, setChartData] = useState<
     { draw: string; winners: number; winnings: number; GameCategoryId: number | null }[]
   >([]);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const fetchChartData = useCallback(async () => {
     setLoading(true);
@@ -96,16 +98,18 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
           <p className="text-lg leading-none">Today&apos;s Winners and Winnings</p>
           <CustomLegend />
         </div>
-        <GenericCSVExportButton
-          data={chartData}
-          headers={["Draw", "Winners", "Winnings"]}
-          title="Summary of Winners and Winnings per Draw"
-          getRowData={(item) => [
-            item.draw,
-            item.winners.toString(),
-            item.winnings,
-          ]}
-        />
+        {currentUserType !== 3 && (
+          <GenericCSVExportButton
+            data={chartData}
+            headers={["Draw", "Winners", "Winnings"]}
+            title="Summary of Winners and Winnings per Draw"
+            getRowData={(item) => [
+              item.draw,
+              item.winners.toString(),
+              item.winnings,
+            ]}
+          />
+        )}
       </div>
 
       <div className="h-full w-full">

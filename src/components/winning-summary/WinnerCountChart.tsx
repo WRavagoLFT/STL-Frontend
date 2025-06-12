@@ -3,6 +3,7 @@ import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
+import { useAuthStore } from "~/store/useAuthStore";
 
 interface WinnerItem {
   DrawOrder: number;
@@ -37,7 +38,8 @@ const ChartWinnersSummary = () => {
     }[]
   >([]);
   const [loading, setLoading] = useState(false);
-
+  const currentUserType = useAuthStore((state) => state.userTypeId);
+  
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -143,18 +145,20 @@ const ChartWinnersSummary = () => {
           <p className="text-lg leading-none">Today's Winnings by Game Type</p>
           <CustomLegend />
         </div>
-        <GenericCSVExportButton
-          data={data}
-          headers={["Draw", "STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"]}
-          title="Today's Winnings by Game Type"
-          getRowData={(item) => [
-            item.draw,
-            item.pares.toFixed(3),
-            item.swer2.toFixed(3),
-            item.swer3.toFixed(3),
-            item.swer4.toFixed(3),
-          ]}
-        />
+        {currentUserType !== 3 && (
+          <GenericCSVExportButton
+            data={data}
+            headers={["Draw", "STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"]}
+            title="Today's Winnings by Game Type"
+            getRowData={(item) => [
+              item.draw,
+              item.pares.toFixed(3),
+              item.swer2.toFixed(3),
+              item.swer3.toFixed(3),
+              item.swer4.toFixed(3),
+            ]}
+          />
+        )}
       </div>
 
       <div className="h-full w-full">

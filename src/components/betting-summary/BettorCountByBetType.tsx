@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { CircularProgress, Button, } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchTransactions } from "~/utils/api/transactions";
-import { buttonStyles } from "~/styles/theme";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
+import { useAuthStore } from "~/store/useAuthStore";
 
 // Returns the bet types series for a gameCategoryId
 const getBetTypeSeries = (gameCategoryId?: number) => {
@@ -50,7 +50,8 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
     { draw: string; [key: string]: number | string }[]
   >([]);
   const [loading, setLoading] = useState(false);
-
+  const currentUserType = useAuthStore((state) => state.userTypeId);
+  
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -148,6 +149,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
           </p>
           <CustomLegend gameCategoryId={params.gameCategoryId} />
         </div>
+        {currentUserType !== 3 && (
           <GenericCSVExportButton
             data={data}
             headers={["Draw", ...series.map((s) => s.dataKey)]}
@@ -159,6 +161,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
               ),
             ]}
           />
+        )}
       </div>
 
       <div className="h-full w-full">

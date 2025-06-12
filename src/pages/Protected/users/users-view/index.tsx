@@ -18,6 +18,7 @@ import { useAuthStore } from "~/store/useAuthStore";
 import { FaMobileAlt } from "react-icons/fa";
 import { editLogUser } from "~/utils/api/users";
 import { loadUsers } from "~/hooks/useLoadUsers";
+import dayjs from "dayjs";
 
 type UsersViewPageProps = {
   user?: User;
@@ -42,6 +43,20 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   } = useUserStore();
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
+  const titleInfo =
+    user?.data.UserTypeId === 1
+      ? "Kubrador Information"
+      : user?.data.UserTypeId === 2
+      ? "Kabo Information"
+      : "User Information";
+
+  const backUrl =
+    user?.data.UserTypeId === 1
+      ? "/users/kubrador"
+      : user?.data.UserTypeId === 2
+      ? "/users/kabo"
+      : "/";
+      
   //console.log(user);
   //console.log(slug);
   //  THIS IS NULL
@@ -67,16 +82,9 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const onUserUpdateSubmit = async (formData: User) => {
     await handleUpdateUser(
       formData,
-      () => loadUsers(roleConfig, roleKey!, setData, setKaboMap, setOperatorMap, setPscoBranchMap),
+      () => loadUsers(roleConfig, roleKey!, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading),
     );
   };
-
-  const backUrl =
-    user?.data.UserTypeId === 1
-      ? "/users/kubrador"
-      : user?.data.UserTypeId === 2
-      ? "/users/kabo"
-      : "/";
 
   useEffect(() => {
     //console.log("activeTab changed:", activeTab);
@@ -132,22 +140,22 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 items-center my-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center my-4">
         {/* Left side */}
-        <div className="flex gap-6">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6">
           <button
             onClick={() => setActiveTab("kabo")}
-            className={`w-full rounded-lg px-12 py-4 text-sm font-bold ${
+            className={`w-full rounded-lg px-6 py-4 text-sm font-bold ${
               activeTab === "kabo"
                 ? "bg-[#F6BA12] hover:bg-[#FFD100]"
                 : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
             }`}
           >
-            Kabo Information
+            {titleInfo}
           </button>
           <button
             onClick={() => setActiveTab("device")}
-            className={`w-full rounded-lg px-12 py-4 text-sm font-bold ${
+            className={`w-full rounded-lg px-6 py-4 text-sm font-bold ${
               activeTab === "device"
                 ? "bg-[#F6BA12] hover:bg-[#FFD100]"
                 : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
@@ -157,11 +165,11 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
           </button>
         </div>
 
-        {/* Right side - one button */}
+        {/* Right side */}
         <div className="flex justify-start">
           <button
             onClick={() => setActiveTab("history")}
-            className={`rounded-lg px-12 py-4 text-sm font-bold ${
+            className={`w-full md:w-auto rounded-lg px-6 py-4 text-sm font-bold ${
               activeTab === "history"
                 ? "bg-[#F6BA12] hover:bg-[#FFD100]"
                 : "bg-[#0038A8] hover:bg-[#004ccf] text-white"
@@ -245,7 +253,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
                   className="mt-1 w-full"
                   value={
                     user?.data?.DateOfRegistration
-                      ? user?.data?.DateOfRegistration.slice(0, 10)
+                      ? dayjs(user.data.DateOfRegistration).format("YYYY/MM/DD HH:mm:ss")
                       : "N/A"
                   }
                   disabled
@@ -279,7 +287,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
                   className="mt-1 w-full"
                   value={
                     user?.data?.LastUpdatedDate
-                      ? user?.data?.LastUpdatedDate.slice(0, 10)
+                      ? dayjs(user.data.LastUpdatedDate).format("YYYY/MM/DD HH:mm:ss")
                       : "N/A"
                   }
                   disabled

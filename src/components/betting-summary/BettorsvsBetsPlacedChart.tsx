@@ -4,6 +4,8 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { addLabels } from "./tooltips/dataSet";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
+import { TransactionData } from "~/types/types";
+import { useAuthStore } from "~/store/useAuthStore";
 
 // Custom Legend circle
 const CustomLegend = () => (
@@ -18,30 +20,6 @@ const CustomLegend = () => (
     </div>
   </div>
 );
-
-interface TransactionData {
-  TransactionDate: string;
-  RegionId: number;
-  Region: string;
-  ProvinceId: number;
-  Province: string;
-  GameCategoryId: number;
-  GameCategory: string;
-  DrawOrder: 1 | 2 | 3;
-  TotalBets: number;
-  TotalBettors: number;
-  TotalWinners: number;
-  TotalBetAmount: number;
-  TotalTumbok: number;
-  TotalSahod: number;
-  TotalRamble: number;
-  TotalPayout: number;
-  TotalEarnings: number;
-  CombinationOne: string | null;
-  CombinationTwo: string | null;
-  CombinationThree: string | null;
-  CombinationFour: string | null;
-}
 
 const summary: Record<
   number,
@@ -62,6 +40,7 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
   const [data, setData] = useState<
     { gameName: string; bettors: number; bets: number; winners: number }[]
   >([]);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const maxValue = Math.max(...data.map((item) => item.bets));
   const safeMax = maxValue < 1000 ? 1000 : maxValue;
@@ -139,7 +118,7 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
 
   useEffect(() => {
     fetchData();
-  }, [params.gameCategoryId]); // Re-fetch if gameCategoryId changes
+  }, [params.gameCategoryId]);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
@@ -150,17 +129,19 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
           </p>
           <CustomLegend />
         </div>
-        <GenericCSVExportButton
-          data={chartData}
-          headers={["Draw", "Bettors (in 10k)", "Bets (in 10k)", "Bet-to-Bettor Ratio"]}
-          title="Summary of Bettors and Bets per Draw"
-          getRowData={(item) => [
-            item.draw,
-            item.bettors,
-            item.bets,
-            item.ratio,
-          ]}
-        />
+        {currentUserType !== 3 && (
+          <GenericCSVExportButton
+            data={chartData}
+            headers={["Draw", "Bettors (in 10k)", "Bets (in 10k)", "Bet-to-Bettor Ratio"]}
+            title="Summary of Bettors and Bets per Draw"
+            getRowData={(item) => [
+              item.draw,
+              item.bettors,
+              item.bets,
+              item.ratio,
+            ]}
+          />
+        )}
       </div>
 
       <div className="h-full w-full mt-4">

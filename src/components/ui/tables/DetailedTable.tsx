@@ -5,11 +5,11 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import FilterListOffIcon from "@mui/icons-material/FilterListOff";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { SortableTableCell, filterData, sortData } from "../../../utils/sortPaginationSearch";
+import { SortableTableCell, filterData, sortData } from "../../../hooks/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { buttonStyles } from "~/styles/theme";
 import { User, Operator, SortConfig, Device } from "~/types/types";
-import { getUserStatus } from "~/utils/dashboarddata";
+import { getUserStatus } from "~/hooks/dashboarddata";
 import dayjs from "dayjs";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import Swal from 'sweetalert2';
@@ -35,13 +35,13 @@ const DetailedTable = <T extends User | Operator | Device>({
   const sevenDaysAgo = useMemo(() => dayjs().subtract(7, "day"), []);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
   const [isVerifySuspendModalOpen, setIsVerifySuspendModalOpen] = useState(false);
-
   const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [actionType, setActionType] = useState<'suspend' | 'create' | 'update' | 'delete'>('suspend');
   const modalStore = useModalStore.getState();
   const { userTypeId } = useAuthStore();
-  
+  const currentUserType = useAuthStore((state) => state.userTypeId);
+
   // FILTER + SEARCH
   const filteredData = useMemo(() => {
     const filterKeys = columns
@@ -386,7 +386,7 @@ const DetailedTable = <T extends User | Operator | Device>({
             )}
           </TableBody>
         </Table>
-        <div className="p-3">
+        <div className="p-1">
           <TablePagination
             rowsPerPageOptions={[10, 25, 50, 100]}
             component="div"
@@ -411,14 +411,16 @@ const DetailedTable = <T extends User | Operator | Device>({
           />
         )} */}
       </TableContainer>
-      <div className="flex justify-end pt-2">
-        <CSVExportButtonTable
-          pageType={pageType}
-          columns={columns}
-          statsPerRegion={data}
-          operatorMap={operatorMap ? Object.values(operatorMap) : []}
-        />
-      </div>
+      {currentUserType !== 3 && (
+        <div className="flex justify-end pt-2">
+          <CSVExportButtonTable
+            pageType={pageType}
+            columns={columns}
+            statsPerRegion={data}
+            operatorMap={operatorMap ? Object.values(operatorMap) : []}
+          />
+        </div>
+      )}
     </React.Fragment>
   );
 };

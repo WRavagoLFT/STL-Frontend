@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchHistoricalSummary } from "../../utils/api/transactions";
-import { useRouter } from "next/navigation";
 import { Button } from "@mui/material";
 import { buttonStyles } from "~/styles/theme";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
+import { TransactionData } from "~/types/types";
+import { useAuthStore } from "~/store/useAuthStore";
 
 // Custom Legend circle
 const CustomLegend = () => (
@@ -15,7 +16,7 @@ const CustomLegend = () => (
     </div>
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#5050A5] mr-2" />
-      <p className="text-sm">Bets</p>
+      <p className="text-sm">Bets Placed Today</p>
     </div>
   </div>
 );
@@ -33,67 +34,65 @@ const SummaryBettorsBetsPlacedPage = () => {
   const [data, setData] = useState<
     { gameName: string; bettors: number; bets: number; winners: number }[]
   >([]);
-  const summaryRecord = summary as Record<
-    number,
-    { gameName: string; bettors: number; bets: number; winners: number }
-  >;
+  const [chartData, setChartData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
-  const router = useRouter();
   const maxValue = Math.max(...data.map((item) => item.bets));
   const safeMax = maxValue < 1000 ? 1000 : maxValue;
 
   const fetchData = async () => {
     try {
       const response = await fetchHistoricalSummary();
-      //console.log("API Response of Bettors charts:", response);
 
       if (response.success) {
-        //console.log("Processing data...");
-
         const today = new Date().toISOString().split("T")[0];
-        console.log(today);
 
-        // Filter Data for Today's Date
-        const filteredData = response.data.filter(
-          (item: { TransactionDate: string }) =>
-            item.TransactionDate.startsWith(today)
+        // Filter by today's date
+        const filteredData = response.data.filter((item: TransactionData) =>
+          item.TransactionDate.startsWith(today)
         );
 
-        // Loop through filtered data and update summary
-        filteredData.forEach(
-          (item: {
-            DrawOrder: number;
-            TotalBettors: number;
-            TotalBetAmount: number;
-            TotalWinners: number;
-          }) => {
-            if (summaryRecord[item.DrawOrder]) {
-              summaryRecord[item.DrawOrder].bettors += item.TotalBettors || 0;
-              summaryRecord[item.DrawOrder].bets += item.TotalBetAmount || 0;
-              summaryRecord[item.DrawOrder].winners += item.TotalWinners || 0;
-            }
+        // Local summary object
+        const localSummary: typeof summary = {
+          1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
+          2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
+          3: { gameName: "Third Draw", bettors: 0, bets: 0, winners: 0 },
+        };
+
+        filteredData.forEach((item: TransactionData) => {
+          if (localSummary[item.DrawOrder]) {
+            localSummary[item.DrawOrder].bettors += item.TotalBettors || 0;
+            localSummary[item.DrawOrder].bets += item.TotalBetAmount || 0;
+            localSummary[item.DrawOrder].winners += item.TotalWinners || 0;
           }
-        );
+        });
 
-        // Convert summary object to an array
-        const formattedData = Object.values(summaryRecord);
+        const formattedData = Object.values(localSummary);
 
-        // optional, scalling to 100000
         const scaledData = formattedData.map((item) => ({
           ...item,
-          //bettors: item.bettors / 100000,
           bets: item.bets / 100000,
-          winners: item.winners / 100000,
+          ratio: item.bettors === 0 ? 0 : item.bets / item.bettors,
         }));
 
-        //console.log(formattedData);
-        //console.log("Aggregated Data:", formattedData);
         setData(scaledData);
+
+        const transformedChartData = scaledData.map((item) => ({
+          draw: item.gameName,
+          bettors: item.bettors,
+          bets: item.bets,
+          ratio: item.ratio,
+        }));
+
+        setChartData(transformedChartData);
       } else {
         console.error("API Request Failed:", response.message);
       }
     } catch (error) {
       console.error("Error Fetching Data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,26 +102,24 @@ const SummaryBettorsBetsPlacedPage = () => {
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
-      <div>
-        <div className="flex justify-between items-center w-full">
-          <div className="flex flex-col leading-none">
-            <p className="text-lg leading-none">
-              Summary of Bettors and Bets Placed Today
-            </p>
-            <CustomLegend />
-          </div>
-            <GenericCSVExportButton
-              data={data}
-              headers={["Game Name", "Bettors", "Bets"]}
-              title={`Bettors and Bets Summary`}
-              getRowData={(item) => [
-                item.gameName,
-                item.bettors,
-                item.bets,
-              ]}
-            />
+      <div className="flex justify-between items-center w-full">
+        <div className="flex flex-col leading-none">
+          <p className="text-lg leading-none">
+            Summary of Bettors and Bets Placed Today
+          </p>
+          <CustomLegend />
         </div>
+
+        {currentUserType !== 3 && (
+          <GenericCSVExportButton
+            data={data}
+            headers={["Game Name", "Bettors", "Bets Placed Today"]}
+            title="Bettors and Bets Summary"
+            getRowData={(item) => [item.gameName, item.bettors, item.bets]}
+          />
+        )}
       </div>
+
       <div className="h-full w-full">
         <BarChart
           height={300}
@@ -145,7 +142,7 @@ const SummaryBettorsBetsPlacedPage = () => {
             {
               data: data.map((item) => item.bets),
               color: "#5050A5",
-              label: "Bets",
+              label: "Bets Placed Today",
             },
           ]}
           yAxis={[
@@ -157,7 +154,7 @@ const SummaryBettorsBetsPlacedPage = () => {
           ]}
           xAxis={[
             {
-              label: "Amount (in 100,000 units)",
+              label: "Total (x 100,000)",
               scaleType: "linear",
               min: 0,
               max: safeMax,

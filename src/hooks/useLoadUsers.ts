@@ -9,16 +9,21 @@ export const loadUsers = async (
   setData: (users: User[]) => void,
   setKaboMap: (data: any) => void,
   setOperatorMap: (data: any) => void,
-  setPscoBranchMap: (data: any) => void
+  setPscoBranchMap: (data: any) => void,
+  setLoading: (loading: boolean) => void
 ) => {
   try {
+    setLoading(true);
+
     if (!roleConfig?.roleId || !roleKey) {
       console.warn("Missing roleId or roleKey");
+      setLoading(false);
       return;
     }
 
     if (roleKey === "kabo") {
       await fetchUsersByRole(roleConfig.roleId, null, null, setData);
+      setLoading(false);
       return;
     }
 
@@ -27,25 +32,15 @@ export const loadUsers = async (
       setKaboMap(response.data);
 
       await fetchUsersByRole(roleConfig.roleId, null, null, setData);
+      setLoading(false);
       return;
     }
 
     const operatorMap = await fetchOperatorMap();
-    // if (!operatorMap) {
-    //   console.warn("No operator map found.");
-    //   setData([]);
-    //   return;
-    // }
     setOperatorMap(operatorMap);
 
     const pcsoBranchMap = await fetchPCSOBranch();
-    // if (!pcsoBranchMap) {
-    //   console.warn("No PCSO branch map found.");
-    //   setData([]);
-    //   return;
-    // }
     setPscoBranchMap(pcsoBranchMap);
-    //console.log('PCSO BRANCH MAP IN THE USER PAGE', pcsoBranchMap);
 
     await fetchUsersByRole(
       roleConfig.roleId,
@@ -56,5 +51,7 @@ export const loadUsers = async (
   } catch (error) {
     console.error("Error in loadUsers:", (error as Error).message);
     setData([]);
+  } finally {
+    setLoading(false);
   }
 };

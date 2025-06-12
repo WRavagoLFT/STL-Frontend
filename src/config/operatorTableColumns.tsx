@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import React from "react";
 import Button from "@mui/material/Button";
-import { getUserStatus } from "~/utils/dashboarddata";
+import { getUserStatus } from "~/hooks/dashboarddata";
 import { Operator } from "~/types/types";
 import { Column } from "~/types/interfaces";
 

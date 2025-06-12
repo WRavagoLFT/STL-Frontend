@@ -143,12 +143,14 @@ const DrawResultsPage = () => {
   }, [provinces, regions, gameCategories]);
 
   useEffect(() => {
-    //console.log("useEffect triggered with:");
-    //console.log("Selected Region:", selectedRegion);
-    //console.log("Selected Province:", selectedProvince);
-    //console.log("Selected Game Category:", selectedGameCategory);
-    //console.log("Original winningCombinations:", winningCombinations);
+    const regionId = selectedRegion ? Number(selectedRegion) : null;
 
+    if (regionId !== null) {
+      fetchProvinces({ regionId });
+    }
+  }, [selectedRegion]);
+
+  useEffect(() => {
     let filtered = winningCombinations;
 
     const regionId = selectedRegion ? Number(selectedRegion) : null;
@@ -157,29 +159,19 @@ const DrawResultsPage = () => {
       ? Number(selectedGameCategory)
       : null;
 
-    // console.log("Parsed filter values:", {
-    //   regionId,
-    //   provinceId,
-    //   gameCategoryId,
-    // });
-
     if (regionId !== null) {
       filtered = filtered.filter((c) => c.RegionId === regionId);
-      //console.log(`Filtered by RegionId (${regionId}):`, filtered);
     }
 
     if (provinceId !== null) {
       filtered = filtered.filter((c) => c.ProvinceId === provinceId);
-      //console.log(`Filtered by ProvinceId (${provinceId}):`, filtered);
     }
 
     if (gameCategoryId !== null) {
       filtered = filtered.filter((c) => c.GameCategoryId === gameCategoryId);
-      //console.log(`Filtered by GameCategoryId (${gameCategoryId}):`, filtered);
     }
 
     setFilteredWinningCombinations(filtered);
-    //console.log("Final filtered combinations set:", filtered);
   }, [
     selectedRegion,
     selectedProvince,

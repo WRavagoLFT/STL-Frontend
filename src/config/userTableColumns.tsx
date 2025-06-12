@@ -1,7 +1,7 @@
 import React from "react";
 import dayjs from "dayjs";
 import Button from "@mui/material/Button";
-import { getUserStatus } from "~/utils/dashboarddata";
+import { getUserStatus } from "~/hooks/dashboarddata";
 import { User } from "~/types/types";
 import { Column } from "~/types/interfaces";
 
@@ -71,6 +71,17 @@ export const userTableColumns = (roleId: number): Column<User>[] => {
     },
   ];
 
+  if (roleId === 1 || roleId === 2) {
+    columns.splice(1, 0, {
+      key: "AssignedArea",
+      label: "Assigned Area / Zone",
+      sortable: true,
+      filterable: false,
+      render: (user) =>
+        user?.AssignedArea ?? "No Assigned Area available.",
+    });
+  }
+
   // Conditionally insert the column for RoleId === 4
   if (roleId === 4) {
     columns.splice(1, 0, {
@@ -79,7 +90,9 @@ export const userTableColumns = (roleId: number): Column<User>[] => {
       sortable: true,
       filterable: false,
       render: (user) =>
-        user.OperatorDetails?.OperatorName ?? "No operator assigned",
+        user.OperatorDetails && user.OperatorDetails.OperatorName
+          ? user.OperatorDetails.OperatorName
+          : "No operator assigned",
     });
   }
 
