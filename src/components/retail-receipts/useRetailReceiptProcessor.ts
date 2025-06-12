@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Share } from "~/types/types";
-import { fetchRetailReceiptsData } from "~/utils/api/transactions";
 import { calculateNetIncome, processShares } from "./calculateShareTotals";
 
 export const useRetailReceiptProcessor = (
+  receiptData: string,
   filterBy: string,
   operationDate: string,
   selectedYear?: number,
@@ -31,6 +31,8 @@ export const useRetailReceiptProcessor = (
   const [netPcsoTotalAmount, setNetPcsoTotalAmount] = useState(0);
   const [netPcsoTotalPercentage, setNetPcsoTotalPercentage] = useState(0);
 
+  //console.log('RECEIPT DATA:', receiptData);
+  
   const AAC_GROSS_TITLES = [
     "Authorized Agent Share",
     "Commission of Salesforce",
@@ -65,45 +67,36 @@ export const useRetailReceiptProcessor = (
       return;
     }
 
-    //console.log('OPERATOR ID IN THE PROCESS FUNCTION:', operatorId);
-
     const [parsedYear, parsedMonth] = operationDate.split("-").map(Number);
     const yearToUse = selectedYear ?? parsedYear;
 
     const filterByLower = typeof filterBy === "string" ? filterBy.toLowerCase() : null;
-
     const isMonthly = filterByLower === "monthly";
     const isYearly = filterByLower === "yearly";
 
     const monthParam: number | undefined = isMonthly ? parsedMonth : undefined;
-
     const filterByParam: number | undefined =
       !isMonthly && !isYearly && typeof filterBy !== "undefined"
         ? Number(filterBy)
         : undefined;
 
-    fetchRetailReceiptsData(yearToUse, monthParam, filterByParam, operatorId).then((response) => {
-      if (!response?.success) {
-        console.warn("Failed to fetch retail receipts");
-        return;
-      }
-
-      const aac = processShares(response.data?.Receipts?.AAC, AAC_GROSS_TITLES, yearToUse, monthParam, 1);
+    const handleProcess = (data: any) => {
+      const aac = processShares(data?.Receipts?.AAC, AAC_GROSS_TITLES, yearToUse, monthParam, 1);
       setAacBreakdown(aac.breakdown);
       setAacTotalPercentage(aac.totalPercentage);
       setAacTotalShareAmount(aac.totalShareAmount);
 
-      const pcso = processShares(response.data?.Receipts?.PCSO, PCSO_TITLES, yearToUse, monthParam, 1);
+      const pcso = processShares(data?.Receipts?.PCSO, PCSO_TITLES, yearToUse, monthParam, 1);
       setPcsoBreakdown(pcso.breakdown);
       setPcsoTotalPercentage(pcso.totalPercentage);
       setPcsoTotalShareAmount(pcso.totalShareAmount);
 
-      const aacTax = processShares(response.data?.Receipts?.PCSO, AAC_TAX_TITLES, yearToUse, monthParam, 2);
+      const aacTax = processShares(data?.Receipts?.PCSO, AAC_TAX_TITLES, yearToUse, monthParam, 2);
       setAacTaxBreakdown(aacTax.breakdown);
       setAacTaxTotalPercentage(aacTax.totalPercentage);
       setAacTaxTotalShareAmount(aacTax.totalShareAmount);
 
-      const pcsoTax = processShares(response.data?.Receipts?.PCSO, PCSO_TAX_TITLES, yearToUse, monthParam, 2);
+      const pcsoTax = processShares(data?.Receipts?.PCSO, PCSO_TAX_TITLES, yearToUse, monthParam, 2);
       setPcsoTaxBreakdown(pcsoTax.breakdown);
       setPcsoTaxTotalPercentage(pcsoTax.totalPercentage);
       setPcsoTaxTotalShareAmount(pcsoTax.totalShareAmount);
@@ -127,8 +120,21 @@ export const useRetailReceiptProcessor = (
       );
       setNetPcsoTotalAmount(netPcsoAmount);
       setNetPcsoTotalPercentage(netPcsoPercentage);
-    });
-  }, [filterBy, operationDate, selectedYear, operatorId]);
+    };
+
+  if (receiptData) {
+    try {
+      const parsedData = typeof receiptData === "string"
+        ? JSON.parse(receiptData)
+        : receiptData;
+
+      handleProcess(parsedData);
+    } catch (error) {
+      console.error("Invalid receiptData JSON:", error);
+    }
+  }
+
+  }, [receiptData, filterBy, operationDate, selectedYear, operatorId]);
 
   return {
     aacBreakdown,

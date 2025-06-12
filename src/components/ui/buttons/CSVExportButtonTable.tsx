@@ -50,12 +50,12 @@ const CSVExportButtonTable: React.FC<CSVExportButtonProps> = ({
   const downloadExcel = () => {
     const baseRole = getRoleName(roleId ?? 0);
     const pluralRole = baseRole.endsWith("s") ? baseRole : baseRole + "s";
-
     const readablePageType = pageType ?? "Summary";
-    //const capitalizedPageType = readablePageType.charAt(0).toUpperCase() + readablePageType.slice(1);
 
     const title = `${pluralRole} Data Table Summary`;
     const sheetTitle = `${pluralRole} Dashboard`;
+
+    const currentDateTime = new Date().toLocaleString();
 
     const excelData = convertToExcelData(
       statsPerRegion ?? [],
@@ -63,14 +63,27 @@ const CSVExportButtonTable: React.FC<CSVExportButtonProps> = ({
       operatorMap ?? []
     );
 
-    // Create worksheet with title in A1
-    const worksheet = XLSX.utils.aoa_to_sheet([[title]]); // Title row
+    // Create worksheet with title and generated time
+    const worksheetData = [
+      [title],
+      [`Generated on: ${currentDateTime}`],
+      [],
+    ];
 
-    // Add data starting at A3 (skip title and headers)
+    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // Add data starting at row 4
     XLSX.utils.sheet_add_json(worksheet, excelData, {
-      origin: "A3", // start adding data here
+      origin: "A4",
       skipHeader: false,
     });
+
+    // Merge title and generated date rows across all columns
+    const totalColumns = columns?.length || 10;
+    worksheet["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: totalColumns - 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: totalColumns - 1 } },
+    ];
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetTitle);
