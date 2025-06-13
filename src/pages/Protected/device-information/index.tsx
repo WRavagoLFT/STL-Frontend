@@ -1,8 +1,9 @@
 import router from "next/router";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import Card from "~/components/ui/dashboardcards/Cards";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
+import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
 import { devicesTableColumns } from "~/config/devicesTableColumns";
 import { Device } from "~/types/types";
 import { fetchDevices } from "~/utils/api/device";
@@ -112,25 +113,31 @@ const DeviceInformationPage = () => {
 
   return (
     <AccessGuard allowedUserTypes={[5]}>
-      <div className="space-y-3 h-full">
-        <h1 className="text-3xl font-bold">Device Information</h1>
-        <div className="flex flex-wrap gap-4">
-          {calculatedDevices.map((item, index) => (
-            <Card key={index} label={item.label} value={item.value} />
-          ))}
-        </div>
-        <div>
-          <DetailedTable
-            data={devices}
-            columns={tableColumns}
-            pageType="Device Information"
-            onAddClick={() =>
-              router.push("/device-information/device-information-add")
-            }
-            source="device"
-          />
-        </div>
-      </div>
+      {loading ? (
+        <UsersSkeletonPage />
+      ) : (
+        <Suspense fallback={<UsersSkeletonPage />}>
+          <div className="space-y-3 h-full">
+            <h1 className="text-3xl font-bold">Device Information</h1>
+            <div className="flex flex-wrap gap-4">
+              {calculatedDevices.map((item, index) => (
+                <Card key={index} label={item.label} value={item.value} />
+              ))}
+            </div>
+            <div>
+              <DetailedTable
+                data={devices}
+                columns={tableColumns}
+                pageType="Device Information"
+                onAddClick={() =>
+                  router.push("/device-information/device-information-add")
+                }
+                source="device"
+              />
+            </div>
+          </div>
+        </Suspense>
+      )}
     </AccessGuard>
   );
 };

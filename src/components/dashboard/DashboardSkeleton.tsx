@@ -7,7 +7,7 @@ interface SkeletonCardProps {
 
 const SkeletonCard: React.FC<SkeletonCardProps> = ({ height = "110px" }) => (
   <div
-    className="flex-[1_1_200px] bg-[#171717] rounded-lg m-0"
+    className="flex-[1_1_200px] bg-gray-200 rounded-lg m-0"
     style={{ height }}
   />
 );
@@ -17,7 +17,7 @@ export const DashboardSkeletonPage: React.FC = () => {
     <div className="animate-pulse space-y-4">
       {/* Top Line Skeletons */}
       {[...Array(2)].map((_, index) => (
-        <div key={index} className="h-4 w-[15%] bg-[#171717] rounded-lg" />
+        <div key={index} className="h-4 w-[15%] bg-gray-200 rounded-lg" />
       ))}
 
       {/* Horizontal Skeleton Cards */}
@@ -28,18 +28,22 @@ export const DashboardSkeletonPage: React.FC = () => {
       </div>
 
       {/* Two Column Layout */}
-      <div className="flex flex-col md:flex-row gap-4">
-        {/* Left Column */}
-        <div className="w-full md:w-1/2 flex flex-col space-y-4">
-          <SkeletonCard height="350px" />
-          <SkeletonCard height="350px" />
-          <SkeletonCard height="350px" />
-        </div>
+      <div className="flex flex-col items-center space-y-4">
+        <div className="w-full space-y-4">
+          <div className="w-full flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
+            {/* Left Column */}
+            <div className="space-y-6 w-full lg:w-1/3">
+              <SkeletonCard height="189px" />
+              <SkeletonCard height="189px" />
+              <SkeletonCard height="195px" />
+            </div>
 
-        {/* Right Column */}
-        <div className="w-full md:w-1/2 flex flex-col space-y-4">
-          <SkeletonCard height="350px" />
-          <SkeletonCard height="350px" />
+            {/* Right Column */}
+            <div className="space-y-6 w-full lg:w-2/3">
+              <SkeletonCard height="300px" />
+              <SkeletonCard height="300px" />
+            </div>
+          </div>
         </div>
       </div>
     </div>

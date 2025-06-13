@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchHistoricalSummary } from "../../utils/api/transactions";
-import { Button } from "@mui/material";
-import { buttonStyles } from "~/styles/theme";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { TransactionData } from "~/types/types";
 import { useAuthStore } from "~/store/useAuthStore";
@@ -16,7 +14,7 @@ const CustomLegend = () => (
     </div>
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#5050A5] mr-2" />
-      <p className="text-sm">Bets Placed Today</p>
+      <p className="text-sm">Bets</p>
     </div>
   </div>
 );
