@@ -9,12 +9,10 @@ export const addGameCombination = z
       },
       z.number({ required_error: "Game Type is required" })
     ),
-
     gameSchedule: z.preprocess((val) => {
       const parsed = parseInt(val as string);
       return isNaN(parsed) ? undefined : parsed;
     }, z.number().optional()),
-
     combinationOne: z
       .string({ required_error: "First Drawn Number is required" })
       .min(1, "First Drawn Number is required"),

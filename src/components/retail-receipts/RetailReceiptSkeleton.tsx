@@ -2,7 +2,7 @@ import React from 'react';
 import { AccessGuard } from '../auth/AccessGuard';
 
 const SkeletonBox = ({ height = 'h-10', width = 'w-full', rounded = 'rounded-md' }) => (
-  <div className={`bg-gray-200 animate-pulse ${height} ${width} ${rounded}`} />
+  <div className={`bg-[#7A7766] animate-pulse ${height} ${width} ${rounded}`} />
 );
 
 export default function RetailReceiptSkeleton() {
@@ -26,7 +26,7 @@ export default function RetailReceiptSkeleton() {
           {[...Array(5)].map((_, idx) => (
             <div
               key={idx}
-              className="bg-gray-100 p-4 rounded-lg shadow-sm animate-pulse"
+              className="bg-[#7A7766] p-4 rounded-lg shadow-sm animate-pulse"
             >
               <SkeletonBox height="h-4" width="w-1/2 mb-2" />
               <SkeletonBox height="h-8" width="w-2/3" />
@@ -53,7 +53,7 @@ export default function RetailReceiptSkeleton() {
               {[...Array(3)].map((_, secIdx) => (
                 <div
                   key={secIdx}
-                  className="bg-gray-100 p-4 rounded-lg shadow-sm animate-pulse space-y-2"
+                  className="bg-[#7A7766] p-4 rounded-lg shadow-sm animate-pulse space-y-2"
                 >
                   <SkeletonBox height="h-4" width="w-1/2" />
                   <SkeletonBox height="h-4" width="w-3/4" />

@@ -14,7 +14,6 @@ export const addDeviceSchema = z.object({
     .refine((val) => /^09\d{9}$/.test(val), {
       message: "Please enter a valid SIM number starting with 09 and 11 digits long.",
     }),
-
   telcoProvider: z
     .string({ required_error: "Telco Provider is required" })
     .min(1, "Telco Provider is required"),

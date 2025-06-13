@@ -29,21 +29,21 @@ export const operatorSchema = z.object({
     }),
   execPassword: z
     .string({ required_error: "Password is required" })
-    .min(1, "Password is required")
-    .refine((val) => val.length >= 8, {
-      message: "Password must be at least 8 characters long.",
-    })
-    .refine((val) => /[A-Z]/.test(val), {
-      message: "Password must include at least one uppercase letter.",
-    })
-    .refine((val) => /[a-z]/.test(val), {
-      message: "Password must include at least one lowercase letter.",
-    })
-    .refine((val) => /\d/.test(val), {
-      message: "Password must include at least one number.",
-    })
-    .refine((val) => /[!@#$%^&*]/.test(val), {
-      message: "Password must include at least one special character (!@#$%^&*).",
+    .superRefine((val, ctx) => {
+      const isValid =
+        val.length >= 8 &&
+        /[A-Z]/.test(val) &&
+        /[a-z]/.test(val) &&
+        /\d/.test(val) &&
+        /[!@#$%^&*]/.test(val);
+
+      if (!isValid) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+        });
+      }
     }),
   name: z
     .string({ required_error: "Operator Name is required" })

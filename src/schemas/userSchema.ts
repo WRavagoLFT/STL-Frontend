@@ -32,43 +32,25 @@ export const userSchema = z
       }),
 
     password: z
-      .string({ required_error: "Password is required" })
+      .string()
+      .min(1, "Password is required")
       .superRefine((val, ctx) => {
-        if (val.length < 8) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must be at least 8 characters long.",
-          });
-          return; // stop validation here
-        }
-        if (!/[A-Z]/.test(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must include at least one uppercase letter.",
-          });
-          return;
-        }
-        if (!/[a-z]/.test(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must include at least one lowercase letter.",
-          });
-          return;
-        }
-        if (!/\d/.test(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must include at least one number.",
-          });
-          return;
-        }
-        if (!/[!@#$%^&*]/.test(val)) {
+        // Skip further validation if password is empty
+        if (!val) return;
+
+        const isValid =
+          val.length >= 8 &&
+          /[A-Z]/.test(val) &&
+          /[a-z]/.test(val) &&
+          /\d/.test(val) &&
+          /[!@#$%^&*]/.test(val);
+
+        if (!isValid) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message:
-              "Password must include at least one special character (!@#$%^&*).",
+              "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
           });
-          return;
         }
       }),
 
@@ -116,7 +98,7 @@ export const userSchema = z
     if (data.userTypeId === 5) {
       if (data.pcsoBranchId === undefined) {
         ctx.addIssue({
-          path: ["BranchId"],
+          path: ["pcsoBranchId"],
           code: z.ZodIssueCode.custom,
           message: "Assigned PCSO Branch is required.",
         });
