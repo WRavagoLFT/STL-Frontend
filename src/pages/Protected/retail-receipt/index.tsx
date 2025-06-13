@@ -150,9 +150,9 @@ const RetailReceiptPage = () => {
     netPcsoTotalPercentage,
   } = useRetailReceiptProcessor(
     receiptData,
-    filterBy.value,
+    filterBy?.value,
     operationDate,
-    yearNumber
+    yearNumber,
   );
 
   return (

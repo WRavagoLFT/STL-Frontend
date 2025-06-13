@@ -6,7 +6,7 @@ export const handleRouter = async (router: any) => {
 
   try {
     //console.log("Resetting userTypeId to null...");
-    setUserTypeId(0); // Reset before fetch
+    //setUserTypeId(0); // Reset before fetch
 
     //console.log("Fetching current user...");
     const userResponse = await axiosInstance.get("/users/getCurrentUser");

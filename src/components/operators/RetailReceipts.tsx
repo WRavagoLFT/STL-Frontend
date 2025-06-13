@@ -128,7 +128,13 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
     netAacTotalPercentage,
     netPcsoTotalAmount,
     netPcsoTotalPercentage,
-  } = useRetailReceiptProcessor(filterBy?.value, operationDate, yearNumber, operatorId);
+  } = useRetailReceiptProcessor(
+    receiptData,
+    filterBy?.value,
+    operationDate,
+    yearNumber,
+    operatorId
+  );
 
   return (
     <div className="flex flex-col">
