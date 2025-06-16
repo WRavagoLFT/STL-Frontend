@@ -14,7 +14,7 @@ export const Card = <T extends React.ReactNode>({ label, value, color, style }: 
       }}
     >
       <p className="text-xs">{label}</p>
-      <p className="text-2xl font-bold leading-[1.1]">{value}</p>
+      <p className="text-2xl font-bold">{value}</p>
     </div>
   );
 };

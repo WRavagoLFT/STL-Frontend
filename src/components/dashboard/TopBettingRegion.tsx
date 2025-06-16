@@ -19,7 +19,10 @@ const TopBettingRegionPage = () => {
     { region: RegionData; rank: number; trend: number }[]
   >([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
-  const bettingLabel = currentUserType === 3 ? "Top Betting Area Today" : "Top Betting Regions Today";
+  const bettingLabel =
+    currentUserType === 3
+      ? "Top Betting Area Today"
+      : "Top Betting Regions Today";
 
   const getBettingRegions = async () => {
     try {
@@ -91,12 +94,17 @@ const TopBettingRegionPage = () => {
 
   return (
     <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
-      <div className="flex mb-2 items-center w-full">
-        <div className="bg-[#0038A8] rounded-lg p-1">
-          <FaDiceSix size={20} color={"#F6BA12"} />
+      <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
+        {/* Left side: icon + label */}
+        <div className="flex items-center">
+          <div className="bg-[#0038A8] rounded-lg p-1">
+            <FaDiceSix size={20} color={"#F6BA12"} />
+          </div>
+          <p className="text-base ml-3">{bettingLabel}</p>
         </div>
-        <div className="flex items-center justify-between flex-1 ml-3">
-          <p className="text-base">{bettingLabel}</p>
+
+        {/* Right side: button */}
+        <div className="mt-2 md:mt-0">
           <button
             onClick={() => router.push("/betting-summary/dashboard")}
             className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
@@ -105,6 +113,7 @@ const TopBettingRegionPage = () => {
           </button>
         </div>
       </div>
+
       <div className="h-px bg-[#ACA993] mt-1 mb-2" />
 
       <div className="mt-2 w-full max-h-[720px] overflow-y-auto">
@@ -127,15 +136,15 @@ const TopBettingRegionPage = () => {
                     item.trend > 0
                       ? "text-[#046115]"
                       : item.trend < 0
-                      ? "text-[#CE1126]"
-                      : "text-[#aaa]"
+                        ? "text-[#CE1126]"
+                        : "text-[#aaa]"
                   }`}
                 >
                   {item.trend > 0
                     ? `↑${item.trend}`
                     : item.trend < 0
-                    ? `↓${Math.abs(item.trend)}`
-                    : "→"}
+                      ? `↓${Math.abs(item.trend)}`
+                      : "→"}
                 </span>
               </div>
 
@@ -144,7 +153,7 @@ const TopBettingRegionPage = () => {
               </p>
 
               <p className="text-[#212121] text-right flex-1 text-md">
-                {(item.region.TotalBetAmount ?? 0).toLocaleString()}
+                ₱ {(item.region.TotalBetAmount ?? 0).toLocaleString()}
               </p>
             </div>
           ))
