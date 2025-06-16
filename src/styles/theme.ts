@@ -275,14 +275,14 @@ export const filterStyles = {
   fontSize: "12px",
   backgroundColor: "none",
   "& .MuiFilledInput-input::placeholder": {
-    color: "#E0DCBD",
+    color: "#E0DCBD" ,
     opacity: 1, // ensure full opacity if needed
     fontSize: "12px",
   },
   "& .MuiInputBase-input": {
     padding: 0,
     paddingBottom: 0,
-    // color: '#E0DCBD'
+    color: '#E0DCBD',
     fontSize: "12px",
     margin: 0,
   },

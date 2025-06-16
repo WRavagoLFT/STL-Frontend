@@ -3,72 +3,54 @@ import { z } from "zod";
 export const userSchema = z
   .object({
     firstName: z
-      .string({ required_error: "Given Name is required" })
-      .min(1, "Given Name is required")
+      .string({ required_error: "Given Name is required." })
+      .min(1, "Given Name is required.")
       .refine((val) => /^[A-Za-z\s]+$/.test(val), {
         message: "First Name can only contain letters and spaces.",
       }),
 
     lastName: z
-      .string({ required_error: "Last Name is required" })
-      .min(1, "Last Name is required")
+      .string({ required_error: "Last Name is required." })
+      .min(1, "Last Name is required.")
       .refine((val) => /^[A-Za-z\s]+$/.test(val), {
         message: "Last Name can only contain letters and spaces.",
       }),
 
     phoneNumber: z
-      .string({ required_error: "Phone Number is required" })
-      .min(1, "Phone Number is required")
+      .string({ required_error: "Phone Number is required." })
+      .min(1, "Phone Number is required.")
       .refine((val) => /^09\d{9}$/.test(val), {
         message:
           "Please enter a valid phone number starting with 09 and 11 digits long (e.g. 09XXXXXXXXX).",
       }),
 
     email: z
-      .string({ required_error: "Email is required" })
-      .min(1, "Email is required")
+      .string({ required_error: "Email is required." })
+      .min(1, "Email is required.")
       .refine((val) => /\S+@\S+\.\S+/.test(val), {
-        message: "Please enter a valid email address e.g. xxx@email.com",
+        message: "Please enter a valid email address e.g. xxx@email.com.",
       }),
 
     password: z
-      .string({ required_error: "Password is required" })
+      .string()
+      .min(1, "Password is required.")
       .superRefine((val, ctx) => {
-        if (val.length < 8) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must be at least 8 characters long.",
-          });
-          return; // stop validation here
-        }
-        if (!/[A-Z]/.test(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must include at least one uppercase letter.",
-          });
-          return;
-        }
-        if (!/[a-z]/.test(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must include at least one lowercase letter.",
-          });
-          return;
-        }
-        if (!/\d/.test(val)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "Password must include at least one number.",
-          });
-          return;
-        }
-        if (!/[!@#$%^&*]/.test(val)) {
+        // Skip further validation if password is empty
+        if (!val) return;
+
+        const isValid =
+          val.length >= 8 &&
+          /[A-Z]/.test(val) &&
+          /[a-z]/.test(val) &&
+          /\d/.test(val) &&
+          /[!@#$%^&*]/.test(val);
+
+        if (!isValid) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message:
-              "Password must include at least one special character (!@#$%^&*).",
+              "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
           });
-          return;
         }
       }),
 
@@ -77,7 +59,7 @@ export const userSchema = z
     street: z.string().optional(),
     CreatedBy: z.string().optional(),
 
-    userTypeId: z.number({ required_error: "User Type is required" }),
+    userTypeId: z.number({ required_error: "User Type is required." }),
     accountType: z.number(),
 
     operatorId: z.preprocess(
@@ -116,7 +98,7 @@ export const userSchema = z
     if (data.userTypeId === 5) {
       if (data.pcsoBranchId === undefined) {
         ctx.addIssue({
-          path: ["BranchId"],
+          path: ["pcsoBranchId"],
           code: z.ZodIssueCode.custom,
           message: "Assigned PCSO Branch is required.",
         });
@@ -126,15 +108,15 @@ export const userSchema = z
   
 export const updateUserSchema = z.object({
   phoneNumber: z
-    .string({ required_error: "Phone Number is required" })
-    .min(1, "Phone Number is required")
+    .string({ required_error: "Phone Number is required." })
+    .min(1, "Phone Number is required.")
     .refine((val) => /^09\d{9}$/.test(val), {
       message:
         "Please enter a valid phone number starting with 09 and 11 digits long (e.g. 09XXXXXXXXX).",
     }),
   email: z
-    .string({ required_error: "Email is required" })
-    .min(1, "Email is required")
+    .string({ required_error: "Email is required." })
+    .min(1, "Email is required.")
     .refine((val) => /\S+@\S+\.\S+/.test(val), {
       message: "Please enter a valid email address e.g. xxx@email.com",
     }),

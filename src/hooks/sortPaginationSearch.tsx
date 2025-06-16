@@ -10,7 +10,6 @@ import useDetailTableStore from '../store/useTableStore';
 import { SortableTableCellProps } from '../types/interfaces';
 import { User, Operator, SortConfig, EditLogFields } from '~/types/types';
 import { filterStyles } from '~/styles/theme';
-import { FaAngleDoubleDown, FaAngleDoubleUp } from "react-icons/fa";
 
 // SORTING + FILTERING COMPONENT
 export const SortableTableCell: React.FC<SortableTableCellProps> = ({
@@ -55,19 +54,33 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
 
   // Always show the sort icon, but only highlight the selected one
   const isActive = sortConfig.key === sortKey;
-  const icon = sortConfig.key === sortKey
-    ? (sortConfig.direction === "asc"
-        ? <FaAngleDoubleUp style={{ fontSize: 16, marginRight: 4, color: '#FFFFFF' }} />
-        : <FaAngleDoubleDown style={{ fontSize: 16, marginRight: 4, color: '#FFFFFF' }} />)
-    : <FaAngleDoubleDown style={{ fontSize: 16, marginRight: 4, opacity: 0.3 }} />;
+  const iconSrc = "/svg/Sorting-Arrows.svg"; // public path
+
+  const icon = (
+    <img
+      src={iconSrc}
+      alt="Sort Icon"
+      style={{
+        width: 20,
+        height: 20,
+        marginRight: 4,
+        opacity: isActive ? 1 : 0.3,
+        //filter: isActive ? "invert(1)" : "invert(0.6)",
+        transition: "filter 0.2s ease, opacity 0.2s ease",
+      }}
+    />
+  );
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <TableCell sx={{ cursor: 'pointer', userSelect: 'none' }} onClick={handleSort}>
+      <TableCell
+        sx={{ cursor: "pointer", userSelect: "none" }}
+        onClick={handleSort}
+      >
         <Tooltip
           title={
             isActive
-              ? `Sort ${label} ${sortConfig.direction === 'asc' ? 'Ascending' : 'Descending'}`
+              ? `Sort ${label} ${sortConfig.direction === "asc" ? "Ascending" : "Descending"}`
               : `Sort by ${label}`
           }
         >
@@ -78,22 +91,35 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
         </Tooltip>
         {isFilterVisible && (
           <div>
-            {(sortKey === 'DateOfRegistration' || sortKey === 'DateOfOperation') ? (
+            {sortKey === "DateOfRegistration" ||
+            sortKey === "DateOfOperation" ? (
               <DatePicker
                 value={filters[sortKey] ? dayjs(filters[sortKey]) : null}
                 onChange={handleDateChange}
                 format="YYYY/MM/DD"
                 slotProps={{
                   textField: {
-                    variant: 'filled',
+                    variant: "filled",
                     fullWidth: true,
-                    sx: { 
-                      ...filterStyles, 
-                      m: 0, 
-                      p: 0, 
+                    sx: {
+                      ...filterStyles,
+                      m: 0,
+                      p: 0,
                       "& .MuiFilledInput-root": {
                         paddingBottom: "0px",
                         backgroundColor: "transparent !important",
+                      },
+                      "& .MuiSvgIcon-root": {
+                        color: "#E0DCBD", // calendar icon color
+                      },
+                      "& .MuiFilledInput-underline:before": {
+                        borderBottom: "1px solid #E0DCBD",
+                      },
+                      "& .MuiFilledInput-underline:after": {
+                        borderBottom: "1px solid #E0DCBD",
+                      },
+                      "& .MuiFilledInput-underline:hover:before": {
+                        borderBottom: "1px solid #E0DCBD !important", // prevent color change on hover
                       },
                     },
                   },
@@ -103,18 +129,29 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
               <TextField
                 placeholder={`Filter by ${label}`}
                 variant="filled"
-                value={filters[sortKey] || ''}
-                onChange={(event) => handleFilterChange(sortKey)(event.target.value)}
+                value={filters[sortKey] || ""}
+                onChange={(event) =>
+                  handleFilterChange(sortKey)(event.target.value)
+                }
                 fullWidth
-                sx={{ 
-                  ...filterStyles, 
-                  m: 0, 
-                  p: 0, 
+                sx={{
+                  ...filterStyles,
+                  m: 0,
+                  p: 0,
                   "& .MuiFilledInput-root": {
                     paddingBottom: "8px",
                     paddingTop: "8px",
                     backgroundColor: "transparent !important",
                   },
+                      "& .MuiFilledInput-underline:before": {
+                        borderBottom: "1px solid #E0DCBD",
+                      },
+                      "& .MuiFilledInput-underline:after": {
+                        borderBottom: "1px solid #E0DCBD",
+                      },
+                      "& .MuiFilledInput-underline:hover:before": {
+                        borderBottom: "1px solid #E0DCBD !important", // prevent color change on hover
+                      },
                 }}
               />
             )}

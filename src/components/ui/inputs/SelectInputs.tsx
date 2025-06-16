@@ -63,7 +63,7 @@ const handleChange = (
           fontSize: "0.875rem",
           padding: "2px",
           color: state.isDisabled ? "#6B7280" : "inherit", // Gray text when disabled
-          backgroundColor: state.isDisabled ? "#F3F4F6" : "white", // Optional: lighter background when disabled
+          backgroundColor: state.isDisabled ? "transparent" : "transparent", // Optional: lighter background when disabled
           cursor: state.isDisabled ? "not-allowed" : "default",
           "&:hover": {
             borderColor: state.isDisabled

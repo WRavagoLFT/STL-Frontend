@@ -183,11 +183,11 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       noValidate
     >
       {/* Column 1 */}
-      <div className="flex flex-col gap-x-6 gap-y-2">
+      <div className="flex flex-col gap-x-6 gap-y-3">
         <div>
           <label htmlFor="firstName" className="block text-sm">
             Given Name
-          </label>
+          </label>  
           <Input
             type="text"
             id="firstName"
@@ -263,7 +263,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
 
       {/* Column 2 */}
       {/* FOR MANAGERS ONLY */}
-      <div className="flex flex-col gap-x-6 gap-y-2">
+      <div className="flex flex-col gap-x-6 gap-y-3">
         {formik.values.userTypeId === 4 && (
           <div>
             <label htmlFor="operatorId" className="block text-sm mb-1">

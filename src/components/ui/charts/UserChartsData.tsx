@@ -42,7 +42,7 @@ export const ChartsDataPage = <T extends RegionUser & { OperatorName?: string; B
 
   // Memoized function to compute stats and chart data
   const computeStatsAndChartData = useCallback(() => {
-    console.log('DASHBOARD DATA: ', dashboardData);
+    //console.log('DASHBOARD DATA: ', dashboardData);
     if (!dashboardData || dashboardData.length === 0 || regionList.length === 0) return null;
 
     const stats = displayRegions.map((shortRegion) => {
@@ -130,8 +130,8 @@ export const ChartsDataPage = <T extends RegionUser & { OperatorName?: string; B
   useEffect(() => {
     if (!computedData) return;
 
-    console.log("Computed stats per region:", computedData.stats);
-    console.log("Chart data set:", computedData.newChartData);
+    //console.log("Computed stats per region:", computedData.stats);
+    //console.log("Chart data set:", computedData.newChartData);
 
     setStatsPerRegion(computedData.stats);
     setLocalChartData(computedData.newChartData);
