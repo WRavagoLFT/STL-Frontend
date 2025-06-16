@@ -122,7 +122,7 @@ const DrawResultsSummaryPage = ({
         {drawData.map((number, index) => (
           <div
             key={index}
-            className="bg-transparent border border-[#0038A8] rounded-sm p-5 md:px-9 md:py-7 flex items-center justify-center"
+            className="bg-transparent border border-[#0038A8] rounded-sm p-5 lg:px-9 lg:py-7 flex items-center justify-center"
           >
             <p className="font-bold text-3xl lg:text-5xl">{number}</p>
           </div>
