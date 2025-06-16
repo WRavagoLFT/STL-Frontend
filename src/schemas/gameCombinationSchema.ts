@@ -7,18 +7,18 @@ export const addGameCombination = z
         const parsed = parseInt(val as string);
         return isNaN(parsed) ? undefined : parsed;
       },
-      z.number({ required_error: "Game Type is required" })
+      z.number({ required_error: "Game Type is required." })
     ),
     gameSchedule: z.preprocess((val) => {
       const parsed = parseInt(val as string);
       return isNaN(parsed) ? undefined : parsed;
     }, z.number().optional()),
     combinationOne: z
-      .string({ required_error: "First Drawn Number is required" })
-      .min(1, "First Drawn Number is required"),
+      .string({ required_error: "First Drawn Number is required." })
+      .min(1, "First Drawn Number is required."),
     combinationTwo: z
-      .string({ required_error: "Second Drawn Number is required" })
-      .min(1, "Second Drawn Number is required"),
+      .string({ required_error: "Second Drawn Number is required." })
+      .min(1, "Second Drawn Number is required."),
     combinationThree: z.string().optional(),
     combinationFour: z.string().optional(),
   })
@@ -56,17 +56,17 @@ export const addGameCombination = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["gameSchedule"],
-        message: "Game Schedule is required",
+        message: "Game Schedule is required.",
       });
     }
 
-    // Required fields based on gameType
+    // required. fields based on gameType
     if (gameType >= 3 && !data.combinationThree?.trim()) {
-      addIssue("combinationThree", "Third Drawn Number is required");
+      addIssue("combinationThree", "Third Drawn Number is required.");
     }
 
     if (gameType === 4 && !data.combinationFour?.trim()) {
-      addIssue("combinationFour", "Fourth Drawn Number is required");
+      addIssue("combinationFour", "Fourth Drawn Number is required.");
     }
 
     // Range checks

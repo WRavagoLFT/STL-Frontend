@@ -40,7 +40,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   }>({});
   const [isDisabled, setIsDisabled] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-
+  const [showEditButton, setShowEditButton] = useState(true);
   // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
@@ -48,7 +48,11 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
     closeConfirmModal();
     if (onClose) onClose();
   };
-  const handleDisable = () => setIsDisabled(false);
+  
+  const handleDisable = () => {
+    setIsDisabled(false);
+    setShowEditButton(false);
+  };
 
   const alwaysDisabledKeys = ["name", "LastName"];
   if (!selectedUser) return null;
@@ -436,7 +440,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
 
       {/* Remarks input shown only when editing */}
       {!isDisabled && (
-        <div className="col-span-2 my-1">
+        <div className="col-span-2 my-3">
           <label htmlFor="remarks" className="block text-sm">
             Remarks
           </label>
@@ -456,31 +460,30 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
           )}
         </div>
       )}
-
+      
       {currentUserType !== 3 && (
         <>
-          {/* Buttons */}
-          <div className="flex justify-end gap-3 mt-2">
-            {isDisabled ? (
+          {/* Action Buttons */}
+          {showEditButton && (
+            <div className="w-full flex justify-end items-center my-2">
               <button
-                type="button"
+                type={isDisabled ? "button" : "submit"}
+                onClick={isDisabled ? handleDisable : undefined}
                 className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-                onClick={handleDisable}
               >
-                Update
+                {isDisabled ? "Update" : "Save"}
               </button>
-            ) : (
-              <>
-                <button
-                  type="submit"
-                  className="w-full mt-3 px-7 py-2 bg-[#F6BA12] text-black text-sm rounded transition"
-                  disabled={!formik.isValid}
-                >
-                  Save
-                </button>
-              </>
-            )}
-          </div>
+            </div>
+          )}
+
+          {!isDisabled && (
+            <button
+              type="submit"
+              className="col-span-2 mt-2 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
+            >
+              Save
+            </button>
+          )}
         </>
       )}
 

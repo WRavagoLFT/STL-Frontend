@@ -83,6 +83,7 @@ select option:disabled {
   padding: 0px !important;
   color: #2F2F2F !important;
 }
+
 .react-select-dashboard__option {
   background-color: transparent !important;  /* Transparent background for options */
   color: inherit !important;                  /* Inherit text color */
@@ -134,6 +135,37 @@ select option:disabled {
 .sidebar-scrollbar:hover {
   scrollbar-color: rgba(200, 200, 200, 0.7) transparent;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.react-select-multi-select {
+  background-color: transparent !important;
+  border-radius: 0.5rem !important;
+  border: none !important;         /* use 'none' to remove border */
+  font-size: 14px !important;      /* specify units for font-size */
+  padding: 0px !important;
+  color: #2F2F2F !important;
+}
+
+/* Adjust dropdown option styles */
+.react-select-multi-select__option {
+  background-color: transparent !important;  /* Transparent background for options */
+}
+
+.react-select-multi-select__option--is-selected {
+  background-color: #0038A8 !important;      /* Highlight color when selected */
+  color: white !important;
+}
+
+
+
 
 
 

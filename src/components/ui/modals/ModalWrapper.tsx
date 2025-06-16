@@ -40,7 +40,7 @@ const ModalWrapper: React.FC<ModalWrapperProps> = ({
           className="bg-[#F8F0E3] rounded-lg shadow-lg w-full 
              max-w-[90%] sm:max-w-[80%] md:max-w-[600px] 
              lg:max-w-[650px] xl:max-w-[720px] 
-             max-h-[90vh] overflow-y-auto sidebar-scrollbar p-8"
+             max-h-[90vh] overflow-y-auto sidebar-scrollbar p-8 scrollbar-hide"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex justify-end leading-none !-mt-2 !-mr-2">

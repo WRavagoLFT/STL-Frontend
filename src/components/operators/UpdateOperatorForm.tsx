@@ -7,6 +7,8 @@ import { Operator } from "~/types/types";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import { useFormik } from "formik";
+import { toFormikValidationSchema } from "~/utils/formikHelpers";
+import { updateOperatorSchema } from "~/schemas/operatorSchema";
 
 type GameTypeOption = {
   value: number;
@@ -203,6 +205,8 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       operatorFormData();
     }
   }, [operatorFormData]);
+  
+  const validate = toFormikValidationSchema(updateOperatorSchema);
 
   // 4. Formik setup (NOTE: selectedUser should already be loaded before this runs)
   const formik = useFormik({
@@ -211,6 +215,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       ...mapSelectedOperatorToFormData(initialUserOperatorData),
       remarks: '',
     },
+    validate,
     onSubmit: async (values) => {
       console.log("[Form Submit] Raw Submitted Values:", values);
 
@@ -268,6 +273,11 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
     
     return null;
   };
+  
+  const gameTypesError = getError("gameTypes");
+  const areaOfOperationsError = getError("areaOfOperations");
+  const provincesError = getError("provinces");
+  const statusError = getError("status");
 
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -358,7 +368,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
             )}
         </div>
       </div>
-      
+
       {/* Owner Information */}
       <div className="mt-3">
         <div className="text-base font-bold mb-2">Owner Information</div>
@@ -391,7 +401,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               id="contactNo"
               type="text"
               {...formik.getFieldProps("contactNo")}
-              disabled
+              disabled={isDisabled}
             />
           </div>
 
@@ -406,13 +416,12 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
             <Input
               id="email"
               {...formik.getFieldProps("email")}
-              disabled
+              disabled={isDisabled}
             />
           </div>
-
         </div>
       </div>
-      
+
       {/* AAC Information */}
       <div className="mt-5">
         <div className="text-base font-bold mb-2">AAC Information</div>
@@ -431,7 +440,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               disabled={isDisabled}
             />
           </div>
-          
+
           {/* Exec Contact Number */}
           <div>
             <label
@@ -459,7 +468,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
             <Input
               id="operatorAddress"
               {...formik.getFieldProps("operatorAddress")}
-              disabled
+              disabled={isDisabled}
             />
           </div>
 
@@ -519,13 +528,53 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               onChange={(selected) =>
                 formik.setFieldValue("gameTypes", selected)
               }
+              isDisabled={isDisabled}
               classNamePrefix="react-select"
               placeholder="Select Games Provided"
               menuPortalTarget={
                 typeof window !== "undefined" ? document.body : null
               }
-              styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+              styles={{
+                control: (provided, state) => {
+                  const isDisabled = state.isDisabled;
+                  const hasError = !!gameTypesError;
+
+                  return {
+                    ...provided,
+                    borderColor: isDisabled
+                      ? "#A1A1AA !important"
+                      : hasError
+                        ? "#EF4444 !important"
+                        : "#0038A8 !important",
+                    fontSize: "0.875rem",
+                    padding: "2px",
+                    color: isDisabled ? "#6B7280" : "inherit",
+                    backgroundColor: "transparent",
+                    cursor: isDisabled ? "not-allowed" : "default",
+                    "&:hover": {
+                      borderColor: isDisabled
+                        ? "#A1A1AA"
+                        : hasError
+                          ? "#EF4444"
+                          : "#0038A8",
+                    },
+                    boxShadow: "none",
+                  };
+                },
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 1000000,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 400,
+                  overflowY: "auto",
+                }),
+              }}
             />
+            {gameTypesError && (
+              <p className="text-red-500 text-sm mt-1">{gameTypesError}</p>
+            )}
           </div>
 
           {/* Area Of Operations */}
@@ -551,7 +600,49 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               }
               classNamePrefix="react-select"
               placeholder="Select Area of Operations"
+              styles={{
+                control: (provided, state) => {
+                  const isDisabled = state.isDisabled;
+                  const hasError = !!areaOfOperationsError;
+
+                  return {
+                    ...provided,
+                    borderColor: isDisabled
+                      ? "#A1A1AA !important"
+                      : hasError
+                        ? "#EF4444 !important"
+                        : "#0038A8 !important",
+                    fontSize: "0.875rem",
+                    padding: "2px",
+                    color: isDisabled ? "#6B7280" : "inherit",
+                    backgroundColor: "transparent",
+                    cursor: isDisabled ? "not-allowed" : "default",
+                    "&:hover": {
+                      borderColor: isDisabled
+                        ? "#A1A1AA"
+                        : hasError
+                          ? "#EF4444"
+                          : "#0038A8",
+                    },
+                    boxShadow: "none",
+                  };
+                },
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 1000000,    
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 400,
+                  overflowY: "auto",
+                }),
+              }}
             />
+            {areaOfOperationsError && (
+              <p className="text-red-500 text-sm mt-1">
+                {areaOfOperationsError}
+              </p>
+            )}
           </div>
 
           {/* Provinces */}
@@ -576,8 +667,50 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               menuPortalTarget={
                 typeof window !== "undefined" ? document.body : null
               }
-              styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+              isDisabled={isDisabled}
+              styles={{
+                control: (provided, state) => {
+                  const isDisabled = state.isDisabled;
+                  const hasError = !!provincesError;
+
+                  return {
+                    ...provided,
+                    borderColor: isDisabled
+                      ? "#A1A1AA !important"
+                      : hasError
+                        ? "#EF4444 !important"
+                        : "#0038A8 !important",
+                    fontSize: "0.875rem",
+                    padding: "2px",
+                    color: isDisabled ? "#6B7280" : "inherit",
+                    backgroundColor: "transparent",
+                    cursor: isDisabled ? "not-allowed" : "default",
+                    "&:hover": {
+                      borderColor: isDisabled
+                        ? "#A1A1AA"
+                        : hasError
+                          ? "#EF4444"
+                          : "#0038A8",
+                    },
+                    boxShadow: "none",
+                  };
+                },
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 1000000,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 400,
+                  overflowY: "auto",
+                }),
+              }}
             />
+            {provincesError && (
+              <p className="text-red-500 text-sm mt-1">
+                {provincesError}
+              </p>
+            )}
           </div>
 
           {/* Status */}
@@ -600,14 +733,43 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               onChange={(selected) =>
                 formik.setFieldValue("status", selected?.value)
               }
-              isDisabled={isDisabled}
               placeholder="Select Status"
               classNamePrefix="react-select"
               menuPortalTarget={
                 typeof window !== "undefined" ? document.body : null
               }
+              isDisabled={isDisabled}
               styles={{
-                menuPortal: (base) => ({ ...base, zIndex: 1000000 }),
+                control: (provided, state) => {
+                  const isDisabled = state.isDisabled;
+                  const hasError = !!statusError;
+
+                  return {
+                    ...provided,
+                    borderColor: isDisabled
+                      ? "#A1A1AA !important"
+                      : hasError
+                        ? "#EF4444 !important"
+                        : "#0038A8 !important",
+                    fontSize: "0.875rem",
+                    padding: "2px",
+                    color: isDisabled ? "#6B7280" : "inherit",
+                    backgroundColor: "transparent",
+                    cursor: isDisabled ? "not-allowed" : "default",
+                    "&:hover": {
+                      borderColor: isDisabled
+                        ? "#A1A1AA"
+                        : hasError
+                          ? "#EF4444"
+                          : "#0038A8",
+                    },
+                    boxShadow: "none",
+                  };
+                },
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 1000000,
+                }),
                 menu: (provided) => ({
                   ...provided,
                   maxHeight: 400,
@@ -615,13 +777,18 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
                 }),
               }}
             />
+            {statusError && (
+              <p className="text-red-500 text-sm mt-1">
+                {statusError}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
       {/* Remarks */}
       {!isDisabled && (
-        <div className="col-span-2 my-2">
+        <div className="col-span-2 my-3">
           <label htmlFor="remarks" className="block text-sm">
             Remarks
           </label>
@@ -663,6 +830,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
           Save
         </button>
       )}
+      
       <ConfirmUserActionModalPage
         open={isConfirmModalOpen}
         onClose={handleModalClose}

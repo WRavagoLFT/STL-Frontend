@@ -335,7 +335,7 @@ const DetailedTable = function <T extends User | Operator | Device>({
                       </TableCell>
                     );
                   })}
-                  <TableCell align="center" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  <TableCell align="center" sx={{ justifyContent: 'center', alignItems: 'center' }}>
                     {userTypeId === 3 ? (
                       <span
                         className="text-[#0038A8] cursor-pointer hover:underline"
