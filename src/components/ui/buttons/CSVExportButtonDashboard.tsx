@@ -31,11 +31,25 @@ const GenericCSVExportButton: React.FC<GenericExportButtonProps> = ({
 
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
-    // Merge the title and date rows across all header columns
+    // Merge the title and generated date rows
     worksheet["!merges"] = [
       { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
       { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } }
     ];
+
+    const colWidths = headers.map((_, colIndex) => {
+      const columnData = [
+        headers[colIndex],
+        ...data.map(item => {
+          const value = getRowData(item)[colIndex];
+          return value != null ? value.toString() : "";
+        })
+      ];
+      const maxLength = columnData.reduce((max, val) => Math.max(max, val.length), 10);
+      return { wch: maxLength + 2 }; 
+    });
+
+    worksheet["!cols"] = colWidths;
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Export");
@@ -58,4 +72,3 @@ const GenericCSVExportButton: React.FC<GenericExportButtonProps> = ({
 };
 
 export default GenericCSVExportButton;
-

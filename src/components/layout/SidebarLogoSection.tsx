@@ -31,11 +31,8 @@ const SidebarLogoSection: React.FC<SidebarUserSectionProps> = ({
       <div className="bg-[#ACA993] pt-1 rounded-md w-full">
         <div className="flex justify-between px-3 py-3 w-full">
           <BackIconButton
-            bgColor="#0038A8"
-            hoverColor="#004ccf"
-            iconColor="#fff"
-            size={28}
             onClick={toggleCollapse}
+            isSidebarToggled={collapsed} 
           />
           {!collapsed && (
             <div className="flex ml-auto">

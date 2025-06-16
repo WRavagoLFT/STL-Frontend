@@ -3,7 +3,11 @@ import { fetchHistoricalSummary } from "../../utils/api/transactions";
 import { fetchWinners } from "../../utils/api/winners"; // <-- import it
 import Card from "../ui/dashboardcards/Cards";
 
-const DashboardCardsPage = ({ gameCategoryId }: { gameCategoryId?: number }) => {
+const DashboardCardsPage = ({
+  gameCategoryId,
+}: {
+  gameCategoryId?: number;
+}) => {
   const [dashboardData, setDashboardData] = useState({
     totalBettors: 0,
     totalWinners: 0,
@@ -92,7 +96,7 @@ const DashboardCardsPage = ({ gameCategoryId }: { gameCategoryId?: number }) => 
   ];
 
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 w-full">
       {cardItems.map((item, index) => (
         <Card key={index} label={item.label} value={item.value} />
       ))}

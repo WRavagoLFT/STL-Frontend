@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import { useRouter } from "next/router";
 import {
@@ -13,7 +13,10 @@ import {
   FaUsers,
   FaBuilding,
   FaMobileAlt,
+  FaDoorOpen,
 } from "react-icons/fa";
+import { logoutUser } from "~/utils/api/auth";
+import ActivityIndicator from "../auth/ActivityIndicator";
 
 interface SidebarMenuItemProps {
   label: string;
@@ -40,7 +43,6 @@ const WINNING_SUBMENUS = [
   { name: "STL Swer4", path: "/winning-summary/stl-swer4" },
 ];
 
-// menu visibility - 'ACCESS GUARD component' is different since this only restricts from VIEWING.
 const MENU_VISIBILITY: Record<string, number[]> = {
   Dashboard: [1, 2, 3, 4, 6],
   Managers: [6],
@@ -50,9 +52,10 @@ const MENU_VISIBILITY: Record<string, number[]> = {
   Kubrador: [3, 4],
   "Betting Summary": [3, 4, 6],
   "Winning Summary": [3, 4, 6],
-  "Draw Summary": [3, 4, 5, 6,],
+  "Draw Summary": [3, 4, 5, 6],
   "Device Information": [5],
   "Retail Receipt": [3, 4, 6],
+  Logout: [1, 2, 3, 4, 5, 6],
 };
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -67,6 +70,7 @@ const iconMap: Record<string, React.ReactNode> = {
   "Draw Summary": <FaBroadcastTower size={19} />,
   "Device Information": <FaMobileAlt size={19} />,
   "Retail Receipt": <FaReceipt size={19} />,
+  Logout: <FaDoorOpen size={19} />,
 };
 
 const routeMap: Record<string, string> = {
@@ -81,6 +85,7 @@ const routeMap: Record<string, string> = {
   "Draw Summary": "/draw-summary",
   "Device Information": "/device-information",
   "Retail Receipt": "/retail-receipt",
+  Logout: "#logout",
 };
 
 const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
@@ -92,6 +97,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
   setSideBarActiveGameType,
 }) => {
   const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const currentPath = router.asPath;
 
   if (!MENU_VISIBILITY[label]?.includes(userTypeId)) return null;
@@ -100,25 +106,47 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
     label === "Betting Summary"
       ? BETTING_SUBMENUS
       : label === "Winning Summary"
-      ? WINNING_SUBMENUS
-      : null;
+        ? WINNING_SUBMENUS
+        : null;
 
-  const path = routeMap[label] ?? `/${label.toLowerCase().replace(/\s+/g, "-")}`;
+  const path =
+    routeMap[label] ?? `/${label.toLowerCase().replace(/\s+/g, "-")}`;
   const isGroup = submenu !== null;
-
   const isGroupActive = currentPath.startsWith(path);
   const isActive = (path: string) => currentPath === path;
 
-  const handleListItemClick = (subItem: (typeof BETTING_SUBMENUS)[number]) => {
-    setSideBarActiveGameType(subItem.name as any);
-    router.push(subItem.path);
+  const handleClick = async () => {
+    if (label === "Logout") {
+      try {
+        setIsLoggingOut(true);
+        await logoutUser();
+        router.push("/auth/login");
+      } catch (error) {
+        setIsLoggingOut(false);
+        console.error("Logout failed:", error);
+      }
+      return;
+    }
+
+    if (isGroup) {
+      setOpenSubmenu(openSubmenu === label ? null : label);
+      if (!isGroupActive) {
+        setSideBarActiveGameType("Dashboard");
+        router.push(`${path}/dashboard`);
+      }
+    } else {
+      router.push(path);
+    }
   };
 
   const renderSubmenu = (items: typeof BETTING_SUBMENUS) =>
     items.map(({ name, path }) => (
       <div
         key={path}
-        onClick={() => handleListItemClick({ name, path })}
+        onClick={() => {
+          setSideBarActiveGameType(name as any);
+          router.push(path);
+        }}
         className={clsx(
           "ml-6 py-1.5 pl-4 pr-2 pt-3 rounded-md cursor-pointer text-sm transition-colors",
           isActive(path)
@@ -131,33 +159,33 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
     ));
 
   return (
-    <div key={label}>
-      <div
-        onClick={() => {
-          setOpenSubmenu(openSubmenu === label ? null : label);
-          if (!isGroupActive) {
-            if (isGroup) {
-              setSideBarActiveGameType("Dashboard");
-              router.push(`${path}/dashboard`);
-            } else {
-              router.push(path);
-            }
-          }
-        }}
-        className={clsx(
-          "flex items-center justify-between px-4 py-2 cursor-pointer rounded-md",
-          isGroupActive
-            ? "bg-[#F6BA12] text-[#0038A8] font-semibold"
-            : "hover:text-[#F6BA12] text-gray-300"
-        )}
-      >
-        <span className="flex items-center gap-3 text-sm">
-          {iconMap[label]}
-          {!collapsed && label}
-        </span>
+    <>
+      <div key={label}>
+        <div
+          onClick={handleClick}
+          className={clsx(
+            "flex items-center justify-start px-4 py-2 cursor-pointer rounded-md",
+            isGroupActive && label !== "Logout"
+              ? "bg-[#F6BA12] text-[#0038A8] font-semibold"
+              : "hover:text-[#F6BA12] text-gray-300"
+          )}
+        >
+          <span
+            className={clsx(
+              "text-sm w-full",
+              collapsed
+                ? "flex justify-center items-center h-10"
+                : "flex items-center gap-3"
+            )}
+          >
+            {iconMap[label]}
+            {!collapsed && label}
+          </span>
+        </div>
+        {!collapsed && isGroupActive && submenu && renderSubmenu(submenu)}
       </div>
-      {!collapsed && isGroupActive && submenu && renderSubmenu(submenu)}
-    </div>
+      {isLoggingOut && <ActivityIndicator />}
+    </>
   );
 };
 

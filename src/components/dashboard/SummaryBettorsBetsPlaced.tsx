@@ -5,16 +5,15 @@ import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { TransactionData } from "~/types/types";
 import { useAuthStore } from "~/store/useAuthStore";
 
-// Custom Legend circle
 const CustomLegend = () => (
   <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#BB86FC] mr-2" />
-      <p className="text-sm">Bettors</p>
+      <p className="text-xs md:text-sm">Bettors</p>
     </div>
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#5050A5] mr-2" />
-      <p className="text-sm">Bets</p>
+      <p className="text-xs md:text-sm">Bets</p>
     </div>
   </div>
 );
@@ -70,7 +69,7 @@ const SummaryBettorsBetsPlacedPage = () => {
 
         const scaledData = formattedData.map((item) => ({
           ...item,
-          bets: item.bets / 100000,
+          bets: item.bets,
           ratio: item.bettors === 0 ? 0 : item.bets / item.bettors,
         }));
 
@@ -100,25 +99,30 @@ const SummaryBettorsBetsPlacedPage = () => {
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
-      <div className="flex justify-between items-center w-full">
+      <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
+        {/* Left section: text and legend */}
         <div className="flex flex-col leading-none">
-          <p className="text-lg leading-none">
+          <p className="text-sm md:text-base lg:text-lg leading-none">
             Summary of Bettors and Bets Placed Today
           </p>
           <CustomLegend />
         </div>
 
+        {/* Right section: CSV export button (conditional) */}
         {currentUserType !== 3 && (
-          <GenericCSVExportButton
-            data={data}
-            headers={["Game Name", "Bettors", "Bets Placed Today"]}
-            title="Bettors and Bets Summary"
-            getRowData={(item) => [item.gameName, item.bettors, item.bets]}
-          />
+          <div className="mt-2 md:mt-0">
+            <GenericCSVExportButton
+              data={data}
+              headers={["Game Name", "Bettors", "Bets Placed Today"]}
+              title="Bettors and Bets Summary"
+              getRowData={(item) => [item.gameName, item.bettors, item.bets]}
+            />
+          </div>
         )}
       </div>
 
-      <div className="h-full w-full">
+      <div className="w-full overflow-x-auto pb-4">
+        <div className="min-w-[600px]">
         <BarChart
           height={300}
           grid={{ vertical: true }}
@@ -133,14 +137,18 @@ const SummaryBettorsBetsPlacedPage = () => {
           }}
           series={[
             {
-              data: data.map((item) => item.bettors),
+              data: data.map((item) => item.bettors / 100000),
               color: "#BB86FC",
               label: "Bettors",
+              valueFormatter: (value, context) =>
+                `${data[context.dataIndex].bettors.toLocaleString()}`,
             },
             {
-              data: data.map((item) => item.bets),
+              data: data.map((item) => item.bets / 100000),
               color: "#5050A5",
               label: "Bets Placed Today",
+              valueFormatter: (value, context) =>
+                `${data[context.dataIndex].bets.toLocaleString()}`,
             },
           ]}
           yAxis={[
@@ -155,14 +163,16 @@ const SummaryBettorsBetsPlacedPage = () => {
               label: "Total (x 100,000)",
               scaleType: "linear",
               min: 0,
-              max: safeMax,
-              valueFormatter: (value: number) => `${value.toLocaleString()}`,
+              max: 750,
+              tickInterval: 50,
+              valueFormatter: (value: number) => value.toString(),
               tickSize: 2,
               barCategoryGap: 0.2,
               tickLabelProps: { style: { fontSize: "12px" } },
             } as any,
           ]}
         />
+        </div>
       </div>
     </div>
   );

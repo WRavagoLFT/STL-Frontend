@@ -19,7 +19,10 @@ const TopWinningRegionPage = () => {
     { region: RegionData; rank: number; trend: number }[]
   >([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
-  const winningLabel = currentUserType === 3 ? "Top Winning Area Today" : "Top Winning Regions Today";
+  const winningLabel =
+    currentUserType === 3
+      ? "Top Winning Area Today"
+      : "Top Winning Regions Today";
 
   const getWinningRegions = async () => {
     try {
@@ -84,12 +87,17 @@ const TopWinningRegionPage = () => {
 
   return (
     <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
-      <div className="flex mb-2 items-center w-full">
-        <div className="bg-[#0038A8] rounded-lg p-1">
-          <FaMoneyBillAlt size={20} color={"#F6BA12"} />
+      <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
+        {/* Left side: icon + label */}
+        <div className="flex items-center">
+          <div className="bg-[#0038A8] rounded-lg p-1">
+            <FaMoneyBillAlt size={20} color={"#F6BA12"} />
+          </div>
+          <p className="text-base ml-3">{winningLabel}</p>
         </div>
-        <div className="flex items-center justify-between flex-1 ml-3">
-          <p className="text-base">{winningLabel}</p>
+
+        {/* Right side: button */}
+        <div className="mt-2 md:mt-0">
           <button
             onClick={() => router.push("/winning-summary/dashboard")}
             className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
@@ -120,15 +128,15 @@ const TopWinningRegionPage = () => {
                     item.trend > 0
                       ? "text-[#046115]"
                       : item.trend < 0
-                      ? "text-[#CE1126]"
-                      : "text-[#aaa]"
+                        ? "text-[#CE1126]"
+                        : "text-[#aaa]"
                   }`}
                 >
                   {item.trend > 0
                     ? `↑${item.trend}`
                     : item.trend < 0
-                    ? `↓${Math.abs(item.trend)}`
-                    : "→"}
+                      ? `↓${Math.abs(item.trend)}`
+                      : "→"}
                 </span>
               </div>
 

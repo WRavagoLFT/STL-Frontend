@@ -70,7 +70,7 @@ const DrawResultsPage = () => {
       label: province.ProvinceName,
     }));
 
-    //console.log('SELECTED PROVINCE:', filteredProvinceOptions);
+  //console.log('SELECTED PROVINCE:', filteredProvinceOptions);
 
   // Find selected options
   const selectedGameCategoryOption = gameCategoryOptions.find(
@@ -86,17 +86,29 @@ const DrawResultsPage = () => {
   useEffect(() => {
     async function loadData() {
       const regionsRes = await fetchRegions();
-      if (regionsRes.success) setRegions(regionsRes.data);
-
       const provincesRes = await fetchProvinces();
-      //console.log('Fetched province:',provincesRes);
-      
-      if (provincesRes.success)
-        setProvinces(provincesRes.data.filter((p: any) => p.RegionId !== 0));
-
       const gameCategoriesRes = await fetchGameCategories();
-      if (gameCategoriesRes.success) setGameCategories(gameCategoriesRes.data);
+
+      if (regionsRes.success) {
+        setRegions(regionsRes.data);
+      }
+
+      if (provincesRes.success) {
+        const filteredProvinces = provincesRes.data.filter(
+          (p: any) => p.RegionId !== 0
+        );
+        setProvinces(filteredProvinces);
+      }
+
+      if (gameCategoriesRes.success) {
+        setGameCategories(gameCategoriesRes.data);
+      }
+
+      // Set default selections to ID 1
+      setSelectedRegion(1);
+      setSelectedGameCategory(1);
     }
+
     loadData();
   }, []);
 
@@ -180,7 +192,14 @@ const DrawResultsPage = () => {
       fetchProvinces({ regionId }).then((res) => {
         if (res.success) {
           setProvinces(res.data);
-          setSelectedProvince(""); // Reset selection when region changes
+
+          // ✅ Automatically select ProvinceId = 1 if it exists in the fetched list
+          const defaultProvince = res.data.find((p: any) => p.ProvinceId === 1);
+          if (defaultProvince) {
+            setSelectedProvince(1);
+          } else {
+            setSelectedProvince("");
+          }
         }
       });
     }
@@ -193,15 +212,23 @@ const DrawResultsPage = () => {
 
   return (
     <div className="bg-transparent p-4 rounded-xl border border-[#0038A8]">
-      <div className="flex mb-2 items-center w-full">
-        <div className="bg-[#0038A8] rounded-lg p-1">
-          <FaBroadcastTower size={20} color={"#F6BA12"} />
+      <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
+        {/* Left side: icon + text */}
+        <div className="flex items-center">
+          <div className="bg-[#0038A8] rounded-lg p-1">
+            <FaBroadcastTower size={20} color={"#F6BA12"} />
+          </div>
+          <p className="text-base ml-3">Draw Results Today</p>
         </div>
-        <div className="flex items-center justify-between flex-1 ml-3">
-          <p className="text-base">Draw Results Today</p>
+
+        {/* Right side: button */}
+        <div className="mt-2 md:mt-0">
           <button
-            onClick={() => { router.push("/draw-summary");}}
-            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
+            onClick={() => {
+              router.push("/draw-summary");
+            }}
+            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
+          >
             View Draw Result
           </button>
         </div>
@@ -218,16 +245,14 @@ const DrawResultsPage = () => {
             onChange={(option) => setSelectedGameCategory(option?.value || "")}
             options={gameCategoryOptions}
             placeholder="Select a Game Category"
-            classNamePrefix="react-select-dashboard"  
+            classNamePrefix="react-select-dashboard"
             styles={{
               control: (provided, state) => ({
                 ...provided,
                 borderRadius: "0.5rem",
-                color: '#2F2F2F',
+                color: "#2F2F2F",
                 padding: "0.25rem",
-                boxShadow: state.isFocused
-                  ? "none"
-                  : provided.boxShadow,
+                boxShadow: state.isFocused ? "none" : provided.boxShadow,
               }),
               menu: (provided) => ({
                 ...provided,
@@ -249,7 +274,6 @@ const DrawResultsPage = () => {
               setSelectedRegion(option?.value ?? "");
               setSelectedProvince("");
             }}
-            isDisabled={!selectedGameCategory}
             options={regionOptions}
             placeholder="Select a Region"
             classNamePrefix="react-select-dashboard"
@@ -258,9 +282,7 @@ const DrawResultsPage = () => {
                 ...provided,
                 borderRadius: "0.5rem",
                 padding: "0.25rem",
-                boxShadow: state.isFocused
-                  ? "none"
-                  : provided.boxShadow,
+                boxShadow: state.isFocused ? "none" : provided.boxShadow,
               }),
               menu: (provided) => ({
                 ...provided,
@@ -279,16 +301,13 @@ const DrawResultsPage = () => {
             onChange={(option) => setSelectedProvince(option?.value || "")}
             options={filteredProvinceOptions}
             placeholder="Select a Province"
-            isDisabled={!selectedRegion}
             classNamePrefix="react-select-dashboard"
             styles={{
               control: (provided, state) => ({
                 ...provided,
                 borderRadius: "0.5rem",
                 padding: "0.25rem",
-                boxShadow: state.isFocused
-                  ? "none"
-                  : provided.boxShadow,
+                boxShadow: state.isFocused ? "none" : provided.boxShadow,
               }),
               menu: (provided) => ({
                 ...provided,
@@ -315,19 +334,19 @@ const DrawResultsPage = () => {
               Number(selectedGameCategory) === 4
                 ? 4
                 : Number(selectedGameCategory) === 3
-                ? 3
-                : 2;
+                  ? 3
+                  : 2;
 
             const displayInGrid = totalBoxes > 2;
 
             return (
               <div key={gameTypeId} className="flex-1 min-w-0">
-                <p className="text-sm font-light mb-1">
+                <p className="text-xs md:text-sm font-light mb-1">
                   {gameTypeId === 1
                     ? "First Draw"
                     : gameTypeId === 2
-                    ? "Second Draw"
-                    : "Third Draw"}
+                      ? "Second Draw"
+                      : "Third Draw"}
                 </p>
 
                 <div
@@ -340,7 +359,7 @@ const DrawResultsPage = () => {
                     className={`bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center 
                       ${displayInGrid ? "w-[calc(50%-4px)]" : "w-full sm:flex-1"}`}
                   >
-                    <p className="font-bold text-2xl text-center break-words">
+                    <p className="font-bold text-base md:text-2xl text-center break-words">
                       {displayValue(item?.WinningCombinationOne ?? "-")}
                     </p>
                   </div>
@@ -350,7 +369,7 @@ const DrawResultsPage = () => {
                     className={`bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center 
                       ${displayInGrid ? "w-[calc(50%-4px)]" : "w-full sm:flex-1"}`}
                   >
-                    <p className="font-bold text-2xl text-center break-words">
+                    <p className="font-bold text-base md:text-2xl text-center break-words">
                       {displayValue(item?.WinningCombinationTwo ?? "-")}
                     </p>
                   </div>
@@ -358,7 +377,7 @@ const DrawResultsPage = () => {
                   {/* Box 3 */}
                   {totalBoxes >= 3 && (
                     <div className="bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center w-full sm:w-[calc(50%-4px)]">
-                      <p className="font-bold text-2xl text-center break-words">
+                      <p className="font-bold text-base md:text-2xl text-center break-words">
                         {displayValue(item?.WinningCombinationThree ?? "-")}
                       </p>
                     </div>
@@ -367,7 +386,7 @@ const DrawResultsPage = () => {
                   {/* Box 4 */}
                   {totalBoxes >= 4 && (
                     <div className="bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center w-full sm:w-[calc(50%-4px)]">
-                      <p className="font-bold text-2xl text-center break-words">
+                      <p className="font-bold text-base md:text-2xl text-center break-words">
                         {displayValue(item?.WinningCombinationFour ?? "-")}
                       </p>
                     </div>

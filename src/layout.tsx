@@ -12,7 +12,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
       {/* Main content grows, scrolls vertically */}
       <div className="flex flex-col flex-grow overflow-hidden">
-        <main className="flex-grow overflow-y-auto p-8">{children}</main>
+        <main className="flex-grow overflow-y-auto px-4 py-8">{children}</main>
       </div>
     </div>
   );
