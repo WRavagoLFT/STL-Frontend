@@ -573,7 +573,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               }}
             />
             {gameTypesError && (
-              <p className="text-red-500 text-sm mt-1">{gameTypesError}</p>
+              <p className="text-[#CE1126] text-xs mt-1">{gameTypesError}</p>
             )}
           </div>
 
@@ -629,7 +629,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
                 },
                 menuPortal: (base) => ({
                   ...base,
-                  zIndex: 1000000,    
+                  zIndex: 1000000,
                 }),
                 menu: (provided) => ({
                   ...provided,
@@ -639,7 +639,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               }}
             />
             {areaOfOperationsError && (
-              <p className="text-red-500 text-sm mt-1">
+              <p className="text-[#CE1126] text-xs mt-1">
                 {areaOfOperationsError}
               </p>
             )}
@@ -707,9 +707,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               }}
             />
             {provincesError && (
-              <p className="text-red-500 text-sm mt-1">
-                {provincesError}
-              </p>
+              <p className="text-[#CE1126] text-xs mt-1">{provincesError}</p>
             )}
           </div>
 
@@ -778,9 +776,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               }}
             />
             {statusError && (
-              <p className="text-red-500 text-sm mt-1">
-                {statusError}
-              </p>
+              <p className="text-[#CE1126] text-xs mt-1">{statusError}</p>
             )}
           </div>
         </div>
@@ -811,7 +807,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
 
       {/* Action Buttons */}
       {showEditButton && (
-        <div className="w-full flex justify-end items-center my-2">
+        <div className="w-full flex justify-end items-center my-5">
           <button
             type={isDisabled ? "button" : "submit"}
             onClick={isDisabled ? handleDisable : undefined}
@@ -825,12 +821,12 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       {!isDisabled && (
         <button
           type="submit"
-          className="col-span-2 mt-2 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
+          className="col-span-2 mt-4 w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2"
         >
           Save
         </button>
       )}
-      
+
       <ConfirmUserActionModalPage
         open={isConfirmModalOpen}
         onClose={handleModalClose}

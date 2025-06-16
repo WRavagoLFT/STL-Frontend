@@ -88,7 +88,7 @@ const Sidebar: React.FC = () => {
       >
         <div
           className={`p-3 bg-blue-800 text-white flex flex-col transition-all duration-200 
-          ${collapsed ? "w-20" : "w-64"} sticky top-0 h-screen z-50 overflow-y-auto sidebar-scrollbar`}
+          ${collapsed ? "w-20" : "w-64"} sticky top-0 h-screen z-50 overflow-y-auto sidebar-scrollbar scrollbar-hide`}
         >
           <SidebarLogoSection
             collapsed={collapsed}

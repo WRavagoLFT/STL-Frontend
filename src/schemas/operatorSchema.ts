@@ -78,8 +78,10 @@ export const operatorSchema = z.object({
           invalid_type_error: "Each Game Type must be a number",
         })
       )
-      .min(1, { message: "At least one Game Type is required." })
+      .min(1, { message: "Game Type are required." })
   ),
+
+  
   regions: z.preprocess(
     (val) => {
       if (Array.isArray(val)) {
@@ -128,6 +130,7 @@ export const operatorSchema = z.object({
       )
       .min(1, { message: "At least one City is required." })
   ),
+
   dateOfOperation: z
     .string({ required_error: "Date of operations is required." })
     .min(1, "Date of operations is required."),
@@ -223,7 +226,7 @@ export const updateOperatorSchema = z.object({
           invalid_type_error: "Each City must be a number.",
         })
       )
-      .min(1, { message: "At least one City is required." })
+      .min(1, { message: "Cities are required." })
   ),
   dateOfOperation: z
     .string({ required_error: "Date of operations is required." })
@@ -235,7 +238,7 @@ export const updateOperatorSchema = z.object({
     (val) => (typeof val === "number" ? String(val) : val),
     z
       .string({ required_error: "Area of operations is required." })
-      .min(1, "At least one area of operation is required.")
+      .min(1, "Cities are required.")
   ),
   remarks: z
     .string({ required_error: "Remarks is required." })
