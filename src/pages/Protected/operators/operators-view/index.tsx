@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import OperatorViewPage from "~/components/operators/UpdateOperatorForm";
 import { useOperatorFormStore } from "../../../../store/useOperatorFormStore";
-import { operatorSchema } from "~/schemas/operatorSchema";
 import { Operator } from "~/types/types";
 import RetailReceiptOperatorsPage from "~/components/operators/RetailReceipts";
 import BackIconButton from "~/components/ui/icons/BackButton";
@@ -44,68 +43,68 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
     fetchFormOptionsData();
   }, []);
 
-const handleUpdateOperator = async (data: Operator): Promise<void> => {
-  try {
-    console.log("[handleUpdateOperator] Called with data:", data);
+  const handleUpdateOperator = async (data: Operator): Promise<void> => {
+    try {
+      console.log("[handleUpdateOperator] Called with data:", data);
 
-    if (!data.operatorId) {
-      console.warn("[handleUpdateOperator] Missing operatorId in data:", data);
-      throw new Error("Operator ID is required to update operator.");
-    }
+      if (!data.operatorId) {
+        console.warn("[handleUpdateOperator] Missing operatorId in data:", data);
+        throw new Error("Operator ID is required to update operator.");
+      }
 
-    console.log("[handleUpdateOperator] Sending update request to backend with operatorId:", data.operatorId);
-    const result = await updateOperator(data);
+      console.log("[handleUpdateOperator] Sending update request to backend with operatorId:", data.operatorId);
+      const result = await updateOperator(data);
 
-    console.log("[handleUpdateOperator] Response from updateOperator:", result);
+      console.log("[handleUpdateOperator] Response from updateOperator:", result);
 
-    if (result.success) {
-      // Optional: log exactly what was updated
-      console.log("[handleUpdateOperator] Operator updated successfully:", {
-        operatorId: data.operatorId,
-        updatedFields: data,
-      });
+      if (result.success) {
+        // Optional: log exactly what was updated
+        console.log("[handleUpdateOperator] Operator updated successfully:", {
+          operatorId: data.operatorId,
+          updatedFields: data,
+        });
 
-      Swal.fire({
-        icon: "success",
-        title: "Success!",
-        text: "User updated successfully.",
-        timer: 2000,
-        showConfirmButton: false,
-      });
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "User updated successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
 
-      // Optional: reload or re-fetch data here
-      // await loadData();
+        // Optional: reload or re-fetch data here
+        // await loadData();
 
-    } else {
-      console.error("[handleUpdateOperator] Update failed. Message:", result.message);
-      console.error("[handleUpdateOperator] Response data:", result.data);
+      } else {
+        console.error("[handleUpdateOperator] Update failed. Message:", result.message);
+        console.error("[handleUpdateOperator] Response data:", result.data);
+
+        Swal.fire({
+          icon: "error",
+          title: "Update Failed",
+          text: result.message || "Something went wrong while updating the user.",
+        });
+      }
+
+    } catch (error) {
+      const err = error as Error;
+
+      console.error("[handleUpdateOperator] Unexpected error occurred:", err);
+      console.error("[handleUpdateOperator] Stack Trace:", err.stack);
 
       Swal.fire({
         icon: "error",
-        title: "Update Failed",
-        text: result.message || "Something went wrong while updating the user.",
+        title: "Unexpected Error",
+        text: err.message || "An unexpected error occurred.",
       });
     }
-
-  } catch (error) {
-    const err = error as Error;
-
-    console.error("[handleUpdateOperator] Unexpected error occurred:", err);
-    console.error("[handleUpdateOperator] Stack Trace:", err.stack);
-
-    Swal.fire({
-      icon: "error",
-      title: "Unexpected Error",
-      text: err.message || "An unexpected error occurred.",
-    });
-  }
-};
+  };
 
   return (
     <AccessGuard allowedUserTypes={[6]}>
       <div className="w-full flex flex-col gap-4">
         <div className="flex items-center space-x-4">
-          <BackIconButton
+           <BackIconButton
             to="/operators"
             bgColor="#0038A8"
             hoverColor="#004ccf"
@@ -133,7 +132,6 @@ const handleUpdateOperator = async (data: Operator): Promise<void> => {
               onClose={() => router.push("/operators")}
               onViewEditLogs={(operatorId) => handleViewEditLogs(operatorId)}
               onSubmit={handleUpdateOperator}
-
             />
 
             {selectedOperatorId !== null && showEditLog && (

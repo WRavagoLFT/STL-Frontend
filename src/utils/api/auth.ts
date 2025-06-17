@@ -1,5 +1,5 @@
-import { AxiosError } from "axios";
-import axiosInstance from "../axiosInstance";
+import axios, { AxiosError } from "axios";
+import axiosInstance, { waitUntilNotRefreshing } from "../axiosInstance";
 import { useAuthStore } from "~/store/useAuthStore";
 
 // Helper to validate URL paths
@@ -10,18 +10,21 @@ const validateRelativeUrl = (url: string) => {
     return url;
 };
 
-const getCurrentUser = async (queryParams: Record<string, any>) => {
-    try {
-        const url = validateRelativeUrl("/users/getCurrentUser");
-        const response = await axiosInstance.get(url, {
-            params: queryParams
-        });
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching users:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: [] };
+const getCurrentUser = async () => {
+  await waitUntilNotRefreshing(); // wait if refresh in progress
+
+  try {
+    const res = await axiosInstance.get("/users/getCurrentUser");
+    return res.data;
+  } catch (error: any) {
+    const message = error?.response?.data?.message;
+    if (message !== "Token expired.") {
+      console.error("getCurrentUser failed:", message || error.message);
     }
+    return { success: false, data: null };
+  }
 };
+
 
 const logoutUser = async (queryParams: Record<string, any> = {}) => {
     try {

@@ -11,6 +11,37 @@ import { match } from "path-to-regexp";
 const App = ({ Component, pageProps }: AppProps) => {
   const { loading } = useAuth();
   const router = useRouter();
+  //const rawPath = router.asPath.split("?")[0];
+
+  const aliasMap: Record<string, string> = {
+    "/dashboard": "/Protected/dashboard",
+    "/operators": "/Protected/operators",
+    "/operators-add": "/Protected/operators/operators-add",
+    "/users/executives": "/Protected/users/executive",
+    "/users/managers": "/Protected/users/managers",
+    "/users/kabo": "/Protected/users/kabo",
+    "/users/kubrador": "/Protected/users/kubrador",
+    "/retail-receipt": "/Protected/retail-receipt",
+    "/device-information": "/Protected/device-information",
+    "/bets-comparisons": "/Protected/betting-comparisons",
+    "/wins-comparisons": "/Protected/winning-comparisons",
+    "/draw-summary": "/Protected/draw-summary",
+    "/draw-selected": "/Protected/draw-selected",
+    "/operators-view": "/Protected/operators-view",
+    "/error404": "/auth/error404",
+  };
+
+  const staticPaths = [
+    "/Protected/dashboard",
+    "/Protected/operators",
+    "/Protected/operators/operators-add",
+    "/Protected/draw-summary",
+    "/Protected/retail-receipt",
+    "/Protected/betting-comparisons",
+    "/Protected/winning-comparisons",
+    "/Protected/device-information",
+    "/Protected/device-information/device-information-add",
+  ];
 
   const excludedPaths = [
     "/",
@@ -22,39 +53,35 @@ const App = ({ Component, pageProps }: AppProps) => {
     "/auth/error404",
   ];
 
-  const staticPaths = [
-    "/Protected/dashboard",
-    "/Protected/operators",
-    "/Protected/operators/operators-add",
-    "/Protected/draw-summary",
-    "/Protected/retail-receipt",
-    "/Protected/betting-comparisons",
-    "/Protected/winning-comparisons",
-    "/Protected/device-information",
-  ];
-
+  // Now using public route format for dynamic matching
   const dynamicPaths = [
-    "/Protected/users/:role",
-    "/Protected/users/users-view/:role",
-    "/Protected/operators/:slug",
-    "/Protected/betting-summary/:path",
-    "/Protected/winning-summary/:path",
-    "/Protected/device-information/device-information-add",
-    "/Protected/device-information/device-information-view/:slug",
+    "/users/:role",
+    "/users/users-view/:slug",
+    "/operators/:slug",
+    "/device-information/device-information-view/:slug",
+    "/betting-summary/:path",
+    "/winning-summary/:path",
   ];
 
-  // Check dynamic route match
+  const rawPath = router.asPath.split("?")[0];
+  const normalizedPath = aliasMap[rawPath] || rawPath;
+
+  // Match rawPath against dynamic patterns
   const isDynamicMatch = dynamicPaths.some((pattern) => {
     const matcher = match(pattern, { decode: decodeURIComponent });
-    return matcher(router.pathname);
+    return matcher(rawPath); // match against actual route
   });
 
-  // Check static or excluded match
-  const isStaticMatch =
-    excludedPaths.includes(router.pathname) || staticPaths.includes(router.pathname);
+  const isStaticMatch = staticPaths.includes(normalizedPath);
+  const isExcludedPath = excludedPaths.includes(normalizedPath);
+  const isValidPath = isStaticMatch || isExcludedPath || isDynamicMatch;
 
-  const isValidPath = isStaticMatch || isDynamicMatch;
-  const isExcludedPath = excludedPaths.includes(router.pathname);
+  //console.log("rawPath:", rawPath);
+  //console.log("normalizedPath:", normalizedPath);
+  //console.log("isDynamicMatch:", isDynamicMatch);
+  //console.log("isStaticMatch:", isStaticMatch);
+  //console.log("isExcludedPath:", isExcludedPath);
+  //console.log("isValidPath:", isValidPath);
 
   if (loading) {
     return (

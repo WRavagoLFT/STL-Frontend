@@ -141,18 +141,18 @@ const nextConfig: NextConfig = {
           },
           // Prevents loading of unsafe or third-party scripts/styles. 
           // Extremely effective but must be tailored carefully if using external fonts, analytics, etc.
-          {
-            key: "Content-Security-Policy",
-            value: [
-              "default-src 'self';",
-              "connect-src 'self' https://stl-backend-fork.onrender.com;",
-              "script-src 'self';",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-              "font-src 'self' https://fonts.gstatic.com;",
-              "img-src 'self' data:;",
-              "object-src 'none';",
-            ].join(" "),
-          },
+          // {
+          //   key: "Content-Security-Policy",
+          //   value: [
+          //     "default-src 'self';",
+          //     "connect-src 'self' https://stl-backend-fork.onrender.com;",
+          //     "script-src 'self';",
+          //     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
+          //     "font-src 'self' https://fonts.gstatic.com;",
+          //     "img-src 'self' data:;",
+          //     "object-src 'none';",
+          //   ].join(" "),
+          // },
         ],
       },
     ];

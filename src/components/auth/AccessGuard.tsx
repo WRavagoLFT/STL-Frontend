@@ -10,23 +10,17 @@ export const AccessGuard = ({
   allowedUserTypes: number[];
   children: React.ReactNode;
 }) => {
-  const { userTypeId } = useAuthStore();
+  const { userTypeId, isLoading } = useAuthStore();
   const router = useRouter();
-  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    if (userTypeId === null) {
-      // Uncomment this if you want to redirect unauthenticated users
+    if (!isLoading && userTypeId === null) {
       router.replace("/auth/error404");
-      return;
     }
+  }, [isLoading, userTypeId, router]);
 
-    setIsChecking(false);
-  }, [userTypeId]);
+  if (isLoading) return null;
 
-  if (isChecking) return null;
-
-  // Unauthorized user type
   if (userTypeId !== null && !allowedUserTypes.includes(userTypeId)) {
     return <Error statusCode={404} />;
   }

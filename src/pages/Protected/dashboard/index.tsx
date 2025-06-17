@@ -49,7 +49,7 @@ const DashboardPage = () => {
                   <div className="lg:w-2/5 space-y-6">
                     <DrawResultsPage />
                     <TopBettingRegionPage />
-                    <TopWinningRegionPage />
+                    <TopWinningRegionPage />  
                   </div>
 
                   {/* Right Column: 3/5 */}
