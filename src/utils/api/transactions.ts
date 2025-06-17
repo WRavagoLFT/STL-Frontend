@@ -32,7 +32,7 @@ export const fetchHistoricalRegion = async <T = any>(p0?: { date: string }): Pro
     return response.data;
   } catch (error) {
     console.error("Error fetching historical region data:", (error as Error).message);
-    throw error; // optionally throw or handle differently
+    throw error; 
   }
 };
 

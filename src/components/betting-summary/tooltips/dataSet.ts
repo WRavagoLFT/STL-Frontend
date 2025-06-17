@@ -51,21 +51,7 @@ export function addLabels<
   }));
 }
 
-export function addLabelsGameTypes<
-  T extends { dataKey: keyof typeof translationsGameTypes }
->(series: T[]) {
-  return series.map((item) => ({
-    ...item,
-    label: translationsGameTypes[item.dataKey],
-    valueFormatter: (v: number | null) => {
-      if (v === null) return '-';
-      return (v * 100000).toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-    },
-  }));
-}
+
 
 export function addLabelsBets<
   T extends { dataKey: keyof typeof translationsBets }

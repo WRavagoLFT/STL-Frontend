@@ -19,7 +19,9 @@ const DashboardCardsPage = ({
   useEffect(() => {
     const fetchDataDashboard = async () => {
       try {
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toLocaleDateString("en-CA", {
+          timeZone: "Asia/Manila",
+        });
 
         const [summaryResponse, winnersResponse] = await Promise.all([
           fetchHistoricalSummary({ from: today, to: today }),

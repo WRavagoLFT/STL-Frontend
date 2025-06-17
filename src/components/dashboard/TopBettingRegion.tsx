@@ -95,15 +95,12 @@ const TopBettingRegionPage = () => {
   return (
     <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
       <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
-        {/* Left side: icon + label */}
         <div className="flex items-center">
           <div className="bg-[#0038A8] rounded-lg p-1">
             <FaDiceSix size={20} color={"#F6BA12"} />
           </div>
           <p className="text-base ml-3">{bettingLabel}</p>
         </div>
-
-        {/* Right side: button */}
         <div className="mt-2 md:mt-0">
           <button
             onClick={() => router.push("/betting-summary/dashboard")}
@@ -114,7 +111,7 @@ const TopBettingRegionPage = () => {
         </div>
       </div>
 
-      <div className="h-px bg-[#ACA993] mt-1 mb-2" />
+      <div className="border-b border-[#0038A8]" />
 
       <div className="mt-2 w-full max-h-[720px] overflow-y-auto">
         {rankedRegions.length === 0 ? (
@@ -123,7 +120,7 @@ const TopBettingRegionPage = () => {
             <p>Data will be displayed once available.</p>
           </div>
         ) : (
-          rankedRegions.map((item, index) => (
+          rankedRegions.slice(0, 5).map((item, index) => (
             <div
               key={item.region.RegionId ?? item.region.Region}
               className={`flex items-center py-2 ${

@@ -1,9 +1,8 @@
+import React, { useState, useEffect, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { useEffect, useState, useCallback } from "react";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
-import dayjs from "dayjs";
 import { useAuthStore } from "~/store/useAuthStore";
 
 interface Winner {
@@ -21,22 +20,26 @@ const drawLabelMap: Record<number, string> = {
 };
 
 const CustomLegend = () => (
-  <div className="flex flex-row text-sm space-x-5 justify-start mt-0.5 mr-4">
+  <div className="flex flex-row space-x-5 justify-start mt-0.5 mr-4">
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#E5C7FF] mr-2" />
-      <p className="text-sm">Winners</p>
+      <p className="text-xs md:text-sm">Winners</p>
     </div>
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#5050A5] mr-2" />
-      <p className="text-sm">Winnings</p>
+      <p className="text-xs md:text-sm">Winnings</p>
     </div>
   </div>
 );
 
-const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: number }) => {
+const ChartWinnersvsWinningsSummary = ({
+  gameCategoryId,
+}: {
+  gameCategoryId?: number;
+}) => {
   const [loading, setLoading] = useState(true);
-  const [chartData, setChartData] = useState<
-    { draw: string; winners: number; winnings: number; GameCategoryId: number | null }[]
+  const [data, setData] = useState<
+    { draw: string; winners: number; winnings: number }[]
   >([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
@@ -56,10 +59,15 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
     }
 
     const filteredData: Winner[] = gameCategoryId
-      ? result.data.filter((item : any) => item.GameCategoryId === gameCategoryId)
+      ? result.data.filter(
+          (item: any) => item.GameCategoryId === gameCategoryId
+        )
       : result.data;
 
-    const drawSummary: Record<DrawNumber, { winners: number; winnings: number }> = {
+    const drawSummary: Record<
+      DrawNumber,
+      { winners: number; winnings: number }
+    > = {
       1: { winners: 0, winnings: 0 },
       2: { winners: 0, winnings: 0 },
       3: { winners: 0, winnings: 0 },
@@ -76,11 +84,11 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
     const finalChartData = ([1, 2, 3] as DrawNumber[]).map((drawNum) => ({
       draw: drawLabelMap[drawNum],
       winners: drawSummary[drawNum].winners,
-      winnings: drawSummary[drawNum].winnings / 100000, // scaled
+      winnings: drawSummary[drawNum].winnings,
       GameCategoryId: gameCategoryId ?? null,
     }));
 
-    setChartData(finalChartData);
+    setData(finalChartData);
     setLoading(false);
   }, [gameCategoryId]);
 
@@ -88,68 +96,88 @@ const ChartWinnersvsWinningsSummary = ({ gameCategoryId }: { gameCategoryId?: nu
     fetchChartData();
   }, [fetchChartData]);
 
-  const maxWinnings = Math.max(...chartData.map((item) => item.winnings));
-  const safeMax = maxWinnings < 1000 ? 1000 : maxWinnings;
-
   return (
-    <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
-      <div className="flex justify-between items-center w-full mb-4">
+    <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
+      <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col leading-none">
-          <p className="text-lg leading-none">Today&apos;s Winners and Winnings</p>
+          <p className="text-sm md:text-base lg:text-lg leading-none">
+            Today&apos;s Winners and Winnings
+          </p>
           <CustomLegend />
         </div>
         {currentUserType !== 3 && (
-          <GenericCSVExportButton
-            data={chartData}
-            headers={["Draw", "Winners", "Winnings"]}
-            title="Summary of Winners and Winnings per Draw"
-            getRowData={(item) => [
-              item.draw,
-              item.winners.toString(),
-              item.winnings,
-            ]}
-          />
+          <div className="mt-2 md:mt-0">
+            <GenericCSVExportButton
+              data={data}
+              headers={["Draw", "Winners", "Winnings"]}
+              title="Summary of Winners and Winnings per Draw"
+              getRowData={(item) => [
+                item.draw,
+                item.winners.toString(),
+                item.winnings,
+              ]}
+            />
+          </div>
         )}
       </div>
 
-      <div className="h-full w-full">
-        {/* {loading ? (
+      <div className="w-full pb-4">
+        {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : ( */}
-          <BarChart
-            height={300}
-            grid={{ vertical: true }}
-            layout="horizontal"
-            slotProps={{
-              legend: { hidden: true },
-              noDataOverlay: {
-                message: "Today's Winners and Winnings will be displayed once available.",
-              },
-            }}
-            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-            dataset={chartData}
-            yAxis={[
-              {
-                scaleType: "band",
-                data: chartData.map((d) => d.draw),
-              },
-            ]}
-            xAxis={[
-              {
-                label: "Total (x 100,000)",
-                min: 0,
-                max: safeMax,
-                valueFormatter: (value: number) => `${value.toLocaleString()}`,
-              },
-            ]}
-            series={[
-              { dataKey: "winners", color: "#E5C7FF", label: "Winners" },
-              { dataKey: "winnings", color: "#5050A5", label: "Winnings" },
-            ]}
-          />
-        {/* )} */}
+        ) : (
+          <div className="min-w-[850px] md:min-w-[600px]">
+            <BarChart
+              height={300}
+              grid={{ vertical: true }}
+              layout="horizontal"
+              margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+              slotProps={{
+                legend: { hidden: true },
+                noDataOverlay: {
+                  message:
+                    "Today's Winners and Winnings will be displayed once available.",
+                },
+              }}
+              series={[
+                {
+                  data: data.map((item) => item.winners / 100000),
+                  color: "#BB86FC",
+                  label: "Winners",
+                  valueFormatter: (value, context) =>
+                    `${data[context.dataIndex].winners.toLocaleString()}`,
+                },
+                {
+                  data: data.map((item) => item.winnings / 100000),
+                  color: "#5050A5",
+                  label: "Winnings",
+                  valueFormatter: (value, context) =>
+                    `₱${data[context.dataIndex].winnings.toLocaleString()}`,
+                },
+              ]}
+              yAxis={[
+                {
+                  scaleType: "band",
+                  data: data.map((d) => d.draw),
+                },
+              ]}
+              xAxis={[
+                {
+                  label: "Total (x 100,000)",
+                  scaleType: "linear",
+                  min: 0,
+                  max: 750,
+                  tickInterval: 50,
+                  valueFormatter: (value: number) => value.toString(),
+                  tickSize: 2,
+                  barCategoryGap: 0.2,
+                  tickLabelProps: { style: { fontSize: "12px" } },
+                } as any,
+              ]}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

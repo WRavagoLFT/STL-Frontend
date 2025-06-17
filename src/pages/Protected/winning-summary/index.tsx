@@ -54,7 +54,7 @@ const WinningSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number })
 
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
-      <div className="space-y-4 h-full">
+      <div className="space-y-4 h-full mt-8 md:mt-0">
         <h1 className="text-3xl font-bold">{title} Winning Summary</h1>
         <DashboardCardsPage gameCategoryId={gameCategoryId} />
         <div className="flex flex-col items-center space-y-4">

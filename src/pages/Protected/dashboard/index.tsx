@@ -46,7 +46,7 @@ const DashboardPage = () => {
               <div className="w-full space-y-4">
                 <div className="w-full flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
                   {/* Left Column */}
-                  <div className="lg:w-2/5 space-y-6">
+                  <div className="lg:w-2/5 space-y-4">
                     <DrawResultsPage />
                     <TopBettingRegionPage />
                     <TopWinningRegionPage />
