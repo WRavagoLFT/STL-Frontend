@@ -7,7 +7,7 @@ interface SkeletonCardProps {
 
 const SkeletonCard: React.FC<SkeletonCardProps> = ({ height = "110px" }) => (
   <div
-    className="flex-[1_1_200px] bg-[#7A7766] rounded-lg m-0"
+    className="flex-[1_1_200px] bg-gray-200 rounded-lg m-0"
     style={{ height }}
   />
 );
@@ -18,7 +18,7 @@ export const UsersSkeletonPage: React.FC = () => {
   return (
     <div className="animate-pulse space-y-4">
       {[...Array(2)].map((_, index) => (
-        <div key={index} className="h-3 w-[35%] bg-[#7A7766] rounded-lg" />
+        <div key={index} className="h-3 w-[35%] bg-gray-200 rounded-lg" />
       ))}
 
       <div className="flex flex-wrap gap-3">

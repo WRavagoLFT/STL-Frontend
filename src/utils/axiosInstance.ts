@@ -1,53 +1,78 @@
 import axios from "axios";
+import { useAuthStore } from "~/store/useAuthStore";
+
+let isRefreshing = false;
+let refreshSubscribers: (() => void)[] = [];
+
+export const waitUntilNotRefreshing = (): Promise<void> => {
+  if (!isRefreshing) return Promise.resolve();
+  return new Promise((resolve) => {
+    refreshSubscribers.push(resolve);
+  });
+};
 
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
   withCredentials: true,
 });
 
-axiosInstance.interceptors.request.use((config) => {
-  if (config.url?.startsWith('http://') || config.url?.startsWith('https://')) {
-    throw new Error('Absolute URLs are not allowed.');
-  }
-  return config;
-});
+// Helper: retry original request after refresh
+const retryOriginalRequest = (originalRequest: any) =>
+  new Promise((resolve, reject) => {
+    refreshSubscribers.push(() => {
+      axiosInstance(originalRequest)
+        .then(resolve)
+        .catch(reject);
+    });
+  });
 
-// Global variables for handling token refresh
-export let isRefreshing = false;
-export let refreshSubscribers: (() => void)[] = [];
-
-// Response interceptor to handle token expiration
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
+    const message = error?.response?.data?.message;
 
-    if (error.response?.status === 403 && error.response?.data?.message === "Token expired.") {
+    const isTokenExpired = status === 403 && message === "Token expired.";
+
+    if (isTokenExpired) {
       if (!isRefreshing) {
         isRefreshing = true;
         try {
-          // Attempt to refresh the token
-          await axiosInstance.post("/auth/tokenRefresh", {}, { withCredentials: true });
+          await axios.post(
+            `${process.env.NEXT_PUBLIC_API_URL}/auth/tokenRefresh`,
+            {},
+            { withCredentials: true }
+          );
 
-          // Once the token is refreshed, resolve the subscribers
           isRefreshing = false;
           refreshSubscribers.forEach((cb) => cb());
-          refreshSubscribers = []; // Clear subscribers
+          refreshSubscribers = [];
 
-          return axiosInstance(originalRequest); // Retry the original request with the new token
+          return axiosInstance(originalRequest);
         } catch (refreshError) {
           isRefreshing = false;
           refreshSubscribers = [];
-          console.error("Refresh token failed", refreshError);
+
+          console.error("Token refresh failed. Logging out user.");
+          useAuthStore.getState().clearUser(); // Optional Zustand state clear
           window.location.href = "/auth/login";
           return Promise.reject(refreshError);
         }
       } else {
-        return new Promise((resolve) => {
-          refreshSubscribers.push(() => resolve(axiosInstance(originalRequest))); // Push the request to the refresh queue
-        });
+        return retryOriginalRequest(originalRequest);
       }
     }
+
+    // // Handle other unauthorized (401) errors
+    // if (status === 401) {
+    //   console.warn("Unauthorized (401). Logging out.");
+    //   useAuthStore.getState().clearUser(); // Optional Zustand state clear
+    //   window.location.href = "/auth/login";
+    // }
 
     return Promise.reject(error);
   }

@@ -1,35 +1,31 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
-import Error from "next/error";
+import { useAuth } from "~/utils/useAuth";
 
-export const AccessGuard = ({
-  allowedUserTypes,
-  children,
-}: {
+interface AccessGuardProps {
   allowedUserTypes: number[];
   children: React.ReactNode;
-}) => {
+}
+
+export const AccessGuard = ({ allowedUserTypes, children }: AccessGuardProps) => {
   const { userTypeId } = useAuthStore();
+  const { loading } = useAuth(); // ensures auth check has completed
   const router = useRouter();
-  const [isChecking, setIsChecking] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (userTypeId === null) {
-      // Uncomment this if you want to redirect unauthenticated users
+    if (loading) return; // don’t check anything until auth check is done
+
+    if (userTypeId === null || !allowedUserTypes.includes(userTypeId)) {
+      console.warn("Unauthorized access. Redirecting to error404.");
       router.replace("/auth/error404");
-      return;
+    } else {
+      setIsAuthorized(true);
     }
+  }, [loading, userTypeId, allowedUserTypes, router]);
 
-    setIsChecking(false);
-  }, [userTypeId]);
-
-  if (isChecking) return null;
-
-  // Unauthorized user type
-  if (userTypeId !== null && !allowedUserTypes.includes(userTypeId)) {
-    return <Error statusCode={404} />;
-  }
+  if (loading || !isAuthorized) return null;
 
   return <>{children}</>;
 };

@@ -7,7 +7,6 @@ import Select from "react-select";
 import router from "next/router";
 
 const DrawResultsPage = () => {
-  // States for filters
   const [selectedRegion, setSelectedRegion] = useState<number | "">("");
   const [selectedProvince, setSelectedProvince] = useState<number | "">("");
   const [selectedGameCategory, setSelectedGameCategory] = useState<number | "">(
@@ -16,7 +15,6 @@ const DrawResultsPage = () => {
   const [filteredWinningCombinations, setFilteredWinningCombinations] =
     useState<any[]>([]);
 
-  // Data states
   const [regions, setRegions] = useState<
     { RegionName: string; RegionId: number; Region: string }[]
   >([]);
@@ -117,7 +115,6 @@ const DrawResultsPage = () => {
     const loadWinningCombinations = async () => {
       const response = await getTodaysWinningCombination();
       if (response.success) {
-        // Enrich data with names from provinces, regions, and gameCategories
         const enrichedCombinations = response.data.map((combination: any) => {
           const matchedProvince = provinces.find(
             (prov) => Number(prov.ProvinceId) === Number(combination.ProvinceId)
@@ -193,7 +190,7 @@ const DrawResultsPage = () => {
         if (res.success) {
           setProvinces(res.data);
 
-          // ✅ Automatically select ProvinceId = 1 if it exists in the fetched list
+          // Automatically select ProvinceId = 1 if it exists in the fetched list
           const defaultProvince = res.data.find((p: any) => p.ProvinceId === 1);
           if (defaultProvince) {
             setSelectedProvince(1);
@@ -213,15 +210,12 @@ const DrawResultsPage = () => {
   return (
     <div className="bg-transparent p-4 rounded-xl border border-[#0038A8]">
       <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
-        {/* Left side: icon + text */}
         <div className="flex items-center">
           <div className="bg-[#0038A8] rounded-lg p-1">
             <FaBroadcastTower size={20} color={"#F6BA12"} />
           </div>
           <p className="text-base ml-3">Draw Results Today</p>
         </div>
-
-        {/* Right side: button */}
         <div className="mt-2 md:mt-0">
           <button
             onClick={() => {
@@ -233,11 +227,8 @@ const DrawResultsPage = () => {
           </button>
         </div>
       </div>
-
       <div className="h-px bg-[#303030] mb-4" />
-
       <div className="flex gap-4 w-full mt-2 mb-4">
-        {/* Game Category Select */}
         <div className="w-full relative">
           <Select
             id="gamecategory-select"
@@ -265,7 +256,6 @@ const DrawResultsPage = () => {
       </div>
 
       <div className="flex gap-4 w-full">
-        {/* Region Select */}
         <div className="w-full relative">
           <Select
             id="region-select"
@@ -292,8 +282,6 @@ const DrawResultsPage = () => {
             }}
           />
         </div>
-
-        {/* Province Select */}
         <div className="w-full relative">
           <Select
             id="province-select"
@@ -318,7 +306,6 @@ const DrawResultsPage = () => {
           />
         </div>
       </div>
-
       <div className="mt-4 w-full">
         <div className="flex gap-4 justify-between w-full">
           {[1, 2, 3].map((gameTypeId) => {

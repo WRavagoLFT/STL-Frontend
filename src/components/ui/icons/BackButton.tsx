@@ -6,6 +6,10 @@ interface BackIconButtonProps {
   to?: string;
   onClick?: () => void;
   isSidebarToggled?: boolean;
+  bgColor?: string;
+  hoverColor?: string;
+  iconColor?: string;
+  size?: number;
 }
 
 const BackIconButton: React.FC<BackIconButtonProps> = ({

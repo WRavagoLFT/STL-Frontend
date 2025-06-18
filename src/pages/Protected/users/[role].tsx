@@ -1,12 +1,7 @@
-// React & Next
 import React, { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/router";
-
-// Stores & Hooks
 import useUserRoleStore from "~/store/useUserStore";
 import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
-
-// Components
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 const ChartsDataPage = React.lazy(() => import("~/components/ui/charts/UserChartsData"));
 const CardsPage = React.lazy(() => import("~/components/user/CardsData"));
@@ -14,19 +9,10 @@ import AddUserModal from "~/components/user/AddUser";
 import UpdateUserModal from "~/components/user/UpdateUser";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-
-// Configs & Types
 import { userTableColumns } from "~/config/userTableColumns";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
 import { User } from "~/types/types";
-
-// Utils
-import {
-  addUser,
-  editLogUser
-} from "~/utils/api/users";
-
-// Libs
+import { addUser, editLogUser, suspendUser, updateUser } from "~/utils/api/users";
 import Swal from "sweetalert2";
 import { loadUsers } from "~/hooks/useLoadUsers";
 import { useAuthStore } from "~/store/useAuthStore";
@@ -45,25 +31,25 @@ const roleMap: Record<
     label: "Kubrador",
     textlabel: "Kubrador",
     roleId: 1,
-    permittedUserTypes: [3, 4], // managers, exec, admin
+    permittedUserTypes: [3, 4],
   },
   kabo: {
     label: "Kabo",
     textlabel: "Kabo",
     roleId: 2,
-    permittedUserTypes: [3, 4, 5  ], // managers, exec, admin
+    permittedUserTypes: [3, 4, 5  ],
   },
   executive: {
     label: "Small Town Lottery Executive",
     textlabel: "Executives",
-    roleId: 5, // just adjusted 06/02
-    permittedUserTypes: [6], // admin ONLY
+    roleId: 5,
+    permittedUserTypes: [6],
   },
   managers: {
     label: "Small Town Lottery Manager",
     textlabel: "Managers",
     roleId: 4,
-    permittedUserTypes: [6], // admin ONLY
+    permittedUserTypes: [6],
   },
 };
 
@@ -112,6 +98,8 @@ const RolePage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  console.log('current user type:', currentUserType);
+
   const openCreateModal = () => {
     setIsCreateModalOpen(true);
   };
@@ -136,7 +124,7 @@ const RolePage = () => {
   };
 
   useEffect(() => {
-    if (!roleKey) return; // or if (roleKey === undefined) return;
+    if (!roleKey) return;
 
     loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading);
   }, [roleConfig, roleKey]);
@@ -195,6 +183,50 @@ const RolePage = () => {
     );
   };
 
+  const handleSuspendUser = async (data: User & { remarks?: string }): Promise<void> => {
+    try {
+      const userId = data?.UserId;
+
+      if (!userId) {
+        throw new Error("User ID is missing.");
+      }
+
+      const result = await suspendUser(userId, data.remarks);
+
+      if (result.success) {
+        console.log("User suspended successfully:", result.data);
+
+        if (roleKey) {
+          await loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading);
+        }
+
+        Swal.fire({
+          icon: "success",
+          title: "Success!",
+          text: "User suspended successfully.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        console.error("Failed to suspend user:", result.message);
+        Swal.fire({
+          icon: "error",
+          title: "Suspend Failed",
+          text: result.message || "Something went wrong while suspending the user.",
+        });
+      }
+    } catch (error) {
+      console.error("Unexpected error in handleSuspendUser:", (error as Error).message);
+      Swal.fire({
+        icon: "error",
+        title: "Unexpected Error",
+        text: (error as Error).message || "An unexpected error occurred.",
+      });
+    } finally {
+      setIsCreateModalOpen(false);
+    }
+  };
+
   return (
     <AccessGuard allowedUserTypes={roleConfig.permittedUserTypes}>
       {loading ? (
@@ -225,6 +257,7 @@ const RolePage = () => {
               source="users"
               onAddClick={openCreateModal}
               onUpdateClick={openUpdateModal}
+              onSubmit={handleSuspendUser}
             />
 
             <AddUserModal

@@ -1,36 +1,46 @@
 import React, { useState } from "react";
-import {
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { verifyPass } from "~/utils/api/auth";
 import { LoginSectionData } from "~/data/LoginSectionData";
 
 export interface ConfirmUserActionModalProps {
   open: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (remarks?: string) => Promise<void>;
+  mode: "add" | "update" | "suspend";
+  remarks?: string;
+  setRemarks?: (data: string) => void;
 }
 
 const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
   open,
   onConfirm,
+  onClose,
+  mode,
 }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [remarks, setRemarks] = useState("");
 
-  const handleTogglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const handleTogglePasswordVisibility = () =>
+    setShowPassword((prev) => !prev);
 
   const handleVerifyUserAction = async () => {
     if (!password.trim()) {
+      console.warn("[WARN] Password is empty");
       setError("Password is required.");
       return;
     }
 
+    if (mode === "suspend" && !remarks.trim()) {
+      console.warn("[WARN] Remarks are empty during suspend mode");
+      setError("Remarks are required for suspension.");
+      return;
+    }
+  
     setLoading(true);
-
     try {
       const { success: isVerified } = await verifyPass(password);
 
@@ -41,9 +51,14 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
       }
 
       setError("");
-      await onConfirm();
+
+      if (mode === "suspend") {
+        await onConfirm(remarks); 
+      } else {
+        await onConfirm();
+      }
     } catch (err) {
-      console.error("Unexpected error during verification:", err);
+      console.error("[ERROR] Unexpected error during verification:", err);
       setError("An error occurred during verification.");
     } finally {
       setLoading(false);
@@ -56,7 +71,6 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-75">
       <div className="relative z-20 flex w-full justify-center items-center">
         <div className="w-[60%] sm:w-[60%] md:w-[40%] max-w-[430px] py-8 px-6 bg-[#F8F0E3] rounded-lg relative">
-          {/* Logo + Title */}
           <div className="text-center mb-4 mt-2">
             <img
               src={LoginSectionData.image}
@@ -73,7 +87,24 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
           </div>
 
           <div className="px-5 mt-7">
-            {/* Password Input */}
+            {mode === "suspend" && (
+              <div className="relative w-full mb-2">
+                <textarea
+                  id="remarks"
+                  placeholder="Enter remarks"
+                  value={remarks}
+                  onChange={(e) => setRemarks?.(e.target.value)}
+                  className={`w-full px-4 py-2.5 text-sm rounded-md border ${
+                    error ? "border-red-500" : "border-gray-600"
+                  } bg-transparent placeholder-gray-400 focus:outline-none focus:ring-2 ${
+                    error ? "focus:ring-red-500" : "focus:ring-white-200"
+                  }`}
+                  disabled={loading}
+                  rows={5}
+                />
+              </div>
+            )}
+
             <div className="relative w-full mb-2">
               <input
                 id="password"
@@ -105,7 +136,6 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </div>
 
-            {/* Confirm Button */}
             <button
               type="submit"
               onClick={handleVerifyUserAction}

@@ -31,19 +31,15 @@ const AACTaxesPage: React.FC<ShareBreakdownPageProps> = ({
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
-            {/* toggle icon here */}
           </div>
         </button>
 
-        {/* Accordion Content */}
         {!isOpen && (
           <div
             id="share-breakdown-content"
             className="bg-transparent border border-[#0038A8] p-2 rounded-md mt-3"
           >
             <span className="text-sm font-bold">{title} Details</span>
-
-            {/* Breakdown List */}
             {breakdownToShow.length > 0 ? (
               breakdownToShow.map((item, index) => (
               <div

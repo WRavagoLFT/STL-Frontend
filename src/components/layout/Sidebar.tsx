@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { gameType, useSideBarStore } from "../../store/useSideBarStore";
-import { getCurrentUser } from "~/utils/api/auth";
-import { FaBars } from "react-icons/fa"; // removed FaSignOutAlt
+import { FaBars } from "react-icons/fa";
 import { useAuthStore } from "~/store/useAuthStore";
 import UserInfo from "./UserInfo";
 import SidebarMenuItem from "./SidebarMenuItem";
@@ -11,16 +10,11 @@ import SidebarLogoSection from "./SidebarLogoSection";
 const Sidebar: React.FC = () => {
   const router = useRouter();
   const { setSideBarActiveGameType } = useSideBarStore();
-  const userTypeId = useAuthStore((state) => state.userTypeId);
-
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
-  const [user, setUser] = useState<{
-    firstName: string;
-    lastName: string;
-    userTypeId: number;
-  } | null>(null);
+  const userTypeId = useAuthStore((state) => state.userTypeId);
+  const user = useAuthStore((state) => state.user);
 
   const getUserRole = (userTypeId: number) => {
     switch (userTypeId) {
@@ -49,26 +43,10 @@ const Sidebar: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const response = await getCurrentUser({});
-      if (response?.data) {
-        setUser({
-          firstName: response.data.FirstName,
-          lastName: response.data.LastName,
-          userTypeId: response.data.UserTypeId,
-        });
-      }
-    };
-
-    fetchUser();
-  }, []);
-
   if (userTypeId === null) return null;
 
   return (
-    <>
-      {/* Hamburger for mobile */}
+    <div>
       <div className="md:hidden fixed top-4 left-4 z-50">
         {!isMobileSidebarOpen && (
           <button
@@ -79,8 +57,6 @@ const Sidebar: React.FC = () => {
           </button>
         )}
       </div>
-
-      {/* Sidebar overlay on mobile */}
       <div
         className={`fixed top-0 left-0 h-full z-40 transition-transform duration-200
         ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}
@@ -88,7 +64,7 @@ const Sidebar: React.FC = () => {
       >
         <div
           className={`p-3 bg-blue-800 text-white flex flex-col transition-all duration-200 
-          ${collapsed ? "w-20" : "w-64"} sticky top-0 h-screen z-50 overflow-y-auto sidebar-scrollbar`}
+          ${collapsed ? "w-20" : "w-64"} sticky top-0 h-screen z-50 overflow-y-auto sidebar-scrollbar scrollbar-hide`}
         >
           <SidebarLogoSection
             collapsed={collapsed}
@@ -116,7 +92,7 @@ const Sidebar: React.FC = () => {
               "Draw Summary",
               "Device Information",
               "Retail Receipt",
-              "Logout", // ✅ Now logout is handled via SidebarMenuItem
+              "Logout",
             ].map((label) => (
               <SidebarMenuItem
                 key={label}
@@ -133,15 +109,13 @@ const Sidebar: React.FC = () => {
           </nav>
         </div>
       </div>
-
-      {/* Backdrop on mobile */}
       {isMobileSidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-30 z-30 md:hidden"
           onClick={() => setIsMobileSidebarOpen(false)}
         />
       )}
-    </>
+    </div>
   );
 };
 

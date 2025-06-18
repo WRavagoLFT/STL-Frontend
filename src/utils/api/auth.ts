@@ -1,5 +1,5 @@
-import { AxiosError } from "axios";
-import axiosInstance from "../axiosInstance";
+import axios, { AxiosError } from "axios";
+import axiosInstance, { waitUntilNotRefreshing } from "../axiosInstance";
 import { useAuthStore } from "~/store/useAuthStore";
 
 // Helper to validate URL paths
@@ -10,38 +10,53 @@ const validateRelativeUrl = (url: string) => {
     return url;
 };
 
-const getCurrentUser = async (queryParams: Record<string, any>) => {
-    try {
-        const url = validateRelativeUrl("/users/getCurrentUser");
-        const response = await axiosInstance.get(url, {
-            params: queryParams
-        });
-        return response.data;
-    } catch (error) {
-        console.error("Error fetching users:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: [] };
+const getCurrentUser = async () => {
+  console.log("[getCurrentUser] Waiting for token refresh to complete...");
+  await waitUntilNotRefreshing();
+  console.log("[getCurrentUser] Proceeding with API request...");
+
+  try {
+    const res = await axiosInstance.get("/users/getCurrentUser");
+    console.log("[getCurrentUser] Success:", res.data);
+    return res.data;
+  } catch (error: any) {
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || error.message;
+
+    console.error("[getCurrentUser] Request failed:");
+    console.error("  • Status:", status);
+    console.error("  • Message:", message);
+    console.error("  • Full error object:", error);
+
+    if (message !== "Token expired." && message !== "Invalid request token.") {
+      console.warn("[getCurrentUser] Unexpected error encountered.");
     }
+
+    return { success: false, data: null };
+  }
 };
 
 const logoutUser = async (queryParams: Record<string, any> = {}) => {
-    try {
-        // Clear intervals and client state FIRST
-        //useAuthStore.getState().logout();
-        
-        // Then make the server call
-        const url = validateRelativeUrl("/auth/logout");
-        const response = await axiosInstance.delete(url, {
-            params: queryParams
-        });
-        
-        return { success: true, message: "Logout successful", data: response.data };
-    } catch (error) {
-        console.error("Error logging out:", (error as Error).message);
-        
-        // Even if server call fails, we've already cleared client state
-        // This prevents the "double logout" error
-        return { success: true, message: "Logout completed (client-side)" };
-    }
+  try {
+    // 1. Call API to clear server cookie
+    const url = validateRelativeUrl("/auth/logout");
+    const response = await axiosInstance.delete(url, {
+      params: queryParams,
+      withCredentials: true, // ⬅️ ensures cookies are included
+    });
+
+    // 2. Clear client state
+    useAuthStore.getState().logout(); // or any client-side clearing logic
+
+    return { success: true, message: "Logout successful", data: response.data };
+  } catch (error) {
+    console.error("Error logging out:", (error as Error).message);
+
+    // Even if server fails, still clear client state
+    useAuthStore.getState().logout();
+
+    return { success: true, message: "Logout completed (client-side)" };
+  }
 };
 
 const verifyPass = async (password: string) => {

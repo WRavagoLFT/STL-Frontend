@@ -1,5 +1,6 @@
 import { Branch, Operator, User } from "~/types/types";
 import axiosInstance from "../axiosInstance";
+import axios from "axios";
 
 // Helper to validate URL paths
 const validateRelativeUrl = (url: string) => {
@@ -197,4 +198,30 @@ export const editLogUser = async (userId: number) => {
         return { success: false, message: (error as Error).message, data: {} };
     }
 };
+
+export const suspendUser = async (userId: number, remarks?: string) => {
+  try {
+    const url = validateRelativeUrl(`/users/${userId}/suspend`);
+
+    const payload = {
+      userId,
+      remarks,
+    };
+
+    console.log("[suspendUser] Endpoint URL:", url);
+    console.log("[suspendUser] Payload:", payload);
+
+    const response = await axiosInstance.patch(url, payload);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error suspending user:", (error as Error).message);
+    return { success: false, message: (error as Error).message, data: {} };
+  }
+};
+
+
+
+
+
 

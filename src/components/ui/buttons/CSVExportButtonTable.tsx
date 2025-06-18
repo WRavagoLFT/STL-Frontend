@@ -63,7 +63,8 @@ const CSVExportButtonTable: React.FC<CSVExportButtonProps> = ({
       operatorMap ?? []
     );
 
-    // Create worksheet with title and generated time
+    const headers = columns?.map((col) => col.label);
+
     const worksheetData = [
       [title],
       [`Generated on: ${currentDateTime}`],
@@ -72,18 +73,33 @@ const CSVExportButtonTable: React.FC<CSVExportButtonProps> = ({
 
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
-    // Add data starting at row 4
+    // Add table data starting from A4
     XLSX.utils.sheet_add_json(worksheet, excelData, {
       origin: "A4",
       skipHeader: false,
     });
 
-    // Merge title and generated date rows across all columns
+    // Merge title and timestamp
     const totalColumns = columns?.length || 10;
     worksheet["!merges"] = [
       { s: { r: 0, c: 0 }, e: { r: 0, c: totalColumns - 1 } },
       { s: { r: 1, c: 0 }, e: { r: 1, c: totalColumns - 1 } },
     ];
+
+    // Set column widths
+    const colWidths = headers?.map((header, colIndex) => {
+      const columnData = [
+        header,
+        ...excelData.map((item) => item[header] ?? ""),
+      ];
+      const maxLength = columnData.reduce(
+        (max, val) => Math.max(max, val.toString().length),
+        10
+      );
+      return { wch: maxLength + 2 };
+    });
+
+    worksheet["!cols"] = colWidths;
 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetTitle);
@@ -93,7 +109,7 @@ const CSVExportButtonTable: React.FC<CSVExportButtonProps> = ({
 
   return (
     <Button sx={buttonStyles} variant="contained" onClick={downloadExcel}>
-      Export as CSV
+      Export as Excel
     </Button>
   );
 };

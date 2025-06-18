@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Operator } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
@@ -39,7 +39,6 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   onClose,
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>({});
-
   const [hasExcludedCity, setHasExcludedCity] = useState(false);
   const selectedAreaId = Number(formData.areaOfOperations); // ensure it's a number
   const showRegionsAndProvinces = selectedAreaId === 1 || selectedAreaId === 2;
@@ -99,10 +98,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
   const provinceOptions = filteredProvinces;
   const cityOptions = filteredCities;
-  const selectedCities = Array.isArray(formData.cities) ? formData.cities : [];
-  const availableExcludedCities = cityOptions.filter(
-    (opt) => !selectedCities.includes(opt.value)
-  );
+  const availableExcludedCities = filteredCities;
+  //const selectedCities = Array.isArray(formData.cities) ? formData.cities : [];
+  //const availableExcludedCities = Array.isArray(formData.cities) ? formData.cities : [];
+  //const availableExcludedCities = cityOptions.filter((opt) => !selectedCities.includes(opt.value));
 
   const handleSelectChange = (e: {
     target: { name: string; value: string };
@@ -180,14 +179,21 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
     validationSchema: toFormikValidationSchema(operatorSchema),
     onSubmit: async (values) => {
       const result = await Swal.fire({
-        title: "Add Confirmation",
-        text: "Did you enter the correct details?",
+        title: "<strong>Add Confirmation</strong>",
+        html: `Did you enter the correct details?`,
         icon: "question",
         showCancelButton: true,
-        confirmButtonText: "Yes, I did",
-        cancelButtonText: "No, let me check",
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#EF4444",
+        cancelButtonColor: "#3B82F6",
+        confirmButtonText: '<i class="fa fa-ban"></i> Yes, I did',
+        cancelButtonText: 'No, let me check',
+        customClass: {
+          popup: 'bg-[#FFFFFF] text-black rounded-md',
+          title: 'text-lg font-semibold',
+          confirmButton: 'bg-[#0038A8] rounded-md text-white text-base hover:bg-blue-700 px-8 py-1',
+          cancelButton: 'bg-transparent px-4 text-base',
+        },
+        buttonsStyling: false,
       });
 
       if (result.isConfirmed) {
@@ -201,6 +207,11 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
     },
   });
 
+  useEffect(() => {
+    console.log("Validation Errors:", formik.errors);
+    //console.log("Touched Fields:", formik.touched);
+  }, [formik.errors, formik.touched]);
+  
   // Helpers to display errors
   const getError = (field: string) =>
     formik.touched[field as keyof typeof formik.touched] &&
@@ -208,6 +219,11 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       ? (formik.errors[field as keyof typeof formik.errors] as string)
       : null;
 
+  const gameTypesError = getError("gameTypes");
+  const regionsError = getError("regions");
+  const provincesError = getError("provinces");
+  const cityErrors = getError("cities");
+  
   return (
     <form onSubmit={formik.handleSubmit}>
       <div className="text-md font-bold my-1">Owner Information</div>
@@ -450,7 +466,13 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             {getError("address") || "\u00A0"}
           </p>
         </div>
+      </div>
 
+      <div className="text-md font-bold mt-[1rem] my-2">
+        Games Information
+      </div>
+
+      <div className="grid grid-cols-2 gap-x-6 gap-y-2">
         <div>
           <label htmlFor="gameTypes" className="block text-sm mb-1">
             STL Games Provided
@@ -474,7 +496,41 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
               typeof window !== "undefined" ? document.body : null
             }
             styles={{
-              menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
+              control: (provided, state) => {
+                const isDisabled = state.isDisabled;
+                const hasError = !!gameTypesError;
+
+                return {
+                  ...provided,
+                  borderColor: isDisabled
+                    ? "#A1A1AA !important"
+                    : hasError
+                      ? "#EF4444 !important"
+                      : "#0038A8 !important",
+                  fontSize: "0.875rem",
+                  padding: "2px",
+                  color: isDisabled ? "#6B7280" : "inherit",
+                  backgroundColor: "transparent",
+                  cursor: isDisabled ? "not-allowed" : "default",
+                  "&:hover": {
+                    borderColor: isDisabled
+                      ? "#A1A1AA"
+                      : hasError
+                        ? "#EF4444"
+                        : "#0038A8",
+                  },
+                  boxShadow: "none",
+                };
+              },
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 1000000,
+              }),
+              menu: (provided) => ({
+                ...provided,
+                maxHeight: 400,
+                overflowY: "auto",
+              }),
             }}
           />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
@@ -529,7 +585,43 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
               menuPortalTarget={
                 typeof window !== "undefined" ? document.body : null
               }
-              styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+              styles={{
+                control: (provided, state) => {
+                  const isDisabled = state.isDisabled;
+                  const hasError = !!regionsError;
+
+                  return {
+                    ...provided,
+                    borderColor: isDisabled
+                      ? "#A1A1AA !important"
+                      : hasError
+                        ? "#EF4444 !important"
+                        : "#0038A8 !important",
+                    fontSize: "0.875rem",
+                    padding: "2px",
+                    color: isDisabled ? "#6B7280" : "inherit",
+                    backgroundColor: "transparent",
+                    cursor: isDisabled ? "not-allowed" : "default",
+                    "&:hover": {
+                      borderColor: isDisabled
+                        ? "#A1A1AA"
+                        : hasError
+                          ? "#EF4444"
+                          : "#0038A8",
+                    },
+                    boxShadow: "none",
+                  };
+                },
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 1000000,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 400,
+                  overflowY: "auto",
+                }),
+              }}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("regions") || "\u00A0"}
@@ -557,7 +649,43 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
               menuPortalTarget={
                 typeof window !== "undefined" ? document.body : null
               }
-              styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+              styles={{
+                control: (provided, state) => {
+                  const isDisabled = state.isDisabled;
+                  const hasError = !!provincesError;
+
+                  return {
+                    ...provided,
+                    borderColor: isDisabled
+                      ? "#A1A1AA !important"
+                      : hasError
+                        ? "#EF4444 !important"
+                        : "#0038A8 !important",
+                    fontSize: "0.875rem",
+                    padding: "2px",
+                    color: isDisabled ? "#6B7280" : "inherit",
+                    backgroundColor: "transparent",
+                    cursor: isDisabled ? "not-allowed" : "default",
+                    "&:hover": {
+                      borderColor: isDisabled
+                        ? "#A1A1AA"
+                        : hasError
+                          ? "#EF4444"
+                          : "#0038A8",
+                    },
+                    boxShadow: "none",
+                  };
+                },
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 1000000,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 400,
+                  overflowY: "auto",
+                }),
+              }}
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("provinces") || "\u00A0"}
@@ -571,7 +699,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         <div className="space-y-4">
           {formData.areaOfOperations && showCities && (
             <div>
-              <label htmlFor="cities" className="block text-sm mb-1">
+              <label htmlFor="cities" className="block text-sm mt-4 mb-1">
                 Area of City Operations
               </label>
               <Select
@@ -588,7 +716,43 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                 menuPortalTarget={
                   typeof window !== "undefined" ? document.body : null
                 }
-                styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+                styles={{
+                  control: (provided, state) => {
+                    const isDisabled = state.isDisabled;
+                    const hasError = !!cityErrors;
+
+                    return {
+                      ...provided,
+                      borderColor: isDisabled
+                        ? "#A1A1AA !important"
+                        : hasError
+                          ? "#EF4444 !important"
+                          : "#0038A8 !important",
+                      fontSize: "0.875rem",
+                      padding: "2px",
+                      color: isDisabled ? "#6B7280" : "inherit",
+                      backgroundColor: "transparent",
+                      cursor: isDisabled ? "not-allowed" : "default",
+                      "&:hover": {
+                        borderColor: isDisabled
+                          ? "#A1A1AA"
+                          : hasError
+                            ? "#EF4444"
+                            : "#0038A8",
+                      },
+                      boxShadow: "none",
+                    };
+                  },
+                  menuPortal: (base) => ({
+                    ...base,
+                    zIndex: 1000000,
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    maxHeight: 400,
+                    overflowY: "auto",
+                  }),
+                }}
               />
               <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
                 {getError("cities") || "\u00A0"}
@@ -598,17 +762,17 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
           {formData.areaOfOperations && showExcluded && hasExcludedCity && (
             <div>
-              <label htmlFor="excludedCities" className="block text-sm mb-1">
+              <label htmlFor="cities" className="block text-sm mt-2 mb-1">
                 Excluded Cities
               </label>
               <Select
-                id="excludedCities"
-                name="excludedCities"
+                id="cities"
+                name="cities"
                 options={availableExcludedCities}
                 isMulti
                 onChange={(selected) =>
                   handleMultiSelect(
-                    "excludedCities",
+                    "cities",
                     selected as OptionType[],
                     formik
                   )
@@ -619,7 +783,43 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                 menuPortalTarget={
                   typeof window !== "undefined" ? document.body : null
                 }
-                styles={{ menuPortal: (base) => ({ ...base, zIndex: 9999 }) }}
+              styles={{
+                control: (provided, state) => {
+                  const isDisabled = state.isDisabled;
+                  const hasError = !!cityErrors;
+
+                  return {
+                    ...provided,
+                    borderColor: isDisabled
+                      ? "#A1A1AA !important"
+                      : hasError
+                        ? "#EF4444 !important"
+                        : "#0038A8 !important",
+                    fontSize: "0.875rem",
+                    padding: "2px",
+                    color: isDisabled ? "#6B7280" : "inherit",
+                    backgroundColor: "transparent",
+                    cursor: isDisabled ? "not-allowed" : "default",
+                    "&:hover": {
+                      borderColor: isDisabled
+                        ? "#A1A1AA"
+                        : hasError
+                          ? "#EF4444"
+                          : "#0038A8",
+                    },
+                    boxShadow: "none",
+                  };
+                },
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 1000000,
+                }),
+                menu: (provided) => ({
+                  ...provided,
+                  maxHeight: 400,
+                  overflowY: "auto",
+                }),
+              }}
               />
               <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
                 {getError("excludedCities") || "\u00A0"}
@@ -643,11 +843,12 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           </div>
         )}
       </div>
+
       {/* Submit Button */}
       <div className="col-span-2">
         <button
           type="submit"
-          className="w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2 mt-4"
+          className="w-full bg-[#F6BA12] text-sm text-black rounded px-4 py-2 mt-6"
         >
           Add Operator
         </button>
@@ -655,6 +856,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         <ConfirmUserActionModalPage
           open={isConfirmModalOpen}
           onClose={handleModalClose}
+          mode="add"
           onConfirm={async () => {
             try {
               await onSubmit(formData as unknown as Operator); // submit from the parent component handled after password verification

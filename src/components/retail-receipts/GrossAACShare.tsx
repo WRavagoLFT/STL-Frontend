@@ -40,8 +40,6 @@ const GrossAACSharePage: React.FC<ShareBreakdownPageProps> = ({
             })}
           </div>
         </button>
-
-        {/* Accordion Content */}
         {!isOpen && (
           <div
             id="share-breakdown-content"

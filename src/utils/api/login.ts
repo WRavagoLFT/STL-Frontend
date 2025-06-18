@@ -6,13 +6,9 @@ import { useAuthStore } from "~/store/useAuthStore";
 export const loginUser = async (
   payload: { email: string; password: string },
   router: any
-  
 ) => {
   try {
-    const { setUserTypeId } = useAuthStore.getState();
-    setUserTypeId(0); // Reset before fetch
-    
-    const loginResponse = await axiosInstance.post("/auth/login", payload);
+    const loginResponse = await axiosInstance.post("/auth/login/web", payload);
     await handleRouter(router);
 
   } catch (error: unknown) {
