@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
@@ -88,13 +89,12 @@ const SummaryWinnersDrawTimePage = () => {
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
       <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
-        {/* Left section: text and legend */}
         <div className="flex flex-col leading-none">
-          <p className="text-sm md:text-base lg:text-lg leading-none">Summary of Winners</p>
+          <p className="text-sm md:text-base lg:text-lg leading-none">
+            Summary of Winners
+          </p>
           <CustomLegend />
         </div>
-
-        {/* Right section: export button (conditional) */}
         {currentUserType !== 3 && (
           <div className="mt-2 md:mt-0">
             <GenericCSVExportButton
@@ -111,58 +111,64 @@ const SummaryWinnersDrawTimePage = () => {
         )}
       </div>
 
-      <div className="w-full overflow-x-auto pb-4">
-        <div className="min-w-[600px]">
-          <BarChart
-            height={300}
-            grid={{ vertical: true }}
-            layout="horizontal"
-            margin={{ left: 90, right: 20, top: 20, bottom: 45 }}
-            slotProps={{
-              noDataOverlay: {
-                message:
-                  "Summary of Winners data will be displayed once available.",
-              },
-              legend: { hidden: true },
-            }}
-            series={[
-              {
-                data: data.map((item) => item.winners / 100000),
-                color: "#BB86FC",
-                label: "Winners",
-                valueFormatter: (value, context) =>
-                  `${data[context.dataIndex].winners.toLocaleString()}`,
-              },
-              {
-                data: data.map((item) => item.winnings / 100000),
-                color: "#5050A5",
-                label: "Winnings",
-                valueFormatter: (value, context) =>
-                  `₱${data[context.dataIndex].winnings.toLocaleString()}`,
-              },
-            ]}
-            yAxis={[
-              {
-                scaleType: "band",
-                data: data.map((item) => item.draw),
-                tickLabelProps: { style: { fontSize: "12px" } },
-              } as any,
-            ]}
-            xAxis={[
-              {
-                label: "Total (x 100,000)",
-                scaleType: "linear",
-                min: 0,
-                max: 750,
-                tickInterval: 50,
-                valueFormatter: (value: number) => value.toString(),
-                tickSize: 2,
-                barCategoryGap: 0.2,
-                tickLabelProps: { style: { fontSize: "12px" } },
-              } as any,
-            ]}
-          />
-        </div>
+      <div className="h-full w-full mt-4">
+        {loading ? (
+          <div className="flex items-center justify-center h-[300px]">
+            <CircularProgress />
+          </div>
+        ) : (
+          <div className="min-w-[600px]">
+            <BarChart
+              height={300}
+              grid={{ vertical: true }}
+              layout="horizontal"
+              margin={{ left: 90, right: 20, top: 20, bottom: 45 }}
+              slotProps={{
+                noDataOverlay: {
+                  message:
+                    "Summary of Winners data will be displayed once available.",
+                },
+                legend: { hidden: true },
+              }}
+              series={[
+                {
+                  data: data.map((item) => item.winners / 100000),
+                  color: "#BB86FC",
+                  label: "Winners",
+                  valueFormatter: (value, context) =>
+                    `${data[context.dataIndex].winners.toLocaleString()}`,
+                },
+                {
+                  data: data.map((item) => item.winnings / 100000),
+                  color: "#5050A5",
+                  label: "Winnings",
+                  valueFormatter: (value, context) =>
+                    `₱${data[context.dataIndex].winnings.toLocaleString()}`,
+                },
+              ]}
+              yAxis={[
+                {
+                  scaleType: "band",
+                  data: data.map((item) => item.draw),
+                  tickLabelProps: { style: { fontSize: "12px" } },
+                } as any,
+              ]}
+              xAxis={[
+                {
+                  label: "Total (x 100,000)",
+                  scaleType: "linear",
+                  min: 0,
+                  max: 750,
+                  tickInterval: 50,
+                  valueFormatter: (value: number) => value.toString(),
+                  tickSize: 2,
+                  barCategoryGap: 0.2,
+                  tickLabelProps: { style: { fontSize: "12px" } },
+                } as any,
+              ]}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

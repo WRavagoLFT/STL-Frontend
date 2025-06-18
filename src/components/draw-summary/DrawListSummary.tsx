@@ -1,30 +1,73 @@
-import React from "react";
+import React, { useState } from "react";
 
 const MonthSummaryPage = React.lazy(
   () => import("~/components/draw-summary/MonthSummary")
 );
 
 const FirstSummaryPage = React.lazy(
-  () => import("~/components/draw-summary/FirstSumarry")
+  () => import("~/components/draw-summary/FirstSummary")
 );
 
 const DrawListSummaryPage = (data: {
-  location: string,
-  month: number,
-  values: {firstDraw: string[], secondDraw: string[], thirdDraw: string[]}[]
+  location: string;
+  month: number;
+  values: { firstDraw: string[]; secondDraw: string[]; thirdDraw: string[] }[];
 }) => {
+  const today = new Date();
+  const [activeMobileTab, setActiveMobileTab] = useState(1);
 
-  //console.log("Transformed data: ", data.values)
-  const today = new Date()
+  // Helper to get values based on draw order
+  const getValuesByDrawOrder = (order: number) => {
+    switch (order) {
+      case 1:
+        return data.values.map((result) => result.firstDraw);
+      case 2:
+        return data.values.map((result) => result.secondDraw);
+      case 3:
+        return data.values.map((result) => result.thirdDraw);
+      default:
+        return [];
+    }
+  };
 
   return (
     <React.Fragment>
-      <h2 className="text-xl font-semibold">{data.location} Draw List Summary</h2>
-      <div className="min-h-screen grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <h2 className="text-base md:text-xl font-semibold">
+        {data.location} Draw List Summary
+      </h2>
+
+      {/* Tabs for mobile */}
+      <div className="flex gap-2 lg:hidden">
+        {["First Draw", "Second Draw", "Third Draw"].map((label, index) => (
+          <button
+            key={label}
+            className={`px-3 py-1 rounded-full text-sm font-medium border ${
+              activeMobileTab === index + 1
+                ? "bg-[#0038A8] text-white"
+                : "bg-none text-[#0038A8] border-[#0038A8]"
+            }`}
+            onClick={() => setActiveMobileTab(index + 1)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Mobile: Only show the selected draw */}
+      <div className="grid grid-cols-2 gap-3 lg:hidden">
         <MonthSummaryPage month={data.month - 1} year={today.getFullYear()} />
-        <FirstSummaryPage drawOrder={1} values={data.values.map((result) => result.firstDraw)} />
-        <FirstSummaryPage drawOrder={2} values={data.values.map((result) => result.secondDraw)} />
-        <FirstSummaryPage drawOrder={3} values={data.values.map((result) => result.thirdDraw)} />
+        <FirstSummaryPage
+          drawOrder={activeMobileTab}
+          values={getValuesByDrawOrder(activeMobileTab)}
+        />
+      </div>
+
+      {/* Desktop: Show all summaries */}
+      <div className="hidden lg:grid lg:grid-cols-4 gap-3">
+        <MonthSummaryPage month={data.month - 1} year={today.getFullYear()} />
+        <FirstSummaryPage drawOrder={1} values={getValuesByDrawOrder(1)} />
+        <FirstSummaryPage drawOrder={2} values={getValuesByDrawOrder(2)} />
+        <FirstSummaryPage drawOrder={3} values={getValuesByDrawOrder(3)} />
       </div>
     </React.Fragment>
   );

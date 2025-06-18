@@ -115,7 +115,7 @@ const TopWinningRegionPage = () => {
             <p>Data will be displayed once available.</p>
           </div>
         ) : (
-          rankedRegions.map((item, index) => (
+          rankedRegions.slice(0, 5).map((item, index) => (
             <div
               key={item.region.RegionId ?? item.region.Region}
               className={`flex items-center py-2 ${

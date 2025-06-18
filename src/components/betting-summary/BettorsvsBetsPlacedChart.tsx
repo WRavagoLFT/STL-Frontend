@@ -1,22 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { CircularProgress, Button } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { addLabels } from "./tooltips/dataSet";
 import { fetchHistoricalSummary } from "~/utils/api/transactions";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { TransactionData } from "~/types/types";
 import { useAuthStore } from "~/store/useAuthStore";
 
-// Custom Legend circle
 const CustomLegend = () => (
-  <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
+  <div className="flex flex-row space-x-5 justify-start mt-1 mr-4">
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#BB86FC] mr-2" />
-      <p className="text-sm">Bettors</p>
+      <p className="text-xs md:text-sm">Bettors</p>
     </div>
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#5050A5] mr-2" />
-      <p className="text-sm">Bets</p>
+      <p className="text-xs md:text-sm">Bets</p>
     </div>
   </div>
 );
@@ -42,22 +40,19 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
   >([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
-  const maxValue = Math.max(...data.map((item) => item.bets));
-  const safeMax = maxValue < 1000 ? 1000 : maxValue;
-
   const fetchData = async () => {
     try {
       const response = await fetchHistoricalSummary();
 
       if (response.success) {
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toLocaleDateString("en-CA", {
+          timeZone: "Asia/Manila",
+        });
 
-        // 1. Filter by today's date
         let filteredData = response.data.filter((item: TransactionData) =>
           item.TransactionDate.startsWith(today)
         );
 
-        // 2. Filter by gameCategoryId if provided
         if (params.gameCategoryId) {
           filteredData = filteredData.filter(
             (item: TransactionData) =>
@@ -65,7 +60,6 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
           );
         }
 
-        // 3. Local summary object to avoid mutating global one
         const localSummary: typeof summary = {
           1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
           2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
@@ -89,10 +83,9 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
 
         const formattedData = Object.values(localSummary);
 
-        // Optionally scale bets if needed (e.g., to 100,000s)
         const scaledData = formattedData.map((item) => ({
           ...item,
-          bets: item.bets / 100000,
+          bets: item.bets,
           ratio: item.bettors === 0 ? 0 : item.bets / item.bettors,
         }));
 
@@ -121,71 +114,94 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
   }, [params.gameCategoryId]);
 
   return (
-    <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
-      <div className="flex justify-between items-center w-full">
+    <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
+      <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col leading-none">
-          <p className="text-lg leading-none">
+          <p className="text-sm md:text-base lg:text-lg leading-none">
             Summary of Bettors and Bets Placed Today
           </p>
           <CustomLegend />
         </div>
         {currentUserType !== 3 && (
-          <GenericCSVExportButton
-            data={chartData}
-            headers={["Draw", "Bettors (in 10k)", "Bets (in 10k)", "Bet-to-Bettor Ratio"]}
-            title="Summary of Bettors and Bets per Draw"
-            getRowData={(item) => [
-              item.draw,
-              item.bettors,
-              item.bets,
-              item.ratio,
-            ]}
-          />
+          <div className="mt-2 md:mt-0">
+            <GenericCSVExportButton
+              data={chartData}
+              headers={[
+                "Draw",
+                "Bettors (in 100k)",
+                "Bets (in 100k)",
+                "Bet-to-Bettor Ratio",
+              ]}
+              title="Summary of Bettors and Bets per Draw"
+              getRowData={(item) => [
+                item.draw,
+                item.bettors,
+                item.bets,
+                item.ratio,
+              ]}
+            />
+          </div>
         )}
       </div>
 
-      <div className="h-full w-full mt-4">
-        {/* {loading ? (
+      <div className="w-full pb-4">
+        {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : ( */}
-          <BarChart
-            height={300}
-            grid={{ vertical: true }}
-            layout="horizontal"
-            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-            slotProps={{
-              legend: { hidden: true },
-              noDataOverlay: {
-                message: "Summary of Bets data will be displayed once available.",
-              },
-            }}
-            dataset={chartData}
-            yAxis={[
-              {
-                scaleType: "band",
-                data: chartData.map((item) => item.draw),
-              },
-            ]}
-            xAxis={[
-              {
-                label: "Total (x 100,000)",
-                scaleType: "linear",
-                min: 0,
-                max: safeMax,
-                valueFormatter: (value: number) => `${value.toLocaleString()}`,
-                tickSize: 2,
-                barCategoryGap: 0.2,
-                tickLabelProps: { style: { fontSize: "12px" } },
-              } as any,
-            ]}
-            series={addLabels([
-              { dataKey: "bettors", color: "#E5C7FF" },
-              { dataKey: "bets", color: "#D2A7FF" },
-            ])}
-          />
-        {/* )} */}
+        ) : (
+          <div className="min-w-[850px] md:min-w-[600px]">
+            <BarChart
+              height={300}
+              grid={{ vertical: true }}
+              layout="horizontal"
+              margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+              slotProps={{
+                legend: { hidden: true },
+                noDataOverlay: {
+                  message:
+                    "Summary of Bets data will be displayed once available.",
+                },
+              }}
+              dataset={chartData}
+              series={[
+                {
+                  data: data.map((item) => item.bettors / 100000),
+                  color: "#BB86FC",
+                  label: "Bettors",
+                  valueFormatter: (value, context) =>
+                    `${data[context.dataIndex].bettors.toLocaleString()}`,
+                },
+                {
+                  data: data.map((item) => item.bets / 100000),
+                  color: "#5050A5",
+                  label: "Bets",
+                  valueFormatter: (value, context) =>
+                    `${data[context.dataIndex].bets.toLocaleString()}`,
+                },
+              ]}
+              yAxis={[
+                {
+                  scaleType: "band",
+                  data: chartData.map((item) => item.draw),
+                },
+              ]}
+              xAxis={[
+                {
+                  label: "Total (x 100,000)",
+                  scaleType: "linear",
+                  min: 0,
+                  max: 750,
+                  tickInterval: 50,
+                  valueFormatter: (value: number) => value.toString(),
+                  tickSize: 2,
+                  barCategoryGap: 0.2,
+                  tickLabelProps: { style: { fontSize: "12px" } },
+                } as any,
+              ]}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
