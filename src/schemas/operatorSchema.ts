@@ -143,44 +143,13 @@ export const operatorSchema = z.object({
 });
     
 export const updateOperatorSchema = z.object({
-  execNumber: z
-    .string({ required_error: "Phone Number is required." })
-    .min(1, "Phone Number is required.")
-    .refine((val) => /^09\d{9}$/.test(val), {
-      message:
-        "Please enter a valid phone number starting with 09 and 11 digits long (e.g. 09XXXXXXXXX).",
-    }),
-  execEmail: z
-    .string({ required_error: "Email is required." })
-    .min(1, "Email is required.")
-    .refine((val) => /\S+@\S+\.\S+/.test(val), {
-      message: "Please enter a valid email address e.g. xxx@email.com",
-    }),
-  execPassword: z
-    .string({ required_error: "Password is required." })
-    .superRefine((val, ctx) => {
-      const isValid =
-        val.length >= 8 &&
-        /[A-Z]/.test(val) &&
-        /[a-z]/.test(val) &&
-        /\d/.test(val) &&
-        /[!@#$%^&*]/.test(val);
-
-      if (!isValid) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
-        });
-      }
-    }),
   name: z
     .string({ required_error: "Operator Name is required." })
     .min(1, "Operator Name is required.")
     .refine((val) => /^[A-Za-z\s]+$/.test(val), {
       message: "Operator Name can only contain letters and spaces.",
     }),
-  contactNumber: z
+  contactNo: z
     .string({ required_error: "Phone Number is required." })
     .min(1, "Phone Number is required.")
     .refine((val) => /^09\d{9}$/.test(val), {
@@ -212,34 +181,12 @@ export const updateOperatorSchema = z.object({
       )
       .min(1, { message: "Game Type is required." })
   ),
-  cities: z.preprocess(
-    (val) => {
-      if (Array.isArray(val)) {
-        return val.map((v) => (typeof v === "string" ? parseInt(v, 10) : v));
-      }
-      return val;
-    },
-    z
-      .array(
-        z.number({
-          required_error: "Cities are required.",
-          invalid_type_error: "Each City must be a number.",
-        })
-      )
-      .min(1, { message: "Cities are required." })
-  ),
   dateOfOperation: z
     .string({ required_error: "Date of operations is required." })
     .min(1, "Date of operations is required."),
-  address: z
+  operatorAddress: z
     .string({ required_error: "Operator address is required." })
     .min(1, "Operator address is required."),
-  areaOfOperations: z.preprocess(
-    (val) => (typeof val === "number" ? String(val) : val),
-    z
-      .string({ required_error: "Area of operations is required." })
-      .min(1, "Cities are required.")
-  ),
   remarks: z
     .string({ required_error: "Remarks is required." })
     .min(1, "Remarks is required.")

@@ -133,6 +133,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       email: data.Email || '',
       dateOfOperation: data.DateOfOperation || '',
       areaOfOperations: data.AreaOfOperations || '',
+      
       status: data.Status === 1 ? 'active' : 'inactive',
       createdAt: data.CreatedAt || '',
       createdBy: data.CreatedBy || '',
@@ -141,7 +142,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       lastUpdatedBy: data.LastUpdatedBy || '',
 
       execFirstName: data.Executive || '',
-      //execLastName: data. 
+      execEmail: data.execEmail || '',
 
       regionId: data.Region?.RegionId || null,
       regionName: data.Region?.RegionName || '',
@@ -220,14 +221,21 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       console.log("[Form Submit] Raw Submitted Values:", values);
 
       const result = await Swal.fire({
-        title: "Update Confirmation",
-        text: "Did you enter the correct details?",
-        icon: "question",
+        title: "<strong>Are you sure?</strong>",
+        html: `If you go back, all your progress will be lost!`,
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonText: "Yes, I did",
-        cancelButtonText: "No, let me check",
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
+        confirmButtonColor: "#EF4444",
+        cancelButtonColor: "#3B82F6",
+        confirmButtonText: '<i class="fa fa-ban"></i> Yes, I did',
+        cancelButtonText: 'Stay here',
+        customClass: {
+          popup: 'bg-[#FFFFFF] text-black rounded-md',
+          title: 'text-lg font-semibold',
+          confirmButton: 'bg-[#CE1126] rounded-md text-white text-base hover:bg-red-700 px-6 py-1.5',
+          cancelButton: 'bg-transparent px-4 text-base',
+        },
+        buttonsStyling: false,
       });
 
       if (!result.isConfirmed) return;
@@ -475,14 +483,14 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
           {/* Email */}
           <div>
             <label
-              htmlFor="email"
+              htmlFor="execEmail"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Email Address
             </label>
             <Input
-              id="email"
-              {...formik.getFieldProps("email")}
+              id="execEmail"
+              {...formik.getFieldProps("execEmail")}
               disabled={isDisabled}
             />
           </div>

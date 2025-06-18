@@ -210,29 +210,38 @@ const DetailedTable = function <T extends User | Operator | Device>({
   );
 
   const handleSuspend = async (row: T) => {
-    console.log("handleSuspend called with row:", row);
+    //console.log("handleSuspend called with row:", row);
+
+    let fullName = "this user";
+
+    if ("FirstName" in row && "LastName" in row) {
+      fullName = `${row.FirstName} ${row.LastName}`;
+    }
 
     const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Do you really want to suspend this user?",
+      title: "<strong>Delete Confirmation</strong>",
+      html: `This action will delete the accounts and any related data for <strong>${fullName}</strong>`,
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
-      confirmButtonText: "Yes, suspend!",
+      confirmButtonColor: "#EF4444",
+      cancelButtonColor: "#3B82F6",
+      confirmButtonText: '<i class="fa fa-ban"></i> Delete',
+      customClass: {
+        popup: 'bg-[#FFFFFF] text-black rounded-md',
+        title: 'text-lg font-semibold',
+        confirmButton: 'bg-[#CE1126] rounded-md text-white text-base hover:bg-red-700 px-8 py-1.5',
+        cancelButton: 'bg-transparent px-4 text-base',
+      },
+      buttonsStyling: false,
     });
-
-    console.log("User confirmed suspension:", result.isConfirmed);
 
     if (result.isConfirmed) {
       const userId = "UserId" in row ? row.UserId : "";
 
       if (!userId) {
-        console.error("Missing UserId or OperatorId in row:", row);
+        console.error("Missing UserId in row:", row);
         return;
       }
-
-      console.log("Setting formData with UserId and remarks:", userId);
 
       setFormData({
         UserId: userId,

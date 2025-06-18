@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
 import { getCurrentUser } from "~/utils/api/auth";
+import axios from "axios"; // for calling token refresh directly
 
 const aliasMap: Record<string, string> = {
   "/dashboard": "/Protected/dashboard",
@@ -39,49 +40,66 @@ export function useAuth() {
   const isErrorPage = normalizedPath === "/auth/error404";
 
   const [loading, setLoading] = useState(true);
-  const { setUser, clearUser, setUserTypeId } = useAuthStore();
+  const {
+    user,
+    userValidated,
+    setUser,
+    clearUser,
+    setUserTypeId,
+    setUserValidated,
+  } = useAuthStore();
 
   useEffect(() => {
-    console.log("Auth check useEffect triggered");
+    const forceTokenRefresh = async () => {
+      try {
+        const refresh = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/tokenRefresh`,
+          {},
+          { withCredentials: true }
+        );
+        console.log("Token refresh success:", refresh.data);
+      } catch (err) {
+        console.error("Token refresh failed:", err);
+      }
+    };
 
     if (isExcludedPath) {
-      console.log("Path is excluded. Clearing user state.");
       clearUser();
       setLoading(false);
       return;
     }
 
-    const performAuthCheck = async () => {
-      console.log("Performing authentication check...");
+    const run = async () => {
+      //await forceTokenRefresh();
+
+      if (user && userValidated) {
+        setLoading(false);
+        return;
+      }
 
       try {
         const res = await getCurrentUser();
-        console.log("getCurrentUser response:", res);
 
         if (res?.success && res.data) {
-          console.log("User authenticated. Setting user data:", res.data);
-          setUserTypeId(res.data.UserTypeId);
           setUser(res.data);
+          setUserTypeId(res.data.UserTypeId);
         } else {
-          console.warn("No valid user data. Clearing user.");
           clearUser();
+          router.replace("/auth/login");
         }
-      } catch (error) {
-        console.error("Auth check failed:", error);
+      } catch (err) {
         clearUser();
-
         if (!isErrorPage) {
-          console.log("Redirecting to login...");
           router.replace("/auth/login");
         }
       } finally {
-        console.log("Auth check complete. Stopping loading state.");
+        setUserValidated(true);
         setLoading(false);
       }
     };
 
-    performAuthCheck();
-  }, [isExcludedPath, isErrorPage, router, setUser]);
+    run();
+  }, [isExcludedPath, isErrorPage, user, userValidated]);
 
   return { loading };
 }

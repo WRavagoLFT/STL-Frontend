@@ -9,6 +9,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { updateUserSchema } from "~/schemas/userSchema";
 import { useAuthStore } from "~/store/useAuthStore";
+import Swal from "sweetalert2";
 
 interface UpdateUserFormProps {
   title?: string;
@@ -30,7 +31,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   onClose,
 }) => {
   const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
-  console.log('SELECTED USER', selectedUser);
+  //console.log('SELECTED USER', selectedUser);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const sevenDaysAgo = dayjs().subtract(7, "day");
@@ -103,7 +104,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   const formik = useFormik({
     initialValues: mapSelectedUserToFormData(selectedUser),
     validationSchema: toFormikValidationSchema(updateUserSchema),
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       const submittedData: any = {
         userId: values.userId,
         firstName: values.firstName,
@@ -120,8 +121,31 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
         remarks: values.remarks,
       };
 
-      setFormData(submittedData);
-      openConfirmModal();
+      const result = await Swal.fire({
+        title: "<strong>Are you sure?</strong>",
+        html: `If you go back, all your progress will be lost!`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#EF4444",
+        cancelButtonColor: "#3B82F6",
+        confirmButtonText: '<i class="fa fa-ban"></i> Yes, I did',
+        cancelButtonText: 'Stay here',
+        customClass: {
+          popup: 'bg-[#FFFFFF] text-black rounded-md',
+          title: 'text-lg font-semibold',
+          confirmButton: 'bg-[#CE1126] rounded-md text-white text-base hover:bg-red-700 px-8 py-1',
+          cancelButton: 'bg-transparent px-4 text-base',
+        },
+        buttonsStyling: false,
+      });
+
+      if (result.isConfirmed) {
+        setFormData(submittedData);
+        console.log('SUBMITTED DATA', submittedData);
+        openConfirmModal();
+      } else {
+        console.log("User cancelled update");
+      }
     },
   });
 

@@ -77,14 +77,21 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
       //console.log("Form submitted. Raw values from Formik:", values);
       try {
         const result = await Swal.fire({
-          title: "Add Confirmation",
-          text: "Did you enter the correct details?",
+          title: "<strong>Add Confirmation</strong>",
+          html: `Did you enter the correct details?`,
           icon: "question",
           showCancelButton: true,
-          confirmButtonText: "Yes, I did",
-          cancelButtonText: "No, let me check",
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
+          confirmButtonColor: "#EF4444",
+          cancelButtonColor: "#3B82F6",
+          confirmButtonText: '<i class="fa fa-ban"></i> Yes, I did',
+          cancelButtonText: 'No, let me check',
+          customClass: {
+            popup: 'bg-[#FFFFFF] text-black rounded-md',
+            title: 'text-lg font-semibold',
+            confirmButton: 'bg-[#0038A8] rounded-md text-white text-base hover:bg-blue-700 px-8 py-1',
+            cancelButton: 'bg-transparent px-4 text-base',
+          },
+          buttonsStyling: false,
         });
 
         if (result.isConfirmed) {

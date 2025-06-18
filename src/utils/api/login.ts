@@ -8,7 +8,7 @@ export const loginUser = async (
   router: any
 ) => {
   try {
-    const loginResponse = await axiosInstance.post("/auth/login", payload);
+    const loginResponse = await axiosInstance.post("/auth/login/web", payload);
     await handleRouter(router);
 
   } catch (error: unknown) {

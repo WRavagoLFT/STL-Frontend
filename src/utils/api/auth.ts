@@ -1,5 +1,6 @@
 import axios, { AxiosError } from "axios";
 import axiosInstance, { waitUntilNotRefreshing } from "../axiosInstance";
+import { useAuthStore } from "~/store/useAuthStore";
 
 // Helper to validate URL paths
 const validateRelativeUrl = (url: string) => {
@@ -36,21 +37,26 @@ const getCurrentUser = async () => {
 };
 
 const logoutUser = async (queryParams: Record<string, any> = {}) => {
-    try {
-        // Clear intervals and client state FIRST
-        //useAuthStore.getState().logout();
-        
-        const url = validateRelativeUrl("/auth/logout");
-        const response = await axiosInstance.delete(url, {
-            params: queryParams
-        });
-        
-        return { success: true, message: "Logout successful", data: response.data };
-    } catch (error) {
-        console.error("Error logging out:", (error as Error).message);
-        
-        return { success: true, message: "Logout completed (client-side)" };
-    }
+  try {
+    // 1. Call API to clear server cookie
+    const url = validateRelativeUrl("/auth/logout");
+    const response = await axiosInstance.delete(url, {
+      params: queryParams,
+      withCredentials: true, // ⬅️ ensures cookies are included
+    });
+
+    // 2. Clear client state
+    useAuthStore.getState().logout(); // or any client-side clearing logic
+
+    return { success: true, message: "Logout successful", data: response.data };
+  } catch (error) {
+    console.error("Error logging out:", (error as Error).message);
+
+    // Even if server fails, still clear client state
+    useAuthStore.getState().logout();
+
+    return { success: true, message: "Logout completed (client-side)" };
+  }
 };
 
 const verifyPass = async (password: string) => {

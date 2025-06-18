@@ -17,7 +17,6 @@ import Swal from "sweetalert2";
 import { loadUsers } from "~/hooks/useLoadUsers";
 import { useAuthStore } from "~/store/useAuthStore";
 import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
-import ConfirmUserActionModalPage from "~/components/ui/modals/ConfirmUserActionModal";
 
 const roleMap: Record<
   string,
@@ -124,12 +123,6 @@ const RolePage = () => {
     setShowEditLog(true);
   };
 
-  const openSuspendModal = (user: User) => {
-    setSelectedUser(user);
-    setIsUpdateModalOpen(true);
-  };
-
-
   useEffect(() => {
     if (!roleKey) return;
 
@@ -197,11 +190,6 @@ const RolePage = () => {
       if (!userId) {
         throw new Error("User ID is missing.");
       }
-
-      // console.log("Suspending user with data:", {
-      //   userId,
-      //   remarks: data.remarks || "(no remarks)",
-      // });
 
       const result = await suspendUser(userId, data.remarks);
 

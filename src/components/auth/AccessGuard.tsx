@@ -1,29 +1,31 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
+import { useAuth } from "~/utils/useAuth";
 
-export const AccessGuard = ({
-  allowedUserTypes,
-  children,
-}: {
+interface AccessGuardProps {
   allowedUserTypes: number[];
   children: React.ReactNode;
-}) => {
-  const { userTypeId, isLoading } = useAuthStore();
+}
+
+export const AccessGuard = ({ allowedUserTypes, children }: AccessGuardProps) => {
+  const { userTypeId } = useAuthStore();
+  const { loading } = useAuth(); // ensures auth check has completed
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (loading) return; // don’t check anything until auth check is done
 
     if (userTypeId === null || !allowedUserTypes.includes(userTypeId)) {
+      console.warn("Unauthorized access. Redirecting to error404.");
       router.replace("/auth/error404");
     } else {
       setIsAuthorized(true);
     }
-  }, [isLoading, userTypeId, allowedUserTypes, router]);
+  }, [loading, userTypeId, allowedUserTypes, router]);
 
-  if (isLoading || !isAuthorized) return null;
+  if (loading || !isAuthorized) return null;
 
   return <>{children}</>;
 };

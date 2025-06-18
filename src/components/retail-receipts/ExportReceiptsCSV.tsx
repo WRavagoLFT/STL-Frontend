@@ -63,14 +63,9 @@ const ExportRetailDataToExcel = ({
     netAacTotalPercentage,
     netPcsoTotalAmount,
     netPcsoTotalPercentage,
-  } = useRetailReceiptProcessor(
-    receiptData,
-    filterBy.value,
-    operationDate,
-    yearNumber,
-  );
+  } = useRetailReceiptProcessor(receiptData, filterBy.value, operationDate, yearNumber);
 
-  const handleDownloadExcel = (receiptData: any, receiptDataMetrics: any) => {
+  const handleDownloadExcel = () => {
     if (!receiptData) return;
 
     const sheetData: any[] = [];
@@ -88,13 +83,12 @@ const ExportRetailDataToExcel = ({
     ]);
     sheetData.push([
       `Generated Date: ${new Date().toLocaleString()}`,
-
-      receiptData?.Collections || 0,
-      receiptDataMetrics?.TotalBets || 0,
-      receiptDataMetrics?.TotalBettors || 0,
-      receiptDataMetrics?.TotalPayout || 0,
-      receiptDataMetrics?.TotalRevenue || 0,
-      receiptDataMetrics?.TotalWinners || 0,
+      receiptData?.Collections ?? 0,
+      receiptDataMetrics?.TotalBets ?? 0,
+      receiptDataMetrics?.TotalBettors ?? 0,
+      receiptDataMetrics?.TotalPayout ?? 0,
+      receiptDataMetrics?.TotalRevenue ?? 0,
+      receiptDataMetrics?.TotalWinners ?? 0,
     ]);
     sheetData.push([]);
 
@@ -134,11 +128,7 @@ const ExportRetailDataToExcel = ({
         item.ShareAmount,
       ]);
     });
-    sheetData.push([
-      "Total",
-      `${aacTaxTotalPercentage}%`,
-      aacTaxTotalShareAmount,
-    ]);
+    sheetData.push(["Total", `${aacTaxTotalPercentage}%`, aacTaxTotalShareAmount]);
     sheetData.push([]);
 
     // 5. PCSO Tax Section
@@ -151,28 +141,16 @@ const ExportRetailDataToExcel = ({
         item.ShareAmount,
       ]);
     });
-    sheetData.push([
-      "Total",
-      `${pcsoTaxTotalPercentage}%`,
-      pcsoTaxTotalShareAmount,
-    ]);
+    sheetData.push(["Total", `${pcsoTaxTotalPercentage}%`, pcsoTaxTotalShareAmount]);
     sheetData.push([]);
 
     // 6. Net Shares Section
     sheetData.push(["Net Shares"]);
     sheetData.push(["Type", "Net Percentage", "Net Amount"]);
-    sheetData.push([
-      "Net AAC Share",
-      `${netAacTotalPercentage}%`,
-      netAacTotalAmount,
-    ]);
-    sheetData.push([
-      "Net PCSO Share",
-      `${netPcsoTotalPercentage}%`,
-      netPcsoTotalAmount,
-    ]);
+    sheetData.push(["Net AAC Share", `${netAacTotalPercentage}%`, netAacTotalAmount]);
+    sheetData.push(["Net PCSO Share", `${netPcsoTotalPercentage}%`, netPcsoTotalAmount]);
 
-    // Create worksheet and download
+    // Create worksheet
     const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
 
     // Auto-fit column widths
@@ -181,12 +159,13 @@ const ExportRetailDataToExcel = ({
         const value = row[colIndex];
         return value !== undefined && value !== null ? value.toString() : "";
       });
-      const maxLength = Math.max(...column.map((cell) => cell.length), 40);
-      return { wch: maxLength + 4 };
+      const maxLength = Math.max(...column.map((cell) => cell.length), 10);
+      return { wch: maxLength + 2 };
     });
 
     worksheet["!cols"] = columnWidths;
 
+    // Create workbook and write file
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Retail Receipt");
 
@@ -197,9 +176,9 @@ const ExportRetailDataToExcel = ({
     <Button
       sx={buttonStylesretail}
       variant="contained"
-        onClick={() => handleDownloadExcel(receiptData, receiptDataMetrics)}
+      onClick={handleDownloadExcel}
     >
-      Download CSV
+      Download Excel
     </Button>
   );
 };

@@ -30,8 +30,6 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
   userid,
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>({});
-  //console.log('PASSED DEVICE ID', deviceId);
-  //console.log('PASSED DEVICE', device);
   const [usageNotes, setUsageNotes] = useState<any[]>([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
@@ -44,23 +42,19 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
     getUsageNotes(setUsageNotes);
   }, []);
 
-  //console.log('DEVICE', device);
-  //console.log('USAGE NOTES IN THE UPDATE', usageNotes);
-
   const [isDisabled, setIsDisabled] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
-  
+
   const handleDisable = () => {
     setTimeout(() => {
       setIsDisabled(false);
-    }, 0); // Slight delay to prevent immediate "Save" click
+    }, 0);
   };
 
   const handleModalClose = () => {
-    // Close the confirm modal and the parent AddUserModal
     closeConfirmModal();
     if (onClose) onClose();
   };
@@ -95,30 +89,36 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
       //console.log("Form submitted. Raw values from Formik:", values);
       try {
         const result = await Swal.fire({
-          title: "Update Confirmation",
-          text: "Did you enter the correct details?",
-          icon: "question",
+          title: "<strong>Are you sure?</strong>",
+          html: `If you go back, all your progress will be lost!`,
+          icon: "warning",
           showCancelButton: true,
-          confirmButtonText: "Yes, I did",
-          cancelButtonText: "No, let me check",
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
+          confirmButtonColor: "#EF4444",
+          cancelButtonColor: "#3B82F6",
+          confirmButtonText: '<i class="fa fa-ban"></i> Yes, I did',
+          cancelButtonText: "Stay here",
+          customClass: {
+            popup: "bg-[#FFFFFF] text-black rounded-md",
+            title: "text-lg font-semibold",
+            confirmButton:
+              "bg-[#CE1126] rounded-md text-white text-base hover:bg-red-700 px-8 py-1",
+            cancelButton: "bg-transparent px-4 text-base",
+          },
+          buttonsStyling: false,
         });
 
         if (result.isConfirmed) {
-          //console.log("User confirmed submission in SweetAlert dialog.");
-
-          // Clean data by removing null, undefined, or empty strings
           const cleanedData = Object.fromEntries(
-            Object.entries(values).filter(([_, value]) =>
-              value !== null && value !== undefined && value !== ""
+            Object.entries(values).filter(
+              ([_, value]) =>
+                value !== null && value !== undefined && value !== ""
             )
           );
 
           if (values.deviceId) {
             cleanedData.deviceId = values.deviceId;
           }
-          
+
           // Add assignedUser if present
           // cleanedData.assignedUser = userid || 0;
 
@@ -130,12 +130,14 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
           console.log("User canceled confirmation dialog. Submission aborted.");
         }
       } catch (error) {
-        console.error("Unexpected error during submission confirmation flow:", error);
+        console.error(
+          "Unexpected error during submission confirmation flow:",
+          error
+        );
       }
     },
   });
 
-  // Helpers to display errors
   const getError = (field: string) =>
     formik.touched[field as keyof typeof formik.touched] &&
     formik.errors[field as keyof typeof formik.errors]
@@ -158,7 +160,9 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               className="mt-1"
               value={
                 formik.values.assignmentDate
-                  ? dayjs(formik.values.assignmentDate).format("YYYY/MM/DD HH:mm:ss")
+                  ? dayjs(formik.values.assignmentDate).format(
+                      "YYYY/MM/DD HH:mm:ss"
+                    )
                   : ""
               }
               onChange={(e) => {
@@ -207,21 +211,21 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
             <label htmlFor="usageNotes" className="block text-sm mb-1">
               Usage Notes / Restrictions
             </label>
-              <CustomSelect
-                name="usageNotes"
-                options={usageNotesOptions}
-                value={
-                  usageNotesOptions.find(
-                    (opt) => opt.label === formik.values.usageNotes
-                  ) || null
-                }
-                onChange={(e) => {
-                  formik.setFieldValue("usageNotes", e.target.value);
-                }}
-                disabled
-                error={!!getError("usageNotes")}
-                //placeholder=""
-              />
+            <CustomSelect
+              name="usageNotes"
+              options={usageNotesOptions}
+              value={
+                usageNotesOptions.find(
+                  (opt) => opt.label === formik.values.usageNotes
+                ) || null
+              }
+              onChange={(e) => {
+                formik.setFieldValue("usageNotes", e.target.value);
+              }}
+              disabled
+              error={!!getError("usageNotes")}
+              //placeholder=""
+            />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("usageNotes") || "\u00A0"}
             </p>
@@ -259,7 +263,9 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
               disabled
               value={
                 formik.values.lastSyncTimestamp
-                  ? dayjs(formik.values.lastSyncTimestamp).format("YYYY/MM/DD HH:mm:ss")
+                  ? dayjs(formik.values.lastSyncTimestamp).format(
+                      "YYYY/MM/DD HH:mm:ss"
+                    )
                   : ""
               }
               onChange={(e) => {
