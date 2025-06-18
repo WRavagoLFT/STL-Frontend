@@ -1,28 +1,23 @@
 import React, { useMemo } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  IconButton,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import FilterListIcon from "@mui/icons-material/FilterList";
-import FilterListOffIcon from "@mui/icons-material/FilterListOff";
-import PersonOffIcon from "@mui/icons-material/PersonOff";
+  FaSearch,
+  FaUserSlash,
+  FaChevronLeft,
+  FaChevronRight,
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
+} from "react-icons/fa";
+import { MdFilterList, MdFilterListOff } from "react-icons/md";
+import { DetailedTableProps } from "../../../types/interfaces";
 import useDetailTableStore from "../../../store/useTableStore";
 import {
   SortableTableCell,
   filterData,
   sortData,
 } from "../../../hooks/sortPaginationSearch";
-import { DetailedTableProps } from "../../../types/interfaces";
-import { User, Operator, SortConfig } from "~/types/types";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
+import { User, Operator, SortConfig } from "~/types/types";
 
 const ReadOnlyTablePage = <T extends Transactions>({
   data,
@@ -44,39 +39,22 @@ const ReadOnlyTablePage = <T extends Transactions>({
     setSearchQuery,
   } = useDetailTableStore();
 
-  // FILTER + SEARCH
   const filteredData = useMemo(() => {
     const filterKeys = columns
       .filter((col) => col.filterable)
       .map((col) => col.filterKey ?? col.key?.toString())
       .filter((key): key is string => !!key);
 
-    const enrichedData = data.map((item) => ({
-      ...item,
-    }));
+    const enrichedData = data.map((item) => ({ ...item }));
 
     return filterData(enrichedData, filterKeys, { ...filters, searchQuery });
   }, [data, filters, searchQuery, columns]);
 
-  // SORTING
   const sortedData = useMemo(() => {
-    if (!filteredData || !sortConfig) {
-      return [];
-    }
-    // console.log('Filtered Data before Sorting:', filteredData);
-    // console.log('Sort Config:', sortConfig);
-
-    // Perform sorting operation
-    const result = sortData(
-      filteredData,
-      sortConfig as SortConfig<User | Operator>
-    );
-    // console.log('Sorted Data:', result);
-
-    return result;
+    if (!filteredData || !sortConfig) return [];
+    return sortData(filteredData, sortConfig as SortConfig<User | Operator>);
   }, [filteredData, sortConfig]);
 
-  // PAGINATION
   const paginatedData = useMemo(() => {
     const start = page * rowsPerPage;
     const end = start + rowsPerPage;
@@ -84,72 +62,97 @@ const ReadOnlyTablePage = <T extends Transactions>({
   }, [sortedData, page, rowsPerPage]);
 
   return (
-    <React.Fragment>
-      <TableContainer>
-        <div className="flex justify-between items-center py-3 px-1">
-          <div className="flex items-center">
-            <div className="relative w-[350px]">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-[10px] bg-transparent border border-[#0038A8] rounded-md text-sm focus:outline-none"
-              />
-              <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <SearchIcon style={{ fontSize: 20 }} />
-              </div>
+    <div className="overflow-x-auto w-full border border-[#0038A8] rounded-xl px-4 py-2">
+      <div className="flex flex-col sm:flex-row justify-between items-center py-2 gap-3">
+        <div className="flex items-center w-full sm:w-auto">
+          <div className="relative w-full sm:w-[350px]">
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-white border border-blue-900 rounded-md text-sm focus:outline-none"
+            />
+            <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <FaSearch size={16} />
             </div>
-            <IconButton
-              onClick={() => setIsFilterActive(!isFilterActive)}
-              className="ml-2"
-            >
-              {isFilterActive ? (
-                <FilterListOffIcon sx={{ color: "#ACA993" }} />
-              ) : (
-                <FilterListIcon sx={{ color: "#ACA993" }} />
-              )}
-            </IconButton>
           </div>
+          <button
+            onClick={() => setIsFilterActive(!isFilterActive)}
+            className="ml-2 text-gray-400 hover:text-gray-600"
+          >
+            {isFilterActive ? (
+              <MdFilterListOff size={24} />
+            ) : (
+              <MdFilterList size={24} />
+            )}
+          </button>
         </div>
-        <Table>
-          <TableHead>
-            <TableRow sx={{ "&:hover": { backgroundColor: "#F08060" } }}>
-              {columns.map((col) =>
-                col.sortable || col.filterable ? (
-                  <SortableTableCell
-                    key={String(col.key)}
-                    label={col.label}
-                    sortKey={String(col.key)}
-                    isFilterVisible={isFilterActive && col.filterable}
-                  />
-                ) : (
-                  <TableCell key={String(col.key)}>{col.label}</TableCell>
-                )
-              )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedData.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length + (actionsRender ? 1 : 1)}
-                  align="center"
-                >
-                  <div className="flex flex-col items-center py-7 text-[#0038A8]">
-                    <PersonOffIcon style={{ fontSize: 50 }} />
-                    <h6 className="mt-2 font-sm text-lg ">No data available</h6>
+      </div>
+
+      <div className="w-full overflow-x-auto">
+        <table className="table-auto w-full">
+          <thead className="bg-[#E97451] text-white">
+            <tr className="mx-auto">
+              {columns.map((col) => (
+                <th key={String(col.key)} className="py-4 text-left font-normal ">
+                  <div className="flex items-center justify-start gap-1">
+                    {col.sortable && (
+                      <SortableTableCell
+                        label=""
+                        sortKey={String(col.key)}
+                        isFilterVisible={false}
+                      />
+                    )}
+                    <span>{col.label}</span>
                   </div>
-                </TableCell>
-              </TableRow>
+                </th>
+              ))}
+            </tr>
+
+            {/* Filter row (conditionally rendered below the column headers) */}
+            {isFilterActive && (
+              <tr>
+                {columns.map((col) => (
+                  <th key={String(col.key)} className="text-left">
+                    <div className="flex items-center justify-center gap-1">
+                      {col.filterable ? (
+                        <SortableTableCell
+                          label=""
+                          sortKey={String(col.key)}
+                          isFilterVisible={true}
+                        />
+                      ) : null}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            )}
+          </thead>
+          <tbody>
+            {paginatedData.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length + (actionsRender ? 1 : 1)}
+                  className="text-center py-10 text-blue-900"
+                >
+                  <div className="flex flex-col items-center">
+                    <FaUserSlash size={40} />
+                    <p className="mt-2 text-lg">No data available</p>
+                  </div>
+                </td>
+              </tr>
             ) : (
               paginatedData.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
+                <tr
+                  key={rowIndex}
+                  className="hover:bg-[#E0DCBD] border-b border-[#ACA993]"
+                >
                   {columns.map((col) => {
                     const key = String(col.key);
                     const value = (row as any)[key];
                     return (
-                      <TableCell key={key} sx={{ paddingY: 0.6 }}>
+                      <td key={key} className="px-2 py-2">
                         {col.render
                           ? col.render(row as unknown as T)
                           : col.filterValue
@@ -166,26 +169,90 @@ const ReadOnlyTablePage = <T extends Transactions>({
                                     )
                                     .join(", ")
                                 : ""}
-                      </TableCell>
+                      </td>
                     );
                   })}
-                </TableRow>
+                </tr>
               ))
             )}
-          </TableBody>
-        </Table>
-        <div className="p-3">
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 50, 100]}
-            component="div"
-            count={filteredData.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+          </tbody>
+        </table>
+      </div>
+
+      <div className="flex flex-col sm:flex-row justify-between items-center p-3 text-sm">
+        <div className="flex items-center gap-2">
+          <label htmlFor="rowsPerPage">Rows per page:</label>
+          <select
+            id="rowsPerPage"
+            className="border border-gray-300 rounded px-1"
+            value={rowsPerPage}
+            onChange={(e) =>
+              handleChangeRowsPerPage({
+                target: { value: e.target.value },
+              } as any)
+            }
+          >
+            {[10, 25, 50, 100].map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
         </div>
-      </TableContainer>
+        <div className="flex items-center gap-3 mt-2 sm:mt-0">
+          <span>
+            {Math.min(page * rowsPerPage + 1, filteredData.length)}–
+            {Math.min((page + 1) * rowsPerPage, filteredData.length)} of{" "}
+            {filteredData.length}
+          </span>
+
+          <button
+            onClick={(e) => handleChangePage(e, 0)}
+            disabled={page === 0}
+            className="p-2 border rounded disabled:opacity-30"
+            title="First Page"
+          >
+            <FaAngleDoubleLeft />
+          </button>
+
+          <button
+            onClick={(e) => handleChangePage(e, page - 1)}
+            disabled={page === 0}
+            className="p-2 border rounded disabled:opacity-30"
+            title="Previous Page"
+          >
+            <FaChevronLeft />
+          </button>
+
+          <span>
+            Page {page + 1} of {Math.ceil(filteredData.length / rowsPerPage)}
+          </span>
+
+          <button
+            onClick={(e) => handleChangePage(e, page + 1)}
+            disabled={page >= Math.ceil(filteredData.length / rowsPerPage) - 1}
+            className="p-2 border rounded disabled:opacity-30"
+            title="Next Page"
+          >
+            <FaChevronRight />
+          </button>
+
+          <button
+            onClick={(e) =>
+              handleChangePage(
+                e,
+                Math.ceil(filteredData.length / rowsPerPage) - 1
+              )
+            }
+            disabled={page >= Math.ceil(filteredData.length / rowsPerPage) - 1}
+            className="p-2 border rounded disabled:opacity-30"
+            title="Last Page"
+          >
+            <FaAngleDoubleRight />
+          </button>
+        </div>
+      </div>
+
       <div className="flex justify-end pt-1">
         <CSVExportButtonTable
           pageType={pageType}
@@ -194,7 +261,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
           operatorMap={operatorMap ? Object.values(operatorMap) : []}
         />
       </div>
-    </React.Fragment>
+    </div>
   );
 };
 

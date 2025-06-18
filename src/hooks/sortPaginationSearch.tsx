@@ -1,168 +1,85 @@
-import React from 'react';
-import dayjs, { Dayjs } from 'dayjs';
-import TableCell from '@mui/material/TableCell';
-import TextField from '@mui/material/TextField';
-import { Tooltip } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import useDetailTableStore from '../store/useTableStore';
-import { SortableTableCellProps } from '../types/interfaces';
-import { User, Operator, SortConfig, EditLogFields } from '~/types/types';
-import { filterStyles } from '~/styles/theme';
+import React from "react";
+import dayjs, { Dayjs } from "dayjs";
+import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
+import { SortableTableCellProps } from "../types/interfaces";
+import useDetailTableStore from "../store/useTableStore";
+import { User, Operator, SortConfig, EditLogFields } from "~/types/types";
 
-// SORTING + FILTERING COMPONENT
 export const SortableTableCell: React.FC<SortableTableCellProps> = ({
   label,
   sortKey,
   isFilterVisible = false,
 }) => {
-  const { sortConfig, setSortConfig, filters, setFilters } = useDetailTableStore();
+  const { sortConfig, setSortConfig, filters, setFilters } =
+    useDetailTableStore();
 
   const handleSort = () => {
     const direction =
-      sortConfig.key === sortKey && sortConfig.direction === 'asc' ? 'desc' : 'asc';
+      sortConfig.key === sortKey && sortConfig.direction === "asc"
+        ? "desc"
+        : "asc";
     setSortConfig({ key: sortKey, direction });
   };
 
-  // Handle filter change for text fields
-  const handleFilterChange = (key: string) => (value: string | Dayjs | null) => {
-    let filterValue: string;
+  const handleFilterChange =
+    (key: string) => (value: string | Dayjs | null) => {
+      let filterValue: string;
+      if (dayjs.isDayjs(value)) {
+        filterValue = value.isValid() ? value.format("YYYY-MM-DD") : "";
+      } else {
+        filterValue = value || "";
+      }
+      setFilters((prev) => ({ ...prev, [key]: filterValue }));
+    };
 
-    // Handle date filters if the value is a Dayjs object
-    if (dayjs.isDayjs(value)) {
-      filterValue = value.isValid() ? value.format("YYYY-MM-DD") : "";
-    } else {
-      filterValue = value || "";
-    }
-
-    setFilters((prevFilters) => {
-      const updatedFilters = {
-        ...prevFilters,
-        [key]: filterValue,
-      };
-      return updatedFilters;
-    });
-  };
-
-  const handleDateChange = (date: dayjs.Dayjs | null) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [sortKey]: date ? date.format('YYYY-MM-DD') : '',
-    }));
-  };
-
-  // Always show the sort icon, but only highlight the selected one
   const isActive = sortConfig.key === sortKey;
-  const iconSrc = "/svg/Sorting-Arrows.svg"; // public path
-
-  const icon = (
-    <img
-      src={iconSrc}
-      alt="Sort Icon"
-      style={{
-        width: 20,
-        height: 20,
-        marginRight: 4,
-        opacity: isActive ? 1 : 0.3,
-        //filter: isActive ? "invert(1)" : "invert(0.6)",
-        transition: "filter 0.2s ease, opacity 0.2s ease",
-      }}
-    />
-  );
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <TableCell
-        sx={{ cursor: "pointer", userSelect: "none" }}
-        onClick={handleSort}
-      >
-        <Tooltip
-          title={
-            isActive
-              ? `Sort ${label} ${sortConfig.direction === "asc" ? "Ascending" : "Descending"}`
-              : `Sort by ${label}`
-          }
-        >
-          <span className="inline-flex items-center cursor-pointer">
-            <span className="ml-1">{icon}</span>
-            {label}
-          </span>
-        </Tooltip>
+    <th
+      onClick={handleSort}
+      className="cursor-pointer select-none text-left px-2 py-1.5 align-top w-[180px]"
+    >
+      <div className="w-full min-w-[180px] max-w-[180px]">
+        <div className="flex items-center gap-1">
+          {!isFilterVisible && (
+            <>
+              {isActive && sortConfig.direction === "asc" && (
+                <FaSortUp className="w-4 h-4" />
+              )}
+              {isActive && sortConfig.direction === "desc" && (
+                <FaSortDown className="w-4 h-4" />
+              )}
+              {!isActive && <FaSort className="w-4 h-4 opacity-30" />}
+            </>
+          )}
+          {label}
+        </div>
         {isFilterVisible && (
-          <div>
+          <div className="mt-1">
             {sortKey === "DateOfRegistration" ||
             sortKey === "DateOfOperation" ? (
-              <DatePicker
-                value={filters[sortKey] ? dayjs(filters[sortKey]) : null}
-                onChange={handleDateChange}
-                format="YYYY/MM/DD"
-                slotProps={{
-                  textField: {
-                    variant: "filled",
-                    fullWidth: true,
-                    sx: {
-                      ...filterStyles,
-                      m: 0,
-                      p: 0,
-                      "& .MuiFilledInput-root": {
-                        paddingBottom: "0px",
-                        backgroundColor: "transparent !important",
-                      },
-                      "& .MuiSvgIcon-root": {
-                        color: "#E0DCBD", // calendar icon color
-                      },
-                      "& .MuiFilledInput-underline:before": {
-                        borderBottom: "1px solid #E0DCBD",
-                      },
-                      "& .MuiFilledInput-underline:after": {
-                        borderBottom: "1px solid #E0DCBD",
-                      },
-                      "& .MuiFilledInput-underline:hover:before": {
-                        borderBottom: "1px solid #E0DCBD !important", // prevent color change on hover
-                      },
-                    },
-                  },
-                }}
+              <input
+                type="date"
+                value={filters[sortKey] || ""}
+                onChange={(e) => handleFilterChange(sortKey)(e.target.value)}
+                className="w-full px-3 py-2 rounded-none text-sm lg:text-base text-[#0038A8] placeholder-[#FFF] focus:outline-none font-normal"
               />
             ) : (
-              <TextField
+              <input
+                type="text"
                 placeholder={`Filter by ${label}`}
-                variant="filled"
                 value={filters[sortKey] || ""}
-                onChange={(event) =>
-                  handleFilterChange(sortKey)(event.target.value)
-                }
-                fullWidth
-                sx={{
-                  ...filterStyles,
-                  m: 0,
-                  p: 0,
-                  "& .MuiFilledInput-root": {
-                    paddingBottom: "8px",
-                    paddingTop: "8px",
-                    backgroundColor: "transparent !important",
-                  },
-                      "& .MuiFilledInput-underline:before": {
-                        borderBottom: "1px solid #E0DCBD",
-                      },
-                      "& .MuiFilledInput-underline:after": {
-                        borderBottom: "1px solid #E0DCBD",
-                      },
-                      "& .MuiFilledInput-underline:hover:before": {
-                        borderBottom: "1px solid #E0DCBD !important", // prevent color change on hover
-                      },
-                }}
+                onChange={(e) => handleFilterChange(sortKey)(e.target.value)}
+                className="w-full px-3 py-2 rounded-none text-sm lg:text-base text-[#0038A8] placeholder-[#FFF] focus:outline-none font-normal"
               />
             )}
           </div>
         )}
-      </TableCell>
-    </LocalizationProvider>
+      </div>
+    </th>
   );
 };
 
-// SORTING FUNCTION
 export function sortData<T extends User | Operator>(
   data: T[],
   sortConfig: SortConfig<T>
@@ -171,45 +88,48 @@ export function sortData<T extends User | Operator>(
     let valueA: any;
     let valueB: any;
 
-    // Custom logic for fullName
     if (sortConfig.key === "fullName") {
-      valueA = `${(a as User).FirstName} ${(a as User).FirstName} ${(a as User).Suffix || ""}`.trim().toLowerCase();
-      valueB = `${(b as User).LastName} ${(b as User).LastName} ${(b as User).Suffix || ""}`.trim().toLowerCase();
+      valueA =
+        `${(a as User).FirstName} ${(a as User).LastName} ${(a as User).Suffix || ""}`
+          .trim()
+          .toLowerCase();
+      valueB =
+        `${(b as User).FirstName} ${(b as User).LastName} ${(b as User).Suffix || ""}`
+          .trim()
+          .toLowerCase();
     } else {
       valueA = getNestedValue(a, sortConfig.key as string);
       valueB = getNestedValue(b, sortConfig.key as string);
 
-      // Special handling if sorting key is "Cities" (which is an array)
       if (sortConfig.key === "Cities") {
         const getCityNames = (cities: any) =>
           Array.isArray(cities)
-            ? cities.map((c) => c.CityName).join(", ").toLowerCase()
+            ? cities
+                .map((c) => c.CityName)
+                .join(", ")
+                .toLowerCase()
             : "";
         valueA = getCityNames((a as any).Cities);
         valueB = getCityNames((b as any).Cities);
       }
     }
 
-    // Handle null or undefined
     if (valueA == null && valueB == null) return 0;
     if (valueA == null) return sortConfig.direction === "asc" ? -1 : 1;
     if (valueB == null) return sortConfig.direction === "asc" ? 1 : -1;
 
-    // Handle valid date strings
     if (dayjs(valueA).isValid() && dayjs(valueB).isValid()) {
       const dateA = dayjs(valueA).valueOf();
       const dateB = dayjs(valueB).valueOf();
       return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
     }
 
-    // Handle strings
     if (typeof valueA === "string" && typeof valueB === "string") {
       return sortConfig.direction === "asc"
         ? valueA.localeCompare(valueB)
         : valueB.localeCompare(valueA);
     }
 
-    // Handle numbers
     if (typeof valueA === "number" && typeof valueB === "number") {
       return sortConfig.direction === "asc" ? valueA - valueB : valueB - valueA;
     }
@@ -218,59 +138,68 @@ export function sortData<T extends User | Operator>(
   });
 }
 
-// Helper function to get nested value safely
 const getNestedValue = (obj: any, path: string) => {
-  return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  return path.split(".").reduce((acc, part) => acc && acc[part], obj);
 };
 
-// FILTERING + SEARCHING FUNCTION
 export const filterData = (
-  data: (any)[],
+  data: any[],
   filterKeys: string[],
   filters: { [key: string]: string },
   operatorMap?: { [key: number]: Operator }
-
 ): (User | Operator)[] => {
   const searchValue = filters.searchQuery?.toLowerCase() || "";
 
-  const filterItem = (key: string, value: string | undefined) => {
-    return value && value.toLowerCase().includes(searchValue);
-  };
-
   return data.filter((item) => {
     const operatorName =
-      operatorMap?.[item.OperatorId]?.OperatorName?.toLowerCase() || "no operator";
+      operatorMap?.[item.OperatorId]?.OperatorName?.toLowerCase() ||
+      "no operator";
 
-    if (searchValue && !Object.values(item).some((val) => filterItem("", String(val)))) {
-      const fullName = `${"FirstName" in item ? item.FirstName : ""} ${"LastName" in item ? item.LastName : ""}`.toLowerCase();
-      const cities = (getNestedValue(item, "Cities") || []) as { CityName: string }[];
-      const cityNames = cities.map(city => city.CityName.toLowerCase()).join(", ");
+    if (
+      searchValue &&
+      !Object.values(item).some((val) =>
+        val?.toString().toLowerCase().includes(searchValue)
+      )
+    ) {
+      const fullName =
+        `${item.FirstName || ""} ${item.LastName || ""}`.toLowerCase();
+      const cities = (getNestedValue(item, "Cities") || []) as {
+        CityName: string;
+      }[];
+      const cityNames = cities.map((c) => c.CityName.toLowerCase()).join(", ");
 
-      if (![fullName, operatorName, cityNames].some(val => val.includes(searchValue))) {
+      if (
+        ![fullName, operatorName, cityNames].some((val) =>
+          val.includes(searchValue)
+        )
+      ) {
         return false;
       }
     }
 
     return filterKeys.every((key) => {
       const filterValue = filters[key]?.toLowerCase() || "";
-      const itemValue = getNestedValue(item, key)?.toString().toLowerCase() || "";
+      const itemValue =
+        getNestedValue(item, key)?.toString().toLowerCase() || "";
 
       if (!filterValue) return true;
 
       if (key === "Cities") {
-        const cities = (getNestedValue(item, "Cities") || []) as { CityName: string }[];
-        const cityNames = cities.map(city => city.CityName.toLowerCase()).join(", ");
+        const cities = (getNestedValue(item, "Cities") || []) as {
+          CityName: string;
+        }[];
+        const cityNames = cities
+          .map((c) => c.CityName.toLowerCase())
+          .join(", ");
         return cityNames.includes(filterValue);
       }
 
       if (key === "DateOfRegistration") {
-        // Compare dates if filtering by date
         const itemDate = dayjs(getNestedValue(item, key)).format("YYYY-MM-DD");
         const filterDate = dayjs(filterValue).format("YYYY-MM-DD");
         return itemDate === filterDate;
       }
 
-      // Handle the 'OperatorName' filtering logic for Users
       if (key === "OperatorDetails.OperatorName" && "OperatorId" in item) {
         return operatorName.includes(filterValue);
       }
@@ -280,41 +209,49 @@ export const filterData = (
   });
 };
 
-// ======================================================= FOR EDIT LOGS MODAL
 
-// Filter function with search and additional filters for Edit Log
+
 export const filterDataEditLog = (
-  data: EditLogFields[], filterKeys: string[], filters: Record<string, any>, searchQuery: string
+  data: EditLogFields[],
+  filterKeys: string[],
+  filters: Record<string, any>,
+  searchQuery: string
 ) => {
   return data.filter((row) => {
-    // Search filter logic
     const matchesSearch = filterKeys.some((key) => {
       const value = row[key as keyof EditLogFields];
-      return value && value.toString().toLowerCase().includes(searchQuery.toLowerCase());
+      return value
+        ?.toString()
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
     });
 
-    // Other filters logic
     const matchesFilters = filterKeys.every((key) => {
       const filterValue = filters[key];
       if (!filterValue) return true;
       const value = row[key as keyof EditLogFields];
-      return value?.toString().toLowerCase().includes(filterValue.toLowerCase());
+      return value
+        ?.toString()
+        .toLowerCase()
+        .includes(filterValue.toLowerCase());
     });
 
     return matchesSearch && matchesFilters;
   });
 };
 
-// Sorting function for Edit Log
-export const sortDataEditLog = (data: EditLogFields[], sortConfig: { key: string, direction: 'asc' | 'desc' }) => {
+export const sortDataEditLog = (
+  data: EditLogFields[],
+  sortConfig: { key: string; direction: "asc" | "desc" }
+) => {
   const { key, direction } = sortConfig;
 
   return data.sort((a, b) => {
     const aValue = a[key as keyof EditLogFields];
     const bValue = b[key as keyof EditLogFields];
 
-    if ((aValue ?? '') < (bValue ?? '')) return direction === 'asc' ? -1 : 1;
-    if ((aValue ?? '') > (bValue ?? '')) return direction === 'asc' ? 1 : -1;
+    if ((aValue ?? "") < (bValue ?? "")) return direction === "asc" ? -1 : 1;
+    if ((aValue ?? "") > (bValue ?? "")) return direction === "asc" ? 1 : -1;
     return 0;
   });
 };
