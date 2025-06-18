@@ -23,28 +23,13 @@ export const fetchRegions = async () => {
 
 export const fetchProvinces = async (filters?: { regionId: number }) => {
   const timestamp = new Date().toISOString();
-
   try {
     const url = validateRelativeUrl("/location/getProvinces");
-
-    //console.log(`[${timestamp}] [fetchProvinces] Sending request to: ${url}`);
-    if (filters?.regionId) {
-      //console.log(`[${timestamp}] [fetchProvinces] Using regionId: ${filters.regionId}`);
-    } else {
-      //console.log(`[${timestamp}] [fetchProvinces] No regionId provided`);
-    }
-
     const response = await axiosInstance.get(url, {
       params: {
         regionId: filters?.regionId,
       },
     });
-
-    // console.log(`[${timestamp}] [fetchProvinces] Response received:`, {
-    //   success: response.data?.success,
-    //   provincesCount: response.data?.data?.length,
-    // });
-
     return response.data;
   } catch (error) {
     const errorMessage = (error as Error).message;

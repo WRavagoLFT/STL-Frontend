@@ -1,4 +1,3 @@
-// axiosInstance.ts
 import axios from "axios";
 
 let isRefreshing = false;
@@ -12,7 +11,7 @@ export const waitUntilNotRefreshing = (): Promise<void> => {
 };
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -37,7 +36,7 @@ axiosInstance.interceptors.response.use(
           refreshSubscribers.forEach((cb) => cb());
           refreshSubscribers = [];
 
-          return axiosInstance(originalRequest); // Retry original request
+          return axiosInstance(originalRequest);
         } catch (refreshError) {
           isRefreshing = false;
           refreshSubscribers = [];

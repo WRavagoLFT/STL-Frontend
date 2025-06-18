@@ -830,6 +830,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       <ConfirmUserActionModalPage
         open={isConfirmModalOpen}
         onClose={handleModalClose}
+        mode="update"
         onConfirm={async () => {
           try {
             await onSubmit(formData as unknown as Operator); // submit from the parent component handled after password verification

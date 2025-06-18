@@ -11,7 +11,6 @@ export interface ExportRetailDataToExcelProps {
   yearNumber?: number;
 }
 
-// Title descriptions
 const AAC_GROSS_TITLES = [
   "Authorized Agent Share",
   "Commission of Salesforce",

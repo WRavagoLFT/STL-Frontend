@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
-import Error from "next/error";
 
 export const AccessGuard = ({
   allowedUserTypes,
@@ -12,18 +11,19 @@ export const AccessGuard = ({
 }) => {
   const { userTypeId, isLoading } = useAuthStore();
   const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && userTypeId === null) {
+    if (isLoading) return;
+
+    if (userTypeId === null || !allowedUserTypes.includes(userTypeId)) {
       router.replace("/auth/error404");
+    } else {
+      setIsAuthorized(true);
     }
-  }, [isLoading, userTypeId, router]);
+  }, [isLoading, userTypeId, allowedUserTypes, router]);
 
-  if (isLoading) return null;
-
-  if (userTypeId !== null && !allowedUserTypes.includes(userTypeId)) {
-    return <Error statusCode={404} />;
-  }
+  if (isLoading || !isAuthorized) return null;
 
   return <>{children}</>;
 };

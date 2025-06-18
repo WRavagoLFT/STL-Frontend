@@ -12,7 +12,7 @@ export interface EditModalPageProps {
   onClose: () => void;
   userTypeId?: number;
   selectedUser?: any; // for users
-  initialUserOperatorData? : any; // for operators
+  initialUserOperatorData? : any;
 }
 
 const EditModalPage: React.FC<EditModalPageProps> = ({
@@ -41,6 +41,7 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
       if (response?.success) {
         setEditData(response.data || []);
       }
+      //console.log('EDIT DATA:', response.data);
       setLoading(false);
     };
 

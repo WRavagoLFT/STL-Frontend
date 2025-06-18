@@ -1,6 +1,5 @@
 import axios, { AxiosError } from "axios";
 import axiosInstance, { waitUntilNotRefreshing } from "../axiosInstance";
-import { useAuthStore } from "~/store/useAuthStore";
 
 // Helper to validate URL paths
 const validateRelativeUrl = (url: string) => {
@@ -11,27 +10,36 @@ const validateRelativeUrl = (url: string) => {
 };
 
 const getCurrentUser = async () => {
-  await waitUntilNotRefreshing(); // wait if refresh in progress
+  console.log("[getCurrentUser] Waiting for token refresh to complete...");
+  await waitUntilNotRefreshing();
+  console.log("[getCurrentUser] Proceeding with API request...");
 
   try {
     const res = await axiosInstance.get("/users/getCurrentUser");
+    console.log("[getCurrentUser] Success:", res.data);
     return res.data;
   } catch (error: any) {
-    const message = error?.response?.data?.message;
-    if (message !== "Token expired.") {
-      console.error("getCurrentUser failed:", message || error.message);
+    const status = error?.response?.status;
+    const message = error?.response?.data?.message || error.message;
+
+    console.error("[getCurrentUser] Request failed:");
+    console.error("  • Status:", status);
+    console.error("  • Message:", message);
+    console.error("  • Full error object:", error);
+
+    if (message !== "Token expired." && message !== "Invalid request token.") {
+      console.warn("[getCurrentUser] Unexpected error encountered.");
     }
+
     return { success: false, data: null };
   }
 };
-
 
 const logoutUser = async (queryParams: Record<string, any> = {}) => {
     try {
         // Clear intervals and client state FIRST
         //useAuthStore.getState().logout();
         
-        // Then make the server call
         const url = validateRelativeUrl("/auth/logout");
         const response = await axiosInstance.delete(url, {
             params: queryParams
@@ -41,8 +49,6 @@ const logoutUser = async (queryParams: Record<string, any> = {}) => {
     } catch (error) {
         console.error("Error logging out:", (error as Error).message);
         
-        // Even if server call fails, we've already cleared client state
-        // This prevents the "double logout" error
         return { success: true, message: "Logout completed (client-side)" };
     }
 };

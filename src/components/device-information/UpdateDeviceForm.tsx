@@ -632,6 +632,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
       <ConfirmUserActionModalPage
         open={isConfirmModalOpen}
         onClose={handleModalClose}
+        mode="update"
         onConfirm={async () => {
           try {
             await onSubmit(formData as unknown as Device); // submit from the parent component handled after password verification

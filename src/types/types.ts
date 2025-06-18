@@ -21,6 +21,7 @@ export interface User {
   Suffix?: string | null;
   OperatorId?: number;
   UserTypeId?: number;
+  remarks?: string;
   
   pcsoBranchId?: number;
   BranchId?: number;

@@ -3,7 +3,7 @@ import { ThemeProvider, CssBaseline, CircularProgress } from "@mui/material";
 import Layout from "../layout";
 import darkTheme from "../styles/theme";
 import "../styles/globals.css";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../utils/useAuth";
 import { useRouter } from "next/router";
 import Error404Page from "~/components/auth/Error404";
 import { match } from "path-to-regexp";
@@ -11,7 +11,6 @@ import { match } from "path-to-regexp";
 const App = ({ Component, pageProps }: AppProps) => {
   const { loading } = useAuth();
   const router = useRouter();
-  //const rawPath = router.asPath.split("?")[0];
 
   const aliasMap: Record<string, string> = {
     "/dashboard": "/Protected/dashboard",
@@ -23,6 +22,7 @@ const App = ({ Component, pageProps }: AppProps) => {
     "/users/kubrador": "/Protected/users/kubrador",
     "/retail-receipt": "/Protected/retail-receipt",
     "/device-information": "/Protected/device-information",
+    "/device-information/device-information-add": "/Protected/device-information/device-information-add",
     "/bets-comparisons": "/Protected/betting-comparisons",
     "/wins-comparisons": "/Protected/winning-comparisons",
     "/draw-summary": "/Protected/draw-summary",
@@ -53,7 +53,6 @@ const App = ({ Component, pageProps }: AppProps) => {
     "/auth/error404",
   ];
 
-  // Now using public route format for dynamic matching
   const dynamicPaths = [
     "/users/:role",
     "/users/users-view/:slug",
@@ -66,10 +65,9 @@ const App = ({ Component, pageProps }: AppProps) => {
   const rawPath = router.asPath.split("?")[0];
   const normalizedPath = aliasMap[rawPath] || rawPath;
 
-  // Match rawPath against dynamic patterns
   const isDynamicMatch = dynamicPaths.some((pattern) => {
     const matcher = match(pattern, { decode: decodeURIComponent });
-    return matcher(rawPath); // match against actual route
+    return matcher(rawPath);
   });
 
   const isStaticMatch = staticPaths.includes(normalizedPath);

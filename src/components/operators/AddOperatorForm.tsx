@@ -849,6 +849,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         <ConfirmUserActionModalPage
           open={isConfirmModalOpen}
           onClose={handleModalClose}
+          mode="add"
           onConfirm={async () => {
             try {
               await onSubmit(formData as unknown as Operator); // submit from the parent component handled after password verification

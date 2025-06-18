@@ -436,6 +436,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
         <ConfirmUserActionModalPage
           open={isConfirmModalOpen}
           onClose={handleModalClose}
+          mode= "add"
           onConfirm={async () => {
             try {
               await onSubmit(formData as unknown as User); // submit from the parent component handled after password verification

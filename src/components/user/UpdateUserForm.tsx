@@ -29,9 +29,8 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   onViewEditLogs = () => {},
   onClose,
 }) => {
-  const title =
-    userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
-  //console.log('SELECTED USER', selectedUser);
+  const title = userTypeId === 2 ? "Manager" : userTypeId === 3 ? "Executive" : "User";
+  console.log('SELECTED USER', selectedUser);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const sevenDaysAgo = dayjs().subtract(7, "day");
@@ -490,6 +489,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
       <ConfirmUserActionModalPage
         open={isConfirmModalOpen}
         onClose={handleModalClose}
+        mode="update"
         onConfirm={async () => {
           try {
             await onSubmit(formData as unknown as User); // submit from the parent component handled after password verification

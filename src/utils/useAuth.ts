@@ -28,45 +28,60 @@ const excludedPaths = [
   "/auth/email-verification",
   "/auth/password-reset",
   "/auth/set-password",
-  "/auth/error404",
 ];
 
 export function useAuth() {
   const router = useRouter();
-  const rawPath = router.asPath.split("?")[0]; // Get full route path
+  const rawPath = router.asPath.split("?")[0];
   const normalizedPath = aliasMap[rawPath] || rawPath;
 
   const isExcludedPath = excludedPaths.includes(normalizedPath);
+  const isErrorPage = normalizedPath === "/auth/error404";
+
   const [loading, setLoading] = useState(true);
   const { setUser, clearUser, setUserTypeId } = useAuthStore();
 
   useEffect(() => {
+    console.log("Auth check useEffect triggered");
+
     if (isExcludedPath) {
-      useAuthStore.getState().clearUser(); // Also set isLoading = false
+      console.log("Path is excluded. Clearing user state.");
+      clearUser();
       setLoading(false);
       return;
     }
 
     const performAuthCheck = async () => {
+      console.log("Performing authentication check...");
+
       try {
         const res = await getCurrentUser();
+        console.log("getCurrentUser response:", res);
+
         if (res?.success && res.data) {
+          console.log("User authenticated. Setting user data:", res.data);
           setUserTypeId(res.data.UserTypeId);
           setUser(res.data);
         } else {
+          console.warn("No valid user data. Clearing user.");
           clearUser();
         }
       } catch (error) {
-        console.warn("Auth check failed:", error);
+        console.error("Auth check failed:", error);
         clearUser();
-        router.replace("/auth/login");
+
+        if (!isErrorPage) {
+          console.log("Redirecting to login...");
+          router.replace("/auth/login");
+        }
       } finally {
+        console.log("Auth check complete. Stopping loading state.");
         setLoading(false);
       }
     };
 
     performAuthCheck();
-  }, [isExcludedPath, router, setUser]);
+  }, [isExcludedPath, isErrorPage, router, setUser]);
 
   return { loading };
 }

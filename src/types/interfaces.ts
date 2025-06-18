@@ -97,6 +97,8 @@ export interface DetailedTableProps<T> {
   source?: 'users' | 'operators' | 'device';
   onAddClick?: () => void;
   onUpdateClick?: (row: T) => void; // for update modal
+  onSuspendClick?: (row: T) => void; // for update modal
+  onSubmit?: (data: T) => void;
 }
 
 export interface ChartBarItem {

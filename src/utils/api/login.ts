@@ -8,12 +8,8 @@ export const loginUser = async (
   router: any
 ) => {
   try {
-    //const { setUserTypeId } = useAuthStore.getState();
-    //setUserTypeId(0); // Reset before fetch
-    
     const loginResponse = await axiosInstance.post("/auth/login", payload);
     await handleRouter(router);
-    //router.push("/dashboard");
 
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {

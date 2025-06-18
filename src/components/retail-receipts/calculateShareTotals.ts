@@ -1,12 +1,4 @@
 import { Share } from "~/types/types";
-/**
- * Generic function to process shares from any source (AAC, PCSO, etc.)
- * 
- * @param shareData - The object containing share data (e.g. data?.data?.Receipts?.AAC)
- * @param titlesToInclude - Array of ShareTitle strings to include in processing
- * @param year - Year to filter OperationDate
- * @param month - Month to filter OperationDate (1-12)
- */
 
 export function processShares(
   data: any,
@@ -21,9 +13,8 @@ export function processShares(
       const share = data?.[title];
       if (share && share.ShareType === shareType) {
 
-        // Handle yearly if month is undefined or 0
         const operationDate = !month || month === 0
-          ? new Date(year, 0, 1).getTime() // Jan 1 of the year
+          ? new Date(year, 0, 1).getTime()
           : new Date(year, month - 1, 1).getTime();
 
         const processedShare = {
@@ -37,12 +28,9 @@ export function processShares(
         return processedShare;
       } else {
         if (share) {
-          // console.log(
-          //   `Skipped share '${title}' due to ShareType mismatch:`,
-          //   share.ShareType
-          // );
+
         } else {
-          //console.log(`No share data found for title: ${title}`);
+          //console.error(`No share data found for title: ${title}`);
         }
         return null;
       }
@@ -59,7 +47,6 @@ export function processShares(
   };
 }
 
-// function in calculating net income ================
 export function calculateNetIncome(
   grossAmount: number,
   grossPercentage: number,
@@ -73,7 +60,6 @@ export function calculateNetIncome(
       netPercentage: grossPercentage - taxPercentage,
     };
   } else {
-    // PCSO case
     return {
       netAmount: grossAmount + taxAmount,
       netPercentage: grossPercentage + taxPercentage,

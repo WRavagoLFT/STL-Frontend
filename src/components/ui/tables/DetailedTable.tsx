@@ -17,6 +17,7 @@ import router from "next/router";
 import { useModalStore } from "~/store/useModalStore";
 import useDetailTableStore from "~/store/useTableStore";
 import { useAuthStore } from "~/store/useAuthStore";
+import ConfirmUserActionModalPage from "../modals/ConfirmUserActionModal";
 
 const DetailedTable = function <T extends User | Operator | Device>({
   data,
@@ -25,22 +26,53 @@ const DetailedTable = function <T extends User | Operator | Device>({
   pageType,
   operatorMap,
   onClose,
-  endpoint,
   source,
   onAddClick,
   onUpdateClick,
+  onSubmit,
+  onSuspendClick,
 }: DetailedTableProps<T>) {
-  const { searchQuery, setIsFilterActive, isFilterActive, page, rowsPerPage, sortConfig, filters, handleChangePage, handleChangeRowsPerPage, setSearchQuery, anchorEl, selectedRow, setAnchorEl, setSelectedRow, resetMenu } = useDetailTableStore();
+  const {
+    searchQuery,
+    setIsFilterActive,
+    isFilterActive,
+    page,
+    rowsPerPage,
+    sortConfig,
+    filters,
+    handleChangePage,
+    handleChangeRowsPerPage,
+    setSearchQuery,
+    anchorEl,
+    selectedRow,
+    setAnchorEl,
+    setSelectedRow,
+    resetMenu,
+  } = useDetailTableStore();
   const [openEditLogModal, setOpenEditLogModal] = useState(false);
   const sevenDaysAgo = useMemo(() => dayjs().subtract(7, "day"), []);
   const [isVerifyModalOpen, setIsVerifyModalOpen] = useState(false);
-  const [isVerifySuspendModalOpen, setIsVerifySuspendModalOpen] = useState(false);
-  const [formData, setFormData] = useState<{ [key: string]: string | number | string[] }>({});
+  const [remarks, setRemarks] = useState<string>("");
+  const [isVerifySuspendModalOpen, setIsVerifySuspendModalOpen] =
+    useState(false);
+  const [formData, setFormData] = useState<{
+    [key: string]: string | number | string[];
+  }>({});
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [actionType, setActionType] = useState<'suspend' | 'create' | 'update' | 'delete'>('suspend');
+  const [actionType, setActionType] = useState<
+    "suspend" | "create" | "update" | "delete"
+  >("suspend");
   const modalStore = useModalStore.getState();
   const { userTypeId } = useAuthStore();
   const currentUserType = useAuthStore((state) => state.userTypeId);
+  
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const openConfirmModal = () => setIsConfirmModalOpen(true);
+  const closeConfirmModal = () => setIsConfirmModalOpen(false);
+  const handleModalClose = () => {
+    closeConfirmModal();
+    if (onClose) onClose();
+  };
 
   // FILTER + SEARCH
   const filteredData = useMemo(() => {
@@ -85,8 +117,10 @@ const DetailedTable = function <T extends User | Operator | Device>({
     // console.log('Filtered Data before Sorting:', filteredData);
     // console.log('Sort Config:', sortConfig);
 
-    // Perform sorting operation
-    const result = sortData(filteredData, sortConfig as SortConfig<User | Operator>);
+    const result = sortData(
+      filteredData,
+      sortConfig as SortConfig<User | Operator>
+    );
     // console.log('Sorted Data:', result);
 
     return result;
@@ -105,110 +139,112 @@ const DetailedTable = function <T extends User | Operator | Device>({
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")}`;
 
-  const handleOpenView = useCallback((row?: T) => {
-    const targetRow = row || selectedRow;
+  const handleOpenView = useCallback(
+    (row?: T) => {
+      const targetRow = row || selectedRow;
 
-    if (!targetRow) {
-      console.warn("[handleOpenViewModal] No selected row available.");
-      return;
-    }
-
-    const {
-      OperatorName,
-      OperatorId,
-      FirstName,
-      LastName,
-      UserId,
-      UserTypeId,
-      DeviceName,
-      DeviceId,
-      AssignedUser,
-    } = targetRow;
-
-    // Same logic, replace selectedRow with targetRow
-    if (source === "operators") {
-      if (!OperatorName || !OperatorId) {
-        console.warn("[handleOpenViewModal] Missing OperatorName or OperatorId.");
+      if (!targetRow) {
+        console.warn("[handleOpenViewModal] No selected row available.");
         return;
       }
 
-      const slug = generateSlug(OperatorName, OperatorId);
-      modalStore.setSelectedData(targetRow);
-      modalStore.setOperatorId(OperatorId);
-      router.push(`/operators/${slug}`);
-    } else if (source === "users" && (UserTypeId === 1 || UserTypeId === 2 || UserTypeId === 3)) {
-      if (!FirstName || !UserId) {
-        console.warn("[handleOpenViewModal] Missing FirstName or UserId.");
-        return;
-      }
+      const {
+        OperatorName,
+        OperatorId,
+        FirstName,
+        LastName,
+        UserId,
+        UserTypeId,
+        DeviceName,
+        DeviceId,
+        AssignedUser,
+      } = targetRow;
 
-      const fullName = `${FirstName} ${LastName || ""}`.trim();
-      const slug = generateSlug(fullName, UserId);
-      modalStore.setSelectedData(targetRow);
-      router.push(`/users/users-view/${slug}`);
-    } else if (source === "device") {
-      if (!AssignedUser || !DeviceId) {
-        console.warn("[handleOpenViewModal] Missing AssignedUser or DeviceId.");
-        return;
-      }
+      if (source === "operators") {
+        if (!OperatorName || !OperatorId) {
+          console.warn(
+            "[handleOpenViewModal] Missing OperatorName or OperatorId."
+          );
+          return;
+        }
 
-      const slug = generateSlug(AssignedUser, DeviceId);
-      modalStore.setSelectedData(targetRow);
-      router.push(`/device-information/device-information-view/${slug}`);
-    } else {
-      if (onUpdateClick) {
-        onUpdateClick(targetRow);
+        const slug = generateSlug(OperatorName, OperatorId);
+        modalStore.setSelectedData(targetRow);
+        modalStore.setOperatorId(OperatorId);
+        router.push(`/operators/${slug}`);
+      } else if (
+        source === "users" &&
+        (UserTypeId === 1 || UserTypeId === 2 || UserTypeId === 3)
+      ) {
+        if (!FirstName || !UserId) {
+          console.warn("[handleOpenViewModal] Missing FirstName or UserId.");
+          return;
+        }
+
+        const fullName = `${FirstName} ${LastName || ""}`.trim();
+        const slug = generateSlug(fullName, UserId);
+        modalStore.setSelectedData(targetRow);
+        router.push(`/users/users-view/${slug}`);
+      } else if (source === "device") {
+        if (!AssignedUser || !DeviceId) {
+          console.warn(
+            "[handleOpenViewModal] Missing AssignedUser or DeviceId."
+          );
+          return;
+        }
+
+        const slug = generateSlug(AssignedUser, DeviceId);
+        modalStore.setSelectedData(targetRow);
+        router.push(`/device-information/device-information-view/${slug}`);
       } else {
-        modalStore.openModal("view", targetRow);
+        if (onUpdateClick) {
+          onUpdateClick(targetRow);
+        } else {
+          modalStore.openModal("view", targetRow);
+        }
       }
-    }
 
-    setOpenEditLogModal(false);
-  }, [selectedRow, source, router, onUpdateClick, setOpenEditLogModal]);
-  
-  const handleClose = () => {
-    setIsVerifyModalOpen(false); // Close the verification modal
-    onClose?.();
-  };
+      setOpenEditLogModal(false);
+    },
+    [selectedRow, source, router, onUpdateClick, setOpenEditLogModal]
+  );
 
   const handleSuspend = async (row: T) => {
-    console.log('handleSuspend called with row:', row);
-
-    // Adjust this check according to your actual id field
-    if (!row || (!('OperatorId' in row) || !row.OperatorId)) {
-      console.error('Invalid user data:', row);
-      setErrors({ form: 'Invalid user data. Cannot proceed with suspension.' });
-      return;
-    }
+    console.log("handleSuspend called with row:", row);
 
     const result = await Swal.fire({
-      title: 'Are you sure?',
-      text: 'Do you really want to suspend this user?',
-      icon: 'warning',
+      title: "Are you sure?",
+      text: "Do you really want to suspend this user?",
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, suspend!',
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, suspend!",
     });
 
-    console.log('User confirmed suspension:', result.isConfirmed);
+    console.log("User confirmed suspension:", result.isConfirmed);
 
     if (result.isConfirmed) {
-      const userId = 'OperatorId' in row ? row.OperatorId ?? '' : '';
-      console.log('Setting formData with UserId:', userId);
+      const userId = "UserId" in row ? row.UserId : "";
+
+      if (!userId) {
+        console.error("Missing UserId or OperatorId in row:", row);
+        return;
+      }
+
+      console.log("Setting formData with UserId and remarks:", userId);
 
       setFormData({
         UserId: userId,
       });
 
-      console.log('Setting actionType to suspend and opening verify suspend modal');
-      setActionType('suspend'); 
-      setIsVerifySuspendModalOpen(true);
+      setActionType("suspend");
+      setIsConfirmModalOpen(true);
 
       setSelectedRow(null);
       resetMenu();
     } else {
-      console.log('Suspension cancelled by user');
+      console.log("Suspension cancelled by user");
     }
   };
 
@@ -335,7 +371,10 @@ const DetailedTable = function <T extends User | Operator | Device>({
                       </TableCell>
                     );
                   })}
-                  <TableCell align="center" sx={{ justifyContent: 'center', alignItems: 'center' }}>
+                  <TableCell
+                    align="center"
+                    sx={{ justifyContent: "center", alignItems: "center" }}
+                  >
                     {userTypeId === 3 ? (
                       <span
                         className="text-[#0038A8] cursor-pointer hover:underline"
@@ -361,16 +400,14 @@ const DetailedTable = function <T extends User | Operator | Device>({
                           open={Boolean(anchorEl)}
                           onClose={resetMenu}
                         >
-                          <MenuItem
-                            onClick={() => {
+                          <MenuItem onClick={() => {
                               resetMenu();
                               handleOpenView();
                             }}
                           >
                             View
                           </MenuItem>
-                          <MenuItem
-                            onClick={() => {
+                          <MenuItem onClick={() => {
                               if (selectedRow) handleSuspend(selectedRow);
                               resetMenu();
                             }}
@@ -398,18 +435,30 @@ const DetailedTable = function <T extends User | Operator | Device>({
           />
         </div>
 
-        {/* {isVerifySuspendModalOpen && (
-          <ConfirmSuspendModal
-            formData={formData}
-            setFormData={setFormData}
-            //errors={errors}
-            actionType="suspend"
-            setErrors={setErrors}
-            open={isVerifySuspendModalOpen}
-            //endpoint={endpoint ?? { create: '', update: '' }}
-            onClose={handleClose}
-          />
-        )} */}
+      <ConfirmUserActionModalPage
+        open={isConfirmModalOpen}
+        onClose={handleModalClose}
+        mode="suspend"
+        remarks={remarks}
+        setRemarks={setRemarks}
+        onConfirm={async (remarksFromModal?: string) => {
+          try {
+            if (onSubmit) {
+              const finalFormData = {
+                ...formData,
+                ...(actionType === "suspend" && { remarks: remarksFromModal }),
+              };
+
+              console.log("Suspending user with data:", finalFormData);
+              await onSubmit(finalFormData as unknown as T);
+            }
+            closeConfirmModal();
+            if (onClose) onClose();
+          } catch (err) {
+            console.error("Error during onSubmit:", err);
+          }
+        }}
+      />
       </TableContainer>
       {currentUserType !== 3 && (
         <div className="flex justify-end pt-2">

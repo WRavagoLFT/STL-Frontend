@@ -6,6 +6,7 @@ import { LoginSectionData } from "~/data/LoginSectionData";
 const Error404Page = () => {
   const router = useRouter();
   const currentUserType = useAuthStore((state) => state.userTypeId);
+  console.log('CURRENT USER TYPE', currentUserType);
 
   const handleRedirect = () => {
     let targetPath = "";
@@ -20,13 +21,11 @@ const Error404Page = () => {
         targetPath = "/draw-summary";
         break;
       default:
-        console.warn("Unrecognized userTypeId:", currentUserType);
-        return;
+        targetPath = "/auth/login";
+        break;
     }
 
-    if (targetPath) {
-      router.push(targetPath);
-    }
+    router.push(targetPath);
   };
 
   return (
@@ -72,7 +71,7 @@ const Error404Page = () => {
                 ease-in-out
               `}
             >
-              Return to Home Page
+              {currentUserType ? "Return to Home Page" : "Return to Login Page"}
             </button>
           </div>
         </div>
