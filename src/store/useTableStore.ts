@@ -13,6 +13,7 @@ interface TableStoreState<T = any> {
   isFilterActive: boolean;
   setIsFilterActive: (val: boolean) => void;
   toggleFilter: () => void;
+  
 
   page: number;
   setPage: (page: number) => void;
