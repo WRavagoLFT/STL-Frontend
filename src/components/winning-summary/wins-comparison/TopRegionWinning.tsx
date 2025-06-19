@@ -1,15 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Typography, Stack, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
-import {
-  WinnersandWinningsSummaryProps,
-  getLegendItemsMap_Specific,
-  getLegendItemsMap_Duration,
-} from "../../../store/useWinningStore";
-import {
-  fetchCompareHistoricalWinnersDate,
-  fetchCompareHistoricalWinnersRange,
-} from "~/utils/api/winners";
+import { WinnersandWinningsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from "../../../store/useWinningStore";
+import { fetchCompareHistoricalWinnersDate, fetchCompareHistoricalWinnersRange } from "~/utils/api/winners";
 
 interface ChartData {
   region: string;
@@ -56,11 +49,11 @@ const formatDate = (date: string | null): string => {
   return `${year}-${month}-${day}`;
 };
 
-// Helper to turn e.g. "IV-A" → "Region IV-A", but leave "NCR"/"CAR"/"BARMM" alone
 const apiRegionLabel = (r: string) =>
   ["NCR", "CAR", "BARMM"].includes(r) ? r : `Region ${r}`;
 
 const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
+  gameCategoryId,
   categoryFilter,
   dateFilter,
   firstDateSpecific,
@@ -110,7 +103,7 @@ const ChartTopRegionByWinsandWinners: React.FC<
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
-  activeGameType,
+  gameCategoryId,
 }) => {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<ChartData[]>([]);
@@ -134,14 +127,11 @@ const ChartTopRegionByWinsandWinners: React.FC<
     "XIII",
     "BARMM",
   ];
-  //console.log("Active Game Category:", activeGameType);
 
-  // Determine which field to aggregated based on categoryFilter
   const aggregateField = categoryFilter.includes("Winnings")
     ? "TotalPayoutAmount"
     : "TotalWinners";
 
-  // Determine chart number based on category
   const chartMap: Record<string, string> = {
     "Total Winnings and Winners": "1",
     "Total Winnings by Bet Type": "2",
@@ -153,22 +143,10 @@ const ChartTopRegionByWinsandWinners: React.FC<
   };
 
   const urlParam = chartMap[categoryFilter];
-  const gameCategoryMap: Record<string, number> = {
-    Dashboard: 0,
-    "STL Pares": 1,
-    "STL Swer2": 2,
-    "STL Swer3": 3,
-    "STL Swer4": 4,
-  };
 
-  const gameCategoryParam = gameCategoryMap[activeGameType];
-  //console.log('Game Category Param:', gameCategoryParam);
-  //console.log('URL Param:', urlParam);
-
-  // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
-    if (gameCategoryParam && gameCategoryParam >= 1 && gameCategoryParam <= 4) {
-      return { gameType: gameCategoryParam };
+    if (gameCategoryId && gameCategoryId >= 1 && gameCategoryId <= 4) {
+      return { gameCategory: gameCategoryId };
     }
     return {};
   };
@@ -309,7 +287,7 @@ const ChartTopRegionByWinsandWinners: React.FC<
       </p>
 
       <CustomLegend
-        activeGameType={activeGameType}
+        gameCategoryId={gameCategoryId}
         categoryFilter={categoryFilter}
         dateFilter={dateFilter}
         firstDateSpecific={firstDateSpecific}

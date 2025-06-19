@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/router";
-
 import DashboardCardsPage from "~/components/dashboard/DashboardCards";
 import TableBettingActivityToday from "~/components/betting-summary/BettingActivityTodayTable";
 import ChartBettorsvsBetsPlacedSummary from "~/components/betting-summary/BettorsvsBetsPlacedChart";
@@ -9,7 +8,6 @@ import ChartBettorsSummary from "~/components/betting-summary/BettorCountChart";
 import TableBettingSummary from "~/components/betting-summary/BettingSummaryTable";
 import ChartBettorsBetTypeSummary from "~/components/betting-summary/BettorCountByBetType";
 import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton"; 
-
 import { buttonStyles } from "~/styles/theme";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { useAuthStore } from "~/store/useAuthStore";
@@ -22,27 +20,40 @@ const GAME_TITLES = [
   "STL Swer 4",
 ];
 
-const BettingSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number }) => {
+const BettingSummaryPage = ({
+  gameCategoryId = 0,
+  slug,
+}: {
+  gameCategoryId?: number;
+  slug?: string;
+}) => {
   const router = useRouter();
   const [title, setTitle] = useState("STL");
   const userTypeId = useAuthStore((state) => state.userTypeId);
-
-  // Simulate loading state (replace this with real loading state from API)
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setTitle(GAME_TITLES[gameCategoryId] || "STL");
-
-    // Simulate fetch delay
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500); // Simulate loading for 1.5s
-
+    }, 1500);
     return () => clearTimeout(timer);
   }, [gameCategoryId]);
 
+  const slugify = (text: string) => 
+    text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w\-]+/g, "")
+      .replace(/\-\-+/g, "-")
+      .replace(/-(\d+)/g, "$1"); 
+
   const handleViewComparisonClick = () => {
-    router.push("/bets-comparisons");
+    const comparisonSlug = slugify(title);
+    const mainSlug = slug || "dashboard";
+    router.push(`/betting-summary/${mainSlug}/betting-comparisons/${comparisonSlug}`);
   };
 
   const ChartSection = (
@@ -56,6 +67,7 @@ const BettingSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number })
     </>
   );
 
+  // pass the game category id
   const ComparisonButton = (
     <div className="self-end my-3">
       <Button variant="contained" sx={buttonStyles} onClick={handleViewComparisonClick}>

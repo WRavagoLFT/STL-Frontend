@@ -20,13 +20,13 @@ export type categoryType =
 type dateType = 'Specific Date' | 'Date Duration';
 
 export interface BettorsandBetsSummaryProps {
-  activeGameType: string;
   categoryFilter: categoryType;
   dateFilter: dateType;
   firstDateSpecific: string | null;
   secondDateSpecific: string | null;
   firstDateDuration: string | null;
   secondDateDuration: string | null;
+  gameCategoryId: number;
 }
 
 interface BettingStore {

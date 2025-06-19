@@ -109,10 +109,10 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
         ? WINNING_SUBMENUS
         : null;
 
-  const path =
+  const slug =
     routeMap[label] ?? `/${label.toLowerCase().replace(/\s+/g, "-")}`;
   const isGroup = submenu !== null;
-  const isGroupActive = currentPath.startsWith(path);
+  const isGroupActive = currentPath.startsWith(slug);
   const isActive = (path: string) => currentPath === path;
 
   const handleClick = async () => {
@@ -132,10 +132,10 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
       setOpenSubmenu(openSubmenu === label ? null : label);
       if (!isGroupActive) {
         setSideBarActiveGameType("Dashboard");
-        router.push(`${path}/dashboard`);
+        router.push(`${slug}/dashboard`);
       }
     } else {
-      router.push(path);
+      router.push(slug);
     }
   };
 
