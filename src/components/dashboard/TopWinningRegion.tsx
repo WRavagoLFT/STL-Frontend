@@ -26,7 +26,9 @@ const TopWinningRegionPage = () => {
 
   const getWinningRegions = async () => {
     try {
-      const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Manila",
+      });
       const response = await fetchWinners({
         from: today,
         to: today,

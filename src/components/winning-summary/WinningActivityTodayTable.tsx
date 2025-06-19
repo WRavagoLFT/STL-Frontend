@@ -35,7 +35,6 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
   const getWinningRegions = async () => {
     try {
       setIsLoading(true);
-
       const today = new Date().toLocaleDateString("en-CA", {
         timeZone: "Asia/Manila",
       });

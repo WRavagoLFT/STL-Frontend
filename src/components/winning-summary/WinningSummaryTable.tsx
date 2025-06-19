@@ -35,20 +35,22 @@ const TableWinningSummary = (params: { gameCategoryId?: number }) => {
             ? params.gameCategoryId
             : undefined;
 
+        const today = new Date().toLocaleDateString("en-CA", {
+          timeZone: "Asia/Manila",
+        });
+
         const fetchParams: {
           from: string;
           to: string;
           gameCategoryId?: number;
         } = {
-          from: "2000-01-01",
-          to: "2099-12-31",
-          ...(gameCategoryId && { gameCategoryId }), // only include if defined
+          from: today,
+          to: today,
+          ...(gameCategoryId && { gameCategoryId }),
         };
 
         //console.log("Fetching winners with params:", fetchParams);
-
         const response = await fetchWinners(fetchParams);
-
         //console.log("API Response:", response);
 
         if (response.success) {

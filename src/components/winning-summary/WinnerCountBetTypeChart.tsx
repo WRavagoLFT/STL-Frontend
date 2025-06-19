@@ -28,13 +28,19 @@ const getBetTypeSeries = (gameCategoryId?: number) => {
 
 // Custom Legend Component
 const CustomLegend = ({ gameCategoryId }: { gameCategoryId?: number }) => {
-  const series = useMemo(() => getBetTypeSeries(gameCategoryId), [gameCategoryId]);
+  const series = useMemo(
+    () => getBetTypeSeries(gameCategoryId),
+    [gameCategoryId]
+  );
 
   return (
     <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
       {series.map(({ dataKey, color }) => (
         <div key={dataKey} className="flex items-center">
-          <div className="w-3.5 h-3.5 rounded-full mr-2" style={{ backgroundColor: color }} />
+          <div
+            className="w-3.5 h-3.5 rounded-full mr-2"
+            style={{ backgroundColor: color }}
+          />
           <p className="text-sm">{dataKey}</p>
         </div>
       ))}
@@ -42,12 +48,21 @@ const CustomLegend = ({ gameCategoryId }: { gameCategoryId?: number }) => {
   );
 };
 
-const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: number }) => {
-  const [data, setData] = useState<Array<{ draw: string; [key: string]: number | string }>>([]);
+const ChartWinnersBetTypeSummary = ({
+  gameCategoryId,
+}: {
+  gameCategoryId?: number;
+}) => {
+  const [data, setData] = useState<
+    Array<{ draw: string; [key: string]: number | string }>
+  >([]);
   const [loading, setLoading] = useState(false);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
-  const series = useMemo(() => getBetTypeSeries(gameCategoryId), [gameCategoryId]);
+  const series = useMemo(
+    () => getBetTypeSeries(gameCategoryId),
+    [gameCategoryId]
+  );
 
   const maxValue = Math.max(
     ...data.flatMap((item) =>
@@ -59,7 +74,9 @@ const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: numbe
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const today = new Date().toISOString().split("T")[0];
+      const today = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Manila",
+      });
       const response = await fetchWinners({ from: today, to: today });
 
       let res = response.data.filter(
@@ -68,7 +85,7 @@ const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: numbe
       );
 
       if (gameCategoryId && gameCategoryId > 0) {
-        res = res.filter((item : any) => item.GameCategoryId === gameCategoryId);
+        res = res.filter((item: any) => item.GameCategoryId === gameCategoryId);
       }
 
       if (response.success && Array.isArray(res)) {
@@ -91,7 +108,11 @@ const ChartWinnersBetTypeSummary = ({ gameCategoryId }: { gameCategoryId?: numbe
         const formattedData = [1, 2, 3].map((drawNum) => {
           const entry: { draw: string; [key: string]: number | string } = {
             draw:
-              drawNum === 1 ? "First Draw" : drawNum === 2 ? "Second Draw" : "Third Draw",
+              drawNum === 1
+                ? "First Draw"
+                : drawNum === 2
+                  ? "Second Draw"
+                  : "Third Draw",
           };
 
           series.forEach(({ dataKey }) => {
