@@ -1,34 +1,40 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Select, MenuItem, InputLabel, FormControl } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-comparison/SummaryBettors&Bets";
-import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettors&Bets";
-import ChartTopRegionByBetsandBettors from "~/components/betting-summary/bets-comparison/TopRegionBetting";
-import { useBettingStore, categoryType } from "../../../../store/useBettingStore";
-import { useSideBarStore } from "../../../../store/useSideBarStore";
-import dayjs from "dayjs";
+import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinners&Winnings";
+import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinners&Winnings";
+import { useWinningStore, categoryType } from "../../../../../store/useWinningStore";
+import { useSideBarStore } from "../../../../../store/useSideBarStore";
+import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
 import BackIconButton from "~/components/ui/icons/BackButton";
-import router, { useRouter } from "next/router";
+import router from "next/router";
+import dayjs from "dayjs";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 
 type dateType = "Specific Date" | "Date Duration";
 
-interface BettingComparisonPageProps {
-  slug: string;
-}
-
-const BettingComparisonPage = ({ slug }: BettingComparisonPageProps) => {
+const WinningComparisonPage = ({
+  gameCategoryId = 0,
+  slug,
+  mainSlug,
+}: {
+  gameCategoryId?: number;
+  slug?: string;
+  mainSlug?: string;
+}) => {
   const {
+    // loading,
     activeGameType,
     categoryFilter,
     dateFilter,
     firstDateSpecific,
     secondDateSpecific,
-    firstDateDuration,  
+    firstDateDuration,
     secondDateDuration,
+    // setLoading,
     setGameType,
     setCategoryFilter,
     setDateFilter,
@@ -36,48 +42,34 @@ const BettingComparisonPage = ({ slug }: BettingComparisonPageProps) => {
     setSecondDateSpecific,
     setFirstDateDuration,
     setSecondDateDuration,
-  } = useBettingStore();
-
-  console.log('SLUG IN BETTING COMPARISON:', slug);
+  } = useWinningStore();
 
   // Format dates to MM/DD/YYYY
-  const formattedFirstDateSpecific = firstDateSpecific
-    ? dayjs(firstDateSpecific).format("MM/DD/YYYY")
-    : null;
-
-  const formattedSecondDateSpecific = secondDateSpecific
-    ? dayjs(secondDateSpecific).format("MM/DD/YYYY")
-    : null;
-
-  const formattedFirstDateDuration = firstDateDuration
-    ? dayjs(firstDateDuration).format("MM/DD/YYYY")
-    : null;
-
-  const formattedSecondDateDuration = secondDateDuration
-    ? dayjs(secondDateDuration).format("MM/DD/YYYY")
-    : null;
-
+  const formattedFirstDateSpecific = firstDateSpecific ? dayjs(firstDateSpecific).format("MM/DD/YYYY") : null;
+  const formattedSecondDateSpecific = secondDateSpecific ? dayjs(secondDateSpecific).format("MM/DD/YYYY") : null;
+  const formattedFirstDateDuration = firstDateDuration ? dayjs(firstDateDuration).format("MM/DD/YYYY") : null;
+  const formattedSecondDateDuration = secondDateDuration ? dayjs(secondDateDuration).format("MM/DD/YYYY") : null;
   const { SideBarActiveGameType } = useSideBarStore();
 
   useEffect(() => {
     if (SideBarActiveGameType !== activeGameType) {
-      setGameType(SideBarActiveGameType); // Update useBettingStore's activeGameType
+      setGameType(SideBarActiveGameType); // Update useWinningStore's activeGameType
     }
   }, [SideBarActiveGameType, activeGameType, setGameType]);
 
   const categoryTypes: categoryType[] = [
-    "Total Bets and Bettors",
-    "Total Bets by Bet Type",
-    "Total Bets by Game Type",
-    "Top Betting Region by Total Bets",
-    "Top Betting Region by Total Bettors",
-    "Total Bettors by Bet Type",
-    "Total Bettors by Game Type",
+    "Total Winnings and Winners",
+    "Total Winnings by Bet Type",
+    "Total Winnings by Game Type",
+    "Top Winning Region by Total Winnings",
+    "Top Winner Region by Total Winners",
+    "Total Winners by Bet Type",
+    "Total Winners by Game Type",
   ];
 
-  // Debugging: Log all states whenever they change
   useEffect(() => {
-    //console.log("Active Sidebar State:", activeGameType);
+    //console.log("Active Sidebar State:", activeGameType)
+    //console.log("State values:");
     //console.log("categoryFilter:", categoryFilter);
     //console.log("dateFilter:", dateFilter);
     //console.log("firstDateSpecific:", firstDateSpecific);
@@ -104,13 +96,13 @@ const BettingComparisonPage = ({ slug }: BettingComparisonPageProps) => {
             iconColor="#fff"
             size={30}
             onClick={() => {
-              router.push("/betting-summary/dashboard");
-            }} // this should be dynamic
+              if (mainSlug) {
+                router.push(`/winning-summary/${mainSlug}`);
+              }
+            }}
           />
-          <h1>Betting Comparison for Game: {slug}</h1>
-
-          <div className="text-3xl ml-3 font-bold"> 
-            {(activeGameType === "Dashboard" ? "STL" : activeGameType)} Betting Summary Overview
+          <div className="text-3xl ml-3 font-bold">
+            {(activeGameType === "Dashboard" ? "STL" : activeGameType)} Winnning Summary Overview
           </div>
         </div>
         <div className="flex flex-col gap-4 w-full h-full mt-8">
@@ -307,9 +299,9 @@ const BettingComparisonPage = ({ slug }: BettingComparisonPageProps) => {
           </div>
 
           {/* Conditional MUI Chart Rendering */}
-          {categoryFilter === "Top Betting Region by Total Bets" ||
-          categoryFilter === "Top Betting Region by Total Bettors" ? (
-            <ChartTopRegionByBetsandBettors // if the condition is true
+          {categoryFilter === "Top Winning Region by Total Winnings" ||
+          categoryFilter === "Top Winner Region by Total Winners" ? (
+            <ChartTopRegionByWinsandWinners
               activeGameType={activeGameType}
               categoryFilter={categoryFilter}
               dateFilter={dateFilter}
@@ -320,7 +312,7 @@ const BettingComparisonPage = ({ slug }: BettingComparisonPageProps) => {
             />
           ) : (
             <>
-              <ChartBettorsAndBetsSummary // if false
+              <ChartWinnersandWinningsSummary
                 activeGameType={activeGameType}
                 categoryFilter={categoryFilter}
                 dateFilter={dateFilter}
@@ -329,7 +321,7 @@ const BettingComparisonPage = ({ slug }: BettingComparisonPageProps) => {
                 firstDateDuration={formattedFirstDateDuration}
                 secondDateDuration={formattedSecondDateDuration}
               />
-              <ChartBettorsAndBetsRegionalSummary // if false
+              <ChartWinnersandWinningsRegionalSummary
                 activeGameType={activeGameType}
                 categoryFilter={categoryFilter}
                 dateFilter={dateFilter}
@@ -346,4 +338,4 @@ const BettingComparisonPage = ({ slug }: BettingComparisonPageProps) => {
   );
 };
 
-export default BettingComparisonPage;
+export default WinningComparisonPage;

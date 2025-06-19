@@ -7,7 +7,7 @@ import ChartBettorsvsBetsPlacedSummary from "~/components/betting-summary/Bettor
 import ChartBettorsSummary from "~/components/betting-summary/BettorCountChart";
 import TableBettingSummary from "~/components/betting-summary/BettingSummaryTable";
 import ChartBettorsBetTypeSummary from "~/components/betting-summary/BettorCountByBetType";
-import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
+import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton"; 
 import { buttonStyles } from "~/styles/theme";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { useAuthStore } from "~/store/useAuthStore";
@@ -34,16 +34,13 @@ const BettingSummaryPage = ({
 
   useEffect(() => {
     setTitle(GAME_TITLES[gameCategoryId] || "STL");
-
-    // Simulate fetch delay
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500); // Simulate loading for 1.5s
-
+    }, 1500);
     return () => clearTimeout(timer);
   }, [gameCategoryId]);
 
-  const slugify = (text: string) =>
+  const slugify = (text: string) => 
     text
       .toString()
       .toLowerCase()
@@ -53,9 +50,9 @@ const BettingSummaryPage = ({
       .replace(/\-\-+/g, "-");
 
   const handleViewComparisonClick = () => {
-    console.log("Game Type ID:", gameCategoryId);
-    const slug = slugify(title);
-    router.push(`/betting-summary/betting-comparisons/${slug}`);
+    const comparisonSlug = slugify(title);
+    const mainSlug = slug || "dashboard";
+    router.push(`/betting-summary/${mainSlug}/betting-comparisons/${comparisonSlug}`);
   };
 
   const ChartSection = (
@@ -69,13 +66,10 @@ const BettingSummaryPage = ({
     </>
   );
 
+  // pass the game category id
   const ComparisonButton = (
     <div className="self-end my-3">
-      <Button
-        variant="contained"
-        sx={buttonStyles}
-        onClick={handleViewComparisonClick}
-      >
+      <Button variant="contained" sx={buttonStyles} onClick={handleViewComparisonClick}>
         View Comparison
       </Button>
     </div>
@@ -84,7 +78,7 @@ const BettingSummaryPage = ({
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
       {isLoading ? (
-        <BettingSummarySkeleton />
+        <BettingSummarySkeleton /> 
       ) : (
         <div className="space-y-4 h-full mt-8 md:mt-0">
           <h1 className="text-3xl font-bold">{title} Betting Summary</h1>
@@ -94,9 +88,7 @@ const BettingSummaryPage = ({
               {userTypeId === 6 ? (
                 <div className="w-full flex flex-col lg:flex-row lg:min-h-[500px] space-y-4 lg:space-y-0 lg:space-x-4">
                   <div className="w-full lg:w-1/3">
-                    <TableBettingActivityToday
-                      gameCategoryId={gameCategoryId}
-                    />
+                    <TableBettingActivityToday gameCategoryId={gameCategoryId} />
                   </div>
                   <div className="w-full lg:w-2/3 flex flex-col space-y-5">
                     {ChartSection}

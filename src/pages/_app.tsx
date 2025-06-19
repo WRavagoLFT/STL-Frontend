@@ -58,9 +58,10 @@ const App = ({ Component, pageProps }: AppProps) => {
     "/users/users-view/:slug",
     "/operators/:slug",
     "/device-information/device-information-view/:slug",
-    "/betting-summary/:slug",
     "/winning-summary/:slug",
-    "/betting-comparisons/:slug",
+    "/betting-summary/:mainSlug",
+    "/betting-summary/:mainSlug/betting-comparisons/:comparisonSlug",
+    "/winning-summary/:mainSlug/winning-comparisons/:comparisonSlug",
   ];
 
   const rawPath = router.asPath.split("?")[0];

@@ -4,30 +4,35 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-
-import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinners&Winnings";
-import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinners&Winnings";
-import { useWinningStore, categoryType } from "../../../store/useWinningStore";
-import { useSideBarStore } from "../../../store/useSideBarStore";
-import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
-import BackIconButton from "~/components/ui/icons/BackButton";
-import router from "next/router";
+import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-comparison/SummaryBettors&Bets";
+import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettors&Bets";
+import ChartTopRegionByBetsandBettors from "~/components/betting-summary/bets-comparison/TopRegionBetting";
+import { useBettingStore, categoryType } from "../../../../../store/useBettingStore";
+import { useSideBarStore } from "../../../../../store/useSideBarStore";
 import dayjs from "dayjs";
+import BackIconButton from "~/components/ui/icons/BackButton";
+import router, { useRouter } from "next/router";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 
 type dateType = "Specific Date" | "Date Duration";
 
-const WinningComparison = () => {
+const BettingComparisonPage = ({
+  gameCategoryId = 0,
+  slug,
+  mainSlug,
+}: {
+  gameCategoryId?: number;
+  slug?: string;
+  mainSlug?: string;
+}) => {
   const {
-    // loading,
     activeGameType,
     categoryFilter,
     dateFilter,
     firstDateSpecific,
     secondDateSpecific,
-    firstDateDuration,
+    firstDateDuration,  
     secondDateDuration,
-    // setLoading,
     setGameType,
     setCategoryFilter,
     setDateFilter,
@@ -35,47 +40,35 @@ const WinningComparison = () => {
     setSecondDateSpecific,
     setFirstDateDuration,
     setSecondDateDuration,
-  } = useWinningStore();
+  } = useBettingStore();
 
-  // Format dates to MM/DD/YYYY
-  const formattedFirstDateSpecific = firstDateSpecific
-    ? dayjs(firstDateSpecific).format("MM/DD/YYYY")
-    : null;
+  //console.log('SLUG IN BETTING COMPARISON:', slug);
+  //console.log('MAIN SLUG:', mainSlug);
 
-  const formattedSecondDateSpecific = secondDateSpecific
-    ? dayjs(secondDateSpecific).format("MM/DD/YYYY")
-    : null;
-
-  const formattedFirstDateDuration = firstDateDuration
-    ? dayjs(firstDateDuration).format("MM/DD/YYYY")
-    : null;
-
-  const formattedSecondDateDuration = secondDateDuration
-    ? dayjs(secondDateDuration).format("MM/DD/YYYY")
-    : null;
-
+  const formattedFirstDateSpecific = firstDateSpecific ? dayjs(firstDateSpecific).format("MM/DD/YYYY") : null;
+  const formattedSecondDateSpecific = secondDateSpecific ? dayjs(secondDateSpecific).format("MM/DD/YYYY") : null;
+  const formattedFirstDateDuration = firstDateDuration ? dayjs(firstDateDuration).format("MM/DD/YYYY") : null;
+  const formattedSecondDateDuration = secondDateDuration ? dayjs(secondDateDuration).format("MM/DD/YYYY") : null;
   const { SideBarActiveGameType } = useSideBarStore();
 
   useEffect(() => {
     if (SideBarActiveGameType !== activeGameType) {
-      setGameType(SideBarActiveGameType); // Update useWinningStore's activeGameType
+      setGameType(SideBarActiveGameType);
     }
   }, [SideBarActiveGameType, activeGameType, setGameType]);
 
   const categoryTypes: categoryType[] = [
-    "Total Winnings and Winners",
-    "Total Winnings by Bet Type",
-    "Total Winnings by Game Type",
-    "Top Winning Region by Total Winnings",
-    "Top Winner Region by Total Winners",
-    "Total Winners by Bet Type",
-    "Total Winners by Game Type",
+    "Total Bets and Bettors",
+    "Total Bets by Bet Type",
+    "Total Bets by Game Type",
+    "Top Betting Region by Total Bets",
+    "Top Betting Region by Total Bettors",
+    "Total Bettors by Bet Type",
+    "Total Bettors by Game Type",
   ];
 
-  // Debugging: Log all states whenever they change
   useEffect(() => {
-    //console.log("Active Sidebar State:", activeGameType)
-    //console.log("State values:");
+    //console.log("Active Sidebar State:", activeGameType);
     //console.log("categoryFilter:", categoryFilter);
     //console.log("dateFilter:", dateFilter);
     //console.log("firstDateSpecific:", firstDateSpecific);
@@ -102,11 +95,14 @@ const WinningComparison = () => {
             iconColor="#fff"
             size={30}
             onClick={() => {
-              router.push("/winning-summary/dashboard");
-            }} // this should be dynamic
+              if (mainSlug) {
+                router.push(`/betting-summary/${mainSlug}`);
+              }
+            }}
           />
           <div className="text-3xl ml-3 font-bold">
-            {(activeGameType === "Dashboard" ? "STL" : activeGameType)} Winnning Summary Overview
+            {activeGameType === "Dashboard" ? "STL" : activeGameType} Betting
+            Summary Overview
           </div>
         </div>
         <div className="flex flex-col gap-4 w-full h-full mt-8">
@@ -146,7 +142,9 @@ const WinningComparison = () => {
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                       label="First Date"
-                      value={firstDateSpecific ? dayjs(firstDateSpecific) : null}
+                      value={
+                        firstDateSpecific ? dayjs(firstDateSpecific) : null
+                      }
                       onChange={(newValue) =>
                         newValue
                           ? setFirstDateSpecific(newValue.format("YYYY-MM-DD"))
@@ -159,13 +157,17 @@ const WinningComparison = () => {
                 {/* Right Side */}
                 <div className="flex flex-col gap-4 w-1/2">
                   <FormControl>
-                    <InputLabel id="date-filter-label">Filter by Date</InputLabel>
+                    <InputLabel id="date-filter-label">
+                      Filter by Date
+                    </InputLabel>
                     <Select
                       labelId="date-filter-label"
                       id="date-filter"
                       value={dateFilter}
                       label="Filter by Date"
-                      onChange={(e) => setDateFilter(e.target.value as dateType)}
+                      onChange={(e) =>
+                        setDateFilter(e.target.value as dateType)
+                      }
                       IconComponent={() => (
                         <FilterListIcon style={{ pointerEvents: "none" }} />
                       )}
@@ -221,7 +223,9 @@ const WinningComparison = () => {
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                       label="First Date"
-                      value={firstDateSpecific ? dayjs(firstDateSpecific) : null}
+                      value={
+                        firstDateSpecific ? dayjs(firstDateSpecific) : null
+                      }
                       onChange={(newValue) =>
                         newValue
                           ? setFirstDateSpecific(newValue.format("YYYY-MM-DD"))
@@ -234,13 +238,17 @@ const WinningComparison = () => {
                 {/* Column 2 */}
                 <div className="flex flex-col gap-4 w-1/4">
                   <FormControl>
-                    <InputLabel id="date-filter-label">Filter by Date</InputLabel>
+                    <InputLabel id="date-filter-label">
+                      Filter by Date
+                    </InputLabel>
                     <Select
                       labelId="date-filter-label"
                       id="date-filter"
                       value={dateFilter}
                       label="Filter by Date"
-                      onChange={(e) => setDateFilter(e.target.value as dateType)}
+                      onChange={(e) =>
+                        setDateFilter(e.target.value as dateType)
+                      }
                       IconComponent={() => (
                         <FilterListIcon style={{ pointerEvents: "none" }} />
                       )}
@@ -271,7 +279,9 @@ const WinningComparison = () => {
                   <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <DatePicker
                       label="First Date"
-                      value={firstDateDuration ? dayjs(firstDateDuration) : null}
+                      value={
+                        firstDateDuration ? dayjs(firstDateDuration) : null
+                      }
                       onChange={(newValue) =>
                         newValue
                           ? setFirstDateDuration(newValue.format("YYYY-MM-DD"))
@@ -303,9 +313,9 @@ const WinningComparison = () => {
           </div>
 
           {/* Conditional MUI Chart Rendering */}
-          {categoryFilter === "Top Winning Region by Total Winnings" ||
-          categoryFilter === "Top Winner Region by Total Winners" ? (
-            <ChartTopRegionByWinsandWinners
+          {categoryFilter === "Top Betting Region by Total Bets" ||
+          categoryFilter === "Top Betting Region by Total Bettors" ? (
+            <ChartTopRegionByBetsandBettors // if the condition is true
               activeGameType={activeGameType}
               categoryFilter={categoryFilter}
               dateFilter={dateFilter}
@@ -316,7 +326,7 @@ const WinningComparison = () => {
             />
           ) : (
             <>
-              <ChartWinnersandWinningsSummary
+              <ChartBettorsAndBetsSummary // if false
                 activeGameType={activeGameType}
                 categoryFilter={categoryFilter}
                 dateFilter={dateFilter}
@@ -325,7 +335,7 @@ const WinningComparison = () => {
                 firstDateDuration={formattedFirstDateDuration}
                 secondDateDuration={formattedSecondDateDuration}
               />
-              <ChartWinnersandWinningsRegionalSummary
+              <ChartBettorsAndBetsRegionalSummary // if false
                 activeGameType={activeGameType}
                 categoryFilter={categoryFilter}
                 dateFilter={dateFilter}
@@ -342,4 +352,4 @@ const WinningComparison = () => {
   );
 };
 
-export default WinningComparison;
+export default BettingComparisonPage;

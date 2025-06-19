@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/router";
-
 import DashboardCardsPage from "~/components/dashboard/DashboardCards";
 import TableWinningActivityToday from "~/components/winning-summary/WinningActivityTodayTable";
 import ChartWinnersvsWinningsSummary from "~/components/winning-summary/WinnersvsWinningsChart";
@@ -20,7 +19,13 @@ const GAME_TITLES = [
   "STL Swer 4",
 ];
 
-const WinningSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number }) => {
+const WinningSummaryPage = ({
+  gameCategoryId = 0,
+  slug,
+}: {
+  gameCategoryId?: number;
+  slug?: string;
+}) => {
   const router = useRouter();
   const [title, setTitle] = useState("STL");
   const userTypeId = useAuthStore((state) => state.userTypeId);
@@ -29,8 +34,19 @@ const WinningSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number })
     setTitle(GAME_TITLES[gameCategoryId] || "STL");
   }, [gameCategoryId]);
 
+  const slugify = (text: string) => 
+    text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w\-]+/g, "")
+      .replace(/\-\-+/g, "-");
+
   const handleViewComparisonClick = () => {
-    router.push("/wins-comparisons");
+    const comparisonSlug = slugify(title);
+    const mainSlug = slug || "dashboard";
+    router.push(`/winning-summary/${mainSlug}/winning-comparisons/${comparisonSlug}`);
   };
 
   const ChartSection = (
