@@ -1,11 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
-import { BarChart } from '@mui/x-charts/BarChart';
-import { 
-  WinnersandWinningsSummaryProps,
-  getLegendItemsMap_Specific,
-  getLegendItemsMap_Duration,
-} from "../../../store/useWinningStore";
+import { BarChart } from "@mui/x-charts/BarChart";
+import { WinnersandWinningsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from "../../../store/useWinningStore";
 import { fetchCompareHistoricalWinnersDate, fetchCompareHistoricalWinnersRange } from "~/utils/api/winners";
 
 type Chart1Data = {
@@ -32,7 +28,7 @@ type Chart25Data = {
   secondRangeTumbok?: number;
   firstRangeWinningsSahod?: number;
   secondRangeWinningsSahod?: number;
-}
+};
 type Chart36Data = {
   drawOrder: number;
   firstDateSTLPares: number;
@@ -52,7 +48,7 @@ type Chart36Data = {
   secondRangeSTLSwer3: number;
   firstRangeSTLSwer4: number;
   secondRangeSTLSwer4: number;
-}
+};
 
 type ChartData = Chart1Data | Chart25Data | Chart36Data;
 
@@ -73,7 +69,7 @@ interface RegionSpecificData {
     Tumbok: number;
     Sahod: number;
     Ramble: number;
-  }
+  };
 }
 interface RegionRangeData {
   RegionName: string;
@@ -94,41 +90,50 @@ interface RegionRangeData {
     Tumbok: number;
     Sahod: number;
     Ramble: number;
-  }
+  };
 }
 interface RangePayload {
-    Region: {
+  Region: {
     FirstRange: RegionRangeData[];
     SecondRange: RegionRangeData[];
-  }
+  };
 }
 const formatDate = (date: string | null): string => {
   if (!date) return "";
   const d = new Date(date);
   const year = d.getFullYear();
-  const month = `${d.getMonth() + 1}`.padStart(2, '0');
-  const day = `${d.getDate()}`.padStart(2, '0');
+  const month = `${d.getMonth() + 1}`.padStart(2, "0");
+  const day = `${d.getDate()}`.padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
 const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
-    categoryFilter,
-    dateFilter,
-    firstDateSpecific,
-    secondDateSpecific,
-    firstDateDuration,
-    secondDateDuration,
-  }) => {
+  categoryFilter,
+  dateFilter,
+  firstDateSpecific,
+  secondDateSpecific,
+  firstDateDuration,
+  secondDateDuration,
+}) => {
   // Determine which legend items map to use based on the dateFilter
   const legendItems =
     dateFilter === "Specific Date"
-      ? getLegendItemsMap_Specific(categoryFilter, firstDateSpecific, secondDateSpecific)
-      : getLegendItemsMap_Duration(categoryFilter, firstDateSpecific, secondDateSpecific, firstDateDuration, secondDateDuration);
+      ? getLegendItemsMap_Specific(
+          categoryFilter,
+          firstDateSpecific,
+          secondDateSpecific
+        )
+      : getLegendItemsMap_Duration(
+          categoryFilter,
+          firstDateSpecific,
+          secondDateSpecific,
+          firstDateDuration,
+          secondDateDuration
+        );
 
-  // Group legend items into rows of 4 for a 4x2 grid layout
   const chunkedLegendItems = legendItems.reduce(
     (result, item, index) => {
-      const chunkIndex = Math.floor(index / 4); // Group into rows of 4
+      const chunkIndex = Math.floor(index / 4);
       if (!result[chunkIndex]) {
         result[chunkIndex] = [];
       }
@@ -159,59 +164,62 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
   );
 };
 
-const ChartWinnersandWinningsRegionalSummary: React.FC<WinnersandWinningsSummaryProps> = ({
+const ChartWinnersandWinningsRegionalSummary: React.FC<
+  WinnersandWinningsSummaryProps
+> = ({
+  gameCategoryId,
   categoryFilter,
   dateFilter,
   firstDateSpecific,
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
-  activeGameType
 }) => {
-console.log('Active Game Category:', activeGameType);
-const [loading, setLoading] = useState(false)
-const [chartData, setChartData] = useState<ChartData[]>([])
-const philippineRegions = [
-  "NCR", "CAR", "I", "II", "III", "IV-A", "IV-B",
-  "V", "VI", "VII", "VIII", "IX", "X", "XI",
-  "XII", "XIII", "BARMM"
-];
+  const [loading, setLoading] = useState(false);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
 
-// Determine chart number based on categoryFilter
-const chartMap: Record<string, string> = {
-  "Total Winnings and Winners": "1",
-  "Total Winnings by Bet Type": "2",
-  "Total Winnings by Game Type": "3",
-  "Total Winners by Bet Type": "5",
-  "Total Winners by Game Type": "6",
-  "Top Winning Region by Total Winning": "4",
-  "Top Winning Region by Total Winners": "4",
-};
-const urlParam = chartMap[categoryFilter];
-// Determine gameCategory number based on activeGameType
+  const philippineRegions = [
+    "NCR",
+    "CAR",
+    "I",
+    "II",
+    "III",
+    "IV-A",
+    "IV-B",
+    "V",
+    "VI",
+    "VII",
+    "VIII",
+    "IX",
+    "X",
+    "XI",
+    "XII",
+    "XIII",
+    "BARMM",
+  ];
 
-const gameCategoryMap: Record<string, number> = {
-  "Dashboard": 0,
-  "STL Pares": 1,
-  "STL Swer2": 2,
-  "STL Swer3": 3,
-  "STL Swer4": 4,
-}
-const gameTypeParam = gameCategoryMap[activeGameType];
-//console.log('Game Category Param:', gameTypeParam)
+  const chartMap: Record<string, string> = {
+    "Total Winnings and Winners": "1",
+    "Total Winnings by Bet Type": "2",
+    "Total Winnings by Game Type": "3",
+    "Total Winners by Bet Type": "5",
+    "Total Winners by Game Type": "6",
+    "Top Winning Region by Total Winning": "4",
+    "Top Winning Region by Total Winners": "4",
+  };
 
-// Add gameType parameter if activeGameType is valid (1-4)
-const getGameCategoryParam = () => {
-  if(gameTypeParam && gameTypeParam >=1 && gameTypeParam <= 4) {
-    return { gameTypeParam: gameTypeParam };
-  }
-  return {};
-}
+  const urlParam = chartMap[categoryFilter];
 
-// Helper function to check if dates match (ignoring time)
-const datesMatch = (dateString1: string, dateString2: string): boolean => {
-  return formatDate(dateString1) === formatDate(dateString2);
-}
+  const getGameCategoryParam = () => {
+    if (gameCategoryId && gameCategoryId >= 1 && gameCategoryId <= 4) {
+      return { gameCategory: gameCategoryId };
+    }
+    return {};
+  };
+
+  const datesMatch = (dateString1: string, dateString2: string): boolean => {
+    return formatDate(dateString1) === formatDate(dateString2);
+  };
 
   // For Specific Date
   // Process Chart 1 Data
@@ -220,24 +228,36 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     firstDate: string,
     secondDate: string
   ) => {
-    return philippineRegions.map(region => {
+    return philippineRegions.map((region) => {
       const allRegionItems = payload.Region.flat().filter(
-        item => item.Region === region || item.Region === `Region ${region}`
+        (item) => item.Region === region || item.Region === `Region ${region}`
       );
 
-      const firstDateItems = allRegionItems.filter(item => 
+      const firstDateItems = allRegionItems.filter((item) =>
         datesMatch(item.DateOfWinningCombination, firstDate)
       );
-      const secondDateItems = allRegionItems.filter(item => 
+      const secondDateItems = allRegionItems.filter((item) =>
         datesMatch(item.DateOfWinningCombination, secondDate)
       );
 
       return {
         region,
-        firstDateWinners: firstDateItems.reduce((sum, item) => sum + item.TotalWinners, 0), 
-        secondDateWinners: secondDateItems.reduce((sum, item) => sum + item.TotalWinners, 0),
-        firstDateWinnings: firstDateItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0),
-        secondDateWinnings: secondDateItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0)
+        firstDateWinners: firstDateItems.reduce(
+          (sum, item) => sum + item.TotalWinners,
+          0
+        ),
+        secondDateWinners: secondDateItems.reduce(
+          (sum, item) => sum + item.TotalWinners,
+          0
+        ),
+        firstDateWinnings: firstDateItems.reduce(
+          (sum, item) => sum + item.TotalPayoutAmount,
+          0
+        ),
+        secondDateWinnings: secondDateItems.reduce(
+          (sum, item) => sum + item.TotalPayoutAmount,
+          0
+        ),
       };
     });
   };
@@ -247,24 +267,36 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     firstDate: string,
     secondDate: string
   ) => {
-    return philippineRegions.map(region => {
+    return philippineRegions.map((region) => {
       const allRegionItems = payload.Region.flat().filter(
-        item => item.Region === region || item.Region === `Region ${region}`
+        (item) => item.Region === region || item.Region === `Region ${region}`
       );
 
-      const firstDateItems = allRegionItems.filter(item => 
+      const firstDateItems = allRegionItems.filter((item) =>
         datesMatch(item.DateOfWinningCombination, firstDate)
       );
-      const secondDateItems = allRegionItems.filter(item => 
+      const secondDateItems = allRegionItems.filter((item) =>
         datesMatch(item.DateOfWinningCombination, secondDate)
       );
 
       return {
         region,
-        firstDateTumbok: firstDateItems.reduce((sum, item) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        secondDateTumbok: secondDateItems.reduce((sum, item) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        firstDateSahod: firstDateItems.reduce((sum, item) => sum + (item.BetTypes?.Sahod || 0), 0),
-        secondDateSahod: secondDateItems.reduce((sum, item) => sum + (item.BetTypes?.Sahod || 0), 0)
+        firstDateTumbok: firstDateItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        secondDateTumbok: secondDateItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        firstDateSahod: firstDateItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
+        secondDateSahod: secondDateItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
       };
     });
   };
@@ -276,26 +308,33 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
   ) => {
     const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-    return philippineRegions.map(region => {
+    return philippineRegions.map((region) => {
       const result: any = { region };
-      
-      gameCategories.forEach(category => {
+
+      gameCategories.forEach((category) => {
         const allItems = payload.Region.flat().filter(
-          item => (item.Region === region || item.Region === `Region ${region}`) && 
-                  item.GameCategory === category
+          (item) =>
+            (item.Region === region || item.Region === `Region ${region}`) &&
+            item.GameCategory === category
         );
-        
-        const firstDateItems = allItems.filter(item => 
+
+        const firstDateItems = allItems.filter((item) =>
           datesMatch(item.DateOfWinningCombination, firstDate)
         );
-        const secondDateItems = allItems.filter(item => 
+        const secondDateItems = allItems.filter((item) =>
           datesMatch(item.DateOfWinningCombination, secondDate)
         );
 
-        result[`firstDate${category.replace(/\s+/g, '')}`] = 
-          firstDateItems.reduce((sum, item) => sum + item.TotalTumbokPayouts, 0);
-        result[`secondDate${category.replace(/\s+/g, '')}`] = 
-          secondDateItems.reduce((sum, item) => sum + item.TotalSahodPayouts, 0);
+        result[`firstDate${category.replace(/\s+/g, "")}`] =
+          firstDateItems.reduce(
+            (sum, item) => sum + item.TotalTumbokPayouts,
+            0
+          );
+        result[`secondDate${category.replace(/\s+/g, "")}`] =
+          secondDateItems.reduce(
+            (sum, item) => sum + item.TotalSahodPayouts,
+            0
+          );
       });
 
       return result;
@@ -307,24 +346,36 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     firstDate: string,
     secondDate: string
   ) => {
-    return philippineRegions.map(region => {
+    return philippineRegions.map((region) => {
       const allRegionItems = payload.Region.flat().filter(
-        item => item.Region === region || item.Region === `Region ${region}`
+        (item) => item.Region === region || item.Region === `Region ${region}`
       );
 
-      const firstDateItems = allRegionItems.filter(item => 
+      const firstDateItems = allRegionItems.filter((item) =>
         datesMatch(item.DateOfWinningCombination, firstDate)
       );
-      const secondDateItems = allRegionItems.filter(item => 
+      const secondDateItems = allRegionItems.filter((item) =>
         datesMatch(item.DateOfWinningCombination, secondDate)
       );
 
       return {
         region,
-        firstDateTumbok:   firstDateItems.reduce((sum, item) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        secondDateTumbok: secondDateItems.reduce((sum, item) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        firstDateSahod: firstDateItems.reduce((sum, item) => sum + (item.BetTypes?.Sahod || 0), 0),
-        secondDateSahod: secondDateItems.reduce((sum, item) => sum + (item.BetTypes?.Sahod || 0), 0)
+        firstDateTumbok: firstDateItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        secondDateTumbok: secondDateItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        firstDateSahod: firstDateItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
+        secondDateSahod: secondDateItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
       };
     });
   };
@@ -336,32 +387,40 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
   ) => {
     const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-    return philippineRegions.map(region => {
+    return philippineRegions.map((region) => {
       const result: any = { region };
-      
-      gameCategories.forEach(category => {
+
+      gameCategories.forEach((category) => {
         const allItems = payload.Region.flat().filter(
-          item => (item.Region === region || item.Region === `Region ${region}`) && 
-                  item.GameCategory === category
+          (item) =>
+            (item.Region === region || item.Region === `Region ${region}`) &&
+            item.GameCategory === category
         );
-        
-        const firstDateItems = allItems.filter(item => 
+
+        const firstDateItems = allItems.filter((item) =>
           datesMatch(item.DateOfWinningCombination, firstDate)
         );
-        const secondDateItems = allItems.filter(item => 
+        const secondDateItems = allItems.filter((item) =>
           datesMatch(item.DateOfWinningCombination, secondDate)
         );
 
-        result[`firstDate${category.replace(/\s+/g, '')}`] = 
-          firstDateItems.reduce((sum, item) => sum + item.TotalTumbokWinners, 0);
-        result[`secondDate${category.replace(/\s+/g, '')}`] = 
-          secondDateItems.reduce((sum, item) => sum + item.TotalSahodWinners, 0);
+        result[`firstDate${category.replace(/\s+/g, "")}`] =
+          firstDateItems.reduce(
+            (sum, item) => sum + item.TotalTumbokWinners,
+            0
+          );
+        result[`secondDate${category.replace(/\s+/g, "")}`] =
+          secondDateItems.reduce(
+            (sum, item) => sum + item.TotalSahodWinners,
+            0
+          );
       });
 
       return result;
     });
   };
-    // Main processor function
+
+  // Main processor function
   const processSpecificDatePayload = (
     urlParam: string,
     payload: any,
@@ -374,130 +433,171 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     }
 
     switch (urlParam) {
-      case "1": return processChart1Data(payload, firstDate, secondDate);
-      case "2": return processChart2Data(payload, firstDate, secondDate);
-      case "3": return processChart3Data(payload, firstDate, secondDate);
-      case "5": return processChart5Data(payload, firstDate, secondDate);
-      case "6": return processChart6Data(payload, firstDate, secondDate);
+      case "1":
+        return processChart1Data(payload, firstDate, secondDate);
+      case "2":
+        return processChart2Data(payload, firstDate, secondDate);
+      case "3":
+        return processChart3Data(payload, firstDate, secondDate);
+      case "5":
+        return processChart5Data(payload, firstDate, secondDate);
+      case "6":
+        return processChart6Data(payload, firstDate, secondDate);
       default:
         console.warn("Unknown urlParam:", urlParam);
         return [];
     }
   };
 
-  //  For Date Duration Date.
-  const processDurationChart1Data = (
-    payload: RangePayload
-  ) => {
-    return philippineRegions.map(region => {
+  // For Date Duration Date.
+  const processDurationChart1Data = (payload: RangePayload) => {
+    return philippineRegions.map((region) => {
       const firstRangeItems = payload.Region.FirstRange.filter(
-        item => item.Region === region || item.Region === `Region ${region}`
+        (item) => item.Region === region || item.Region === `Region ${region}`
       );
       const secondRangeItems = payload.Region.SecondRange.filter(
-        item => item.Region === region || item.Region === `Region ${region}`
+        (item) => item.Region === region || item.Region === `Region ${region}`
       );
 
       return {
         region,
-        firstRangeWinners: firstRangeItems.reduce((sum, item) => sum + item.TotalWinners, 0),
-        secondRangeWinners: secondRangeItems.reduce((sum, item) => sum + item.TotalWinners, 0),
-        firstRangeWinnings: firstRangeItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0),
-        secondRangeWinnings: secondRangeItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0)
+        firstRangeWinners: firstRangeItems.reduce(
+          (sum, item) => sum + item.TotalWinners,
+          0
+        ),
+        secondRangeWinners: secondRangeItems.reduce(
+          (sum, item) => sum + item.TotalWinners,
+          0
+        ),
+        firstRangeWinnings: firstRangeItems.reduce(
+          (sum, item) => sum + item.TotalPayoutAmount,
+          0
+        ),
+        secondRangeWinnings: secondRangeItems.reduce(
+          (sum, item) => sum + item.TotalPayoutAmount,
+          0
+        ),
       };
     });
   };
 
-  const processDurationChart2Data = (
-    payload: RangePayload
-  ) => {
-    return philippineRegions.map(region => {
+  const processDurationChart2Data = (payload: RangePayload) => {
+    return philippineRegions.map((region) => {
       const firstRangeItems = payload.Region.FirstRange.filter(
-        item => item.Region === region || item.Region === `Region ${region}`
+        (item) => item.Region === region || item.Region === `Region ${region}`
       );
       const secondRangeItems = payload.Region.SecondRange.filter(
-        item => item.Region === region || item.Region === `Region ${region}`
+        (item) => item.Region === region || item.Region === `Region ${region}`
       );
 
       return {
         region,
-        firstRangeTumbok: firstRangeItems.reduce((sum, item) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        secondRangeTumbok: secondRangeItems.reduce((sum, item) => sum + (item.BetTypes?.Tumbok || 0), 0),
-        firstRangeSahod: firstRangeItems.reduce((sum, item) => sum + (item.BetTypes?.Sahod || 0), 0),
-        secondRangeSahod: secondRangeItems.reduce((sum, item) => sum + (item.BetTypes?.Sahod || 0), 0)
+        firstRangeTumbok: firstRangeItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        secondRangeTumbok: secondRangeItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+          0
+        ),
+        firstRangeSahod: firstRangeItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
+        secondRangeSahod: secondRangeItems.reduce(
+          (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+          0
+        ),
       };
     });
   };
 
-  const processDurationChart3Data = (
-    payload: RangePayload
-  ) => {
+  const processDurationChart3Data = (payload: RangePayload) => {
     const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-    return philippineRegions.map(region => {
+    return philippineRegions.map((region) => {
       const result: any = { region };
-      
-      gameCategories.forEach(category => {
+
+      gameCategories.forEach((category) => {
         const firstRangeItems = payload.Region.FirstRange.filter(
-          item => (item.Region === region || item.Region === `Region ${region}`) && 
-                  item.GameCategory === category
+          (item) =>
+            (item.Region === region || item.Region === `Region ${region}`) &&
+            item.GameCategory === category
         );
         const secondRangeItems = payload.Region.SecondRange.filter(
-          item => (item.Region === region || item.Region === `Region ${region}`) && 
-                  item.GameCategory === category
+          (item) =>
+            (item.Region === region || item.Region === `Region ${region}`) &&
+            item.GameCategory === category
         );
 
-        result[`firstRange${category.replace(/\s+/g, '')}`] = 
-          firstRangeItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0);
-        result[`secondRange${category.replace(/\s+/g, '')}`] = 
-          secondRangeItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0);
+        result[`firstRange${category.replace(/\s+/g, "")}`] =
+          firstRangeItems.reduce(
+            (sum, item) => sum + item.TotalPayoutAmount,
+            0
+          );
+        result[`secondRange${category.replace(/\s+/g, "")}`] =
+          secondRangeItems.reduce(
+            (sum, item) => sum + item.TotalPayoutAmount,
+            0
+          );
       });
 
       return result;
     });
   };
 
-  const processDurationChart5Data = (
-    payload: RangePayload
-  ) => {
-    return philippineRegions.map(region => {
+  const processDurationChart5Data = (payload: RangePayload) => {
+    return philippineRegions.map((region) => {
       const firstRangeItems = payload.Region.FirstRange.filter(
-        item => item.Region === region || item.Region === `Region ${region}`
+        (item) => item.Region === region || item.Region === `Region ${region}`
       );
       const secondRangeItems = payload.Region.SecondRange.filter(
-        item => item.Region === region || item.Region === `Region ${region}`
+        (item) => item.Region === region || item.Region === `Region ${region}`
       );
 
       return {
         region,
-        firstRangeTumbok: firstRangeItems.reduce((sum, item) => sum + (item.TotalTumbokWinners || 0), 0),
-        secondRangeTumbok: secondRangeItems.reduce((sum, item) => sum + (item.TotalTumbokWinners || 0), 0),
-        firstRangeSahod: firstRangeItems.reduce((sum, item) => sum + (item.TotalSahodWinners || 0), 0),
-        secondRangeSahod: secondRangeItems.reduce((sum, item) => sum + (item.TotalSahodWinners || 0), 0)
+        firstRangeTumbok: firstRangeItems.reduce(
+          (sum, item) => sum + (item.TotalTumbokWinners || 0),
+          0
+        ),
+        secondRangeTumbok: secondRangeItems.reduce(
+          (sum, item) => sum + (item.TotalTumbokWinners || 0),
+          0
+        ),
+        firstRangeSahod: firstRangeItems.reduce(
+          (sum, item) => sum + (item.TotalSahodWinners || 0),
+          0
+        ),
+        secondRangeSahod: secondRangeItems.reduce(
+          (sum, item) => sum + (item.TotalSahodWinners || 0),
+          0
+        ),
       };
     });
   };
 
-  const processDurationChart6Data = (
-    payload: RangePayload
-  ) => {
+  const processDurationChart6Data = (payload: RangePayload) => {
     const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-    return philippineRegions.map(region => {
+    return philippineRegions.map((region) => {
       const result: any = { region };
-      
-      gameCategories.forEach(category => {
+
+      gameCategories.forEach((category) => {
         const firstRangeItems = payload.Region.FirstRange.filter(
-          item => (item.Region === region || item.Region === `Region ${region}`) && 
-                  item.GameCategory === category
+          (item) =>
+            (item.Region === region || item.Region === `Region ${region}`) &&
+            item.GameCategory === category
         );
         const secondRangeItems = payload.Region.SecondRange.filter(
-          item => (item.Region === region || item.Region === `Region ${region}`) && 
-                  item.GameCategory === category
+          (item) =>
+            (item.Region === region || item.Region === `Region ${region}`) &&
+            item.GameCategory === category
         );
 
-        result[`firstRange${category.replace(/\s+/g, '')}`] = 
+        result[`firstRange${category.replace(/\s+/g, "")}`] =
           firstRangeItems.reduce((sum, item) => sum + item.TotalWinners, 0);
-        result[`secondRange${category.replace(/\s+/g, '')}`] = 
+        result[`secondRange${category.replace(/\s+/g, "")}`] =
           secondRangeItems.reduce((sum, item) => sum + item.TotalWinners, 0);
       });
 
@@ -506,21 +606,28 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
   };
 
   // Main processor for Date Duration
-  const processDurationPayload = (
-    urlParam: string,
-    payload: any
-  ) => {
-    if (!payload || !payload.Region || !payload.Region.FirstRange || !payload.Region.SecondRange) {
+  const processDurationPayload = (urlParam: string, payload: any) => {
+    if (
+      !payload ||
+      !payload.Region ||
+      !payload.Region.FirstRange ||
+      !payload.Region.SecondRange
+    ) {
       console.warn("Invalid duration payload structure", payload);
       return [];
     }
 
     switch (urlParam) {
-      case "1": return processDurationChart1Data(payload);
-      case "2": return processDurationChart2Data(payload);
-      case "3": return processDurationChart3Data(payload);
-      case "5": return processDurationChart5Data(payload);
-      case "6": return processDurationChart6Data(payload);
+      case "1":
+        return processDurationChart1Data(payload);
+      case "2":
+        return processDurationChart2Data(payload);
+      case "3":
+        return processDurationChart3Data(payload);
+      case "5":
+        return processDurationChart5Data(payload);
+      case "6":
+        return processDurationChart6Data(payload);
       default:
         console.warn("Unknown urlParam:", urlParam);
         return [];
@@ -605,18 +712,18 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     urlParam,
   ]);
 
-  useEffect(()=> {
+  useEffect(() => {
     fetchData();
   }, [fetchData]);
 
   const generateSeries = (chartData: ChartData[], urlParam: string) => {
     const isDuration = dateFilter === "Date Duration";
-    
+
     // Labels for the legend
-    const firstLabel = isDuration 
+    const firstLabel = isDuration
       ? `${formatDate(firstDateSpecific)} - ${formatDate(secondDateSpecific)}`
       : formatDate(firstDateSpecific);
-      
+
     const secondLabel = isDuration
       ? `${formatDate(firstDateDuration)} - ${formatDate(secondDateDuration)}`
       : formatDate(secondDateSpecific);
@@ -624,110 +731,109 @@ const datesMatch = (dateString1: string, dateString2: string): boolean => {
     if (urlParam === "1") {
       return [
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.firstRangeWinners : item.firstDateWinners
           ),
           label: `Winners ${firstLabel}`,
           color: "#E5C7FF",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.secondRangeWinners : item.secondDateWinners
           ),
           label: `Winners ${secondLabel}`,
           color: "#D2A7FF",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.firstRangeWinners : item.firstDateWinners
           ),
           label: `Winnings ${firstLabel}`,
           color: "#BB86FC",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.secondRangeBets : item.secondDateBets
           ),
           label: `Winnings ${secondLabel}`,
           color: "#A06FE6",
-        }
+        },
       ];
     } else if (urlParam === "2" || urlParam === "5") {
       return [
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.firstRangeTumbok : item.firstDateTumbok
           ),
           label: `Tumbok ${firstLabel}`,
           color: "#E5C7FF",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.secondRangeTumbok : item.secondDateTumbok
           ),
           label: `Tumbok ${secondLabel}`,
           color: "#D2A7FF",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.firstRangeSahod : item.firstDateSahod
           ),
           label: `Sahod ${firstLabel}`,
           color: "#BB86FC",
         },
         {
-          data: chartData.map((item: any) => 
+          data: chartData.map((item: any) =>
             isDuration ? item.secondRangeSahod : item.secondDateSahod
           ),
           label: `Sahod ${secondLabel}`,
           color: "#A06FE6",
-        }
+        },
       ];
     } else if (urlParam === "3" || urlParam === "6") {
       const gameCategories = ["STLPares", "STLSwer2", "STLSwer3", "STLSwer4"];
-      
-      return gameCategories.flatMap(category => [
+
+      return gameCategories.flatMap((category) => [
         {
-          data: chartData.map((item: any) => 
-            isDuration 
-              ? item[`firstRange${category}`] 
+          data: chartData.map((item: any) =>
+            isDuration
+              ? item[`firstRange${category}`]
               : item[`firstDate${category}`]
           ),
           label: `${category.replace("STL", "STL ")} ${firstLabel}`,
           color: getCategoryColor(category, true),
         },
         {
-          data: chartData.map((item: any) => 
-            isDuration 
-              ? item[`secondRange${category}`] 
+          data: chartData.map((item: any) =>
+            isDuration
+              ? item[`secondRange${category}`]
               : item[`secondDate${category}`]
           ),
           label: `${category.replace("STL", "STL ")} ${secondLabel}`,
           color: getCategoryColor(category, false),
-        }
+        },
       ]);
     }
     return [];
   };
 
-  // Helper function for category colors
   const getCategoryColor = (category: string, isFirstDate: boolean) => {
     const colorMap: Record<string, string> = {
       STLPares: isFirstDate ? "#E5C7FF" : "#D2A7FF",
       STLSwer2: isFirstDate ? "#BB86FC" : "#A06FE6",
       STLSwer3: isFirstDate ? "#875AC4" : "#6F58C9",
-      STLSwer4: isFirstDate ? "#563D99" : "#3E2466"
+      STLSwer4: isFirstDate ? "#563D99" : "#3E2466",
     };
     return colorMap[category] || "#CCCCCC";
   };
 
-return (
+  return (
     <div className="bg-transparent p-4 rounded-lg pb-8 w-full h-[585px] border border-[#0038A8]">
       <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
         {`Regional Summary of ${categoryFilter}`}
       </p>
       <CustomLegend
-        activeGameType={activeGameType}
+        gameCategoryId={gameCategoryId}
         categoryFilter={categoryFilter}
         dateFilter={dateFilter}
         firstDateSpecific={firstDateSpecific}
@@ -754,7 +860,6 @@ return (
             ]}
             yAxis={[
               {
-                //label: "Amount (in 100,000 units)",
                 min: 0,
                 max: 10,
               },
@@ -765,6 +870,6 @@ return (
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 export default ChartWinnersandWinningsRegionalSummary;

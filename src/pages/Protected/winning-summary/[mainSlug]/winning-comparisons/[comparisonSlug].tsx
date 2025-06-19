@@ -25,9 +25,11 @@ const BettingComparisonSlug = () => {
       setLoading(true);
       const result = await fetchGameCategories();
       if (result.success && Array.isArray(result.data)) {
+      const normalizedSlug = comparisonSlug.replace(/-/g, "").toLowerCase();
       const matched = result.data.find((cat: any) => {
-        const categorySlug = slugify(cat.GameCategory);
-        return categorySlug === comparisonSlug.toLowerCase();
+        const categorySlug = slugify(cat.GameCategory).replace(/-/g, "");
+        //console.log("Comparing:", categorySlug, "vs", normalizedSlug);
+        return categorySlug === normalizedSlug;
       });
         setCategory(matched || null);
       }

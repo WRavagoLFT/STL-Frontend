@@ -47,7 +47,8 @@ const BettingSummaryPage = ({
       .trim()
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")
-      .replace(/\-\-+/g, "-");
+      .replace(/\-\-+/g, "-")
+      .replace(/-(\d+)/g, "$1"); 
 
   const handleViewComparisonClick = () => {
     const comparisonSlug = slugify(title);

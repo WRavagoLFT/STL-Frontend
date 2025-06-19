@@ -153,7 +153,7 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   // Group legend items into rows of 4 for a 4x2 grid layout
   const chunkedLegendItems = legendItems.reduce(
     (result, item, index) => {
-      const chunkIndex = Math.floor(index / 4); // Group into rows of 4
+      const chunkIndex = Math.floor(index / 4);
       if (!result[chunkIndex]) {
         result[chunkIndex] = [];
       }
@@ -185,17 +185,15 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
 };
 
 const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
+  gameCategoryId,
   categoryFilter,
   dateFilter,
   firstDateSpecific,
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
-  activeGameType,
 }) => {
   
-  // gameCategory
-  //console.log('Active Game Category:', activeGameType)
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<ChartData[]>([]);
 
@@ -211,26 +209,13 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   };
   const urlParam = chartMap[categoryFilter];
 
-  // Determine gameCategory number based on activeGameType
-  const gameCategoryMap: Record<string, number> = {
-    Dashboard: 0,
-    "STL Pares": 1,
-    "STL Swer2": 2,
-    "STL Swer3": 3,
-    "STL Swer4": 4,
-  };
-  const gameCategoryParam = gameCategoryMap[activeGameType];
-  //console.log('Game Category Param:', gameCategoryParam)
-
-  // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
-    if (gameCategoryParam && gameCategoryParam >= 1 && gameCategoryParam <= 4) {
-      return { gameCategory: gameCategoryParam };
+    if (gameCategoryId && gameCategoryId >= 1 && gameCategoryId <= 4) {
+      return { gameCategory: gameCategoryId };
     }
     return {};
   };
 
-  // Helper function to check if dates match (ignoring time)
   const datesMatch = (dateString1: string, dateString2: string): boolean => {
     return formatDate(dateString1) === formatDate(dateString2);
   };
@@ -898,7 +883,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
         {`Summary ${categoryFilter}`}
       </p>
       <CustomLegend
-        activeGameType={activeGameType}
+        gameCategoryId={gameCategoryId}
         categoryFilter={categoryFilter}
         dateFilter={dateFilter}
         firstDateSpecific={firstDateSpecific}

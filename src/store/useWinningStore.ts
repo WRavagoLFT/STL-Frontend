@@ -17,7 +17,7 @@ export type categoryType =
 type dateType = 'Specific Date' | 'Date Duration';
 
 export interface WinnersandWinningsSummaryProps {
-  activeGameType: string;
+  gameCategoryId: number;
   categoryFilter: categoryType;
   dateFilter: string;
   firstDateSpecific: string | null;

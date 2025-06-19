@@ -66,9 +66,11 @@ interface RegionSpecificData {
     Ramble: number;
   }
 }
+
 interface SpecificPayload{
   Region: RegionSpecificData[];
 }
+
 interface RegionRangeData {
   Region: string;
   TotalBets: number;
@@ -103,10 +105,6 @@ const formatDate = (date: string | null): string => {
   return `${year}-${month}-${day}`;
 };
 
-// Helper to turn e.g. "IV-A" → "Region IV-A", but leave "NCR"/"CAR"/"BARMM" alone
-// const apiRegionLabel = (r: string) =>
-//   ["NCR", "CAR", "BARMM"].includes(r) ? r : `Region ${r}`;
-
 const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
     categoryFilter,
     dateFilter,
@@ -114,18 +112,15 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
     secondDateSpecific,
     firstDateDuration,
     secondDateDuration,
-    
   }) => {
-  // Determine which legend items map to use based on the dateFilter
   const legendItems =
     dateFilter === "Specific Date"
       ? getLegendItemsMap_Specific(categoryFilter, firstDateSpecific, secondDateSpecific)
       : getLegendItemsMap_Duration(categoryFilter, firstDateSpecific, secondDateSpecific, firstDateDuration, secondDateDuration);
 
-  // Group legend items into rows of 4 for a 4x2 grid layout
   const chunkedLegendItems = legendItems.reduce(
     (result, item, index) => {
-      const chunkIndex = Math.floor(index / 4); // Group into rows of 4
+      const chunkIndex = Math.floor(index / 4);
       if (!result[chunkIndex]) {
         result[chunkIndex] = [];
       }
@@ -157,15 +152,15 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
 };
 
 const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> = ({
+  gameCategoryId,
   categoryFilter,
   dateFilter,
   firstDateSpecific,
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
-  activeGameType
 }) => {
-  //console.log('Active Game Category:', activeGameType)
+
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] =  useState<ChartData[]>([]);
   const philippineRegions = [
@@ -174,7 +169,6 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
     "XII", "XIII", "BARMM"
   ];
 
-    // Determine chart number based on categoryFilter
   const chartMap: Record<string, string> = {
     "Total Bets and Bettors": "1",
     "Total Bets by Bet Type": "2",
@@ -184,28 +178,16 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
     "Top Betting Region by Total Bets": "4",
     "Top Betting Region by Total Bettors": "4",
   };
+
   const urlParam = chartMap[categoryFilter];
 
-  // Determine gameCategory number based on activeGameType
-  const gameCategoryMap: Record<string, number> = {
-    "Dashboard": 0,
-    "STL Pares": 1,
-    "STL Swer2": 2,
-    "STL Swer3": 3,
-    "STL Swer4": 4,
-  }
-  const gameCategoryParam = gameCategoryMap[activeGameType];
-  //console.log('Game Category Param:', gameCategoryParam)
-
-  // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
-    if(gameCategoryParam && gameCategoryParam >=1 && gameCategoryParam <= 4) {
-      return { gameCategory: gameCategoryParam };
+    if (gameCategoryId && gameCategoryId >= 1 && gameCategoryId <= 4) {
+      return { gameCategory: gameCategoryId };
     }
     return {};
-  }
+  };
 
-  // Helper function to check if dates match (ignoring time)
   const datesMatch = (dateString1: string, dateString2: string): boolean => {
     return formatDate(dateString1) === formatDate(dateString2);
   }
@@ -358,7 +340,8 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
       return result;
     });
   };
-    // Main processor function
+
+  // Main processor function
   const processSpecificDatePayload = (
     urlParam: string,
     payload: any,
@@ -706,7 +689,6 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
     return [];
   };
 
-  // Helper function for category colors
   const getCategoryColor = (category: string, isFirstDate: boolean) => {
     const colorMap: Record<string, string> = {
       STLPares: isFirstDate ? "#E5C7FF" : "#5050A5",
@@ -723,7 +705,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
         {`Regional Summary of ${categoryFilter}`}
       </p>
       <CustomLegend
-        activeGameType={activeGameType}
+        gameCategoryId={gameCategoryId}
         categoryFilter={categoryFilter}
         dateFilter={dateFilter}
         firstDateSpecific={firstDateSpecific}

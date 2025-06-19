@@ -1,15 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { Box, Typography, Stack, CircularProgress } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import {
-  WinnersandWinningsSummaryProps,
-  getLegendItemsMap_Specific,
-  getLegendItemsMap_Duration,
-} from "../../../store/useWinningStore";
-import {
-  fetchCompareHistoricalWinnersDate,
-  fetchCompareHistoricalWinnersRange,
-} from "~/utils/api/winners";
+import { WinnersandWinningsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from "../../../store/useWinningStore";
+import { fetchCompareHistoricalWinnersDate, fetchCompareHistoricalWinnersRange } from "~/utils/api/winners";
 
 // Interfaces
 interface chartOne_Specific {
@@ -172,6 +165,7 @@ const formatDate = (date: string | null): string => {
   return `${year}-${month}-${day}`;
 };
 const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
+  gameCategoryId,
   categoryFilter,
   dateFilter,
   firstDateSpecific,
@@ -179,9 +173,6 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
   firstDateDuration,
   secondDateDuration,
 }) => {
-  // Determine which legend items map to use based on the dateFilter
-  //console.log("categoryFilter:", categoryFilter);
-
   const legendItems =
     dateFilter === "Specific Date"
       ? getLegendItemsMap_Specific(
@@ -197,10 +188,9 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
           secondDateDuration
         );
 
-  // Group legend items into rows of 4 for a 4x2 grid layout
   const chunkedLegendItems = legendItems.reduce(
     (result, item, index) => {
-      const chunkIndex = Math.floor(index / 4); // Group into rows of 4
+      const chunkIndex = Math.floor(index / 4);
       if (!result[chunkIndex]) {
         result[chunkIndex] = [];
       }
@@ -234,20 +224,17 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
 const ChartWinnersandWinningsSummary: React.FC<
   WinnersandWinningsSummaryProps
 > = ({
+  gameCategoryId,
   categoryFilter,
   dateFilter,
   firstDateSpecific,
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
-  activeGameType,
 }) => {
-  // gameCategory
-  console.log("Active Game Category:", activeGameType);
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<ChartData[]>([]);
 
-  // Determine chart number based on categoryFilter
   const chartMap: Record<string, string> = {
     "Total Winnings and Winners": "1",
     "Total Winnings by Bet Type": "2",
@@ -259,27 +246,13 @@ const ChartWinnersandWinningsSummary: React.FC<
   };
   const urlParam = chartMap[categoryFilter];
 
-  // Determine gameCategory number based on activeGameType
-  const gameCategoryMap: Record<string, number> = {
-    Dashboard: 0,
-    "STL Pares": 1,
-    "STL Swer2": 2,
-    "STL Swer3": 3,
-    "STL Swer4": 4,
-  };
-  const gameCategoryParam = gameCategoryMap[activeGameType];
-  //console.log('Chart Type:', urlParam)
-  //console.log('Game Category Param:', gameCategoryParam)
-
-  // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
-    if (gameCategoryParam && gameCategoryParam >= 1 && gameCategoryParam <= 4) {
-      return { gameType: gameCategoryParam };
+    if (gameCategoryId && gameCategoryId >= 1 && gameCategoryId <= 4) {
+      return { gameCategory: gameCategoryId };
     }
     return {};
   };
 
-  // Helper function to check if dates match (ignoring time)
   const datesMatch = (dateString1: string, dateString2: string): boolean => {
     return formatDate(dateString1) === formatDate(dateString2);
   };
@@ -736,7 +709,11 @@ const ChartWinnersandWinningsSummary: React.FC<
     try {
       const gameCategoryParam = getGameCategoryParam();
 
-      if (dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific) {
+      if (
+        dateFilter === "Specific Date" &&
+        firstDateSpecific &&
+        secondDateSpecific
+      ) {
         console.log(
           "Fetching for Specific Date:",
           formatDate(firstDateSpecific),
@@ -752,7 +729,7 @@ const ChartWinnersandWinningsSummary: React.FC<
             ...gameCategoryParam,
           }
         );
-        console.log('GAME CATEG', gameCategoryParam);
+        console.log("GAME CATEG", gameCategoryParam);
         console.log("Response payload:", resp);
 
         // Use resp.data to get the actual payload
@@ -767,7 +744,7 @@ const ChartWinnersandWinningsSummary: React.FC<
           setChartData(processedData);
         } else {
           console.warn("Unexpected payload for Specific Date:", resp);
-          setChartData([]);  // clear data on bad response
+          setChartData([]); // clear data on bad response
         }
       } else if (
         dateFilter === "Date Duration" &&
@@ -943,7 +920,7 @@ const ChartWinnersandWinningsSummary: React.FC<
         {`Summary ${categoryFilter}`}
       </p>
       <CustomLegend
-        activeGameType={activeGameType}
+        gameCategoryId={gameCategoryId}
         categoryFilter={categoryFilter}
         dateFilter={dateFilter}
         firstDateSpecific={firstDateSpecific}
@@ -965,12 +942,14 @@ const ChartWinnersandWinningsSummary: React.FC<
             margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
             series={generateSeries(chartData, urlParam)}
             yAxis={[
-              { scaleType: "band", 
+              {
+                scaleType: "band",
                 data: ["First Draw", "Second Draw", "Third Draw"],
               },
             ]}
             xAxis={[
-              { label: "Amount (in 100,000 units)",
+              {
+                label: "Amount (in 100,000 units)",
                 min: 0,
                 //max: 10,
               },

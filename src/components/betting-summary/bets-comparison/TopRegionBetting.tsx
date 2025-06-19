@@ -60,11 +60,11 @@ const formatDate = (date: string | null): string => {
   return `${year}-${month}-${day}`;
 };
 
-// Helper to turn e.g. "IV-A" → "Region IV-A", but leave "NCR"/"CAR"/"BARMM" alone
 const apiRegionLabel = (r: string) =>
   ["NCR", "CAR", "BARMM"].includes(r) ? r : `Region ${r}`;
 
 const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
+  gameCategoryId,
   categoryFilter,
   dateFilter,
   firstDateSpecific,
@@ -72,7 +72,7 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   firstDateDuration,
   secondDateDuration,
 }) => {
-  // Determine which legend items map to use based on the dateFilter
+
   const legendItems =
     dateFilter === "Specific Date"
       ? getLegendItemsMap_Specific(
@@ -106,17 +106,17 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
 };
 
 const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
+  gameCategoryId,
   categoryFilter,
   dateFilter,
   firstDateSpecific,
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
-  activeGameType,
 }) => {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<ChartData[]>([]);
-  
+
   const philippineRegions = [
     "NCR",
     "CAR",
@@ -136,14 +136,11 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
     "XIII",
     "BARMM",
   ];
-  //console.log('Active Game Category:', activeGameType)
 
-  // Determine which field to aggregated based on categoryFilter
   const aggregateField = categoryFilter.includes("Bets")
     ? "TotalBets"
     : "TotalBettors";
 
-  // Determine chart number based on category
   const chartMap: Record<string, string> = {
     "Total Bets and Bettors": "1",
     "Total Bets by Bet Type": "2",
@@ -155,32 +152,19 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
   };
 
   const urlParam = chartMap[categoryFilter];
-  //console.log('URL Param', urlParam)
 
-  const gameCategoryMap: Record<string, number> = {
-    Dashboard: 0,
-    "STL Pares": 1,
-    "STL Swer2": 2,
-    "STL Swer3": 3,
-    "STL Swer4": 4,
-  };
-
-  const gameCategoryParam = gameCategoryMap[activeGameType];
-
-  // Add gameType parameter if activeGameType is valid (1-4)
   const getGameCategoryParam = () => {
-    if (gameCategoryParam && gameCategoryParam >= 1 && gameCategoryParam <= 4) {
-      return { gameCategory: gameCategoryParam };
+    if (gameCategoryId && gameCategoryId >= 1 && gameCategoryId <= 4) {
+      return { gameCategory: gameCategoryId };
     }
     return {};
   };
 
-  // Specific Date
   const processSpecificPayloadData = (payload: {
     FirstDate: DateSpecific[];
     SecondDate: DateSpecific[];
   }) => {
-    console.log("SPECIFIC DATE: Raw Payload:", payload);
+    //console.log("SPECIFIC DATE: Raw Payload:", payload);
 
     const data: ChartData[] = philippineRegions.map((region) => {
       const apiLabel = apiRegionLabel(region);
@@ -336,7 +320,7 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
         {`${categoryFilter}`}
       </p>
       <CustomLegend
-        activeGameType={activeGameType}
+        gameCategoryId={gameCategoryId}
         categoryFilter={categoryFilter}
         dateFilter={dateFilter}
         firstDateSpecific={firstDateSpecific}
@@ -367,7 +351,6 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
                 curve: "linear",
               },
               {
-                //data: chartData.map((item) => item.secondValue),
                 data: interpolateMissing(chartData.map((item) => item.secondValue)),
                 label:
                   dateFilter === "Specific Date"

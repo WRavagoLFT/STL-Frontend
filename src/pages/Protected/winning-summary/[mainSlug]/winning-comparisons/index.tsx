@@ -7,7 +7,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinners&Winnings";
 import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinners&Winnings";
 import { useWinningStore, categoryType } from "../../../../../store/useWinningStore";
-import { useSideBarStore } from "../../../../../store/useSideBarStore";
 import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import router from "next/router";
@@ -26,14 +25,12 @@ const WinningComparisonPage = ({
   mainSlug?: string;
 }) => {
   const {
-    activeGameType,
     categoryFilter,
     dateFilter,
     firstDateSpecific,
     secondDateSpecific,
     firstDateDuration,
     secondDateDuration,
-    setGameType,
     setCategoryFilter,
     setDateFilter,
     setFirstDateSpecific,
@@ -42,18 +39,20 @@ const WinningComparisonPage = ({
     setSecondDateDuration,
   } = useWinningStore();
 
+  const GAME_TITLES = [
+    "STL",
+    "STL Pares",
+    "STL Swer 2",
+    "STL Swer 3",
+    "STL Swer 4",
+  ];
+  const title = GAME_TITLES[gameCategoryId];
+
   const formattedFirstDateSpecific = firstDateSpecific ? dayjs(firstDateSpecific).format("MM/DD/YYYY") : null;
   const formattedSecondDateSpecific = secondDateSpecific ? dayjs(secondDateSpecific).format("MM/DD/YYYY") : null;
   const formattedFirstDateDuration = firstDateDuration ? dayjs(firstDateDuration).format("MM/DD/YYYY") : null;
   const formattedSecondDateDuration = secondDateDuration ? dayjs(secondDateDuration).format("MM/DD/YYYY") : null;
-  const { SideBarActiveGameType } = useSideBarStore();
-
-  useEffect(() => {
-    if (SideBarActiveGameType !== activeGameType) {
-      setGameType(SideBarActiveGameType);
-    }
-  }, [SideBarActiveGameType, activeGameType, setGameType]);
-
+  
   const categoryTypes: categoryType[] = [
     "Total Winnings and Winners",
     "Total Winnings by Bet Type",
@@ -74,7 +73,6 @@ const WinningComparisonPage = ({
     //console.log("firstDateDuration:", firstDateDuration);
     //console.log("secondDateDuration:", secondDateDuration);
   }, [
-    activeGameType,
     categoryFilter,
     dateFilter,
     firstDateSpecific,
@@ -99,7 +97,7 @@ const WinningComparisonPage = ({
             }}
           />
           <div className="text-3xl ml-3 font-bold">
-            {(activeGameType === "Dashboard" ? "STL" : activeGameType)} Winnning Summary Overview
+            {(title === "Dashboard" ? "STL" : title)} Winnning Summary Overview
           </div>
         </div>
         <div className="flex flex-col gap-4 w-full h-full mt-8">
@@ -127,7 +125,6 @@ const WinningComparisonPage = ({
                         <FilterListIcon style={{ pointerEvents: "none" }} />
                       )}
                       sx={{ pr: 2 }}
-                      // size="small"
                     >
                       {categoryTypes.map((gameType) => (
                         <MenuItem key={gameType} value={gameType}>
@@ -297,7 +294,7 @@ const WinningComparisonPage = ({
           {categoryFilter === "Top Winning Region by Total Winnings" ||
           categoryFilter === "Top Winner Region by Total Winners" ? (
             <ChartTopRegionByWinsandWinners
-              activeGameType={activeGameType}
+              gameCategoryId={gameCategoryId}
               categoryFilter={categoryFilter}
               dateFilter={dateFilter}
               firstDateSpecific={formattedFirstDateSpecific}
@@ -308,7 +305,7 @@ const WinningComparisonPage = ({
           ) : (
             <>
               <ChartWinnersandWinningsSummary
-                activeGameType={activeGameType}
+                gameCategoryId={gameCategoryId}
                 categoryFilter={categoryFilter}
                 dateFilter={dateFilter}
                 firstDateSpecific={formattedFirstDateSpecific}
@@ -317,7 +314,7 @@ const WinningComparisonPage = ({
                 secondDateDuration={formattedSecondDateDuration}
               />
               <ChartWinnersandWinningsRegionalSummary
-                activeGameType={activeGameType}
+                gameCategoryId={gameCategoryId}
                 categoryFilter={categoryFilter}
                 dateFilter={dateFilter}
                 firstDateSpecific={formattedFirstDateSpecific}

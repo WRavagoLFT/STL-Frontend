@@ -8,7 +8,6 @@ import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-compar
 import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettors&Bets";
 import ChartTopRegionByBetsandBettors from "~/components/betting-summary/bets-comparison/TopRegionBetting";
 import { useBettingStore, categoryType } from "../../../../../store/useBettingStore";
-import { useSideBarStore } from "../../../../../store/useSideBarStore";
 import dayjs from "dayjs";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import router, { useRouter } from "next/router";
@@ -26,14 +25,12 @@ const BettingComparisonPage = ({
   mainSlug?: string;
 }) => {
   const {
-    activeGameType,
     categoryFilter,
     dateFilter,
     firstDateSpecific,
     secondDateSpecific,
     firstDateDuration,  
     secondDateDuration,
-    setGameType,
     setCategoryFilter,
     setDateFilter,
     setFirstDateSpecific,
@@ -42,21 +39,19 @@ const BettingComparisonPage = ({
     setSecondDateDuration,
   } = useBettingStore();
 
-  //console.log('SLUG IN BETTING COMPARISON:', slug);
-  //console.log('MAIN SLUG:', mainSlug);
-  //console.log('GAME CATEG ID', gameCategoryId);
+  const GAME_TITLES = [
+    "STL",
+    "STL Pares",
+    "STL Swer 2",
+    "STL Swer 3",
+    "STL Swer 4",
+  ];
+  const title = GAME_TITLES[gameCategoryId];
 
   const formattedFirstDateSpecific = firstDateSpecific ? dayjs(firstDateSpecific).format("MM/DD/YYYY") : null;
   const formattedSecondDateSpecific = secondDateSpecific ? dayjs(secondDateSpecific).format("MM/DD/YYYY") : null;
   const formattedFirstDateDuration = firstDateDuration ? dayjs(firstDateDuration).format("MM/DD/YYYY") : null;
   const formattedSecondDateDuration = secondDateDuration ? dayjs(secondDateDuration).format("MM/DD/YYYY") : null;
-  const { SideBarActiveGameType } = useSideBarStore();
-
-  useEffect(() => {
-    if (SideBarActiveGameType !== activeGameType) {
-      setGameType(SideBarActiveGameType);
-    }
-  }, [SideBarActiveGameType, activeGameType, setGameType]);
 
   const categoryTypes: categoryType[] = [
     "Total Bets and Bettors",
@@ -77,7 +72,6 @@ const BettingComparisonPage = ({
     //console.log("firstDateDuration:", firstDateDuration);
     //console.log("secondDateDuration:", secondDateDuration);
   }, [
-    activeGameType,
     categoryFilter,
     dateFilter,
     firstDateSpecific,
@@ -102,8 +96,7 @@ const BettingComparisonPage = ({
             }}
           />
           <div className="text-3xl ml-3 font-bold">
-            {activeGameType === "Dashboard" ? "STL" : activeGameType} Betting
-            Summary Overview
+            {(title === "Dashboard" ? "STL" : title)} Betting Summary Overview
           </div>
         </div>
         <div className="flex flex-col gap-4 w-full h-full mt-8">
@@ -315,7 +308,7 @@ const BettingComparisonPage = ({
           {categoryFilter === "Top Betting Region by Total Bets" ||
           categoryFilter === "Top Betting Region by Total Bettors" ? (
             <ChartTopRegionByBetsandBettors // if the condition is true
-              activeGameType={activeGameType}
+              gameCategoryId={gameCategoryId}
               categoryFilter={categoryFilter}
               dateFilter={dateFilter}
               firstDateSpecific={formattedFirstDateSpecific}
@@ -326,7 +319,7 @@ const BettingComparisonPage = ({
           ) : (
             <>
               <ChartBettorsAndBetsSummary // if false
-                activeGameType={activeGameType}
+                gameCategoryId={gameCategoryId}
                 categoryFilter={categoryFilter}
                 dateFilter={dateFilter}
                 firstDateSpecific={formattedFirstDateSpecific}
@@ -335,7 +328,7 @@ const BettingComparisonPage = ({
                 secondDateDuration={formattedSecondDateDuration}
               />
               <ChartBettorsAndBetsRegionalSummary // if false
-                activeGameType={activeGameType}
+                gameCategoryId={gameCategoryId}
                 categoryFilter={categoryFilter}
                 dateFilter={dateFilter}
                 firstDateSpecific={formattedFirstDateSpecific}

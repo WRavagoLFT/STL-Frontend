@@ -4,11 +4,29 @@ import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import WinningSummaryPage from "..";
 
+// Normalized slug (e.g. "STL Swer 2" -> "stlswer2")
+const normalizeSlug = (text: string) =>
+  text
+    .replace(/Swer\s*2/gi, "Swer2")
+    .replace(/Swer\s*3/gi, "Swer3")
+    .replace(/Swer\s*4/gi, "Swer4")
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/-/g, "")
+    .replace(/[^\w]/g, "");
+
 const WinningSummarySlugPage = () => {
   const router = useRouter();
   const { mainSlug } = router.query as { mainSlug?: string };
-  const [category, setCategory] = useState<{GameCategoryId: number; GameCategory: string; Digits: number;} | null>(null);
+
+  const [category, setCategory] = useState<{
+    GameCategoryId: number;
+    GameCategory: string;
+    Digits: number;
+  } | null>(null);
+
   const [loading, setLoading] = useState(true);
+  const [invalid, setInvalid] = useState(false);
 
   const fetchCategory = useCallback(async () => {
     if (!mainSlug) return;
@@ -17,10 +35,18 @@ const WinningSummarySlugPage = () => {
     const result = await fetchGameCategories();
 
     if (result.success && Array.isArray(result.data)) {
-      const matched = result.data.find(
-        (cat: any) => slugify(cat.GameCategory) === mainSlug.toLowerCase()
-      );
-      setCategory(matched || null);
+      const normalizedSlug = normalizeSlug(mainSlug);
+
+      const matched = result.data.find((cat: any) => {
+        const categorySlug = normalizeSlug(cat.GameCategory);
+        return categorySlug === normalizedSlug;
+      });
+
+      if (matched) {
+        setCategory(matched);
+      } else if (mainSlug !== "dashboard") {
+        setInvalid(true); // Allow dashboard
+      }
     }
 
     setLoading(false);
@@ -30,40 +56,23 @@ const WinningSummarySlugPage = () => {
     fetchCategory();
   }, [fetchCategory]);
 
-  const slugify = (text: string) =>
-    text
-      .toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w\-]+/g, "")
-      .replace(/\-\-+/g, "-");
-
-  const isDashboard = mainSlug === "dashboard";
-  const isValid = !!category || isDashboard;
+  useEffect(() => {
+    if (!loading && invalid) {
+      router.replace("/auth/error404");
+    }
+  }, [loading, invalid, router]);
 
   if (loading) {
-    return (
-      <div className="p-4 text-center text-gray-600">Loading...</div>
-    );
+    return <div className="p-4 text-center text-gray-600">Loading...</div>;
   }
 
-  if (!isValid) {
-    return (
-      <div className="p-4 text-center text-red-500">
-        <h1 className="text-xl font-semibold">Invalid Page</h1>
-        <p>
-          No matching game category for slug: <strong>{mainSlug}</strong>
-        </p>
-        <p>Only <code>/dashboard</code> is allowed if no game category is found.</p>
-      </div>
-    );
-  }
+  if (invalid) return null;
 
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
       <WinningSummaryPage
-        gameCategoryId={category?.GameCategoryId}
-        slug={mainSlug!} // non-null since isValid passed
+        gameCategoryId={category?.GameCategoryId || 0}
+        slug={mainSlug ?? ""}
       />
     </AccessGuard>
   );
