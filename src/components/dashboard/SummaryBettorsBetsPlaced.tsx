@@ -121,13 +121,13 @@ const SummaryBettorsBetsPlacedPage = () => {
         )}
       </div>
 
-      <div className="w-full overflow-x-auto pb-4">
+      <div className="w-full overflow-x-auto">
         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
         ) : (
-          <div className="w-full overflow-x-auto pb-4">
+          <div className="w-full overflow-x-auto">
             <div className="min-w-[600px]">
               <BarChart
                 height={300}
