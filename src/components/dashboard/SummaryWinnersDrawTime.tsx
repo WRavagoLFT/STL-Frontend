@@ -87,7 +87,7 @@ const SummaryWinnersDrawTimePage = () => {
   }, [fetchAndProcessData]);
 
   return (
-    <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
+    <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
       <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col leading-none">
           <p className="text-sm md:text-base lg:text-lg leading-none">
@@ -117,7 +117,7 @@ const SummaryWinnersDrawTimePage = () => {
             <CircularProgress />
           </div>
         ) : (
-          <div className="min-w-[600px]">
+          <div className="min-w-[850px] md:min-w-[600px]">
             <BarChart
               height={300}
               grid={{ vertical: true }}

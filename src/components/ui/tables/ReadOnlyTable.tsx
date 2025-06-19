@@ -91,11 +91,16 @@ const ReadOnlyTablePage = <T extends Transactions>({
       </div>
 
       <div className="w-full overflow-x-auto">
-        <table className="table-auto w-full">
+        <table className="table-fixed w-full">
           <thead className="bg-[#E97451] text-white">
-            <tr className="mx-auto">
-              {columns.map((col) => (
-                <th key={String(col.key)} className="py-4 text-left font-normal ">
+            <tr>
+              {columns.map((col, index) => (
+                <th
+                  key={String(col.key)}
+                  className={`py-4 text-left font-normal overflow-hidden text-ellipsis ${
+                    index === 0 ? "w-1/3" : "w-1/6"
+                  }`}
+                >
                   <div className="flex items-center justify-start gap-1">
                     {col.sortable && (
                       <SortableTableCell
@@ -110,15 +115,20 @@ const ReadOnlyTablePage = <T extends Transactions>({
               ))}
             </tr>
 
-            {/* Filter row (conditionally rendered below the column headers) */}
+            {/* Filter row */}
             {isFilterActive && (
               <tr>
-                {columns.map((col) => (
-                  <th key={String(col.key)} className="text-left">
+                {columns.map((col, index) => (
+                  <th
+                    key={String(col.key)}
+                    className={`text-left pb-4 font-normal overflow-hidden text-ellipsis ${
+                      index === 0 ? "w-1/3" : "w-1/6"
+                    }`}
+                  >
                     <div className="flex items-center justify-center gap-1">
                       {col.filterable ? (
                         <SortableTableCell
-                          label=""
+                          label={col.label}
                           sortKey={String(col.key)}
                           isFilterVisible={true}
                         />

@@ -26,9 +26,9 @@ html, body {
 }
 
 input, select {
-  border-radius: 0.4rem !important;       /* Rounded corners */
-  background-color: transparent !important; /* Transparent fill */
-  color: inherit;                          /* Inherit text color from parent */
+  /* border-radius: 0.4rem !important;   */
+  background-color: transparent !important; 
+  color: inherit;                         
 }
 
 select option:disabled {

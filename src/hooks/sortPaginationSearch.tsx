@@ -1,6 +1,6 @@
 import React from "react";
 import dayjs, { Dayjs } from "dayjs";
-import { FaSort, FaSortUp, FaSortDown } from "react-icons/fa";
+import { FaSort, FaSortUp, FaSortDown, FaCalendarAlt } from "react-icons/fa";
 import { SortableTableCellProps } from "../types/interfaces";
 import useDetailTableStore from "../store/useTableStore";
 import { User, Operator, SortConfig, EditLogFields } from "~/types/types";
@@ -14,11 +14,13 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
     useDetailTableStore();
 
   const handleSort = () => {
-    const direction =
-      sortConfig.key === sortKey && sortConfig.direction === "asc"
-        ? "desc"
-        : "asc";
-    setSortConfig({ key: sortKey, direction });
+    if (sortConfig.key !== sortKey) {
+      setSortConfig({ key: sortKey, direction: "asc" });
+    } else if (sortConfig.direction === "asc") {
+      setSortConfig({ key: sortKey, direction: "desc" });
+    } else {
+      setSortConfig({ key: "", direction: "asc" });
+    }
   };
 
   const handleFilterChange =
@@ -35,12 +37,12 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
   const isActive = sortConfig.key === sortKey;
 
   return (
-    <th
-      onClick={handleSort}
-      className="cursor-pointer select-none text-left px-2 py-1.5 align-top w-[180px]"
-    >
+    <th className="text-left px-2 align-top">
       <div className="w-full min-w-[180px] max-w-[180px]">
-        <div className="flex items-center gap-1">
+        <div
+          className="flex items-center gap-1 cursor-pointer select-none"
+          onClick={handleSort}
+        >
           {!isFilterVisible && (
             <>
               {isActive && sortConfig.direction === "asc" && (
@@ -52,7 +54,6 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
               {!isActive && <FaSort className="w-4 h-4 opacity-30" />}
             </>
           )}
-          {label}
         </div>
         {isFilterVisible && (
           <div className="mt-1">
@@ -62,7 +63,10 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
                 type="date"
                 value={filters[sortKey] || ""}
                 onChange={(e) => handleFilterChange(sortKey)(e.target.value)}
-                className="w-full px-3 py-2 rounded-none text-sm lg:text-base text-[#0038A8] placeholder-[#FFF] focus:outline-none font-normal"
+                className="w-full py-2 px-2 text-sm lg:text-base text-[#FFF] border-[#000] focus:outline-none font-normal border-b"
+                style={{
+                  colorScheme: "dark",
+                }}
               />
             ) : (
               <input
@@ -70,7 +74,7 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
                 placeholder={`Filter by ${label}`}
                 value={filters[sortKey] || ""}
                 onChange={(e) => handleFilterChange(sortKey)(e.target.value)}
-                className="w-full px-3 py-2 rounded-none text-sm lg:text-base text-[#0038A8] placeholder-[#FFF] focus:outline-none font-normal"
+                className="w-full py-2 px-2  text-sm lg:text-base text-[#FFF] border-[#000] focus:outline-none font-normal border-b"
               />
             )}
           </div>
@@ -84,6 +88,8 @@ export function sortData<T extends User | Operator>(
   data: T[],
   sortConfig: SortConfig<T>
 ): T[] {
+  if (!sortConfig.key) return data;
+
   return [...data].sort((a, b) => {
     let valueA: any;
     let valueB: any;
@@ -208,8 +214,6 @@ export const filterData = (
     });
   });
 };
-
-
 
 export const filterDataEditLog = (
   data: EditLogFields[],

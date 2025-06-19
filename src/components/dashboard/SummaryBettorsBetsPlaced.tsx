@@ -36,9 +36,6 @@ const SummaryBettorsBetsPlacedPage = () => {
   const [loading, setLoading] = useState(true);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
-  const maxValue = Math.max(...data.map((item) => item.bets));
-  const safeMax = maxValue < 1000 ? 1000 : maxValue;
-
   const fetchData = async () => {
     try {
       const response = await fetchHistoricalSummary();
@@ -48,12 +45,10 @@ const SummaryBettorsBetsPlacedPage = () => {
           timeZone: "Asia/Manila",
         });
 
-        // 1. Filter by today's date
         const filteredData = response.data.filter((item: TransactionData) =>
           item.TransactionDate.startsWith(today)
         );
 
-        // 2. Local summary object to avoid mutating global one
         const localSummary: typeof summary = {
           1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
           2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
@@ -101,7 +96,7 @@ const SummaryBettorsBetsPlacedPage = () => {
   }, []);
 
   return (
-    <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
+    <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
       <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col leading-none">
           <p className="text-sm md:text-base lg:text-lg leading-none">
@@ -121,64 +116,62 @@ const SummaryBettorsBetsPlacedPage = () => {
         )}
       </div>
 
-      <div className="w-full overflow-x-auto">
+      <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
         ) : (
-          <div className="w-full overflow-x-auto">
-            <div className="min-w-[600px]">
-              <BarChart
-                height={300}
-                grid={{ vertical: true }}
-                layout="horizontal"
-                margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-                slotProps={{
-                  noDataOverlay: {
-                    message:
-                      "Summary of Bettors and Bets Placed data will be displayed once available.",
-                  },
-                  legend: { hidden: true },
-                }}
-                series={[
-                  {
-                    data: data.map((item) => item.bettors / 100000),
-                    color: "#BB86FC",
-                    label: "Bettors",
-                    valueFormatter: (value, context) =>
-                      `${data[context.dataIndex].bettors.toLocaleString()}`,
-                  },
-                  {
-                    data: data.map((item) => item.bets / 100000),
-                    color: "#5050A5",
-                    label: "Bets",
-                    valueFormatter: (value, context) =>
-                      `${data[context.dataIndex].bets.toLocaleString()}`,
-                  },
-                ]}
-                yAxis={[
-                  {
-                    scaleType: "band",
-                    data: data.map((item) => item.gameName),
-                    tickLabelProps: { style: { fontSize: "14px" } },
-                  } as any,
-                ]}
-                xAxis={[
-                  {
-                    label: "Total (x 100,000)",
-                    scaleType: "linear",
-                    min: 0,
-                    max: 750,
-                    tickInterval: 50,
-                    valueFormatter: (value: number) => value.toString(),
-                    tickSize: 2,
-                    barCategoryGap: 0.2,
-                    tickLabelProps: { style: { fontSize: "12px" } },
-                  } as any,
-                ]}
-              />
-            </div>
+          <div className="min-w-[850px] md:min-w-[600px]">
+            <BarChart
+              height={300}
+              grid={{ vertical: true }}
+              layout="horizontal"
+              margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+              slotProps={{
+                noDataOverlay: {
+                  message:
+                    "Summary of Bettors and Bets Placed data will be displayed once available.",
+                },
+                legend: { hidden: true },
+              }}
+              series={[
+                {
+                  data: data.map((item) => item.bettors / 100000),
+                  color: "#BB86FC",
+                  label: "Bettors",
+                  valueFormatter: (value, context) =>
+                    `${data[context.dataIndex].bettors.toLocaleString()}`,
+                },
+                {
+                  data: data.map((item) => item.bets / 100000),
+                  color: "#5050A5",
+                  label: "Bets",
+                  valueFormatter: (value, context) =>
+                    `${data[context.dataIndex].bets.toLocaleString()}`,
+                },
+              ]}
+              yAxis={[
+                {
+                  scaleType: "band",
+                  data: data.map((item) => item.gameName),
+                  tickLabelProps: { style: { fontSize: "14px" } },
+                } as any,
+              ]}
+              xAxis={[
+                {
+                  label: "Total (x 100,000)",
+                  scaleType: "linear",
+                  min: 0,
+                  max: 750,
+                  tickInterval: 50,
+                  valueFormatter: (value: number) => value.toString(),
+                  tickSize: 2,
+                  barCategoryGap: 0.2,
+                  tickLabelProps: { style: { fontSize: "12px" } },
+                } as any,
+              ]}
+            />
           </div>
         )}
       </div>

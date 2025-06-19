@@ -16,7 +16,7 @@ export const UsersSkeletonPage: React.FC = () => {
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   return (
-    <div className="animate-pulse space-y-4">
+    <div className="animate-pulse space-y-4 py-8">
       {[...Array(2)].map((_, index) => (
         <div key={index} className="h-3 w-[35%] bg-gray-200 rounded-lg" />
       ))}
