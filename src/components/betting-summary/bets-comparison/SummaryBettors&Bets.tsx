@@ -5,26 +5,6 @@ import { BettorsandBetsSummaryProps, getLegendItemsMap_Specific, getLegendItemsM
 import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from '~/utils/api/transactions';
 
 // interfaces
-// Chart Data for Specific Date
-interface SpecificDatePayload {
-  DrawOrder: Array<{
-    TransactionDate: string;
-    DrawOrder: number;
-    TotalBets: number;
-    TotalBettors: number;
-    TotalTumbok?: number;
-    TotalSahod?: number;
-    TotalRamble?: number;
-    BetTypes?: {
-      Tumbok: number;
-      Sahod: number;
-      Ramble: number;
-    };
-    GameCategory?: string;
-  }>;
-  Region: Array<any>; // Not used in these calculations
-}
-
 interface chartOne_Specific {
   TransactionDate: string;
   DrawOrder: number;
@@ -911,6 +891,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     return colorMap[category] || "#CCCCCC";
   };
 
+// chart
   return (
     <div className="bg-transparent p-4 rounded-lg pb-8 w-full h-[511px] border border-[#7266C9]">
       <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
