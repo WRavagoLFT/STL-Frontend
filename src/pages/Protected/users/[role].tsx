@@ -12,7 +12,7 @@ import { AccessGuard } from "~/components/auth/AccessGuard";
 import { userTableColumns } from "~/config/userTableColumns";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
 import { User } from "~/types/types";
-import { addUser, editLogUser, suspendUser, updateUser } from "~/utils/api/users";
+import { addUser, editLogUser, suspendUser } from "~/utils/api/users";
 import Swal from "sweetalert2";
 import { loadUsers } from "~/hooks/useLoadUsers";
 import { useAuthStore } from "~/store/useAuthStore";
@@ -37,7 +37,7 @@ const roleMap: Record<
     label: "Kabo",
     textlabel: "Kabo",
     roleId: 2,
-    permittedUserTypes: [3, 4, 5  ],
+    permittedUserTypes: [3, 4, 5],
   },
   executive: {
     label: "Small Town Lottery Executive",
@@ -83,13 +83,16 @@ const RolePage = () => {
       </div>
     );
   }
+  
   const currentUserType = useAuthStore((state) => state.userTypeId);
   const { roleId, label, textlabel } = roleConfig;
   const operatorMap = useUserRoleStore((state) => state.operatorMap);
   const setOperatorMap = useUserRoleStore((state) => state.setOperatorMap);
   const { data, setData } = useUserRoleStore();
+
   const tableColumns = userTableColumns(roleId);
   const editLogtableColumns = userEditColumns();
+
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showEditLog, setShowEditLog] = useState(false);

@@ -8,6 +8,7 @@ import router from "next/router";
 import { useOperatorFormStore } from "~/store/useOperatorFormStore";
 import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
 import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
+import { fetchGameCategories } from "~/utils/api/gamecategories";
 
 const OperatorsPage = () => {
   const { data } = useOperatorFormStore();

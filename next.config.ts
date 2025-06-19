@@ -31,29 +31,35 @@ const nextConfig: NextConfig = {
         destination: "/Protected/users/managers",
       },
       {
-        source: "/betting-summary/:path",
-        destination: "/Protected/betting-summary/:path",
-      },
-      {
-        source: "/bets-comparisons",
-        destination: "/Protected/betting-comparisons",
-      },
-      {
         source: "/draw-summary",
         destination: "/Protected/draw-summary",
       },
+
+      // betting summaries
       {
-        source: "/draw-summary/:path",
-        destination: "/Protected/draw-summary/:path",
+        source: "/betting-summary/:slug",
+        destination: "/Protected/betting-summary/:slug",
       },
       {
-        source: "/winning-summary/:path",
-        destination: "/Protected/winning-summary/:path",
+        source: "/betting-summary/dashboard",
+        destination: "/Protected/betting-summary/dashboard"
+      },
+      {
+        source: "/betting-comparisons/:slug",
+        destination: "/Protected/betting-summary/betting-comparisons/:slug",
+      },
+
+      // winning summaries
+      {
+        source: "/winning-summary/:slug",
+        destination: "/Protected/winning-summary/:slug",
       },
       {
         source: "/wins-comparisons",
         destination: "/Protected/winning-comparisons",
       },
+
+
       {
         source: "/dashboard",
         destination: "/Protected/dashboard",

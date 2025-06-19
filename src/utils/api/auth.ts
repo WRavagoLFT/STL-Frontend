@@ -42,11 +42,11 @@ const logoutUser = async (queryParams: Record<string, any> = {}) => {
     const url = validateRelativeUrl("/auth/logout");
     const response = await axiosInstance.delete(url, {
       params: queryParams,
-      withCredentials: true, // ⬅️ ensures cookies are included
+      withCredentials: true, // ensures cookies are included
     });
 
     // 2. Clear client state
-    useAuthStore.getState().logout(); // or any client-side clearing logic
+    //useAuthStore.getState().logout(); // or any client-side clearing logic
 
     return { success: true, message: "Logout successful", data: response.data };
   } catch (error) {

@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/router";
-
 import DashboardCardsPage from "~/components/dashboard/DashboardCards";
 import TableBettingActivityToday from "~/components/betting-summary/BettingActivityTodayTable";
 import ChartBettorsvsBetsPlacedSummary from "~/components/betting-summary/BettorsvsBetsPlacedChart";
 import ChartBettorsSummary from "~/components/betting-summary/BettorCountChart";
 import TableBettingSummary from "~/components/betting-summary/BettingSummaryTable";
 import ChartBettorsBetTypeSummary from "~/components/betting-summary/BettorCountByBetType";
-import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton"; 
-
+import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
 import { buttonStyles } from "~/styles/theme";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { useAuthStore } from "~/store/useAuthStore";
@@ -22,12 +20,16 @@ const GAME_TITLES = [
   "STL Swer 4",
 ];
 
-const BettingSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number }) => {
+const BettingSummaryPage = ({
+  gameCategoryId = 0,
+  slug,
+}: {
+  gameCategoryId?: number;
+  slug?: string;
+}) => {
   const router = useRouter();
   const [title, setTitle] = useState("STL");
   const userTypeId = useAuthStore((state) => state.userTypeId);
-
-  // Simulate loading state (replace this with real loading state from API)
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -41,8 +43,19 @@ const BettingSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number })
     return () => clearTimeout(timer);
   }, [gameCategoryId]);
 
+  const slugify = (text: string) =>
+    text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w\-]+/g, "")
+      .replace(/\-\-+/g, "-");
+
   const handleViewComparisonClick = () => {
-    router.push("/bets-comparisons");
+    console.log("Game Type ID:", gameCategoryId);
+    const slug = slugify(title);
+    router.push(`/betting-summary/betting-comparisons/${slug}`);
   };
 
   const ChartSection = (
@@ -58,7 +71,11 @@ const BettingSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number })
 
   const ComparisonButton = (
     <div className="self-end my-3">
-      <Button variant="contained" sx={buttonStyles} onClick={handleViewComparisonClick}>
+      <Button
+        variant="contained"
+        sx={buttonStyles}
+        onClick={handleViewComparisonClick}
+      >
         View Comparison
       </Button>
     </div>
@@ -67,7 +84,7 @@ const BettingSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number })
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
       {isLoading ? (
-        <BettingSummarySkeleton /> 
+        <BettingSummarySkeleton />
       ) : (
         <div className="space-y-4 h-full mt-8 md:mt-0">
           <h1 className="text-3xl font-bold">{title} Betting Summary</h1>
@@ -77,7 +94,9 @@ const BettingSummaryPage = ({ gameCategoryId = 0 }: { gameCategoryId?: number })
               {userTypeId === 6 ? (
                 <div className="w-full flex flex-col lg:flex-row lg:min-h-[500px] space-y-4 lg:space-y-0 lg:space-x-4">
                   <div className="w-full lg:w-1/3">
-                    <TableBettingActivityToday gameCategoryId={gameCategoryId} />
+                    <TableBettingActivityToday
+                      gameCategoryId={gameCategoryId}
+                    />
                   </div>
                   <div className="w-full lg:w-2/3 flex flex-col space-y-5">
                     {ChartSection}

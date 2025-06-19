@@ -4,13 +4,11 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-
-// Components
 import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-comparison/SummaryBettors&Bets";
 import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettors&Bets";
 import ChartTopRegionByBetsandBettors from "~/components/betting-summary/bets-comparison/TopRegionBetting";
-import { useBettingStore, categoryType } from "../../../store/useBettingStore";
-import { useSideBarStore } from "../../../store/useSideBarStore";
+import { useBettingStore, categoryType } from "../../../../store/useBettingStore";
+import { useSideBarStore } from "../../../../store/useSideBarStore";
 import dayjs from "dayjs";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import router, { useRouter } from "next/router";
@@ -18,14 +16,18 @@ import { AccessGuard } from "~/components/auth/AccessGuard";
 
 type dateType = "Specific Date" | "Date Duration";
 
-const BettingComparison = () => {
+interface BettingComparisonPageProps {
+  slug: string;
+}
+
+const BettingComparisonPage = ({ slug }: BettingComparisonPageProps) => {
   const {
     activeGameType,
     categoryFilter,
     dateFilter,
     firstDateSpecific,
     secondDateSpecific,
-    firstDateDuration,
+    firstDateDuration,  
     secondDateDuration,
     setGameType,
     setCategoryFilter,
@@ -35,6 +37,8 @@ const BettingComparison = () => {
     setFirstDateDuration,
     setSecondDateDuration,
   } = useBettingStore();
+
+  console.log('SLUG IN BETTING COMPARISON:', slug);
 
   // Format dates to MM/DD/YYYY
   const formattedFirstDateSpecific = firstDateSpecific
@@ -103,6 +107,8 @@ const BettingComparison = () => {
               router.push("/betting-summary/dashboard");
             }} // this should be dynamic
           />
+          <h1>Betting Comparison for Game: {slug}</h1>
+
           <div className="text-3xl ml-3 font-bold"> 
             {(activeGameType === "Dashboard" ? "STL" : activeGameType)} Betting Summary Overview
           </div>
@@ -340,4 +346,4 @@ const BettingComparison = () => {
   );
 };
 
-export default BettingComparison;
+export default BettingComparisonPage;
