@@ -15,7 +15,6 @@ interface UpdateDeviceFormProps {
   title?: string;
   onSubmit: (data: Device) => void;
   onClose?: () => void;
-
   device?: Device;
   deviceId?: Device;
   slug?: string;
@@ -32,7 +31,6 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [usageNotes, setUsageNotes] = useState<any[]>([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
-
   const usageNotesOptions = usageNotes.map((un) => ({
     value: un.DeviceUsageNotesId.toString(),
     label: un.DeviceUsageNotes,
@@ -44,7 +42,6 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
 
   const [isDisabled, setIsDisabled] = useState(true);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
 

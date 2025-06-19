@@ -44,6 +44,7 @@ const BettingComparisonPage = ({
 
   //console.log('SLUG IN BETTING COMPARISON:', slug);
   //console.log('MAIN SLUG:', mainSlug);
+  //console.log('GAME CATEG ID', gameCategoryId);
 
   const formattedFirstDateSpecific = firstDateSpecific ? dayjs(firstDateSpecific).format("MM/DD/YYYY") : null;
   const formattedSecondDateSpecific = secondDateSpecific ? dayjs(secondDateSpecific).format("MM/DD/YYYY") : null;
@@ -311,8 +312,6 @@ const BettingComparisonPage = ({
               </div>
             )}
           </div>
-
-          {/* Conditional MUI Chart Rendering */}
           {categoryFilter === "Top Betting Region by Total Bets" ||
           categoryFilter === "Top Betting Region by Total Bettors" ? (
             <ChartTopRegionByBetsandBettors // if the condition is true

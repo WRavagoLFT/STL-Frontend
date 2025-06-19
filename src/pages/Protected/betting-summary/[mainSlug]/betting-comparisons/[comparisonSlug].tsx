@@ -25,10 +25,11 @@ const BettingComparisonSlug = () => {
       setLoading(true);
       const result = await fetchGameCategories();
       if (result.success && Array.isArray(result.data)) {
+      const normalizedSlug = comparisonSlug.replace(/-/g, "").toLowerCase();
       const matched = result.data.find((cat: any) => {
-        const categorySlug = slugify(cat.GameCategory);
-        //console.log("Comparing:", categorySlug, "vs", comparisonSlug);
-        return categorySlug === comparisonSlug.toLowerCase();
+        const categorySlug = slugify(cat.GameCategory).replace(/-/g, "");
+        //console.log("Comparing:", categorySlug, "vs", normalizedSlug);
+        return categorySlug === normalizedSlug;
       });
         setCategory(matched || null);
       }
@@ -38,17 +39,13 @@ const BettingComparisonSlug = () => {
     fetchCategory();
   }, [comparisonSlug]);
 
-  const slugify = (text: string) => {
-    return text
-      .replace(/Swer2/i, "Swer 2")
-      .replace(/Swer3/i, "Swer 3")
-      .replace(/Swer4/i, "Swer 4")
+  const slugify = (text: string) =>
+    text
       .toLowerCase()
       .trim()
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")
       .replace(/\-\-+/g, "-");
-  };
 
   const isDashboard = comparisonSlug === "stl";
   const isValid = !!category || isDashboard;
@@ -72,7 +69,7 @@ const BettingComparisonSlug = () => {
   }
 
   return (
-    <AccessGuard allowedUserTypes={[6]}>
+    <AccessGuard allowedUserTypes={[3, 4, 6]}>
       <BettingComparisonPage
         gameCategoryId={category?.GameCategoryId}
         slug={comparisonSlug!}

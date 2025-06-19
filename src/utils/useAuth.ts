@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
 import { getCurrentUser } from "~/utils/api/auth";
-import axios from "axios"; // for calling token refresh directly
+import axios from "axios";
 
 const aliasMap: Record<string, string> = {
   "/dashboard": "/Protected/dashboard",

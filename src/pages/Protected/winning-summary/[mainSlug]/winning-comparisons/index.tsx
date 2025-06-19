@@ -26,7 +26,6 @@ const WinningComparisonPage = ({
   mainSlug?: string;
 }) => {
   const {
-    // loading,
     activeGameType,
     categoryFilter,
     dateFilter,
@@ -34,7 +33,6 @@ const WinningComparisonPage = ({
     secondDateSpecific,
     firstDateDuration,
     secondDateDuration,
-    // setLoading,
     setGameType,
     setCategoryFilter,
     setDateFilter,
@@ -44,7 +42,6 @@ const WinningComparisonPage = ({
     setSecondDateDuration,
   } = useWinningStore();
 
-  // Format dates to MM/DD/YYYY
   const formattedFirstDateSpecific = firstDateSpecific ? dayjs(firstDateSpecific).format("MM/DD/YYYY") : null;
   const formattedSecondDateSpecific = secondDateSpecific ? dayjs(secondDateSpecific).format("MM/DD/YYYY") : null;
   const formattedFirstDateDuration = firstDateDuration ? dayjs(firstDateDuration).format("MM/DD/YYYY") : null;
@@ -53,7 +50,7 @@ const WinningComparisonPage = ({
 
   useEffect(() => {
     if (SideBarActiveGameType !== activeGameType) {
-      setGameType(SideBarActiveGameType); // Update useWinningStore's activeGameType
+      setGameType(SideBarActiveGameType);
     }
   }, [SideBarActiveGameType, activeGameType, setGameType]);
 
@@ -297,8 +294,6 @@ const WinningComparisonPage = ({
               </div>
             )}
           </div>
-
-          {/* Conditional MUI Chart Rendering */}
           {categoryFilter === "Top Winning Region by Total Winnings" ||
           categoryFilter === "Top Winner Region by Total Winners" ? (
             <ChartTopRegionByWinsandWinners

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { AccessGuard } from "~/components/auth/AccessGuard";
@@ -10,25 +10,25 @@ const WinningSummarySlugPage = () => {
   const [category, setCategory] = useState<{GameCategoryId: number; GameCategory: string; Digits: number;} | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchCategory = useCallback(async () => {
     if (!mainSlug) return;
 
-    const fetchCategory = async () => {
-      setLoading(true);
-      const result = await fetchGameCategories();
+    setLoading(true);
+    const result = await fetchGameCategories();
 
-      if (result.success && Array.isArray(result.data)) {
-        const matched = result.data.find(
-          (cat: any) => slugify(cat.GameCategory) === mainSlug.toLowerCase()
-        );
-        setCategory(matched || null);
-      }
+    if (result.success && Array.isArray(result.data)) {
+      const matched = result.data.find(
+        (cat: any) => slugify(cat.GameCategory) === mainSlug.toLowerCase()
+      );
+      setCategory(matched || null);
+    }
 
-      setLoading(false);
-    };
-
-    fetchCategory();
+    setLoading(false);
   }, [mainSlug]);
+
+  useEffect(() => {
+    fetchCategory();
+  }, [fetchCategory]);
 
   const slugify = (text: string) =>
     text
@@ -60,7 +60,7 @@ const WinningSummarySlugPage = () => {
   }
 
   return (
-    <AccessGuard allowedUserTypes={[6]}>
+    <AccessGuard allowedUserTypes={[3, 4, 6]}>
       <WinningSummaryPage
         gameCategoryId={category?.GameCategoryId}
         slug={mainSlug!} // non-null since isValid passed
