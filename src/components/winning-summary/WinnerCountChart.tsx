@@ -47,13 +47,21 @@ const CustomLegend = () => (
 const ChartWinnersSummary = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<
-    { draw: string; pares: number; swer2: number; swer3: number; swer4: number }[]
+    {
+      draw: string;
+      pares: number;
+      swer2: number;
+      swer3: number;
+      swer4: number;
+    }[]
   >([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const fetchChartData = useCallback(async () => {
     setLoading(true);
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toLocaleDateString("en-CA", {
+      timeZone: "Asia/Manila",
+    });
 
     const result = await fetchWinners({
       from: today,
@@ -76,8 +84,9 @@ const ChartWinnersSummary = () => {
 
     for (const item of result.data) {
       const draw = item.DrawOrder as DrawNumber;
-      const categoryKey = gameCategoryMap[item.GameCategory as keyof typeof gameCategoryMap];
-      
+      const categoryKey =
+        gameCategoryMap[item.GameCategory as keyof typeof gameCategoryMap];
+
       if (drawSummary[draw] && categoryKey) {
         drawSummary[draw][categoryKey] += 1;
       }
@@ -164,14 +173,14 @@ const ChartWinnersSummary = () => {
                   data: data.map((item) => item.pares / 100000),
                   color: "#E5C7FF",
                   label: "STL Pares",
-                   valueFormatter: (value, context) =>
+                  valueFormatter: (value, context) =>
                     `${data[context.dataIndex].pares.toLocaleString()}`,
                 },
                 {
                   data: data.map((item) => item.swer2 / 100000),
                   color: "#D2A7FF",
                   label: "STL Swer2",
-                  valueFormatter: (value, context ) =>
+                  valueFormatter: (value, context) =>
                     `${data[context.dataIndex].swer2.toLocaleString()}`,
                 },
                 {

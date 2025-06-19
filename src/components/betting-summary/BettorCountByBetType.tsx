@@ -56,7 +56,9 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const today = new Date().toISOString().split("T")[0];
+        const today = new Date().toLocaleDateString("en-CA", {
+          timeZone: "Asia/Manila",
+        });
         const response = await fetchTransactions({ from: today, to: today });
 
         let res = response.data.filter(
