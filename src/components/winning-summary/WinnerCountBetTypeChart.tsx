@@ -70,18 +70,32 @@ const ChartWinnersBetTypeSummary = ({
       const today = new Date().toLocaleDateString("en-CA", {
         timeZone: "Asia/Manila",
       });
+
       const response = await fetchWinners({ from: today, to: today });
 
+      if (!response.success || !Array.isArray(response.data)) {
+        console.warn("[DEBUG] Invalid fetchWinners response");
+        setLoading(false);
+        return;
+      }
+
+      // Convert DateOfTransaction to PHT and filter
       let res = response.data.filter(
-        (item: { DateOfTransaction: string; GameCategoryId: number }) =>
-          item.DateOfTransaction.startsWith(today)
+        (item: { DateOfTransaction?: string; GameCategoryId: number }) => {
+          if (!item.DateOfTransaction) return false;
+          const localDate = new Date(item.DateOfTransaction).toLocaleDateString(
+            "en-CA",
+            { timeZone: "Asia/Manila" }
+          );
+          return localDate === today;
+        }
       );
 
       if (gameCategoryId && gameCategoryId > 0) {
         res = res.filter((item: any) => item.GameCategoryId === gameCategoryId);
       }
 
-      if (response.success && Array.isArray(res)) {
+      if (Array.isArray(res)) {
         const aggregatedData: Record<number, Record<string, number>> = {};
 
         res.forEach((item: any) => {
@@ -104,8 +118,8 @@ const ChartWinnersBetTypeSummary = ({
               drawNum === 1
                 ? "First Draw"
                 : drawNum === 2
-                  ? "Second Draw"
-                  : "Third Draw",
+                ? "Second Draw"
+                : "Third Draw",
           };
 
           series.forEach(({ dataKey }) => {

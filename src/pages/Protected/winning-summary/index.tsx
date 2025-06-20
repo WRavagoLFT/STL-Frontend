@@ -6,11 +6,11 @@ import DashboardCardsPage from "~/components/dashboard/DashboardCards";
 import TableWinningActivityToday from "~/components/winning-summary/WinningActivityTodayTable";
 import ChartWinnersvsWinningsSummary from "~/components/winning-summary/WinnersvsWinningsChart";
 import TableWinningSummary from "~/components/winning-summary/WinningSummaryTable";
-import ChartWinnersSummary from "~/components/winning-summary/WinnerCountChart";
 import ChartWinnersBetTypeSummary from "~/components/winning-summary/WinnerCountBetTypeChart";
 import { buttonStyles } from "~/styles/theme";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { useAuthStore } from "~/store/useAuthStore";
+import { ChartWinnersSummary } from "~/components/winning-summary/WinnerCountChart";
 
 const GAME_TITLES = [
   "STL",

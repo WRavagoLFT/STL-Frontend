@@ -71,7 +71,7 @@ const ChartBettorsSummary = () => {
               swer4: 0,
             };
           }
-
+          
           switch (item.GameCategoryId) {
             case 1:
               aggregatedData[item.DrawOrder].pares += item.TotalBettors || 0;

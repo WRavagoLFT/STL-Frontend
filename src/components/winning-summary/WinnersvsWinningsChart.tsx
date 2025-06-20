@@ -65,15 +65,20 @@ const ChartWinnersvsWinningsSummary = ({
 
       console.log("RESULT DATA:", result.data);
 
-      // FIXED: use result.data instead of response.data
-      let filtered = result.data.filter(
-        (item: TransactionData) =>
-          typeof item.DateOfTransaction === "string" &&
-          item.DateOfTransaction.startsWith(today)
-      );
-      console.log("[DEBUG] Filtered by DateOfTransaction:", filtered);
+      // Convert DateOfTransaction to PHT before filtering
+      let filtered = result.data.filter((item: TransactionData) => {
+        if (!item.DateOfTransaction) return false;
 
-      // Optional: further filter by GameCategoryId (defensive)
+        const localDate = new Date(item.DateOfTransaction).toLocaleDateString(
+          "en-CA",
+          { timeZone: "Asia/Manila" }
+        );
+
+        return localDate === today;
+      });
+
+      console.log("[DEBUG] Filtered by PHT DateOfTransaction:", filtered);
+
       if (gameCategoryId) {
         filtered = filtered.filter(
           (item: TransactionData) => item.GameCategoryId === gameCategoryId

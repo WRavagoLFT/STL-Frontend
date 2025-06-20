@@ -16,82 +16,96 @@ const DashboardCardsPage = ({
     totalRevenue: 0,
   });
 
-  //console.log('GAME CATEG ID:', gameCategoryId);
+  console.log('GAME CATEG ID:', gameCategoryId);
 
-  useEffect(() => {
-    const fetchDataDashboard = async () => {
-      try {
-        const today = new Date().toLocaleDateString("en-CA", {
-          timeZone: "Asia/Manila",
-        });
-        //console.log("[DEBUG] Today's date (PHT):", today);
+useEffect(() => {
+  const fetchDataDashboard = async () => {
+    try {
+      const today = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Manila",
+      });
+      //console.log("[DEBUG] Today's date (PHT):", today);
 
-        const [summaryResponse, winnersResponse] = await Promise.all([
-          fetchHistoricalSummary({ from: today, to: today }),
-          fetchWinners({
-            from: today,
-            to: today,
-            gameCategoryId,
-          }),
-        ]);
+      const [summaryResponse, winnersResponse] = await Promise.all([
+        fetchHistoricalSummary({ from: today, to: today }),
+        fetchWinners({
+          from: today,
+          to: today,
+          gameCategoryId,
+        }),
+      ]);
 
-        //console.log("[DEBUG] Summary Response:", summaryResponse);
-        //console.log("[DEBUG] Winners Response:", winnersResponse);
+      //console.log("[DEBUG] Summary Response:", summaryResponse);
+      //console.log("[DEBUG] Winners Response:", winnersResponse);
 
-        if (summaryResponse.success) {
-          let filteredData = summaryResponse.data;
+      if (summaryResponse.success) {
+        let filteredData = summaryResponse.data;
 
-          if (gameCategoryId && gameCategoryId > 0) {
-            filteredData = filteredData.filter(
-              (item: { GameCategoryId: number }) =>
-                item.GameCategoryId === gameCategoryId
-            );
-            // console.log(
-            //   `[DEBUG] Filtered summary data by GameCategoryId (${gameCategoryId}):`,
-            //   filteredData
-            // );
-          } else {
-            console.log("[DEBUG] No GameCategoryId filter applied.");
+        if (gameCategoryId && gameCategoryId > 0) {
+          filteredData = filteredData.filter(
+            (item: { GameCategoryId: number }) =>
+              item.GameCategoryId === gameCategoryId
+          );
+          // console.log(
+          //   `[DEBUG] Filtered summary data by GameCategoryId (${gameCategoryId}):`,
+          //   filteredData
+          // );
+        } else {
+          console.log("[DEBUG] No GameCategoryId filter applied.");
+        }
+
+        const totals = filteredData.reduce(
+          (acc: any, item: any) => {
+            acc.totalBettors += item.TotalBettors || 0;
+            acc.totalBetsPlaced += item.TotalBetAmount || 0;
+            acc.totalPayout += item.TotalPayout || 0;
+            acc.totalRevenue += item.TotalEarnings || 0;
+            return acc;
+          },
+          {
+            totalBettors: 0,
+            totalWinners: 0,
+            totalBetsPlaced: 0,
+            totalPayout: 0,
+            totalRevenue: 0,
           }
+        );
 
-          const totals = filteredData.reduce(
-            (acc: any, item: any) => {
-              acc.totalBettors += item.TotalBettors || 0;
-              acc.totalBetsPlaced += item.TotalBetAmount || 0;
-              acc.totalPayout += item.TotalPayout || 0;
-              acc.totalRevenue += item.TotalEarnings || 0;
-              return acc;
-            },
-            {
-              totalBettors: 0,
-              totalWinners: 0,
-              totalBetsPlaced: 0,
-              totalPayout: 0,
-              totalRevenue: 0,
+        //console.log("[DEBUG] Aggregated summary totals (before winners):", totals);
+
+        if (winnersResponse.success && Array.isArray(winnersResponse.data)) {
+          const filteredWinners = winnersResponse.data.filter(
+            (item: { DateOfTransaction?: string }) => {
+              if (typeof item.DateOfTransaction !== "string") return false;
+
+              // Convert to local date string in Asia/Manila
+              const localDate = new Date(item.DateOfTransaction).toLocaleDateString("en-CA", {
+                timeZone: "Asia/Manila",
+              });
+
+              return localDate === today;
             }
           );
 
-          //console.log("[DEBUG] Aggregated summary totals (before winners):", totals);
-
-          if (winnersResponse.success && Array.isArray(winnersResponse.data)) {
-            totals.totalWinners = winnersResponse.data.length;
-            //console.log("[DEBUG] Total winners count:", totals.totalWinners);
-          } else {
-            console.warn("[DEBUG] Failed to fetch or invalid winners data:", winnersResponse.message);
-          }
-
-          //console.log("[DEBUG] Final dashboard data set:", totals);
-          setDashboardData(totals);
+          totals.totalWinners = filteredWinners.length;
+          //console.log("[DEBUG] Filtered winners count (Asia/Manila):", totals.totalWinners);
         } else {
-          console.error("[DEBUG] Summary API Request Failed:", summaryResponse.message);
+          console.warn("[DEBUG] Failed to fetch or invalid winners data:", winnersResponse.message);
         }
-      } catch (error) {
-        console.error("[DEBUG] Error Fetching Dashboard Data:", error);
-      }
-    };
 
-    fetchDataDashboard();
-  }, [gameCategoryId]);
+        //console.log("[DEBUG] Final dashboard data set:", totals);
+        setDashboardData(totals);
+      } else {
+        console.error("[DEBUG] Summary API Request Failed:", summaryResponse.message);
+      }
+    } catch (error) {
+      console.error("[DEBUG] Error Fetching Dashboard Data:", error);
+    }
+  };
+
+  fetchDataDashboard();
+}, [gameCategoryId]);
+
 
   const cardItems = [
     { label: "Total Bettors", value: dashboardData.totalBettors },
