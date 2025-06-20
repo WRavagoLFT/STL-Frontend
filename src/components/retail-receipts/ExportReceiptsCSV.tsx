@@ -63,7 +63,12 @@ const ExportRetailDataToExcel = ({
     netAacTotalPercentage,
     netPcsoTotalAmount,
     netPcsoTotalPercentage,
-  } = useRetailReceiptProcessor(receiptData, filterBy.value, operationDate, yearNumber);
+  } = useRetailReceiptProcessor(
+    receiptData,
+    filterBy.value,
+    operationDate,
+    yearNumber
+  );
 
   const handleDownloadExcel = () => {
     if (!receiptData) return;
@@ -128,7 +133,11 @@ const ExportRetailDataToExcel = ({
         item.ShareAmount,
       ]);
     });
-    sheetData.push(["Total", `${aacTaxTotalPercentage}%`, aacTaxTotalShareAmount]);
+    sheetData.push([
+      "Total",
+      `${aacTaxTotalPercentage}%`,
+      aacTaxTotalShareAmount,
+    ]);
     sheetData.push([]);
 
     // 5. PCSO Tax Section
@@ -141,14 +150,26 @@ const ExportRetailDataToExcel = ({
         item.ShareAmount,
       ]);
     });
-    sheetData.push(["Total", `${pcsoTaxTotalPercentage}%`, pcsoTaxTotalShareAmount]);
+    sheetData.push([
+      "Total",
+      `${pcsoTaxTotalPercentage}%`,
+      pcsoTaxTotalShareAmount,
+    ]);
     sheetData.push([]);
 
     // 6. Net Shares Section
     sheetData.push(["Net Shares"]);
     sheetData.push(["Type", "Net Percentage", "Net Amount"]);
-    sheetData.push(["Net AAC Share", `${netAacTotalPercentage}%`, netAacTotalAmount]);
-    sheetData.push(["Net PCSO Share", `${netPcsoTotalPercentage}%`, netPcsoTotalAmount]);
+    sheetData.push([
+      "Net AAC Share",
+      `${netAacTotalPercentage}%`,
+      netAacTotalAmount,
+    ]);
+    sheetData.push([
+      "Net PCSO Share",
+      `${netPcsoTotalPercentage}%`,
+      netPcsoTotalAmount,
+    ]);
 
     // Create worksheet
     const worksheet = XLSX.utils.aoa_to_sheet(sheetData);
@@ -173,13 +194,12 @@ const ExportRetailDataToExcel = ({
   };
 
   return (
-    <Button
-      sx={buttonStylesretail}
-      variant="contained"
+    <button
       onClick={handleDownloadExcel}
+      className="w-full bg-[#0038A8] text-white px-4 py-2 rounded-md hover:bg-[#002e82] transition-colors duration-200 text-xs font-semibold"
     >
-      Download Excel
-    </Button>
+      Download as CSV File
+    </button>
   );
 };
 

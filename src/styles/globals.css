@@ -25,88 +25,64 @@ html, body {
   color: #CE1126 !important;
 }
 
-input, select {
-  /* border-radius: 0.4rem !important;   */
-  background-color: transparent !important; 
-  color: inherit;                         
+/* input,
+select {
+  background-color: transparent !important;
+  color: inherit;
 }
 
-select option:disabled {
-  color: #9CA3AF !important; /* Tailwind's text-gray-400 */
-}
-
-/* Target react-select control for transparency */
-.react-select__control {
-  background-color: transparent !important;  /* Transparent background */
-  border-radius: 0.4rem !important;          /* Rounded corners */
-  border: 1px solid rgba(0, 0, 0, 0.23) !important;      /* Set border color */
-}
-
-/* Error state for react-select */
-.react-select__control--is-invalid {
-  font-size: 12px !important;             /* Font size for error message */
-}
-
-/* Adjust dropdown option styles */
-.react-select__option {
-  background-color: transparent !important;  /* Transparent background for options */
-}
-
-.react-select__option--is-selected {
-  background-color: #0038A8 !important;      /* Highlight color when selected */
-  color: white !important;
-}
-
-/* Target the multi-value label (the label of the selected items in multi-select) */
-.react-select__multi-value__label {
-  background-color: #0038A8 !important;  /* Transparent background */
-  color: white !important;                 /* Inherit text color */
-  border-radius: 0.4rem !important;          /* Rounded corners */
-  font-size: 12px !important;
-  padding: 1px 6px !important; /* Top/Bottom 10px, Left/Right 5px */
-}
-
-.react-select__multi-value {
-  background-color: #0038A8 !important;      /* Highlight color when selected */
-  color: white !important;
-}
-
-.react-select__control {
-  padding: 0px !important;
-}
-
-.react-select-dashboard__control {
+/* Base control */
+.custom-select__control {
+  font-size: 0.875rem;
+  padding: 2px;
   background-color: #F6BA12 !important;
-  border-radius: 0.5rem !important;
-  border: none !important;         /* use 'none' to remove border */
-  font-size: 14px !important;      /* specify units for font-size */
-  padding: 0px !important;
-  color: #2F2F2F !important;
+  color: inherit;
+  cursor: default;
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
 }
 
-.react-select-dashboard__option {
-  background-color: transparent !important;  /* Transparent background for options */
-  color: inherit !important;                  /* Inherit text color */
-  border-bottom: 1px solid #0038A8;
-  font-size: 14px !important;
+/* Dropdown options */
+.custom-select__option {
+  background-color: #F6BA12;
+  color: #000000;
+  cursor: pointer;
 }
 
-.react-select-dashboard__option--is-selected {
-  background-color: #0038A8 !important;      /* Highlight color when selected */
-  color: white !important;
-}
-/* Hover state for options */
-.react-select-dashboard__option:hover {
-  background-color: #F6BA12 !important; /* Slightly darker blue on hover */
+.custom-select__option--is-selected {
+  background-color: #0038A8 !important;
+  color: #ffffff !important;
 }
 
-.react-select-dashboard__dropdown-indicator {
-  color: #0038A8 !important;
+.custom-select__option--is-focused {
+  background-color: #FDE68A !important;
 }
 
-.react-select-dashboard__placeholder {
-  color: #2F2F2F !important;
+/* Menu container */
+.custom-select__menu {
+  background-color: #F6BA12 !important;
+  max-height: 400px;
+  overflow-y: auto;
 }
+
+/* Dropdown indicator */
+.custom-select__dropdown-indicator {
+  color: #000000 !important;
+  padding: 4px;
+}
+
+/* Remove separator */
+.custom-select__indicator-separator {
+  display: none !important;
+}
+
+/* Raise z-index if needed */
+.custom-select__menu-portal {
+  z-index: 100 !important;
+}
+
+
 
 /* Small thin scrollbar */
 .sidebar-scrollbar::-webkit-scrollbar {

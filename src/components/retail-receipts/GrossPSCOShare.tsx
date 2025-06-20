@@ -1,3 +1,4 @@
+// GrossPCSOShare.tsx
 import React, { useState } from "react";
 import { ShareBreakdownPageProps } from "~/types/interfaces";
 
@@ -10,7 +11,8 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const breakdownToShow = breakdown && breakdown.length > 0 ? breakdown : defaultBreakdown;
+  const breakdownToShow =
+    breakdown && breakdown.length > 0 ? breakdown : defaultBreakdown;
 
   return (
     <div className="flex flex-col">
@@ -22,20 +24,36 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
           aria-controls="share-breakdown-content"
         >
           <div className="flex flex-col">
-            <span className="text-sm font-bold">{title}</span>
-            <span className="text-sm font-medium">{totalPercentage.toFixed(2)}%</span>
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-bold">{title}</span>
+              <span className="text-sm font-medium md:hidden">
+                {totalPercentage.toFixed(3)}%
+              </span>
+            </div>
+            <span className="text-sm font-medium hidden md:block">
+              {totalPercentage.toFixed(3)}%
+            </span>
+
+            {/* Mobile: Show amount below */}
+            <span className="text-lg font-bold md:hidden mt-1">
+              ₱{" "}
+              {totalShareAmount.toLocaleString(undefined, {
+                minimumFractionDigits: 3,
+                maximumFractionDigits: 3,
+              })}
+            </span>
           </div>
-          <div className="flex justify-center md:justify-end text-base font-semibold">
+
+          {/* Desktop: Show amount on the right */}
+          <div className="hidden md:flex justify-center md:justify-end text-base font-semibold">
             ₱{" "}
             {totalShareAmount.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
+              minimumFractionDigits: 3,
+              maximumFractionDigits: 3,
             })}
-            {/* toggle icon here */}
           </div>
         </button>
 
-        {/* Accordion Content */}
         {!isOpen && (
           <div
             id="share-breakdown-content"
@@ -43,24 +61,52 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
           >
             <span className="text-sm font-bold">{title} Details</span>
 
-            {/* Breakdown List */}
             {breakdownToShow.length > 0 ? (
-            breakdownToShow.map((item, index) => (
-              <div
-                key={index}
-                className="mt-2 grid grid-cols-1 md:grid-cols-2 items-center gap-2"
-              >
-                <div className="flex flex-col">
-                  <span className="text-sm font-bold">{item.ShareTitle ?? "N/A"}</span>
-                  <span className="text-sm font-medium">{item.Percentage ?? 0}%</span>
+              breakdownToShow.map((item, index) => (
+                <div
+                  key={index}
+                  className="mt-2 grid grid-cols-1 md:grid-cols-2 items-center md:gap-2"
+                >
+                  {/* Left side: Title + Percentage */}
+                  <div className="flex flex-col">
+                    {/* Mobile: title + percentage in one row */}
+                    <div className="flex justify-between items-center md:hidden">
+                      <span className="text-sm font-bold">
+                        {item.ShareTitle ?? "N/A"}
+                      </span>
+                      <span className="text-sm font-medium">
+                        {(item.Percentage ?? 0).toLocaleString(undefined, {
+                          minimumFractionDigits: 3,
+                          maximumFractionDigits: 3,
+                        })}
+                        %
+                      </span>
+                    </div>
+
+                    {/* Desktop: title then percentage below */}
+                    <div className="hidden md:flex flex-col">
+                      <span className="text-sm font-bold">
+                        {item.ShareTitle ?? "N/A"}
+                      </span>
+                      <span className="text-sm font-medium">
+                        {(item.Percentage ?? 0).toLocaleString(undefined, {
+                          minimumFractionDigits: 3,
+                          maximumFractionDigits: 3,
+                        })}
+                        %
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Right side: Share amount */}
+                  <div className="flex justify-start md:justify-end text-lg font-bold">
+                    ₱{" "}
+                    {(item.ShareAmount ?? 0).toLocaleString(undefined, {
+                      minimumFractionDigits: 3,
+                      maximumFractionDigits: 3,
+                    })}
+                  </div>
                 </div>
-                <div className="flex justify-center md:justify-end text-base font-semibold">
-                  ₱{" "}
-                  {(item.ShareAmount ?? 0).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                  })}
-                </div>
-              </div>
               ))
             ) : (
               <div className="mt-2 text-sm italic text-gray-500">

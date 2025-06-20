@@ -287,7 +287,7 @@ const DrawSelectedPage = () => {
               options={regions}
               placeholder="Select a Region"
               isDisabled={currentUserType === 5}
-              classNamePrefix="react-select-dashboard"
+              classNamePrefix="custom-select"
               styles={{
                 control: (provided, state) => ({
                   ...provided,
@@ -327,21 +327,7 @@ const DrawSelectedPage = () => {
               }}
               options={filteredProvinces}
               placeholder="Select a Province"
-              classNamePrefix="react-select-dashboard"
-              styles={{
-                control: (provided, state) => ({
-                  ...provided,
-                  borderRadius: "0.5rem",
-                  color: "#2F2F2F",
-                  padding: "0.25rem",
-                  boxShadow: state.isFocused ? "none" : provided.boxShadow,
-                }),
-                menu: (provided) => ({
-                  ...provided,
-                  backgroundColor: "#F8C73F",
-                  zIndex: 10,
-                }),
-              }}
+              classNamePrefix="custom-select"
             />
           </div>
 
@@ -365,21 +351,7 @@ const DrawSelectedPage = () => {
               }}
               options={gameCategories}
               placeholder="Select a Game Category"
-              classNamePrefix="react-select-dashboard"
-              styles={{
-                control: (provided, state) => ({
-                  ...provided,
-                  borderRadius: "0.5rem",
-                  color: "#2F2F2F",
-                  padding: "0.25rem",
-                  boxShadow: state.isFocused ? "none" : provided.boxShadow,
-                }),
-                menu: (provided) => ({
-                  ...provided,
-                  backgroundColor: "#F8C73F",
-                  zIndex: 10,
-                }),
-              }}
+              classNamePrefix="custom-select"
             />
           </div>
 
@@ -403,20 +375,7 @@ const DrawSelectedPage = () => {
                 )
               }
               placeholder="Select a Month"
-              classNamePrefix="react-select-dashboard"
-              styles={{
-                control: (provided, state) => ({
-                  ...provided,
-                  borderRadius: "0.5rem",
-                  padding: "0.25rem",
-                  boxShadow: state.isFocused ? "none" : provided.boxShadow,
-                }),
-                menu: (provided) => ({
-                  ...provided,
-                  backgroundColor: "#F8C73F",
-                  zIndex: 10,
-                }),
-              }}
+              classNamePrefix="custom-select"
             />
           </div>
         </div>

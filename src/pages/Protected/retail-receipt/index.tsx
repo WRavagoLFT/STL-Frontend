@@ -1,21 +1,42 @@
-import React, { useCallback, useEffect, useMemo, useState, Suspense } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  Suspense,
+} from "react";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import PCSOTaxesPage from "~/components/retail-receipts/PCSOTaxes";
 import { useRetailReceiptProcessor } from "~/components/retail-receipts/useRetailReceiptProcessor";
-import { fetchRetailReceiptsMetrics, fetchRetailReceiptsData } from "~/utils/api/transactions";
+import {
+  fetchRetailReceiptsMetrics,
+  fetchRetailReceiptsData,
+} from "~/utils/api/transactions";
 import Select, { ActionMeta, SingleValue } from "react-select";
 import Input from "~/components/ui/inputs/TextInputs";
 
 import RetailReceiptSkeleton from "~/components/retail-receipts/RetailReceiptSkeleton";
-import { buttonStylesretail } from "~/styles/theme";
-import { Button } from "@mui/material";
+import { ExportRetailDataToPDF } from "~/components/retail-receipts/ExportRetailDataToPdf";
 import ExportRetailDataToExcel from "~/components/retail-receipts/ExportReceiptsCSV";
-const ReceiptCardsPage = React.lazy(() => import("~/components/retail-receipts/ReceiptsCardPage"));
-const GrossAACSharePage = React.lazy(() => import("~/components/retail-receipts/GrossAACShare"));
-const GrossPSCOSharePage = React.lazy(() => import("~/components/retail-receipts/GrossPSCOShare"));
-const AACTaxesPage = React.lazy(() => import("~/components/retail-receipts/ACCSTaxes"));
-const NetAACIncomePage = React.lazy(() => import("~/components/retail-receipts/NetAACIncome"));
-const NetPSCOIncomePage = React.lazy(() => import("~/components/retail-receipts/NetPSCOIncome"));
+
+const ReceiptCardsPage = React.lazy(
+  () => import("~/components/retail-receipts/ReceiptsCardPage")
+);
+const GrossAACSharePage = React.lazy(
+  () => import("~/components/retail-receipts/GrossAACShare")
+);
+const GrossPSCOSharePage = React.lazy(
+  () => import("~/components/retail-receipts/GrossPSCOShare")
+);
+const AACTaxesPage = React.lazy(
+  () => import("~/components/retail-receipts/ACCSTaxes")
+);
+const NetAACIncomePage = React.lazy(
+  () => import("~/components/retail-receipts/NetAACIncome")
+);
+const NetPSCOIncomePage = React.lazy(
+  () => import("~/components/retail-receipts/NetPSCOIncome")
+);
 
 export type OptionType = {
   label: string;
@@ -34,7 +55,7 @@ const RetailReceiptPage = () => {
   ];
 
   const [receiptData, setReceiptData] = useState<any | null>(null);
-  const [filterBy, setFilterBy] = useState<OptionType>(filterOptions[0]); // default to Monthly
+  const [filterBy, setFilterBy] = useState<OptionType>(filterOptions[0]);
 
   const [selectedYear, setSelectedYear] = useState<OptionType | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,8 +79,11 @@ const RetailReceiptPage = () => {
     });
   }, [currentYearOption]);
 
-  const [appliedFilterBy, setAppliedFilterBy] = useState<OptionType>(filterOptions[0]);
-  const [appliedSelectedYear, setAppliedSelectedYear] = useState<OptionType | null>(currentYearOption);
+  const [appliedFilterBy, setAppliedFilterBy] = useState<OptionType>(
+    filterOptions[0]
+  );
+  const [appliedSelectedYear, setAppliedSelectedYear] =
+    useState<OptionType | null>(currentYearOption);
 
   useEffect(() => {
     if (filterBy?.value === "Yearly" && !selectedYear) {
@@ -129,7 +153,7 @@ const RetailReceiptPage = () => {
     fetchAllRetailData();
   }, [fetchAllRetailData]);
 
-    const yearNumber = Number(selectedYear?.value ?? new Date().getFullYear());
+  const yearNumber = Number(selectedYear?.value ?? new Date().getFullYear());
 
   const {
     aacBreakdown,
@@ -152,7 +176,7 @@ const RetailReceiptPage = () => {
     receiptData,
     filterBy?.value,
     operationDate,
-    yearNumber,
+    yearNumber
   );
 
   return (
@@ -161,10 +185,10 @@ const RetailReceiptPage = () => {
         {loading ? (
           <RetailReceiptSkeleton />
         ) : (
-          <div className="mx-auto px-0 py-1">
+          <div className="mx-auto px-0 py-8 md:py-1">
             <h1 className="text-3xl font-bold mb-3">STL Retail Receipt</h1>
-            <div className="flex flex-col md:flex-row md:flex-wrap gap-4 mb-4">
-              <div className="flex-[1_1_200px]">
+            <div className="flex flex-col md:flex-row  gap-4 mb-4 w-full md:w-2/5">
+              <div className="w-full md:w-1/2">
                 <div>
                   <label
                     htmlFor="filterBy"
@@ -172,61 +196,38 @@ const RetailReceiptPage = () => {
                   >
                     Filter by
                   </label>
-                    <Select
-                      name="filterBy"
-                      value={filterBy}
-                      onChange={(selectedOption) => {
-                        if (!loading && selectedOption) {
-                          setFilterBy(selectedOption);
-
-                          // Reset selection only when Monthly is chosen
-                          if (selectedOption.value === "Monthly") {
-                            setSelectedYear(null);
-                          }
+                  <Select
+                    name="filterBy"
+                    value={filterBy}
+                    onChange={(selectedOption) => {
+                      if (!loading && selectedOption) {
+                        setFilterBy(selectedOption);
+                        if (selectedOption.value === "Monthly") {
+                          setSelectedYear(null);
                         }
-                      }}
-                      options={filterOptions}
-                      classNamePrefix="react-select"
-                      styles={{
-                        control: (provided) => ({
-                          ...provided,
-                          borderColor: "#0038A8 !important", // Default blue border
-                          fontSize: "0.875rem",
-                          padding: "2px",
-                          color: "inherit",
-                          backgroundColor: "white",
-                          cursor: "default",
-                          "&:hover": {
-                            borderColor: "#0038A8",
-                          },
-                          boxShadow: "none",
-                        }),
-                        menuPortal: (base) => ({
-                          ...base,
-                          zIndex: 1000000,
-                        }),
-                        menu: (provided) => ({
-                          ...provided,
-                          maxHeight: 400,
-                          overflowY: "auto",
-                        }),
-                      }}
-                    />
+                      }
+                    }}
+                    options={filterOptions}
+                    classNamePrefix="custom-select"
+                  />
                 </div>
               </div>
-              <div className="flex-[1_1_200px]">
-                <div>
+              <div className="w-full md:w-1/2">
+                <div className="flex flex-col gap-1">
                   <label
                     htmlFor="operationDate"
                     className="text-sm font-medium text-[#0038A8]"
                   >
                     Date of Report
                   </label>
+
                   {filterBy?.value === "Monthly" && (
-                    <Input
+                    <input
+                      id="operationDate"
                       type="month"
                       value={operationDate}
-                      onChange={(e: any) => setOperationDate(e.target.value)}
+                      onChange={(e) => setOperationDate(e.target.value)}
+                      className="text-sm py-2 px-2 bg-[#F6BA12] text-black border border-transparent focus:outline-none rounded cursor-default"
                     />
                   )}
 
@@ -236,52 +237,36 @@ const RetailReceiptPage = () => {
                       value={selectedYear}
                       options={yearOptions}
                       onChange={handleYearChange}
-                      placeholder="Select Year"
-                      classNamePrefix="react-select"
-                      styles={{
-                        control: (provided) => ({
-                          ...provided,
-                          borderColor: "#0038A8 !important", // Default blue border
-                          fontSize: "0.875rem",
-                          padding: "2px",
-                          color: "inherit",
-                          backgroundColor: "white",
-                          cursor: "default",
-                          "&:hover": {
-                            borderColor: "#0038A8",
-                          },
-                          boxShadow: "none",
-                        }),
-                        menuPortal: (base) => ({
-                          ...base,
-                          zIndex: 1000000,
-                        }),
-                        menu: (provided) => ({
-                          ...provided,
-                          maxHeight: 400,
-                          overflowY: "auto",
-                        }),
-                      }}
+                      classNamePrefix="custom-select"
+                      menuPortalTarget={document.body}
                     />
                   )}
                 </div>
               </div>
-              <div className="flex-[1_1_200px]" />
-              <div className="flex-[1_1_200px] content-end"></div>
-              <div className="flex-[1_1_200px] content-end"></div>
             </div>
-              {/* Cards */}
-              <ReceiptCardsPage
-                receiptDataMetrics={receiptDataMetrics}
-                textlabel="Collection"
-              />
+
+            <ReceiptCardsPage
+              receiptDataMetrics={receiptDataMetrics}
+              textlabel="Collection"
+            />
+
             <div className="flex gap-6 mt-8 mb-3">
-              <div className="w-1/2">
-                <div className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 md:grid-cols-2 items-center gap-2 text-left">
+              <div className="w-full md:w-1/2">
+                <div className="w-full bg-[#F6BA12] p-2 rounded-md flex flex-col md:flex-row md:items-center md:justify-between text-left gap-1">
+                  {/* Label and Mobile Amount */}
                   <div className="flex flex-col">
                     <span className="text-sm font-bold">STL Collections</span>
+                    <span className="text-lg font-bold md:hidden">
+                      ₱{" "}
+                      {receiptData?.Collections?.toLocaleString("en-PH", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }) || "0.00"}
+                    </span>
                   </div>
-                  <div className="flex justify-center md:justify-end text-base font-semibold">
+
+                  {/* Desktop Amount */}
+                  <div className="hidden md:block text-base font-semibold">
                     ₱{" "}
                     {receiptData?.Collections?.toLocaleString("en-PH", {
                       minimumFractionDigits: 2,
@@ -290,11 +275,9 @@ const RetailReceiptPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="w-1/2"></div>
             </div>
 
             <div className="flex flex-col md:flex-row gap-6">
-              {/* Left Column */}
               <div className="w-full md:w-1/2 flex flex-col justify-between">
                 <div>
                   <GrossAACSharePage
@@ -312,29 +295,12 @@ const RetailReceiptPage = () => {
                     netPercentage={netAacTotalPercentage}
                   />
                 </div>
-
-                {/* Push buttons to the bottom */}
-                <div className="flex gap-4 mb-2">
-                  <ExportRetailDataToExcel
-                    receiptData={receiptData}
-                    receiptDataMetrics={receiptDataMetrics}
-                    filterBy={filterBy}
-                    operationDate={operationDate}
-                    yearNumber={yearNumber}
-
-                  />
-                  <Button sx={buttonStylesretail} variant="contained">
-                    Export as PDF
-                  </Button>
-                </div>
               </div>
-
-              {/* Right Column */}
               <div className="w-full md:w-1/2 flex flex-col justify-between">
                 <div>
                   <GrossPSCOSharePage
-                    totalPercentage={pcsoTotalPercentage}
-                    totalShareAmount={pcsoTotalShareAmount}
+                    totalPercentage={netPcsoTotalPercentage}
+                    totalShareAmount={netPcsoTotalAmount}
                     breakdown={pcsoBreakdown}
                   />
                   <PCSOTaxesPage
@@ -343,10 +309,39 @@ const RetailReceiptPage = () => {
                     breakdown={pcsoTaxBreakdown}
                   />
                   <NetPSCOIncomePage
-                    netAmount={netPcsoTotalAmount}
-                    netPercentage={netPcsoTotalPercentage}
+                    netAmount={pcsoTotalShareAmount}
+                    netPercentage={pcsoTotalPercentage}
                   />
                 </div>
+              </div>
+            </div>
+            <div className="w-full md:w-1/2 mb-2 mt-4 flex flex-row gap-2">
+              <div className="w-1/2">
+                <ExportRetailDataToExcel
+                  receiptData={receiptData}
+                  receiptDataMetrics={receiptDataMetrics}
+                  filterBy={filterBy}
+                  operationDate={operationDate}
+                  yearNumber={yearNumber}
+                />
+              </div>
+              <div className="w-1/2">
+                <ExportRetailDataToPDF
+                  filterBy={filterBy}
+                  operationDate={operationDate}
+                  yearNumber={yearNumber}
+                  receiptDataMetrics={receiptDataMetrics}
+                  aacTotalShareAmount={aacTotalShareAmount}
+                  pcsoTotalShareAmount={pcsoTotalShareAmount}
+                  aacTaxTotalShareAmount={aacTaxTotalShareAmount}
+                  pcsoTaxTotalShareAmount={pcsoTaxTotalShareAmount}
+                  netAacTotalAmount={netAacTotalAmount}
+                  netPcsoTotalAmount={netPcsoTotalAmount}
+                  aacBreakdown={aacBreakdown}
+                  pcsoBreakdown={pcsoBreakdown}
+                  aacTaxBreakdown={aacTaxBreakdown}
+                  pcsoTaxBreakdown={pcsoTaxBreakdown}
+                />
               </div>
             </div>
           </div>

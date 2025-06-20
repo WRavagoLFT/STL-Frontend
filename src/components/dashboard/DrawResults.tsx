@@ -236,21 +236,7 @@ const DrawResultsPage = () => {
             onChange={(option) => setSelectedGameCategory(option?.value || "")}
             options={gameCategoryOptions}
             placeholder="Select a Game Category"
-            classNamePrefix="react-select-dashboard"
-            styles={{
-              control: (provided, state) => ({
-                ...provided,
-                borderRadius: "0.5rem",
-                color: "#2F2F2F",
-                padding: "0.25rem",
-                boxShadow: state.isFocused ? "none" : provided.boxShadow,
-              }),
-              menu: (provided) => ({
-                ...provided,
-                backgroundColor: "#F8C73F",
-                zIndex: 10,
-              }),
-            }}
+            classNamePrefix="custom-select"
           />
         </div>
       </div>
@@ -266,20 +252,7 @@ const DrawResultsPage = () => {
             }}
             options={regionOptions}
             placeholder="Select a Region"
-            classNamePrefix="react-select-dashboard"
-            styles={{
-              control: (provided, state) => ({
-                ...provided,
-                borderRadius: "0.5rem",
-                padding: "0.25rem",
-                boxShadow: state.isFocused ? "none" : provided.boxShadow,
-              }),
-              menu: (provided) => ({
-                ...provided,
-                backgroundColor: "#F8C73F",
-                zIndex: 10,
-              }),
-            }}
+            classNamePrefix="custom-select"
           />
         </div>
         <div className="w-full relative">
@@ -289,20 +262,7 @@ const DrawResultsPage = () => {
             onChange={(option) => setSelectedProvince(option?.value || "")}
             options={filteredProvinceOptions}
             placeholder="Select a Province"
-            classNamePrefix="react-select-dashboard"
-            styles={{
-              control: (provided, state) => ({
-                ...provided,
-                borderRadius: "0.5rem",
-                padding: "0.25rem",
-                boxShadow: state.isFocused ? "none" : provided.boxShadow,
-              }),
-              menu: (provided) => ({
-                ...provided,
-                backgroundColor: "#F8C73F",
-                zIndex: 10,
-              }),
-            }}
+            classNamePrefix="custom-select" 
           />
         </div>
       </div>
