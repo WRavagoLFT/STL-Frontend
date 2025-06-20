@@ -4,6 +4,7 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "~/store/useAuthStore";
+import { TransactionData } from "~/types/types";
 
 interface Winner {
   GameCategoryId: number;
@@ -45,53 +46,71 @@ const ChartWinnersvsWinningsSummary = ({
 
   const fetchChartData = useCallback(async () => {
     setLoading(true);
-    const today = new Date().toLocaleDateString("en-CA", {
-      timeZone: "Asia/Manila",
-    });
+    try {
+      const today = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Manila",
+      });
 
-    const result = await fetchWinners({
-      from: today,
-      to: today,
-      gameCategoryId,
-    });
+      const result = await fetchWinners({
+        from: today,
+        to: today,
+        gameCategoryId,
+      });
 
-    if (!result.success || !Array.isArray(result.data)) {
-      setLoading(false);
-      return;
-    }
-
-    const filteredData: Winner[] = gameCategoryId
-      ? result.data.filter(
-          (item: any) => item.GameCategoryId === gameCategoryId
-        )
-      : result.data;
-
-    const drawSummary: Record<
-      DrawNumber,
-      { winners: number; winnings: number }
-    > = {
-      1: { winners: 0, winnings: 0 },
-      2: { winners: 0, winnings: 0 },
-      3: { winners: 0, winnings: 0 },
-    };
-
-    for (const item of filteredData) {
-      const draw = item.DrawOrder as DrawNumber;
-      if (drawSummary[draw]) {
-        drawSummary[draw].winners += 1;
-        drawSummary[draw].winnings += item.PayoutAmount || 0;
+      if (!result.success || !Array.isArray(result.data)) {
+        console.warn("[DEBUG] Invalid result from fetchWinners:", result);
+        setLoading(false);
+        return;
       }
+
+      console.log("RESULT DATA:", result.data);
+
+      // FIXED: use result.data instead of response.data
+      let filtered = result.data.filter(
+        (item: TransactionData) =>
+          typeof item.DateOfTransaction === "string" &&
+          item.DateOfTransaction.startsWith(today)
+      );
+      console.log("[DEBUG] Filtered by DateOfTransaction:", filtered);
+
+      // Optional: further filter by GameCategoryId (defensive)
+      if (gameCategoryId) {
+        filtered = filtered.filter(
+          (item: TransactionData) => item.GameCategoryId === gameCategoryId
+        );
+      }
+
+      const drawSummary: Record<
+        DrawNumber,
+        { winners: number; winnings: number }
+      > = {
+        1: { winners: 0, winnings: 0 },
+        2: { winners: 0, winnings: 0 },
+        3: { winners: 0, winnings: 0 },
+      };
+
+      for (const item of filtered) {
+        const draw = item.DrawOrder as DrawNumber;
+        if (drawSummary[draw]) {
+          drawSummary[draw].winners += 1;
+          drawSummary[draw].winnings += item.PayoutAmount || 0;
+        }
+      }
+
+      const finalChartData = ([1, 2, 3] as DrawNumber[]).map((drawNum) => ({
+        draw: drawLabelMap[drawNum],
+        winners: drawSummary[drawNum].winners,
+        winnings: drawSummary[drawNum].winnings,
+        GameCategoryId: gameCategoryId ?? null,
+      }));
+
+      console.log("[DEBUG] Final chart data:", finalChartData);
+      setData(finalChartData);
+    } catch (error) {
+      console.error("Error in fetchChartData:", error);
+    } finally {
+      setLoading(false);
     }
-
-    const finalChartData = ([1, 2, 3] as DrawNumber[]).map((drawNum) => ({
-      draw: drawLabelMap[drawNum],
-      winners: drawSummary[drawNum].winners,
-      winnings: drawSummary[drawNum].winnings,
-      GameCategoryId: gameCategoryId ?? null,
-    }));
-
-    setData(finalChartData);
-    setLoading(false);
   }, [gameCategoryId]);
 
   useEffect(() => {

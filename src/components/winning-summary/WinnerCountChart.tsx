@@ -4,26 +4,7 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "~/store/useAuthStore";
-
-interface Winner {
-  DrawOrder: number;
-  GameCategory: string;
-}
-
-type DrawNumber = 1 | 2 | 3;
-
-const drawLabelMap: Record<number, string> = {
-  1: "First Draw",
-  2: "Second Draw",
-  3: "Third Draw",
-};
-
-const gameCategoryMap = {
-  "STL Pares": "pares",
-  "STL Swer2": "swer2",
-  "STL Swer3": "swer3",
-  "STL Swer4": "swer4",
-} as const;
+import { TransactionData } from "~/types/types";
 
 const CustomLegend = () => (
   <div className="flex flex-row space-x-5 justify-start mt-0.5 mr-4">
@@ -44,7 +25,11 @@ const CustomLegend = () => (
   </div>
 );
 
-const ChartWinnersSummary = () => {
+const ChartWinnersSummary = ({
+  gameCategoryId,
+}: {
+  gameCategoryId?: number;
+}) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<
     {
@@ -57,64 +42,91 @@ const ChartWinnersSummary = () => {
   >([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
-  const fetchChartData = useCallback(async () => {
+  const fetchWinnersData = useCallback(async () => {
     setLoading(true);
-    const today = new Date().toLocaleDateString("en-CA", {
-      timeZone: "Asia/Manila",
-    });
+    try {
+      const today = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Manila",
+      });
 
-    const result = await fetchWinners({
-      from: today,
-      to: today,
-    });
+      const response = await fetchWinners({
+        from: today,
+        to: today,
+      });
 
-    if (!result.success || !Array.isArray(result.data)) {
-      setLoading(false);
-      return;
-    }
+      console.log('WINNER COUNT CHART', response);
 
-    const drawSummary: Record<
-      DrawNumber,
-      { pares: number; swer2: number; swer3: number; swer4: number }
-    > = {
-      1: { pares: 0, swer2: 0, swer3: 0, swer4: 0 },
-      2: { pares: 0, swer2: 0, swer3: 0, swer4: 0 },
-      3: { pares: 0, swer2: 0, swer3: 0, swer4: 0 },
-    };
-
-    for (const item of result.data) {
-      const draw = item.DrawOrder as DrawNumber;
-      const categoryKey =
-        gameCategoryMap[item.GameCategory as keyof typeof gameCategoryMap];
-
-      if (drawSummary[draw] && categoryKey) {
-        drawSummary[draw][categoryKey] += 1;
+      if (!response.success || !Array.isArray(response.data)) {
+        console.warn("[DEBUG] fetchWinners failed or data is invalid.");
+        setLoading(false);
+        return;
       }
+
+      const filtered = response.data.filter(
+        (item: TransactionData) =>
+          typeof item.DateOfTransaction === "string" &&
+          item.DateOfTransaction.startsWith(today)
+      );
+
+      //console.log("[DEBUG] Filtered today's transactions:", filtered);
+
+      const aggregatedData: Record<
+        number,
+        { pares: number; swer2: number; swer3: number; swer4: number }
+      > = {};
+
+      for (const item of filtered) {
+        if (!aggregatedData[item.DrawOrder]) {
+          aggregatedData[item.DrawOrder] = {
+            pares: 0,
+            swer2: 0,
+            swer3: 0,
+            swer4: 0,
+          };
+        }
+
+        const bucket = aggregatedData[item.DrawOrder];
+        switch (item.GameCategoryId) {
+          case 1:
+            bucket.pares += item.TotalBettors || 0;
+            break;
+          case 2:
+            bucket.swer2 += item.TotalBettors || 0;
+            break;
+          case 3:
+            bucket.swer3 += item.TotalBettors || 0;
+            break;
+          case 4:
+            bucket.swer4 += item.TotalBettors || 0;
+            break;
+        }
+      }
+
+      const formattedData = [1, 2, 3].map((draw) => ({
+        draw:
+          draw === 1
+            ? "First Draw"
+            : draw === 2
+            ? "Second Draw"
+            : "Third Draw",
+        pares: aggregatedData[draw]?.pares || 0,
+        swer2: aggregatedData[draw]?.swer2 || 0,
+        swer3: aggregatedData[draw]?.swer3 || 0,
+        swer4: aggregatedData[draw]?.swer4 || 0,
+      }));
+
+      //console.log("[DEBUG] Final formatted bettor data:", formattedData);
+      setData(formattedData);
+    } catch (error) {
+      console.error("Error loading Bettors Count:", error);
+    } finally {
+      setLoading(false);
     }
-
-    const finalChartData = ([1, 2, 3] as DrawNumber[]).map((drawNum) => ({
-      draw: drawLabelMap[drawNum],
-      pares: drawSummary[drawNum].pares,
-      swer2: drawSummary[drawNum].swer2,
-      swer3: drawSummary[drawNum].swer3,
-      swer4: drawSummary[drawNum].swer4,
-    }));
-
-    setData(finalChartData);
-    setLoading(false);
   }, []);
 
   useEffect(() => {
-    fetchChartData();
-  }, [fetchChartData]);
-
-  const allValues = data.flatMap((item) => [
-    item.pares,
-    item.swer2,
-    item.swer3,
-    item.swer4,
-  ]);
-  const safeMax = Math.max(10, ...allValues);
+    fetchWinnersData();
+  }, [fetchWinnersData]);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
@@ -170,28 +182,28 @@ const ChartWinnersSummary = () => {
               }}
               series={[
                 {
-                  data: data.map((item) => item.pares / 100000),
+                  data: data.map((item) => item.pares),
                   color: "#E5C7FF",
                   label: "STL Pares",
                   valueFormatter: (value, context) =>
                     `${data[context.dataIndex].pares.toLocaleString()}`,
                 },
                 {
-                  data: data.map((item) => item.swer2 / 100000),
+                  data: data.map((item) => item.swer2),
                   color: "#D2A7FF",
                   label: "STL Swer2",
                   valueFormatter: (value, context) =>
                     `${data[context.dataIndex].swer2.toLocaleString()}`,
                 },
                 {
-                  data: data.map((item) => item.swer3 / 100000),
+                  data: data.map((item) => item.swer3),
                   color: "#BB86FC",
                   label: "STL Swer3",
                   valueFormatter: (value, context) =>
                     `${data[context.dataIndex].swer3.toLocaleString()}`,
                 },
                 {
-                  data: data.map((item) => item.swer4 / 100000),
+                  data: data.map((item) => item.swer4),
                   color: "#A06FE6",
                   label: "STL Swer4",
                   valueFormatter: (value, context) =>

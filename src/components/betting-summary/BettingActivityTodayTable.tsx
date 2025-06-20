@@ -17,6 +17,7 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
   const [rankedRegions, setRankedRegions] = useState<
     { region: RegionData; rank: number; trend: number }[]
   >([]);
+  const [gameCategoryId, setGameCategoryId] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [isMobile, setIsMobile] = useState(false);

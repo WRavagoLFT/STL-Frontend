@@ -87,7 +87,7 @@ const BettingSummaryPage = ({
           <div className="flex flex-col items-center space-y-4">
             <div className="w-full space-y-4">
               {userTypeId === 6 ? (
-                <div className="w-full flex flex-col lg:flex-row lg:min-h-[500px] space-y-4 lg:space-y-0 lg:space-x-4">
+                <div className="w-full flex flex-col lg:flex-row lg:min-h-[400px] space-y-4 lg:space-y-0 lg:space-x-4">
                   <div className="w-full lg:w-1/3">
                     <TableBettingActivityToday gameCategoryId={gameCategoryId} />
                   </div>

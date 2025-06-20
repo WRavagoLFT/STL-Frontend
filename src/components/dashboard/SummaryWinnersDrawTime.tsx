@@ -41,47 +41,55 @@ const SummaryWinnersDrawTimePage = () => {
 
   const fetchAndProcessData = useCallback(async () => {
     setLoading(true);
-    const today = new Date().toLocaleDateString("en-CA", {
-      timeZone: "Asia/Manila",
-    });
+    try {
+      const today = new Date().toLocaleDateString("en-CA", {
+        timeZone: "Asia/Manila",
+      });
+      console.log("[DEBUG] Today's date:", today);
 
-    const result = await fetchWinners({ from: today, to: today });
+      const result = await fetchWinners({ from: today, to: today });
 
-    if (!result.success || !Array.isArray(result.data)) {
-      setLoading(false);
-      return;
-    }
-
-    const filteredData: Winner[] = result.data;
-
-    const drawSummary: Record<
-      DrawNumber,
-      { winners: number; winnings: number }
-    > = {
-      1: { winners: 0, winnings: 0 },
-      2: { winners: 0, winnings: 0 },
-      3: { winners: 0, winnings: 0 },
-    };
-
-    for (const item of filteredData) {
-      const draw = item.DrawOrder as DrawNumber;
-      if (drawSummary[draw]) {
-        drawSummary[draw].winners += 1;
-        drawSummary[draw].winnings += item.PayoutAmount || 0;
+      if (!result.success || !Array.isArray(result.data)) {
+        console.warn("[DEBUG] No valid data from fetchWinners");
+        setLoading(false);
+        return;
       }
-    }
 
-    const finaldata = [1, 2, 3].map((draw) => {
-      const drawNum = draw as DrawNumber;
-      return {
+      const filteredData: Winner[] = result.data.filter(
+        (item: { DateOfTransaction: string }) =>
+          item.DateOfTransaction?.startsWith(today)
+      );
+
+      const drawSummary: Record<
+        DrawNumber,
+        { winners: number; winnings: number }
+      > = {
+        1: { winners: 0, winnings: 0 },
+        2: { winners: 0, winnings: 0 },
+        3: { winners: 0, winnings: 0 },
+      };
+
+      for (const item of filteredData) {
+        const draw = item.DrawOrder as DrawNumber;
+        if (drawSummary[draw]) {
+          drawSummary[draw].winners += 1;
+          drawSummary[draw].winnings += item.PayoutAmount || 0;
+        }
+      }
+
+      const finalData = ([1, 2, 3] as DrawNumber[]).map((drawNum) => ({
         draw: drawLabelMap[drawNum] || `Draw ${drawNum}`,
         winners: drawSummary[drawNum].winners,
         winnings: drawSummary[drawNum].winnings,
-      };
-    });
+      }));
 
-    setData(finaldata);
-    setLoading(false);
+      console.log("[DEBUG] Final Chart Data:", finalData);
+      setData(finalData);
+    } catch (error) {
+      console.error("Error fetching summary winners draw time:", error);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

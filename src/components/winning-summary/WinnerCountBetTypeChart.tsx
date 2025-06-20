@@ -64,13 +64,6 @@ const ChartWinnersBetTypeSummary = ({
     [gameCategoryId]
   );
 
-  const maxValue = Math.max(
-    ...data.flatMap((item) =>
-      series.map(({ dataKey }) => Number(item[dataKey.toLowerCase()] || 0))
-    )
-  );
-  const safeMax = maxValue < 1000 ? 1000 : maxValue;
-
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
@@ -159,45 +152,55 @@ const ChartWinnersBetTypeSummary = ({
       </div>
 
       <div className="h-full w-full">
-        {/* {loading ? (
+        {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : ( */}
-        <BarChart
-          height={300}
-          grid={{ vertical: true }}
-          layout="horizontal"
-          margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-          slotProps={{
-            legend: { hidden: true },
-            noDataOverlay: {
-              message:
-                "Today's Winnings by Game Type will be displayed once available.",
-            },
-          }}
-          dataset={data}
-          yAxis={[
-            {
-              scaleType: "band",
-              data: data.map((item) => item.draw),
-            },
-          ]}
-          xAxis={[
-            {
-              label: "Total (x 100,000)",
-              min: 0,
-              max: safeMax,
-              valueFormatter: (value: number) => `${value.toLocaleString()}`,
-            },
-          ]}
-          series={series.map(({ dataKey, color }) => ({
-            dataKey: dataKey.toLowerCase(),
-            label: dataKey,
-            color,
-          }))}
-        />
-        {/* )} */}
+        ) : (
+          <BarChart
+            height={300}
+            grid={{ vertical: true }}
+            layout="horizontal"
+            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+            slotProps={{
+              legend: { hidden: true },
+              noDataOverlay: {
+                message:
+                  "Today's Winnings by Game Type will be displayed once available.",
+              },
+            }}
+            dataset={data}
+            yAxis={[
+              {
+                scaleType: "band",
+                data: data.map((item) => item.draw),
+              },
+            ]}
+            xAxis={[
+              {
+                label: "Total (x 100,000)",
+                min: 0,
+                max: 750,
+                valueFormatter: (value: number) => `${value.toLocaleString()}`,
+              },
+            ]}
+            series={series.map(({ dataKey, color }) => ({
+              dataKey: dataKey.toLowerCase(),
+              label: dataKey,
+              color,
+              valueFormatter: (value) => {
+                if (value == null) return "₱0";
+                const actualValue = value * 100000;
+                return actualValue.toLocaleString("en-PH", {
+                  style: "currency",
+                  currency: "PHP",
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                });
+              },
+            }))}
+          />
+        )}
       </div>
     </div>
   );

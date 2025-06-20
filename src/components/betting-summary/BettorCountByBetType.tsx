@@ -59,34 +59,37 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
         const today = new Date().toLocaleDateString("en-CA", {
           timeZone: "Asia/Manila",
         });
+        //console.log("[DEBUG] Today's date (PHT):", today);
+
         const response = await fetchTransactions({ from: today, to: today });
+        //console.log("[DEBUG] Raw response from fetchTransactions:", response);
 
         let res = response.data.filter(
           (item: { DateOfTransaction: string; GameCategoryId: number }) =>
             item.DateOfTransaction.startsWith(today)
         );
+        //console.log("[DEBUG] Filtered transactions for today:", res);
 
         if (params.gameCategoryId && params.gameCategoryId > 0) {
           res = res.filter(
             (item: { GameCategoryId: number }) =>
               item.GameCategoryId === params.gameCategoryId
           );
+          // console.log(
+          //   `[DEBUG] Filtered by GameCategoryId (${params.gameCategoryId}):`,
+          //   res
+          // );
         }
 
         if (response.success && Array.isArray(res)) {
-          // Get series keys dynamically
           const series = getBetTypeSeries(params.gameCategoryId);
+          //console.log("[DEBUG] Bet type series:", series);
 
-          // Aggregate data by DrawOrder and bet types dynamically
-          const aggregatedData: Record<
-            number,
-            Record<string, number>
-          > = {};
+          const aggregatedData: Record<number, Record<string, number>> = {};
 
           res.forEach((item: any) => {
             if (!aggregatedData[item.DrawOrder]) {
               aggregatedData[item.DrawOrder] = {};
-              // Initialize keys to 0 for all series dataKeys
               series.forEach(({ dataKey }) => {
                 aggregatedData[item.DrawOrder][dataKey.toLowerCase()] = 0;
               });
@@ -98,7 +101,8 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
             });
           });
 
-          // Prepare formatted data for 3 draws
+          //console.log("[DEBUG] Aggregated data:", aggregatedData);
+
           const formattedData = [1, 2, 3].map((drawNum) => {
             const entry: { draw: string; [key: string]: number | string } = {
               draw:
@@ -111,12 +115,14 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
 
             series.forEach(({ dataKey }) => {
               const keyLower = dataKey.toLowerCase();
-              entry[keyLower] = (aggregatedData[drawNum]?.[keyLower] || 0) / 100000;
+              entry[keyLower] =
+                (aggregatedData[drawNum]?.[keyLower] || 0) / 100000;
             });
 
             return entry;
           });
 
+          //console.log("[DEBUG] Final formatted data:", formattedData);
           setData(formattedData);
         }
       } catch (error) {
@@ -131,16 +137,6 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
 
   // Get series for rendering BarChart series
   const series = getBetTypeSeries(params.gameCategoryId);
-
-  const safeMax = Math.max(
-    1000,
-    ...data.map((item) =>
-      series.reduce((sum, { dataKey }) => {
-        const key = dataKey.toLowerCase();
-        return sum + (typeof item[key] === "number" ? (item[key] as number) : 0);
-      }, 0)
-    )
-  );
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8]">
@@ -167,11 +163,11 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
       </div>
 
       <div className="h-full w-full">
-        {/* {loading ? (
+         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : ( */}
+        ) : ( 
           <BarChart
             height={300}
             grid={{ vertical: true }}
@@ -195,7 +191,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
               {
                 label: "Total (x 100,000)",
                 min: 0,
-                max: safeMax,
+                max: 750,
                 valueFormatter: (value: number) => `${value.toLocaleString()}`,
               },
             ]}
@@ -203,9 +199,19 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
               dataKey: dataKey.toLowerCase(),
               label: dataKey,
               color,
+              valueFormatter: (value) => {
+                if (value == null) return "₱0";
+                const actualValue = value * 100000;
+                return actualValue.toLocaleString("en-PH", {
+                  style: "currency",
+                  currency: "PHP",
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                });
+              },
             }))}
           />
-        {/* )} */}
+        )}
       </div>
     </div>
   );

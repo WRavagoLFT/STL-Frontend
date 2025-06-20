@@ -16,12 +16,15 @@ const DashboardCardsPage = ({
     totalRevenue: 0,
   });
 
+  //console.log('GAME CATEG ID:', gameCategoryId);
+
   useEffect(() => {
     const fetchDataDashboard = async () => {
       try {
         const today = new Date().toLocaleDateString("en-CA", {
           timeZone: "Asia/Manila",
         });
+        //console.log("[DEBUG] Today's date (PHT):", today);
 
         const [summaryResponse, winnersResponse] = await Promise.all([
           fetchHistoricalSummary({ from: today, to: today }),
@@ -32,7 +35,8 @@ const DashboardCardsPage = ({
           }),
         ]);
 
-        //console.log(winnersResponse);
+        //console.log("[DEBUG] Summary Response:", summaryResponse);
+        //console.log("[DEBUG] Winners Response:", winnersResponse);
 
         if (summaryResponse.success) {
           let filteredData = summaryResponse.data;
@@ -42,6 +46,12 @@ const DashboardCardsPage = ({
               (item: { GameCategoryId: number }) =>
                 item.GameCategoryId === gameCategoryId
             );
+            // console.log(
+            //   `[DEBUG] Filtered summary data by GameCategoryId (${gameCategoryId}):`,
+            //   filteredData
+            // );
+          } else {
+            console.log("[DEBUG] No GameCategoryId filter applied.");
           }
 
           const totals = filteredData.reduce(
@@ -61,19 +71,22 @@ const DashboardCardsPage = ({
             }
           );
 
-          // Count number of winning entries
+          //console.log("[DEBUG] Aggregated summary totals (before winners):", totals);
+
           if (winnersResponse.success && Array.isArray(winnersResponse.data)) {
             totals.totalWinners = winnersResponse.data.length;
+            //console.log("[DEBUG] Total winners count:", totals.totalWinners);
           } else {
-            console.warn("Failed to fetch winners:", winnersResponse.message);
+            console.warn("[DEBUG] Failed to fetch or invalid winners data:", winnersResponse.message);
           }
 
+          //console.log("[DEBUG] Final dashboard data set:", totals);
           setDashboardData(totals);
         } else {
-          console.error("API Request Failed:", summaryResponse.message);
+          console.error("[DEBUG] Summary API Request Failed:", summaryResponse.message);
         }
       } catch (error) {
-        console.error("Error Fetching Dashboard Data:", error);
+        console.error("[DEBUG] Error Fetching Dashboard Data:", error);
       }
     };
 
