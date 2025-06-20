@@ -115,6 +115,7 @@ export interface TransactionData {
   CombinationTwo: string | null;
   CombinationThree: string | null;
   CombinationFour: string | null;
+  DateOfTransaction?: string;
 }
 
 // for dashboard cards
