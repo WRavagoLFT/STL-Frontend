@@ -45,7 +45,7 @@ const SummaryWinnersDrawTimePage = () => {
       const today = new Date().toLocaleDateString("en-CA", {
         timeZone: "Asia/Manila",
       });
-      console.log("[DEBUG] Today's date:", today);
+      //console.log("[DEBUG] Today's date (PHT):", today);
 
       const result = await fetchWinners({ from: today, to: today });
 
@@ -56,8 +56,15 @@ const SummaryWinnersDrawTimePage = () => {
       }
 
       const filteredData: Winner[] = result.data.filter(
-        (item: { DateOfTransaction: string }) =>
-          item.DateOfTransaction?.startsWith(today)
+        (item: { DateOfTransaction?: string }) => {
+          if (!item.DateOfTransaction) return false;
+
+          const localDate = new Date(item.DateOfTransaction).toLocaleDateString("en-CA", {
+            timeZone: "Asia/Manila",
+          });
+
+          return localDate === today;
+        }
       );
 
       const drawSummary: Record<
@@ -83,7 +90,7 @@ const SummaryWinnersDrawTimePage = () => {
         winnings: drawSummary[drawNum].winnings,
       }));
 
-      console.log("[DEBUG] Final Chart Data:", finalData);
+      //console.log("[DEBUG] Final Chart Data:", finalData);
       setData(finalData);
     } catch (error) {
       console.error("Error fetching summary winners draw time:", error);
