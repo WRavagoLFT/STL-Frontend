@@ -3,10 +3,10 @@
 import { useAuth } from "~/utils/useAuth";
 import { usePathname } from "next/navigation";
 import { ThemeProvider, CssBaseline, CircularProgress } from "@mui/material";
-import Error404Page from "~/components/auth/Error404";
-import Layout from "~/layout";
 import { match } from "path-to-regexp";
 import lightTheme from "~/styles/theme";
+import Error404Page from "~/components/auth/Error404";
+import Sidebar from "~/components/layout/Sidebar";
 
 const staticPaths = [
   "/dashboard",
@@ -31,7 +31,11 @@ const dynamicPaths = [
   "/winning-summary/:mainSlug/winning-comparisons/:comparisonSlug",
 ];
 
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+export default function ProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { loading } = useAuth();
   const pathname = usePathname();
   const rawPath = pathname?.split("?")[0] || "/";
@@ -56,7 +60,20 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
   return (
     <ThemeProvider theme={lightTheme}>
       <CssBaseline />
-      {!isValidPath ? <Error404Page /> : <Layout>{children}</Layout>}
+      {!isValidPath ? (
+        <Error404Page />
+      ) : (
+        <div className="flex min-h-screen">
+          <div className="h-screen sticky top-0">
+            <Sidebar />
+          </div>
+          <div className="flex flex-col flex-grow overflow-hidden">
+            <main className="flex-grow overflow-y-auto px-4 py-8">
+              {children}
+            </main>
+          </div>
+        </div>
+      )}
     </ThemeProvider>
   );
 }

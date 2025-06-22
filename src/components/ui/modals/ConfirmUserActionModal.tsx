@@ -114,7 +114,7 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
                 placeholder="Enter your Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className={`w-full px-4 py-2.5 pr-10 text-sm rounded-md border ${
+                className={`w-full px-4 py-2.5 pr-10 text-sm rounded-md bg-transparent border ${
                   error ? "border-red-500" : "border-gray-600"
                 } bg-[#1F1F1F] placeholder-gray-400 focus:outline-none focus:ring-2 ${
                   error ? "focus:ring-red-500" : "focus:ring-white-200"

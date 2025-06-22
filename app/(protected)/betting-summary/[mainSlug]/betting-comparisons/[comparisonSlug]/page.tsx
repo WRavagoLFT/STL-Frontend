@@ -58,7 +58,7 @@ export default function BettingComparisonSlugPageClient() {
 
   useEffect(() => {
     if (!loading && invalid) {
-      router.replace("/error404");
+      router.replace("/not-found");
     }
   }, [loading, invalid]);
 

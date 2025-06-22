@@ -21,7 +21,7 @@ export const AccessGuard = ({ allowedUserTypes, children }: AccessGuardProps) =>
 
     if (userTypeId === null || !allowedUserTypes.includes(userTypeId)) {
       console.warn("Unauthorized access. Redirecting to error404.");
-      router.replace("/error404");
+      router.replace("/not-found");
     } else {
       setIsAuthorized(true);
     }

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useMemo } from "react";
 import {
   FaSearch,
@@ -14,7 +16,7 @@ import {
   SortableTableCell,
   filterData,
   sortData,
-} from "../../../hooks/sortPaginationSearch";
+} from "../../../utils/sortPaginationSearch";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
 import { User, Operator, SortConfig } from "~/types/types";

@@ -3,7 +3,7 @@ import { ParentRetailReceipt } from "~/components/retail-receipts/ParentRetailRe
 
 export default function Page() {
   return (
-    <AccessGuard allowedUserTypes={[6]}>
+    <AccessGuard allowedUserTypes={[4, 6]}>
       <ParentRetailReceipt />
     </AccessGuard>
   );

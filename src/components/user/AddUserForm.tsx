@@ -8,7 +8,7 @@ import { useFormik } from "formik";
 import { userSchema } from "~/schemas/userSchema";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { generateValidPassword } from "~/hooks/passwordgenerate";
+import { generateValidPassword } from "~/utils/passwordgenerate";
 import Swal from "sweetalert2";
 import { toFormikValidationSchema } from "~/utils/formikHelpers";
 

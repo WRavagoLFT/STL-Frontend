@@ -83,7 +83,7 @@ const ParentComparisonBetting = ({
   ]);
 
   return (
-    <AccessGuard allowedUserTypes={[3, 4, 6]}>
+    <>
       <div className="w-full">
         <div className="flex flex-row items-center">
           <BackIconButton
@@ -342,7 +342,7 @@ const ParentComparisonBetting = ({
           )}
         </div>
       </div>
-    </AccessGuard>
+    </>
   );
 };
 

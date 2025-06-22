@@ -15,7 +15,7 @@ import {
   SortableTableCell,
   filterData,
   sortData,
-} from "../../../hooks/sortPaginationSearch";
+} from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { User, Operator, SortConfig, Device } from "~/types/types";
 import { getUserStatus } from "~/hooks/dashboarddata";
@@ -225,7 +225,7 @@ const DetailedTable = function <T extends User | Operator | Device>({
         </div>
         {currentUserType !== 3 && pageType && (
           <button
-            className="bg-[#0038A8] hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm"
+            className="bg-[#0038A8] hover:bg-blue-700 text-white rounded-lg px-7 py-2 text-[0.8rem]"
             onClick={onAddClick}
           >
             Add{" "}

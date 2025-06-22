@@ -31,7 +31,6 @@ const GenericCSVExportButton: React.FC<GenericExportButtonProps> = ({
 
     const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
 
-    // Merge the title and generated date rows
     worksheet["!merges"] = [
       { s: { r: 0, c: 0 }, e: { r: 0, c: headers.length - 1 } },
       { s: { r: 1, c: 0 }, e: { r: 1, c: headers.length - 1 } }

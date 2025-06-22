@@ -8,7 +8,7 @@ type AddGameCombinationModalProps = {
   onClose: () => void;
   onSubmit: (data: GameCombination) => void;
   gameCategoryMap: Map<string, string>;
-  gameScheduleOptions: { value: number; label: string; }[]; // Change from 'number | undefined' to 'string'
+  gameScheduleOptions: { value: number; label: string; }[];
   gameTypes: {
     GameTypeId: number;
     GameType: string;

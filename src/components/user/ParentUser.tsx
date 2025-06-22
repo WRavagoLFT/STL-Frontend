@@ -16,7 +16,9 @@ import { addUser, suspendUser, editLogUser } from "~/utils/api/users";
 import type { User } from "~/types/types";
 import Swal from "sweetalert2";
 
-const ChartsDataPage = React.lazy(() => import("~/components/ui/charts/UserChartsData"));
+const ChartsDataPage = React.lazy(
+  () => import("~/components/ui/charts/UserChartsData")
+);
 const CardsPage = React.lazy(() => import("~/components/user/CardsData"));
 
 interface UsersPageProps {
@@ -26,7 +28,13 @@ interface UsersPageProps {
     roleId: number;
     permittedUserTypes: number[];
   };
-  roleKey: "kubrador" | "kabo" | "manager" | "executive" | "operator" | "Device Information";
+  roleKey:
+    | "kubrador"
+    | "kabo"
+    | "manager"
+    | "executive"
+    | "operator"
+    | "Device Information";
 }
 
 export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
@@ -45,7 +53,15 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
 
   useEffect(() => {
     if (!roleConfig || !roleKey) return;
-    loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading);
+    loadUsers(
+      roleConfig,
+      roleKey,
+      setData,
+      setKaboMap,
+      setOperatorMap,
+      setPscoBranchMap,
+      setLoading
+    );
   }, [roleConfig, roleKey]);
 
   const { roleId, label, textlabel } = roleConfig;
@@ -69,14 +85,31 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
     try {
       const result = await addUser(data);
       if (result.success) {
-        await loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading);
-        Swal.fire({ icon: "success", title: "User added", timer: 2000, showConfirmButton: false });
+        await loadUsers(
+          roleConfig,
+          roleKey,
+          setData,
+          setKaboMap,
+          setOperatorMap,
+          setPscoBranchMap,
+          setLoading
+        );
+        Swal.fire({
+          icon: "success",
+          title: "User added",
+          timer: 2000,
+          showConfirmButton: false,
+        });
         setIsCreateModalOpen(false);
       } else {
         Swal.fire({ icon: "error", title: "Add Failed", text: result.message });
       }
     } catch (err: any) {
-      Swal.fire({ icon: "error", title: "Unexpected Error", text: err?.message || "An error occurred." });
+      Swal.fire({
+        icon: "error",
+        title: "Unexpected Error",
+        text: err?.message || "An error occurred.",
+      });
     }
   };
 
@@ -85,20 +118,50 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
       if (!data.UserId) throw new Error("Missing UserId");
       const result = await suspendUser(data.UserId, data.remarks);
       if (result.success) {
-        await loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading);
-        Swal.fire({ icon: "success", title: "User suspended", timer: 2000, showConfirmButton: false });
+        await loadUsers(
+          roleConfig,
+          roleKey,
+          setData,
+          setKaboMap,
+          setOperatorMap,
+          setPscoBranchMap,
+          setLoading
+        );
+        Swal.fire({
+          icon: "success",
+          title: "User suspended",
+          timer: 2000,
+          showConfirmButton: false,
+        });
       } else {
-        Swal.fire({ icon: "error", title: "Suspend Failed", text: result.message });
+        Swal.fire({
+          icon: "error",
+          title: "Suspend Failed",
+          text: result.message,
+        });
       }
     } catch (err: any) {
-      Swal.fire({ icon: "error", title: "Unexpected Error", text: err?.message || "An error occurred." });
+      Swal.fire({
+        icon: "error",
+        title: "Unexpected Error",
+        text: err?.message || "An error occurred.",
+      });
     }
   };
 
   const handleUpdate = async (formData: User) => {
     await handleUpdateUser(
       formData,
-      () => loadUsers(roleConfig, roleKey, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading),
+      () =>
+        loadUsers(
+          roleConfig,
+          roleKey,
+          setData,
+          setKaboMap,
+          setOperatorMap,
+          setPscoBranchMap,
+          setLoading
+        ),
       () => setIsCreateModalOpen(false)
     );
   };
@@ -109,13 +172,14 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
     <Suspense fallback={<UsersSkeletonPage />}>
       <div className="mx-auto px-0 py-8 md:py-0">
         <h1 className="text-3xl font-bold mb-3">{label}</h1>
-
-        <CardsPage dashboardData={data} roleLabel={label} textlabel={textlabel} />
-
+        <CardsPage
+          dashboardData={data}
+          roleLabel={label}
+          textlabel={textlabel}
+        />
         {currentUserType !== 3 && (
           <ChartsDataPage pageType={roleKey} dashboardData={data} />
         )}
-
         <DetailedTable<User>
           data={data}
           columns={userTableColumns(roleId)}
@@ -128,7 +192,6 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
           onUpdateClick={openUpdateModal}
           onSubmit={handleSuspendUser}
         />
-
         <AddUserModal
           open={isCreateModalOpen}
           onClose={closeCreateModal}
@@ -138,7 +201,6 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
           pcsoBranchMap={pcsoBranchMap}
           kaboMap={kaboMap}
         />
-
         {isUpdateModalOpen && selectedUser && (
           <UpdateUserModal
             open={isUpdateModalOpen}
@@ -150,7 +212,6 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
             onViewEditLogs={() => openEditLogModal(selectedUser)}
           />
         )}
-
         {showEditLog && selectedUser && (
           <EditModalPage
             open={showEditLog}

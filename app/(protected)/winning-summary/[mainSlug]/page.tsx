@@ -67,7 +67,7 @@ export default function WinningSummarySlugPage() {
 
   useEffect(() => {
     if (!loading && invalid) {
-      router.replace("/auth/error404");
+      router.replace("/not-found");
     }
   }, [loading, invalid, router]);
 

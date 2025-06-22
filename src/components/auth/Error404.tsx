@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 const Error404Page = () => {
   const router = useRouter();
   const currentUserType = useAuthStore((state) => state.userTypeId);
-  console.log('CURRENT USER TYPE', currentUserType);
+  console.log("CURRENT USER TYPE", currentUserType);
 
   const handleRedirect = () => {
     let targetPath = "";
@@ -31,7 +31,7 @@ const Error404Page = () => {
   };
 
   return (
-    <>
+    <div className="bg-[#F8F0E3]">
       <div className="container mx-auto flex items-center gap-4 mt-8">
         <img
           src={LoginSectionData.image2}
@@ -78,7 +78,7 @@ const Error404Page = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

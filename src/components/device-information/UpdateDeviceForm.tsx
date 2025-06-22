@@ -146,7 +146,6 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
   return (
     <form onSubmit={formik.handleSubmit}>
       <div className="grid grid-cols-2 gap-6">
-        {/* Column 1 */}
         <div className="flex flex-col gap-x-6 gap-y-2">
           <div className="text-md font-bold">Device Information</div>
           <div>

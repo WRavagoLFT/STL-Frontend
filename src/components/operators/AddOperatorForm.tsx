@@ -10,7 +10,7 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { operatorSchema } from "~/schemas/operatorSchema";
 import Swal from "sweetalert2";
-import { generateValidPassword } from "~/hooks/passwordgenerate";
+import { generateValidPassword } from "~/utils/passwordgenerate";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface AddOperatorFormProps {

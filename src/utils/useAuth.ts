@@ -12,7 +12,7 @@ export function useAuth() {
   const pathname = usePathname();
 
   const rawPath = pathname?.split("?")[0] || "/";
-  const isErrorPage = rawPath === "/error404";
+  const isErrorPage = rawPath === "/not-found";
 
   const [loading, setLoading] = useState(true);
   const {

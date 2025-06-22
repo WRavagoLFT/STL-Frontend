@@ -79,7 +79,7 @@ export const ParentBettingSummary = ({
   );
 
   return (
-    <AccessGuard allowedUserTypes={[3, 4, 6]}>
+    <>
       {isLoading ? (
         <BettingSummarySkeleton /> 
       ) : (
@@ -111,6 +111,6 @@ export const ParentBettingSummary = ({
           </div>
         </div>
       )}
-    </AccessGuard>
+    </>
   );
 };

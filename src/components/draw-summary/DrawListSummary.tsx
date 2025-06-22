@@ -16,7 +16,6 @@ const DrawListSummaryPage = (data: {
   const today = new Date();
   const [activeMobileTab, setActiveMobileTab] = useState(1);
 
-  // Helper to get values based on draw order
   const getValuesByDrawOrder = (order: number) => {
     switch (order) {
       case 1:

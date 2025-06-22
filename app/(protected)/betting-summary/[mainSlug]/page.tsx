@@ -60,7 +60,7 @@ export default function BettingSummarySlugPage() {
 
   useEffect(() => {
     if (!loading && invalid) {
-      router.replace("/error404");
+      router.replace("/not-found");
     }
   }, [loading, invalid, router]);
 
