@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Operator } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
@@ -40,28 +42,19 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 }) => {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [hasExcludedCity, setHasExcludedCity] = useState(false);
-  const selectedAreaId = Number(formData.areaOfOperations); // ensure it's a number
+  const selectedAreaId = Number(formData.areaOfOperations);
   const showRegionsAndProvinces = selectedAreaId === 1 || selectedAreaId === 2;
   const showCities = selectedAreaId !== 1;
   const showExcluded = selectedAreaId !== 2;
   const [showPassword, setShowPassword] = useState(false);
-
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
 
   const handleModalClose = () => {
-    // Close the confirm modal and the parent AddUserModal
     closeConfirmModal();
     if (onClose) onClose();
   };
-
-  //console.log("GAMETYPES:", gameTypes);
-  //console.log("REGIONS", regions);
-  //console.log("PROVINCES", provinces);
-  //console.log("CITIES", cities);
-  //console.log("AREA OF OPERATORS", areaOfOperations);
 
   const [filteredProvinces, setFilteredProvinces] = useState<OptionType[]>([]);
   const [filteredCities, setFilteredCities] = useState<OptionType[]>([]);
@@ -120,7 +113,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
     formik: FormikProps<any>
   ) => {
     const selectedValues = selectedOptions.map((option) => option.value);
-    const selectedValuesNum = selectedValues.map((v) => Number(v)); // Convert to numbers
+    const selectedValuesNum = selectedValues.map((v) => Number(v));
 
     if (name === "regions") {
       const filteredProvinces = provinces
@@ -203,16 +196,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
         setFormData(submittedData);
         openConfirmModal();
       }
-      // If canceled, do nothing
     },
   });
-
-  useEffect(() => {
-    console.log("Validation Errors:", formik.errors);
-    //console.log("Touched Fields:", formik.touched);
-  }, [formik.errors, formik.touched]);
   
-  // Helpers to display errors
   const getError = (field: string) =>
     formik.touched[field as keyof typeof formik.touched] &&
     formik.errors[field as keyof typeof formik.errors]

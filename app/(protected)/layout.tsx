@@ -11,7 +11,7 @@ import lightTheme from "~/styles/theme";
 const staticPaths = [
   "/dashboard",
   "/operators",
-  "/operators-add",
+  "/operators/operators-add",
   "/retail-receipt",
   "/device-information",
   "/device-information/device-information-add",

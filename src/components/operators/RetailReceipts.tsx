@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import GrossAACSharePage from "../retail-receipts/GrossAACShare";
 import { useRetailReceiptProcessor } from "~/components/retail-receipts/useRetailReceiptProcessor";

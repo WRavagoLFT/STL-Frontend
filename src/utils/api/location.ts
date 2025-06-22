@@ -63,10 +63,10 @@ export const fetchPCSOBranch = async () => {
 // Area of Operations
 export const fetchAreaOfOperations = async () => {
   try {
-    const url = validateRelativeUrl("/operators/getAreaOption");
+    const url = validateRelativeUrl("/operators/getAreaOptions");
     const response = await axiosInstance.get(url);
-    return { success: true, message: "Cities fetched", data: response.data?.data || [] };
+    return { success: true, message: "Area of operations fetched", data: response.data?.data || [] };
   } catch (error) {
-    return handleError("fetchCities", error);
+    return handleError("fetchAreaOfOperations", error);
   }
 };

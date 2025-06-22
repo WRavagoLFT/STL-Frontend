@@ -9,7 +9,8 @@ const TopBettingRegionPage = dynamic(() => import("./TopBettingRegion"), {ssr: f
 const TopWinningRegionPage = dynamic(() => import("./TopWinningRegion"), {ssr: false, loading: () => <DashboardSkeletonPage />});
 const SummaryBettorsBetsPlacedPage = dynamic(() => import("./SummaryBettorsBetsPlaced"),{ ssr: false, loading: () => <DashboardSkeletonPage /> });
 const SummaryWinnersDrawTimePage = dynamic(() => import("./SummaryWinnersDrawTime"),{ ssr: false, loading: () => <DashboardSkeletonPage /> });
-const Dashboard = () => {
+
+export const ParentDashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,5 +48,3 @@ const Dashboard = () => {
     </>
   );
 };
-
-export default Dashboard;

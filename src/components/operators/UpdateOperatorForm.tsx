@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 import useUpdateModalState from "../../store/useUpdateModalStore";
@@ -76,7 +78,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
     setShowEditButton(false);
   };
 
-  // console.log("hihihh", areaofoperations);
+  //console.log("hihihh", areaofoperations);
   //console.log("SELECTED USERRR:", selectedUser);
   //console.log("initialUserData:", initialUserOperatorData);
   //console.log("provinces:", provinces);
