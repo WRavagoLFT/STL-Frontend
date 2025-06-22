@@ -1,10 +1,12 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
 import { FaArrowLeft } from "react-icons/fa";
 import { LoginSectionData } from "../../data/LoginSectionData";
 import { useAuthStore } from "../../store/useForgetAuthStore";
 import { forgetPassEmail, verifyOtp } from "~/utils/api/auth";
 import ActivityIndicator from "./ActivityIndicator";
+import { useRouter } from "next/navigation";
 
 const EmailVerification = () => {
   const router = useRouter();

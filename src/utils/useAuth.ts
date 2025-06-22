@@ -1,8 +1,11 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
 import { getCurrentUser } from "~/utils/api/auth";
-import axios from "axios";
+import { useRouter, usePathname } from "next/navigation";
+import { User } from "~/types/types";
+import axiosInstance from "./axiosInstance";
 
 const aliasMap: Record<string, string> = {
   "/dashboard": "/Protected/dashboard",
@@ -19,7 +22,7 @@ const aliasMap: Record<string, string> = {
   "/draw-summary": "/Protected/draw-summary",
   "/draw-selected": "/Protected/draw-selected",
   "/operators-view": "/Protected/operators-view",
-  "/error404": "/auth/error404",
+  "/error404": "/error404",
 };
 
 const excludedPaths = [
@@ -33,11 +36,13 @@ const excludedPaths = [
 
 export function useAuth() {
   const router = useRouter();
-  const rawPath = router.asPath.split("?")[0];
+  const pathname = usePathname();
+
+  const rawPath = pathname?.split("?")[0] || "/";
   const normalizedPath = aliasMap[rawPath] || rawPath;
 
   const isExcludedPath = excludedPaths.includes(normalizedPath);
-  const isErrorPage = normalizedPath === "/auth/error404";
+  const isErrorPage = normalizedPath === "/error404";
 
   const [loading, setLoading] = useState(true);
   const {
@@ -49,17 +54,40 @@ export function useAuth() {
     setUserValidated,
   } = useAuthStore();
 
+  const fetchForceToken = async () => {
+    try {
+      const res = await axiosInstance.post("/auth/tokenRefresh", {}, {
+        withCredentials: true,
+      });
+
+      console.log("[fetchForceToken] Token refreshed:", res.data);
+      return res.data;
+    } catch (err) {
+      console.error("[fetchForceToken] Failed to refresh token:", err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
-    const forceTokenRefresh = async () => {
+    const fetchCurrentUser = async () => {
       try {
-        const refresh = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_URL}/auth/tokenRefresh`,
-          {},
-          { withCredentials: true }
-        );
-        console.log("Token refresh success:", refresh.data);
+        await fetchForceToken(); 
+        const res = await getCurrentUser();
+
+      if (res?.success && res.data && res.data.UserTypeId !== undefined) {
+        setUser(res.data as User);
+        setUserTypeId(res.data.UserTypeId);
+      } else {
+        clearUser();
+        if (!isErrorPage) router.replace("/");
+      }
       } catch (err) {
-        console.error("Token refresh failed:", err);
+        console.error("Error fetching user:", err);
+        clearUser();
+        if (!isErrorPage) router.replace("/");
+      } finally {
+        setUserValidated(true);
+        setLoading(false);
       }
     };
 
@@ -69,37 +97,13 @@ export function useAuth() {
       return;
     }
 
-    const run = async () => {
-      //await forceTokenRefresh();
-
-      if (user && userValidated) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const res = await getCurrentUser();
-
-        if (res?.success && res.data) {
-          setUser(res.data);
-          setUserTypeId(res.data.UserTypeId);
-        } else {
-          clearUser();
-          router.replace("/auth/login");
-        }
-      } catch (err) {
-        clearUser();
-        if (!isErrorPage) {
-          router.replace("/auth/login");
-        }
-      } finally {
-        setUserValidated(true);
-        setLoading(false);
-      }
-    };
-
-    run();
-  }, [isExcludedPath, isErrorPage, user, userValidated]);
+    // Only run if user is not validated
+    if (!userValidated) {
+      fetchCurrentUser();
+    } else {
+      setLoading(false);
+    }
+  }, [isExcludedPath, isErrorPage, userValidated]);
 
   return { loading };
 }

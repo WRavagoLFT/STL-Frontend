@@ -1,4 +1,6 @@
-import React, { ReactNode, useEffect } from "react";
+"use client";
+
+import React, { ReactNode } from "react";
 import ExtIconButton from "../icons/ExitButton";
 
 interface ModalWrapperProps {

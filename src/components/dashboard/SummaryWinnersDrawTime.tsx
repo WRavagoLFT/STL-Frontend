@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";

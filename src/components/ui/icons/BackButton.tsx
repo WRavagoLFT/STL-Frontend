@@ -1,5 +1,7 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import React from "react";
-import { useRouter } from "next/router";
 import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
 
 interface BackIconButtonProps {

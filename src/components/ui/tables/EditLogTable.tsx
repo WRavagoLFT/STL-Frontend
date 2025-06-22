@@ -2,6 +2,8 @@
 // components as they have different data structures and requirements.
 // they are not meant to be used interchangeably or be reusable, hence the separation.
 
+"use client";
+
 import React, { useMemo, useState } from "react";
 import {
   Table,

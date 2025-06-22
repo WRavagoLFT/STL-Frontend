@@ -337,6 +337,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
         <ConfirmUserActionModalPage
           open={isConfirmModalOpen}
           onClose={handleModalClose}
+          mode="add"
           onConfirm={async () => {
             try {
               const dataToSubmit = {

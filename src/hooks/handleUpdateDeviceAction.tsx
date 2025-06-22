@@ -1,12 +1,12 @@
 import { Device } from "~/types/types";
 import { updateDevice } from "~/utils/api/device";
 import Swal from "sweetalert2";
-import { NextRouter } from "next/router";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export const handleUpdateDevice = async (
   data: Device,
   loadData: () => Promise<void>,
-  router: NextRouter,
+  router: AppRouterInstance,
   redirectPath: string,
 ): Promise<void> => {
   //console.log("[handleUpdateDevice] - Submitting Device Data:", data);

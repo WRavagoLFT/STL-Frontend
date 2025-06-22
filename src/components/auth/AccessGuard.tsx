@@ -1,5 +1,7 @@
+"use client";
+
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
 import { useAuth } from "~/utils/useAuth";
 
@@ -19,7 +21,7 @@ export const AccessGuard = ({ allowedUserTypes, children }: AccessGuardProps) =>
 
     if (userTypeId === null || !allowedUserTypes.includes(userTypeId)) {
       console.warn("Unauthorized access. Redirecting to error404.");
-      router.replace("/auth/error404");
+      router.replace("/error404");
     } else {
       setIsAuthorized(true);
     }

@@ -1,7 +1,9 @@
+"use client";
+
 import React from "react";
-import { useRouter } from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
 import { LoginSectionData } from "~/data/LoginSectionData";
+import { useRouter } from "next/navigation";
 
 const Error404Page = () => {
   const router = useRouter();
@@ -21,7 +23,7 @@ const Error404Page = () => {
         targetPath = "/draw-summary";
         break;
       default:
-        targetPath = "/auth/login";
+        targetPath = "/";
         break;
     }
 

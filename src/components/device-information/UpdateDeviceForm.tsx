@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Device } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
@@ -7,9 +9,9 @@ import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import dayjs from "dayjs";
-import { getUsageNotes } from "~/pages/Protected/device-information/device-information-view";
 import { updateDeviceSchema } from "~/schemas/deviceSchema";
 import { useAuthStore } from "~/store/useAuthStore";
+import { getUsageNotes } from "../../../app/(protected)/device-information/device-information-view";
 
 interface UpdateDeviceFormProps {
   title?: string;

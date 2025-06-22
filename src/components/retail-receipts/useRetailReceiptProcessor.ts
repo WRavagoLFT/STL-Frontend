@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Share } from "~/types/types";
 import { calculateNetIncome, processShares } from "./calculateShareTotals";

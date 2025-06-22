@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { verifyPass } from "~/utils/api/auth";

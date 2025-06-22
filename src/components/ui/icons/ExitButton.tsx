@@ -1,7 +1,7 @@
 import React from "react";
-import { useRouter } from "next/router";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { useRouter } from "next/navigation";
 
 interface ExtIconButtonProps {
   to?: string;

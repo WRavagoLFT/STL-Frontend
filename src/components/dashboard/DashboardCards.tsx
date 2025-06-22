@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { fetchHistoricalSummary } from "../../utils/api/transactions";
 import { fetchWinners } from "../../utils/api/winners"; // <-- import it

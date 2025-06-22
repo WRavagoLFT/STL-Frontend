@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Device } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
@@ -6,8 +8,8 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
-import { getUsageNotes } from "~/pages/Protected/device-information/device-information-view";
 import { addDeviceSchema } from "~/schemas/deviceSchema";
+import { getUsageNotes } from "../../../app/(protected)/device-information/device-information-view";
 
 interface AddDeviceFormProps {
   title?: string;

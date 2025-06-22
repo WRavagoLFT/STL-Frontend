@@ -1,9 +1,11 @@
+"use client";
+
 import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useRouter } from "next/router";
 import { LoginSectionData } from "../../data/LoginSectionData";
 import { loginUser } from "../../utils/api/login";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),

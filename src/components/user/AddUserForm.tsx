@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Branch, Operator, User } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
