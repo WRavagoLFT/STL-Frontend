@@ -1,7 +1,5 @@
 import * as XLSX from "xlsx";
 import { useRetailReceiptProcessor } from "~/components/retail-receipts/useRetailReceiptProcessor";
-import { Button } from "@mui/material";
-import { buttonStylesretail } from "~/styles/theme";
 
 export interface ExportRetailDataToExcelProps {
   receiptData: any;

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { GameCombination } from "~/types/types";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import ParentComparisonBetting from "~/components/betting-summary/ParentComparison";
+import ParentComparisonBetting from "~/components/betting-summary/ParentBettingComparison";
 
 const slugify = (text: string) =>
   text
@@ -30,7 +30,7 @@ export default function BettingComparisonSlugPageClient() {
   useEffect(() => {
     const fetchCategory = async () => {
       const result = await fetchGameCategories();
-      console.log("🟡 [Client] Game Categories:", result);
+      //console.log("[Client] Game Categories:", result);
 
       if (result.success && Array.isArray(result.data)) {
         const normalizedSlug = normalize(comparisonSlug);
@@ -46,7 +46,7 @@ export default function BettingComparisonSlugPageClient() {
           setInvalid(true);
         }
       } else {
-        console.warn("⚠️ Failed to fetch categories on client.");
+        console.warn("Failed to fetch categories on client.");
         setInvalid(true);
       }
 

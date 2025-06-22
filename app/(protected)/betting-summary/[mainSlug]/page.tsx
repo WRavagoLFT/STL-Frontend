@@ -35,7 +35,6 @@ export default function BettingSummarySlugPage() {
 
     setLoading(true);
     const result = await fetchGameCategories();
-    console.log("GAME CATEGORIES Result:", result); // dito okay naman
 
     if (result.success && Array.isArray(result.data)) {
       const normalizedSlug = normalizeSlug(mainSlug);
