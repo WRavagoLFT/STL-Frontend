@@ -1,12 +1,13 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useParams } from "next/navigation";
 import { Device } from "~/types/types";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { fetchDeviceById } from "~/utils/api/device";
-import DevicesViewPage from ".";
+import { DevicesViewPage } from "~/components/device-information/ParentDeviceView";
 
-// Exportable fetch logic
-export const fetchAndSetDevice = async (
+const fetchAndSetDevice = async (
   slug: string,
   setDevice: (d: Device | null) => void,
   setLoading: (l: boolean) => void
@@ -45,8 +46,7 @@ export const fetchAndSetDevice = async (
 };
 
 const DeviceSlugPage = () => {
-  const router = useRouter();
-  const { slug } = router.query;
+  const { slug } = useParams();
   const [device, setDevice] = useState<Device | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -67,8 +67,6 @@ const DeviceSlugPage = () => {
   if (!device) {
     return <p className="text-center text-red-500">No device found.</p>;
   }
-
-  //console.log('DEVICE IN SLUG', device);
 
   return (
     <AccessGuard allowedUserTypes={[5]}>

@@ -19,8 +19,7 @@ import { handleAddDevice } from "~/hooks/handleAddDeviceAction";
 import { handleUpdateDevice } from "~/hooks/handleUpdateDeviceAction";
 import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
 import { useRouter } from "next/navigation";
-import { useLoadDevices } from "../../../app/(protected)/device-information";
-import { fetchAndSetDevice } from "../../../app/(protected)/device-information/device-information-view/[slug]";
+import { useLoadDevices } from "../device-information/ParentDevice";
 
 type UsersViewPageProps = {
   user?: User;
@@ -305,3 +304,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
 };
 
 export default UsersViewPage;
+function fetchAndSetDevice(slugString: string, setDevice: React.Dispatch<React.SetStateAction<Device | null>>, setLoading: React.Dispatch<React.SetStateAction<boolean>>) {
+  throw new Error("Function not implemented.");
+}
+

@@ -11,7 +11,7 @@ import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import dayjs from "dayjs";
 import { updateDeviceSchema } from "~/schemas/deviceSchema";
 import { useAuthStore } from "~/store/useAuthStore";
-import { getUsageNotes } from "../../../app/(protected)/device-information/device-information-view";
+import { getUsageNotes } from "./ParentDeviceView";
 
 interface UpdateDeviceFormProps {
   title?: string;

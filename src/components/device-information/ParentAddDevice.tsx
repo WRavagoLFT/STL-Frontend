@@ -1,10 +1,12 @@
+"use client";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import AddDeviceForm from "~/components/device-information/AddDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { Device } from "~/types/types";
-import { useLoadDevices } from "..";
 import { handleAddDevice } from "~/hooks/handleAddDeviceAction";
+import { useLoadDevices } from "./ParentDevice";
 
 export default function AddDevicePage() {
   const [devices, setDevices] = useState<Device[]>([]);

@@ -1,6 +1,13 @@
-import router from "next/router";
-import React, { useState, useEffect, useCallback, useMemo, Suspense } from "react";
-import { AccessGuard } from "~/components/auth/AccessGuard";
+"use client";
+
+import router, { useRouter } from "next/navigation";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  Suspense,
+} from "react";
 import Card from "~/components/ui/dashboardcards/Cards";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
@@ -56,10 +63,11 @@ export const useLoadDevices = (
     }
   }, [setLoading, setError, setDevices, setDeviceInfoData]);
 
-const DeviceInformationPage = () => {
+export const ParentDevicePage = () => {
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const [deviceInfoData, setDeviceInfoData] = useState<{
     TotalDevices: number;
@@ -112,7 +120,7 @@ const DeviceInformationPage = () => {
   }, [loadData]);
 
   return (
-    <AccessGuard allowedUserTypes={[5]}>
+    <>
       {loading ? (
         <UsersSkeletonPage />
       ) : (
@@ -138,8 +146,6 @@ const DeviceInformationPage = () => {
           </div>
         </Suspense>
       )}
-    </AccessGuard>
+    </>
   );
 };
-
-export default DeviceInformationPage;

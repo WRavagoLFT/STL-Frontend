@@ -5,12 +5,12 @@ import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { Device } from "~/types/types";
 import { editLogDevice, fetchUsageNotes } from "~/utils/api/device";
-import { useLoadDevices } from "..";
 import { useRouter } from "next/navigation";
 import { deviceEditColumns } from "~/config/deviceEditLogTableColumns";
 import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
 import Input from "~/components/ui/inputs/TextInputs";
 import { handleUpdateDevice } from "~/hooks/handleUpdateDeviceAction";
+import { useLoadDevices } from "~/components/device-information/ParentDevice";
 
 type DevicesViewPageProps = {
   slug: string;
@@ -25,7 +25,7 @@ export const getUsageNotes = async (setUsageNotes: (data: any[]) => void) => {
   }
 };
 
-const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
+export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
   const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">(
     "kabo"
   );
@@ -201,5 +201,3 @@ const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }) => {
     </div>
   );
 };
-
-export default DevicesViewPage;
