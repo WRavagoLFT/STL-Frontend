@@ -1,12 +1,13 @@
 "use client";
 
 import { useAuth } from "~/utils/useAuth";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ThemeProvider, CssBaseline, CircularProgress } from "@mui/material";
 import { match } from "path-to-regexp";
 import lightTheme from "~/styles/theme";
-import Error404Page from "~/components/auth/Error404";
 import Sidebar from "~/components/layout/Sidebar";
+import { useEffect, useState } from "react";
+import { AccessGuard } from "~/components/auth/AccessGuard";
 
 const staticPaths = [
   "/dashboard",
@@ -36,33 +37,10 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { loading } = useAuth();
-  const pathname = usePathname();
-  const rawPath = pathname?.split("?")[0] || "/";
-
-  const isDynamicMatch = dynamicPaths.some((pattern) =>
-    match(pattern, { decode: decodeURIComponent })(rawPath)
-  );
-  const isStaticMatch = staticPaths.includes(rawPath);
-  const isValidPath = isStaticMatch || isDynamicMatch;
-
-  if (loading) {
-    return (
-      <ThemeProvider theme={lightTheme}>
-        <CssBaseline />
-        <div className="flex justify-center items-center h-screen">
-          <CircularProgress />
-        </div>
-      </ThemeProvider>
-    );
-  }
-
   return (
     <ThemeProvider theme={lightTheme}>
       <CssBaseline />
-      {!isValidPath ? (
-        <Error404Page />
-      ) : (
+      <AccessGuard allowedUserTypes={[3, 4, 5, 6]}>
         <div className="flex min-h-screen">
           <div className="h-screen sticky top-0">
             <Sidebar />
@@ -73,7 +51,7 @@ export default function ProtectedLayout({
             </main>
           </div>
         </div>
-      )}
+      </AccessGuard>
     </ThemeProvider>
   );
 }

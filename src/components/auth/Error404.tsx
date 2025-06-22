@@ -7,13 +7,15 @@ import { useRouter } from "next/navigation";
 
 const Error404Page = () => {
   const router = useRouter();
-  const currentUserType = useAuthStore((state) => state.userTypeId);
-  console.log("CURRENT USER TYPE", currentUserType);
+
+  // Use selector to access just what you need
+  const userTypeId = useAuthStore((state) => state.user?.UserTypeId ?? null);
+  console.log('USERTYPE ID', userTypeId);
 
   const handleRedirect = () => {
-    let targetPath = "";
+    let targetPath = "/";
 
-    switch (currentUserType) {
+    switch (userTypeId) {
       case 3:
       case 4:
       case 6:
@@ -31,8 +33,9 @@ const Error404Page = () => {
   };
 
   return (
-    <div className="bg-[#F8F0E3]">
-      <div className="container mx-auto flex items-center gap-4 mt-8">
+    <div className="bg-[#F8F0E3] min-h-screen">
+      {/* Header with Logo */}
+      <div className="container mx-auto flex items-center gap-4 pt-8 px-4">
         <img
           src={LoginSectionData.image2}
           alt="PCSO Logo"
@@ -47,10 +50,10 @@ const Error404Page = () => {
         </div>
       </div>
 
-      <div className="mt-40">
-        <div className="flex justify-center items-center">
+      {/* Error Message */}
+      <div className="flex justify-center items-center py-32 px-4">
           <div className="text-center">
-            <div className="font-bold text-5xl">
+            <div className="font-bold text-5xl text-blue-800">
               Oops! The page you’re <br />
               looking for doesn’t exist.
             </div>
@@ -73,10 +76,9 @@ const Error404Page = () => {
                 ease-in-out
               `}
             >
-              {currentUserType ? "Return to Home Page" : "Return to Login Page"}
+              {userTypeId ? "Return to Home Page" : "Return to Login Page"}
             </button>
           </div>
-        </div>
       </div>
     </div>
   );

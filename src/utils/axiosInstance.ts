@@ -54,10 +54,9 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    // Handle 401 Unauthorized by redirecting to "/"
     if (status === 401) {
       console.warn("Unauthorized: redirecting to home.");
-      window.location.href = "/";
+      window.location.href = "/not-found";
       return Promise.reject(error);
     }
 

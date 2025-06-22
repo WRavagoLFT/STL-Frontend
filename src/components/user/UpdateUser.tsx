@@ -30,17 +30,17 @@ export default function UpdateUserModal({
 
   return (
     <ModalWrapper
-      isOpen={open ?? false} // fallback to false if undefined
-      onClose={onClose ?? (() => {})} // fallback to no-op function if undefined
+      isOpen={open ?? false}
+      onClose={onClose ?? (() => {})}
       title={title}
     >
       <UpdateUserForm
-        operatorMap={operatorMap ?? {}} // fallback to empty object
+        operatorMap={operatorMap ?? {}}
         onSubmit={onSubmit}
         userTypeId={userTypeId}
         selectedUser={selectedUser}
         onViewEditLogs={onViewEditLogs}
-        onClose={onClose ?? (() => {})} // same fallback here
+        onClose={onClose ?? (() => {})}
       />
     </ModalWrapper>
   );

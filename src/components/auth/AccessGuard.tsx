@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuthStore } from "~/store/useAuthStore";
 import { useAuth } from "~/utils/useAuth";
+import { useSideBarStore } from "~/store/useSideBarStore";
 
 interface AccessGuardProps {
   allowedUserTypes: number[];
@@ -12,15 +13,15 @@ interface AccessGuardProps {
 
 export const AccessGuard = ({ allowedUserTypes, children }: AccessGuardProps) => {
   const { userTypeId } = useAuthStore();
-  const { loading } = useAuth(); // ensures auth check has completed
+  const { loading } = useAuth();
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    if (loading) return; // don’t check anything until auth check is done
+    if (loading) return;
 
     if (userTypeId === null || !allowedUserTypes.includes(userTypeId)) {
-      console.warn("Unauthorized access. Redirecting to error404.");
+      useSideBarStore.getState().reset();
       router.replace("/not-found");
     } else {
       setIsAuthorized(true);
