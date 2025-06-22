@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import WinningSummaryPage from "../page"; // Adjust if located elsewhere
+import { ParentWinningSummaryPage } from "~/components/winning-summary/ParentWinningSummary";
 
 // Normalize slug: "STL Swer 2" -> "stlswer2"
 const normalizeSlug = (text: string) =>
@@ -23,9 +23,10 @@ interface PageProps {
   };
 }
 
-export default function WinningSummarySlugPage({ params }: PageProps) {
+export default function WinningSummarySlugPage() {
   const router = useRouter();
-  const { mainSlug } = params;
+  const params = useParams();
+  const mainSlug = params?.mainSlug as string;
 
   const [category, setCategory] = useState<{
     GameCategoryId: number;
@@ -53,7 +54,7 @@ export default function WinningSummarySlugPage({ params }: PageProps) {
       if (matched) {
         setCategory(matched);
       } else if (mainSlug !== "dashboard") {
-        setInvalid(true); // Allow dashboard as valid
+        setInvalid(true);
       }
     }
 
@@ -78,7 +79,7 @@ export default function WinningSummarySlugPage({ params }: PageProps) {
 
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
-      <WinningSummaryPage
+      <ParentWinningSummaryPage
         gameCategoryId={category?.GameCategoryId || 0}
         slug={mainSlug ?? ""}
       />

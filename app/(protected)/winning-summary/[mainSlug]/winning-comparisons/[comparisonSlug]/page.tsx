@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import WinningComparisonPage from "./page";
+import { WinningComparisonPage } from "~/components/winning-summary/WinningComparison";
+import { useParams } from "next/navigation";
 
 interface PageProps {
   params: {
@@ -25,7 +26,10 @@ const slugify = (text: string) => {
 };
 
 export default function WinningComparisonSlugPage({ params }: PageProps) {
-  const { mainSlug, comparisonSlug } = params;
+  const { mainSlug, comparisonSlug } = useParams() as {
+    mainSlug: string;
+    comparisonSlug: string;
+  };  
 
   const [category, setCategory] = useState<{
     GameCategoryId: number;

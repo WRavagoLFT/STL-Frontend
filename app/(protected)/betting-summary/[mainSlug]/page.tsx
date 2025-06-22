@@ -1,12 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import BettingSummaryPage from "../page"; // This should be adjusted if this refers to the index route
-import { useRouter } from "next/navigation";
+import { ParentBettingSummary } from "~/components/betting-summary/ParentBettingSummary";
 
-// Normalize slug: "STL Swer 2" -> "stlswer2"
 const normalizeSlug = (text: string) =>
   text
     .replace(/Swer\s*2/gi, "Swer2")
@@ -17,21 +16,17 @@ const normalizeSlug = (text: string) =>
     .replace(/-/g, "")
     .replace(/[^\w]/g, "");
 
-interface PageProps {
-  params: {
-    mainSlug: string;
-  };
-}
-
-export default function BettingSummarySlugPage({ params }: PageProps) {
+export default function BettingSummarySlugPage() {
   const router = useRouter();
-  const { mainSlug } = params;
+  const params = useParams();
+  const mainSlug = params?.mainSlug as string;
 
   const [category, setCategory] = useState<{
     GameCategoryId: number;
     GameCategory: string;
     Digits: number;
   } | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [invalid, setInvalid] = useState(false);
 
@@ -40,6 +35,7 @@ export default function BettingSummarySlugPage({ params }: PageProps) {
 
     setLoading(true);
     const result = await fetchGameCategories();
+    console.log("GAME CATEGORIES Result:", result); // dito okay naman
 
     if (result.success && Array.isArray(result.data)) {
       const normalizedSlug = normalizeSlug(mainSlug);
@@ -77,7 +73,7 @@ export default function BettingSummarySlugPage({ params }: PageProps) {
 
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
-      <BettingSummaryPage
+      <ParentBettingSummary
         gameCategoryId={category?.GameCategoryId || 0}
         slug={mainSlug ?? ""}
       />

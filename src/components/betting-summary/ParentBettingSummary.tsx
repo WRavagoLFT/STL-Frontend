@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import DashboardCardsPage from "~/components/dashboard/DashboardCards";
@@ -20,7 +22,7 @@ const GAME_TITLES = [
   "STL Swer 4",
 ];
 
-const BettingSummaryPage = ({
+export const ParentBettingSummary = ({
   gameCategoryId = 0,
   slug,
 }: {
@@ -112,5 +114,3 @@ const BettingSummaryPage = ({
     </AccessGuard>
   );
 };
-
-export default BettingSummaryPage;

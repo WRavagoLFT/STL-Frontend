@@ -9,7 +9,7 @@ const SkeletonBlock = ({
 }) => (
   <div
     aria-hidden="true"
-    className={`bg-[#7A7766] rounded-lg animate-pulse ${className}`}
+    className={`bg-gray-200 rounded-lg animate-pulse ${className}`}
     style={{ height }}
   />
 );
@@ -17,7 +17,7 @@ const SkeletonBlock = ({
 const BettingSummarySkeleton: React.FC = () => {
   return (
     <div className="space-y-4 h-full mt-8 md:mt-0 animate-pulse">
-      <div className="h-8 w-[250px] bg-[#7A7766] rounded-lg" />
+      <div className="h-8 w-[250px] bg-gray-200 rounded-lg" />
 
       <div className="flex flex-wrap gap-4">
         {[...Array(5)].map((_, i) => (
@@ -35,7 +35,7 @@ const BettingSummarySkeleton: React.FC = () => {
             <div className="w-full lg:w-2/3 flex flex-col space-y-5">
               <SkeletonBlock height="300px" />
               <SkeletonBlock height="300px" />
-              <div className="self-end h-10 w-[160px] bg-[#7A7766] rounded-lg" />
+              <div className="self-end h-10 w-[160px] bg-gray-200 rounded-lg" />
             </div>
           </div>
           <SkeletonBlock height="400px" />

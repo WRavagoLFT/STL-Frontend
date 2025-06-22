@@ -7,49 +7,50 @@ const validateRelativeUrl = (url: string) => {
   return url;
 };
 
-export const fetchHistoricalSummary = async (filters?: {
-  from?: string;
-  to?: string;
-}) => {
+const handleError = (label: string, error: any) => {
+  const message = error?.response?.data?.message || error?.message || "Unknown error";
+  console.error(`[${label}] Error:`, message);
+  return { success: false, message, data: [] };
+};
+
+// Fetch historical summary
+export const fetchHistoricalSummary = async (filters?: {from?: string; to?: string;}) => {
   try {
     const url = validateRelativeUrl("/transactions/getHistorical");
+    const response = await axiosInstance.get(url, { params: filters });
+    return response.data;
+  } catch (error) {
+    return handleError("fetchHistoricalSummary", error);
+  }
+};
+
+// Fetch historical summary by region
+export const fetchHistoricalRegion = async <T = any>(filters?: { date?: string }): Promise<T> => {
+  try {
+    const url = validateRelativeUrl("/transactions/getHistoricalRegion");
     const response = await axiosInstance.get(url, {
       params: filters,
     });
-
     return response.data;
-  } catch (error) {
-    console.error("Error fetching users:", (error as Error).message);
-    return { success: false, message: (error as Error).message, data: [] };
+  } catch (error: any) {
+    console.error("Error fetching historical region data:");
+    console.error("Status:", error?.response?.status);
+    console.error("Details:", error?.response?.data);
+    throw error;
   }
 };
 
-export const fetchHistoricalRegion = async <T = any>(p0?: { date: string }): Promise<T> => {
-  try {
-    const url = validateRelativeUrl("/transactions/getHistoricalRegion");
-    const response = await axiosInstance.get(url, {});
-
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching historical region data:", (error as Error).message);
-    throw error; 
-  }
-};
-
+// Fetch detailed transactions
 export const fetchTransactions = async (filters?: {
   from?: string;
   to?: string;
 }) => {
   try {
     const url = validateRelativeUrl("/transactions/getTransactions");
-    const response = await axiosInstance.get(url, {
-      params: filters,
-    });
-
+    const response = await axiosInstance.get(url, { params: filters });
     return response.data;
   } catch (error) {
-    console.error("Error fetching users:", (error as Error).message);
-    return { success: false, message: (error as Error).message, data: [] };
+    return handleError("fetchTransactions", error);
   }
 };
 
@@ -75,7 +76,6 @@ export const fetchDrawSummary = async (
   }
 };
 
-// Fetch metrics for Monthly or Yearly depending on params
 export const fetchRetailReceiptsMetrics = async (
   year: number,
   month?: number
@@ -101,7 +101,6 @@ export const fetchRetailReceiptsMetrics = async (
   }
 };
 
-// Fetch retail receipts data for Monthly or Yearly depending on params
 export const fetchRetailReceiptsData = async (
   year: number,
   month?: number,

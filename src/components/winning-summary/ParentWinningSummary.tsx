@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -19,7 +21,7 @@ const GAME_TITLES = [
   "STL Swer 4",
 ];
 
-const WinningSummaryPage = ({
+export const ParentWinningSummaryPage = ({
   gameCategoryId = 0,
   slug,
 }: {
@@ -101,5 +103,3 @@ const WinningSummaryPage = ({
     </AccessGuard>
   );
 };
-
-export default WinningSummaryPage;
