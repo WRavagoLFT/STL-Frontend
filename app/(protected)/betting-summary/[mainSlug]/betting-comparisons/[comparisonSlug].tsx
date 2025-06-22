@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { fetchGameCategories } from "~/utils/api/gamecategories";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import BettingComparisonPage from ".";
+import BettingComparisonPage from "./page";
 
 const BettingComparisonSlug = () => {
   const { query } = useRouter();

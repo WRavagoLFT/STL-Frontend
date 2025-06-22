@@ -1,35 +1,14 @@
-'use client';
+"use client";
 
 import React, { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { AccessGuard } from "~/components/auth/AccessGuard";
 import { DashboardSkeletonPage } from "./DashboardSkeleton";
-
-const DashboardCardsPage = dynamic(() => import("./DashboardCards"), {
-  ssr: false,
-  loading: () => <DashboardSkeletonPage />,
-});
-const DrawResultsPage = dynamic(() => import("./DrawResults"), {
-  ssr: false,
-  loading: () => <DashboardSkeletonPage />,
-});
-const TopBettingRegionPage = dynamic(() => import("./TopBettingRegion"), {
-  ssr: false,
-  loading: () => <DashboardSkeletonPage />,
-});
-const TopWinningRegionPage = dynamic(() => import("./TopWinningRegion"), {
-  ssr: false,
-  loading: () => <DashboardSkeletonPage />,
-});
-const SummaryBettorsBetsPlacedPage = dynamic(
-  () => import("./SummaryBettorsBetsPlaced"),
-  { ssr: false, loading: () => <DashboardSkeletonPage /> }
-);
-const SummaryWinnersDrawTimePage = dynamic(
-  () => import("./SummaryWinnersDrawTime"),
-  { ssr: false, loading: () => <DashboardSkeletonPage /> }
-);
-
+const DashboardCardsPage = dynamic(() => import("./DashboardCards"), {ssr: false, loading: () => <DashboardSkeletonPage />});
+const DrawResultsPage = dynamic(() => import("./DrawResults"), {ssr: false, loading: () => <DashboardSkeletonPage />});
+const TopBettingRegionPage = dynamic(() => import("./TopBettingRegion"), {ssr: false, loading: () => <DashboardSkeletonPage /> });
+const TopWinningRegionPage = dynamic(() => import("./TopWinningRegion"), {ssr: false, loading: () => <DashboardSkeletonPage />});
+const SummaryBettorsBetsPlacedPage = dynamic(() => import("./SummaryBettorsBetsPlaced"),{ ssr: false, loading: () => <DashboardSkeletonPage /> });
+const SummaryWinnersDrawTimePage = dynamic(() => import("./SummaryWinnersDrawTime"),{ ssr: false, loading: () => <DashboardSkeletonPage /> });
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +18,7 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <AccessGuard allowedUserTypes={[3, 4, 6]}>
+    <>
       {loading ? (
         <DashboardSkeletonPage />
       ) : (
@@ -65,7 +44,7 @@ const Dashboard = () => {
           </div>
         </Suspense>
       )}
-    </AccessGuard>
+    </>
   );
 };
 

@@ -37,7 +37,7 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
   const isActive = sortConfig.key === sortKey;
 
   return (
-    <th className="text-left px-2 align-top">
+    <div className="text-left px-2 align-top">
       <div className="w-full min-w-[180px] max-w-[180px]">
         <div
           className="flex items-center gap-1 cursor-pointer select-none"
@@ -80,7 +80,7 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
           </div>
         )}
       </div>
-    </th>
+    </div>
   );
 };
 

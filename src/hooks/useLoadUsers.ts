@@ -17,13 +17,16 @@ export const loadUsers = async (
 
     if (!roleConfig?.roleId || !roleKey) {
       console.warn("Missing roleId or roleKey");
-      setLoading(false);
+      setData([]);
       return;
     }
 
+    let users: User[] = [];
+
     if (roleKey === "kabo") {
-      await fetchUsersByRole(roleConfig.roleId, null, null, setData);
-      setLoading(false);
+      const response = await fetchUsersByRole(roleConfig.roleId, null, null);
+      users = response.success ? response.data : [];
+      setData(users);
       return;
     }
 
@@ -31,23 +34,26 @@ export const loadUsers = async (
       const response = await axiosInstance.get("/users/getUsers?userType=2");
       setKaboMap(response.data);
 
-      await fetchUsersByRole(roleConfig.roleId, null, null, setData);
-      setLoading(false);
+      const result = await fetchUsersByRole(roleConfig.roleId, null, null);
+      users = result.success ? result.data : [];
+      setData(users);
       return;
     }
 
-    const operatorMap = await fetchOperatorMap();
-    setOperatorMap(operatorMap);
+    const operatorRes = await fetchOperatorMap();
+    setOperatorMap(operatorRes.data);
 
     const pcsoBranchMap = await fetchPCSOBranch();
     setPscoBranchMap(pcsoBranchMap);
 
-    await fetchUsersByRole(
+    const result = await fetchUsersByRole(
       roleConfig.roleId,
-      operatorMap,
-      pcsoBranchMap,
-      setData
+      operatorRes.data,
+      pcsoBranchMap
     );
+
+    users = result.success ? result.data : [];
+    setData(users);
   } catch (error) {
     console.error("Error in loadUsers:", (error as Error).message);
     setData([]);
@@ -55,3 +61,4 @@ export const loadUsers = async (
     setLoading(false);
   }
 };
+

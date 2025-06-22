@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Branch, Operator, User } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
@@ -167,19 +167,13 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
       openConfirmModal();
     },
   });
-
-  useEffect(() => {
-    console.log("Validation Errors:", formik.errors);
-    //console.log("Touched Fields:", formik.touched);
-  }, [formik.errors, formik.touched]);
   
-  // Helpers to display errors
   const getError = (field: string) => {
     const error = formik.errors[field as keyof typeof formik.errors];
     const touched = formik.touched[field as keyof typeof formik.touched];
     
     if (touched && error && typeof error === "string") {
-      return error.split("|")[0].trim();  // show only the first error message
+      return error.split("|")[0].trim();
     }
     
     return null;
