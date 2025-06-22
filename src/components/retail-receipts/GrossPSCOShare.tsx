@@ -1,4 +1,3 @@
-// GrossPCSOShare.tsx
 import React, { useState } from "react";
 import { ShareBreakdownPageProps } from "~/types/interfaces";
 
@@ -16,12 +15,11 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
 
   return (
     <div className="flex flex-col">
-      <div className="mb-2">
+      <div className="mb-3">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 md:grid-cols-2 items-center gap-2 text-left"
+          className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 lg:grid-cols-2 items-center gap-2 text-left"
           aria-expanded={isOpen}
-          aria-controls="share-breakdown-content"
         >
           <div className="flex flex-col">
             <div className="flex justify-between items-center">
@@ -33,8 +31,6 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
             <span className="text-sm font-medium hidden md:block">
               {totalPercentage.toFixed(3)}%
             </span>
-
-            {/* Mobile: Show amount below */}
             <span className="text-lg font-bold md:hidden mt-1">
               ₱{" "}
               {totalShareAmount.toLocaleString(undefined, {
@@ -43,9 +39,7 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
               })}
             </span>
           </div>
-
-          {/* Desktop: Show amount on the right */}
-          <div className="hidden md:flex justify-center md:justify-end text-base font-semibold">
+          <div className="hidden md:flex  lg:justify-end text-base font-semibold">
             ₱{" "}
             {totalShareAmount.toLocaleString(undefined, {
               minimumFractionDigits: 3,
@@ -56,7 +50,6 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
 
         {!isOpen && (
           <div
-            id="share-breakdown-content"
             className="bg-transparent border border-[#0038A8] p-2 rounded-md mt-3"
           >
             <span className="text-sm font-bold">{title} Details</span>
@@ -65,11 +58,9 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
               breakdownToShow.map((item, index) => (
                 <div
                   key={index}
-                  className="mt-2 grid grid-cols-1 md:grid-cols-2 items-center md:gap-2"
+                  className="mt-2 grid grid-cols-1 lg:grid-cols-2 items-center md:gap-2"
                 >
-                  {/* Left side: Title + Percentage */}
                   <div className="flex flex-col">
-                    {/* Mobile: title + percentage in one row */}
                     <div className="flex justify-between items-center md:hidden">
                       <span className="text-sm font-bold">
                         {item.ShareTitle ?? "N/A"}
@@ -82,8 +73,6 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
                         %
                       </span>
                     </div>
-
-                    {/* Desktop: title then percentage below */}
                     <div className="hidden md:flex flex-col">
                       <span className="text-sm font-bold">
                         {item.ShareTitle ?? "N/A"}
@@ -97,9 +86,7 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
                       </span>
                     </div>
                   </div>
-
-                  {/* Right side: Share amount */}
-                  <div className="flex justify-start md:justify-end text-lg font-bold">
+                  <div className="flex justify-start lg:justify-end text-lg font-bold">
                     ₱{" "}
                     {(item.ShareAmount ?? 0).toLocaleString(undefined, {
                       minimumFractionDigits: 3,

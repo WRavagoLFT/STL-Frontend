@@ -8,7 +8,7 @@ const SkeletonBox = ({ height = 'h-10', width = 'w-full', rounded = 'rounded-md'
 export default function RetailReceiptSkeleton() {
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
-      <div className="mx-auto px-0 py-1">
+      <div className="py-8 md:py-1">
         <SkeletonBox height="h-8" width="w-64" />
 
         {/* Filters */}
@@ -37,7 +37,7 @@ export default function RetailReceiptSkeleton() {
         {/* STL Collections Summary */}
         <div className="flex gap-6 mt-8 mb-3">
           <div className="w-1/2">
-            <div className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 md:grid-cols-2 items-center gap-2 text-left">
+            <div className="w-full bg-gray-200 p-2 rounded-md grid grid-cols-1 md:grid-cols-2 items-center gap-2 text-left">
               <SkeletonBox height="h-4" width="w-32" />
               <div className="flex justify-center md:justify-end">
                 <SkeletonBox height="h-6" width="w-20" />
