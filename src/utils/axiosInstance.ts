@@ -1,4 +1,3 @@
-// axiosInstance.ts
 import axios from "axios";
 
 let isRefreshing = false;
@@ -25,7 +24,9 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     const message = error?.response?.data?.message;
-    const isTokenExpired = error.response?.status === 403 && message === "Token expired.";
+    const status = error?.response?.status;
+
+    const isTokenExpired = status === 403 && message === "Token expired.";
 
     if (isTokenExpired) {
       if (!isRefreshing) {
@@ -51,6 +52,12 @@ axiosInstance.interceptors.response.use(
           refreshSubscribers.push(() => resolve(axiosInstance(originalRequest)));
         });
       }
+    }
+
+    if (status === 401) {
+      console.warn("Unauthorized: redirecting to home.");
+      window.location.href = "/not-found";
+      return Promise.reject(error);
     }
 
     return Promise.reject(error);

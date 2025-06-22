@@ -1,7 +1,6 @@
 import axiosInstance from "../axiosInstance";
 import axios from "axios";
 import { handleRouter } from "../routerHandlers";
-import { useAuthStore } from "~/store/useAuthStore";
 
 export const loginUser = async (
   payload: { email: string; password: string },
@@ -10,6 +9,7 @@ export const loginUser = async (
   try {
     const loginResponse = await axiosInstance.post("/auth/login/web", payload);
     await handleRouter(router);
+    //console.log("[loginUser] Login successful, response data:", loginResponse.data);
 
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {

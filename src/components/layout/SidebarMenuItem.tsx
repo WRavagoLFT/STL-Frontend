@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import clsx from "clsx";
-import { useRouter } from "next/router";
 import {
   FaHome,
   FaBusinessTime,
@@ -17,6 +18,7 @@ import {
 } from "react-icons/fa";
 import { logoutUser } from "~/utils/api/auth";
 import ActivityIndicator from "../auth/ActivityIndicator";
+import { usePathname, useRouter } from "next/navigation";
 
 interface SidebarMenuItemProps {
   label: string;
@@ -97,8 +99,8 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
   setSideBarActiveGameType,
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const currentPath = router.asPath;
 
   if (!MENU_VISIBILITY[label]?.includes(userTypeId)) return null;
 
@@ -112,15 +114,15 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
   const slug =
     routeMap[label] ?? `/${label.toLowerCase().replace(/\s+/g, "-")}`;
   const isGroup = submenu !== null;
-  const isGroupActive = currentPath.startsWith(slug);
-  const isActive = (path: string) => currentPath === path;
+  const isGroupActive = pathname?.startsWith(slug);
+  const isActive = (path: string) => pathname === path;
 
-  const handleClick = async () => {
+  const handleLogout = async () => {
     if (label === "Logout") {
       try {
         setIsLoggingOut(true);
         await logoutUser();
-        router.push("/auth/login");
+        router.push("/");
       } catch (error) {
         setIsLoggingOut(false);
         console.error("Logout failed:", error);
@@ -162,7 +164,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
     <>
       <div key={label}>
         <div
-          onClick={handleClick}
+          onClick={handleLogout}
           className={clsx(
             "flex items-center justify-start px-4 py-2 cursor-pointer rounded-md",
             isGroupActive && label !== "Logout"

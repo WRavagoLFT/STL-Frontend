@@ -1,114 +1,79 @@
 import axios, { AxiosError } from "axios";
-import axiosInstance, { waitUntilNotRefreshing } from "../axiosInstance";
-import { useAuthStore } from "~/store/useAuthStore";
+import axiosInstance from "../axiosInstance";
+import { User } from "~/types/types";
 
-// Helper to validate URL paths
+// Utility to prevent accidental absolute URL usage
 const validateRelativeUrl = (url: string) => {
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-        throw new Error('Absolute URLs are not allowed.');
-    }
-    return url;
-};
-
-const getCurrentUser = async () => {
-  console.log("[getCurrentUser] Waiting for token refresh to complete...");
-  await waitUntilNotRefreshing();
-  console.log("[getCurrentUser] Proceeding with API request...");
-
-  try {
-    const res = await axiosInstance.get("/users/getCurrentUser");
-    console.log("[getCurrentUser] Success:", res.data);
-    return res.data;
-  } catch (error: any) {
-    const status = error?.response?.status;
-    const message = error?.response?.data?.message || error.message;
-
-    console.error("[getCurrentUser] Request failed:");
-    console.error("  • Status:", status);
-    console.error("  • Message:", message);
-    console.error("  • Full error object:", error);
-
-    if (message !== "Token expired." && message !== "Invalid request token.") {
-      console.warn("[getCurrentUser] Unexpected error encountered.");
-    }
-
-    return { success: false, data: null };
+  if (url.startsWith("http://") || url.startsWith("https://")) {
+    throw new Error("Absolute URLs are not allowed.");
   }
+  return url;
 };
 
-const logoutUser = async (queryParams: Record<string, any> = {}) => {
-  try {
-    // 1. Call API to clear server cookie
-    const url = validateRelativeUrl("/auth/logout");
-    const response = await axiosInstance.delete(url, {
-      params: queryParams,
-      withCredentials: true, // ensures cookies are included
-    });
-
-    // 2. Clear client state
-    //useAuthStore.getState().logout(); // or any client-side clearing logic
-
-    return { success: true, message: "Logout successful", data: response.data };
-  } catch (error) {
-    console.error("Error logging out:", (error as Error).message);
-
-    // Even if server fails, still clear client state
-    useAuthStore.getState().logout();
-
-    return { success: true, message: "Logout completed (client-side)" };
-  }
+export type UserResponse = {
+  success: boolean;
+  data: User;
 };
 
-const verifyPass = async (password: string) => {
-    try {
-        const url = validateRelativeUrl("/auth/verifyPass");
-        const response = await axiosInstance.post(url, { password });
+export const getCurrentUser = async (): Promise<UserResponse> => {
+  const url = validateRelativeUrl("/users/getCurrentUser");
 
-        return response.data;
-    } catch (error) {
-        console.error("Error verifying password:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: {} };
-    }
+  const response = await axiosInstance.get<UserResponse>(url);
+  return response.data;
 };
 
-const forgetPassEmail = async (email: string) => {
-    try {
-        const url = validateRelativeUrl("/auth/forgetPassword");
-        const response = await axiosInstance.post(url, { email });
+export const logoutUser = async (
+  queryParams: Record<string, any> = {}
+): Promise<{ success: boolean; message: string; data?: any }> => {
+  const url = validateRelativeUrl("/auth/logout");
 
-        return response.data;
-    } catch (error) {
-        console.error("Error verifying password:", (error as Error).message);
-        return { success: false, message: (error as Error).message, data: {} };
-    }
-}
+  const response = await axiosInstance.delete(url, {
+    params: queryParams,
+  });
 
-const verifyOtp = async (email: string, otp: string) => {
-    try {
-        const url = validateRelativeUrl("/auth/verifyOTP");
-        const response = await axiosInstance.post(url, { email, otp });
+  return {
+    success: true,
+    message: "Logout successful",
+    data: response.data,
+  };
+};
 
-        return response.data;
-    } catch (error) {
-        const err = error as AxiosError
-        console.error("Error verifying password:", (error as Error).message);
-        console.log(error)
-        return err.response?.data;
-    }
-}
+export const verifyPass = async (password: string): Promise<any> => {
+  const url = validateRelativeUrl("/auth/verifyPass");
 
-const updateForgottenPassword = async (email: string, resetToken: string, password: string) => {
-    try {
-        const url = validateRelativeUrl("/auth/updateForgottenPassword");
-        const response = await axiosInstance.post(url, { email, resetToken, password });
+  const response = await axiosInstance.post(url, { password });
+  return response.data;
+};
 
-        return response.data;
-    } catch (error) {
-        const err = error as AxiosError
-        console.error("Error verifying password:", (error as Error).message);
-        console.log(err.response?.data)
-        return err.response?.data
-    }
-}
+export const forgetPassEmail = async (email: string): Promise<any> => {
+  const url = validateRelativeUrl("/auth/forgetPassword");
 
-export { getCurrentUser, verifyPass, logoutUser, forgetPassEmail, verifyOtp, updateForgottenPassword };
+  const response = await axiosInstance.post(url, { email });
+  return response.data;
+};
+
+export const verifyOtp = async (
+  email: string,
+  otp: string
+): Promise<any> => {
+  const url = validateRelativeUrl("/auth/verifyOTP");
+
+  const response = await axiosInstance.post(url, { email, otp });
+  return response.data;
+};
+
+export const updateForgottenPassword = async (
+  email: string,
+  resetToken: string,
+  password: string
+): Promise<any> => {
+  const url = validateRelativeUrl("/auth/updateForgottenPassword");
+
+  const response = await axiosInstance.post(url, {
+    email,
+    resetToken,
+    password,
+  });
+
+  return response.data;
+};

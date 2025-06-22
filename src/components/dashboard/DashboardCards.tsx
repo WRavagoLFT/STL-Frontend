@@ -1,6 +1,8 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { fetchHistoricalSummary } from "../../utils/api/transactions";
-import { fetchWinners } from "../../utils/api/winners"; // <-- import it
+import { fetchWinners } from "../../utils/api/winners";
 import Card from "../ui/dashboardcards/Cards";
 
 const DashboardCardsPage = ({
@@ -16,7 +18,7 @@ const DashboardCardsPage = ({
     totalRevenue: 0,
   });
 
-  console.log('GAME CATEG ID:', gameCategoryId);
+  // console.log('GAME CATEG ID:', gameCategoryId);
 
 useEffect(() => {
   const fetchDataDashboard = async () => {

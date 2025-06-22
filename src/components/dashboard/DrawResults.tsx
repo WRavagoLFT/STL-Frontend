@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { FaBroadcastTower } from "react-icons/fa";
 import { getTodaysWinningCombination } from "../../utils/api/winningcombinations";

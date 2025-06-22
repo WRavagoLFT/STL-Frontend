@@ -19,7 +19,6 @@ export const fetchGameCategories = async () => {
   }
 };
 
-
 export const fetchGameSchedule = async () => {
     try {
         const url = validateRelativeUrl("/gameTypes/getGameSchedule");

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Device } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
@@ -7,9 +9,9 @@ import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import dayjs from "dayjs";
-import { getUsageNotes } from "~/pages/Protected/device-information/device-information-view";
 import { updateDeviceSchema } from "~/schemas/deviceSchema";
 import { useAuthStore } from "~/store/useAuthStore";
+import { getUsageNotes } from "./ParentDeviceView";
 
 interface UpdateDeviceFormProps {
   title?: string;
@@ -144,7 +146,6 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
   return (
     <form onSubmit={formik.handleSubmit}>
       <div className="grid grid-cols-2 gap-6">
-        {/* Column 1 */}
         <div className="flex flex-col gap-x-6 gap-y-2">
           <div className="text-md font-bold">Device Information</div>
           <div>
