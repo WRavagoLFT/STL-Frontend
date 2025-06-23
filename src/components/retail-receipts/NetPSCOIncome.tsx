@@ -7,8 +7,7 @@ const NetPSCOIncomePage: React.FC<NetIncomePageProps> = ({
 }) => {
   return (
     <div className="flex flex-col mb-2">
-      <div className="w-full bg-[#E97451] text-white p-2 rounded-md mt-2 grid grid-cols-1 md:grid-cols-2 items-center gap-2 text-left">
-        {/* Left Side: Title + Percentage + Mobile Amount */}
+      <div className="w-full bg-[#E97451] text-white p-2 rounded-md mt-2 grid grid-cols-1 lg:grid-cols-2 items-center gap-2 text-left">
         <div className="flex flex-col">
           <div className="flex justify-between items-center">
             <span className="text-sm font-bold">Net PCSO Income</span>
@@ -16,13 +15,9 @@ const NetPSCOIncomePage: React.FC<NetIncomePageProps> = ({
               {netPercentage.toFixed(3)}%
             </span>
           </div>
-
-          {/* Desktop: show percentage below title */}
           <span className="text-sm font-medium hidden md:block">
             {netPercentage.toFixed(3)}%
           </span>
-
-          {/* Mobile: show amount below */}
           <span className="text-lg font-bold md:hidden mt-1">
             ₱{" "}
             {netAmount.toLocaleString(undefined, {
@@ -31,9 +26,7 @@ const NetPSCOIncomePage: React.FC<NetIncomePageProps> = ({
             })}
           </span>
         </div>
-
-        {/* Right Side: Desktop only amount */}
-        <div className="hidden md:flex justify-center md:justify-end text-base font-semibold">
+        <div className="hidden md:flex justify-start lg:justify-end text-base font-semibold">
           ₱{" "}
           {netAmount.toLocaleString(undefined, {
             minimumFractionDigits: 3,

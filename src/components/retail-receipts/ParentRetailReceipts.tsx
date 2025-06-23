@@ -186,10 +186,10 @@ export const ParentRetailReceipt = () => {
         {loading ? (
           <RetailReceiptSkeleton />
         ) : (
-          <div className="mx-auto px-0 py-8 md:py-1">
+          <div className="py-8 md:py-1">
             <h1 className="text-3xl font-bold mb-3">STL Retail Receipt</h1>
-            <div className="flex flex-col md:flex-row  gap-4 mb-4 w-full md:w-2/5">
-              <div className="w-full md:w-1/2">
+            <div className="flex flex-col md:flex-row gap-4 lg:pr-2 mb-4 w-full lg:w-2/5">
+              <div className="w-full lg:w-1/2">
                 <div>
                   <label
                     htmlFor="filterBy"
@@ -213,7 +213,7 @@ export const ParentRetailReceipt = () => {
                   />
                 </div>
               </div>
-              <div className="w-full md:w-1/2">
+              <div className="w-full lg:w-1/2">
                 <div className="flex flex-col gap-1">
                   <label
                     htmlFor="operationDate"
@@ -251,10 +251,9 @@ export const ParentRetailReceipt = () => {
               textlabel="Collection"
             />
 
-            <div className="flex gap-6 mt-8 mb-3">
-              <div className="w-full md:w-1/2">
-                <div className="w-full bg-[#F6BA12] p-2 rounded-md flex flex-col md:flex-row md:items-center md:justify-between text-left gap-1">
-                  {/* Label and Mobile Amount */}
+            <div className="flex gap-6 mt-4 mb-3">
+              <div className="w-full md:w-1/2 md:pr-3">
+                <div className="w-full bg-[#F6BA12] p-2 rounded-md flex flex-col lg:flex-row lg:items-center md:justify-between">
                   <div className="flex flex-col">
                     <span className="text-sm font-bold">STL Collections</span>
                     <span className="text-lg font-bold md:hidden">
@@ -266,7 +265,6 @@ export const ParentRetailReceipt = () => {
                     </span>
                   </div>
 
-                  {/* Desktop Amount */}
                   <div className="hidden md:block text-base font-semibold">
                     ₱{" "}
                     {receiptData?.Collections?.toLocaleString("en-PH", {
@@ -316,7 +314,7 @@ export const ParentRetailReceipt = () => {
                 </div>
               </div>
             </div>
-            <div className="w-full md:w-1/2 mb-2 mt-4 flex flex-row gap-2">
+            <div className="w-full md:w-1/2 mt-4 md:mt-8 flex flex-row gap-2 md:gap-3 md:pr-3">
               <div className="w-1/2">
                 <ExportRetailDataToExcel
                   receiptData={receiptData}
