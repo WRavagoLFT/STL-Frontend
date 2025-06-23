@@ -49,20 +49,16 @@ const DrawResultsPage = () => {
     }[]
   >([]);
 
-  // Prepare options for selects
   const gameCategoryOptions = gameCategories.map((cat) => ({
     value: cat.GameCategoryId,
     label: cat.GameCategory,
   }));
-
-  //console.log(gameCategoryOptions);
 
   const regionOptions = regions.map((region) => ({
     value: region.RegionId,
     label: region.RegionName,
   }));
 
-  // Filter provinces based on selectedRegion
   const filteredProvinceOptions = provinces
     .filter((p) => selectedRegion === "" || p.RegionId === selectedRegion)
     .map((province) => ({
@@ -70,9 +66,6 @@ const DrawResultsPage = () => {
       label: province.ProvinceName,
     }));
 
-  //console.log('SELECTED PROVINCE:', filteredProvinceOptions);
-
-  // Find selected options
   const selectedGameCategoryOption = gameCategoryOptions.find(
     (option) => option.value === Number(selectedGameCategory)
   );
@@ -104,7 +97,6 @@ const DrawResultsPage = () => {
         setGameCategories(gameCategoriesRes.data);
       }
 
-      // Set default selections to ID 1
       setSelectedRegion(1);
       setSelectedGameCategory(1);
     }
@@ -112,7 +104,6 @@ const DrawResultsPage = () => {
     loadData();
   }, []);
 
-  // Load winning combinations only when provinces, regions, and gameCategories are loaded
   useEffect(() => {
     const loadWinningCombinations = async () => {
       const response = await getTodaysWinningCombination();
@@ -192,7 +183,6 @@ const DrawResultsPage = () => {
         if (res.success) {
           setProvinces(res.data);
 
-          // Automatically select ProvinceId = 1 if it exists in the fetched list
           const defaultProvince = res.data.find((p: any) => p.ProvinceId === 1);
           if (defaultProvince) {
             setSelectedProvince(1);
@@ -204,21 +194,20 @@ const DrawResultsPage = () => {
     }
   }, [selectedRegion]);
 
-  // Helper
   const displayValue = (value: string | number) => {
     return value === 0 || value === "0" ? "0" : value || "\u00A0";
   };
 
   return (
     <div className="bg-transparent p-4 rounded-xl border border-[#0038A8]">
-      <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
+      <div className="w-full mb-2 flex flex-col xl:flex-row xl:items-center xl:justify-between">
         <div className="flex items-center">
           <div className="bg-[#0038A8] rounded-lg p-1">
             <FaBroadcastTower size={20} color={"#F6BA12"} />
           </div>
           <p className="text-base ml-3">Draw Results Today</p>
         </div>
-        <div className="mt-2 md:mt-0">
+        <div className="mt-2 lg:mt-4 xl:mt-0">
           <button
             onClick={() => {
               router.push("/draw-summary");
@@ -278,7 +267,6 @@ const DrawResultsPage = () => {
                   )
                 : null;
 
-            // Determine boxes based on selectedGameCategory
             const totalBoxes =
               Number(selectedGameCategory) === 4
                 ? 4
@@ -303,7 +291,6 @@ const DrawResultsPage = () => {
                     displayInGrid ? "" : "sm:flex-nowrap"
                   }`}
                 >
-                  {/* Box 1 */}
                   <div
                     className={`bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center 
                       ${displayInGrid ? "w-[calc(50%-4px)]" : "w-full sm:flex-1"}`}
@@ -313,7 +300,6 @@ const DrawResultsPage = () => {
                     </p>
                   </div>
 
-                  {/* Box 2 */}
                   <div
                     className={`bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center 
                       ${displayInGrid ? "w-[calc(50%-4px)]" : "w-full sm:flex-1"}`}
@@ -323,7 +309,6 @@ const DrawResultsPage = () => {
                     </p>
                   </div>
 
-                  {/* Box 3 */}
                   {totalBoxes >= 3 && (
                     <div className="bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center w-full sm:w-[calc(50%-4px)]">
                       <p className="font-bold text-base md:text-2xl text-center break-words">
@@ -332,7 +317,6 @@ const DrawResultsPage = () => {
                     </div>
                   )}
 
-                  {/* Box 4 */}
                   {totalBoxes >= 4 && (
                     <div className="bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center w-full sm:w-[calc(50%-4px)]">
                       <p className="font-bold text-base md:text-2xl text-center break-words">

@@ -26,7 +26,6 @@ useEffect(() => {
       const today = new Date().toLocaleDateString("en-CA", {
         timeZone: "Asia/Manila",
       });
-      //console.log("[DEBUG] Today's date (PHT):", today);
 
       const [summaryResponse, winnersResponse] = await Promise.all([
         fetchHistoricalSummary({ from: today, to: today }),
@@ -37,9 +36,6 @@ useEffect(() => {
         }),
       ]);
 
-      //console.log("[DEBUG] Summary Response:", summaryResponse);
-      //console.log("[DEBUG] Winners Response:", winnersResponse);
-
       if (summaryResponse.success) {
         let filteredData = summaryResponse.data;
 
@@ -48,10 +44,6 @@ useEffect(() => {
             (item: { GameCategoryId: number }) =>
               item.GameCategoryId === gameCategoryId
           );
-          // console.log(
-          //   `[DEBUG] Filtered summary data by GameCategoryId (${gameCategoryId}):`,
-          //   filteredData
-          // );
         } else {
           console.log("[DEBUG] No GameCategoryId filter applied.");
         }
@@ -73,14 +65,11 @@ useEffect(() => {
           }
         );
 
-        //console.log("[DEBUG] Aggregated summary totals (before winners):", totals);
-
         if (winnersResponse.success && Array.isArray(winnersResponse.data)) {
           const filteredWinners = winnersResponse.data.filter(
             (item: { DateOfTransaction?: string }) => {
               if (typeof item.DateOfTransaction !== "string") return false;
 
-              // Convert to local date string in Asia/Manila
               const localDate = new Date(item.DateOfTransaction).toLocaleDateString("en-CA", {
                 timeZone: "Asia/Manila",
               });
@@ -90,12 +79,9 @@ useEffect(() => {
           );
 
           totals.totalWinners = filteredWinners.length;
-          //console.log("[DEBUG] Filtered winners count (Asia/Manila):", totals.totalWinners);
         } else {
           console.warn("[DEBUG] Failed to fetch or invalid winners data:", winnersResponse.message);
         }
-
-        //console.log("[DEBUG] Final dashboard data set:", totals);
         setDashboardData(totals);
       } else {
         console.error("[DEBUG] Summary API Request Failed:", summaryResponse.message);

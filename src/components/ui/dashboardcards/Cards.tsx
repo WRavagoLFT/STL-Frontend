@@ -1,8 +1,5 @@
-// reusable card component for the dashboard
-// This component is used to display the cards in the dashboard
-
 import React from "react";
-import { CardProps } from "~/types/interfaces"; // Import the CardProps type
+import { CardProps } from "~/types/interfaces"; 
 
 export const Card = <T extends React.ReactNode>({ label, value, color, style }: CardProps<T>) => {
   return (
@@ -14,7 +11,7 @@ export const Card = <T extends React.ReactNode>({ label, value, color, style }: 
       }}
     >
       <p className="text-xs">{label}</p>
-      <p className="text-2xl font-bold">{value}</p>
+      <p className="text-lg md:text-sm lg:text-lg xl:text-2xl font-bold">{value}</p>
     </div>
   );
 };

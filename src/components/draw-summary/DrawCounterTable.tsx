@@ -17,8 +17,6 @@ const DrawCounterTablePage = (data: {
     });
 
     setCounterDraw(arr);
-
-    //console.log(data.gameCategory);
   }, [data.numberArr, data.gameCategory]);
 
   const isRightEdge = (index: number) => (index + 1) % 5 === 0;
