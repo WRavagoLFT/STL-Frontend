@@ -1,6 +1,4 @@
 import { jsPDF } from "jspdf";
-import { Button } from "@mui/material";
-import { buttonStylesretail } from "~/styles/theme";
 import autoTable from "jspdf-autotable";
 import { LoginSectionData } from "../../data/LoginSectionData";
 

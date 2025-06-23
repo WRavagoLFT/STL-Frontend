@@ -6,7 +6,7 @@ type Props = {
 } & React.InputHTMLAttributes<HTMLInputElement>;
 
 const Input = ({ disabled, error, className, ...rest }: Props) => {
-  const baseClass = "w-full border rounded px-3 py-2 text-sm focus:outline-none";
+  const baseClass = "w-full bg-transparent border rounded px-3 py-2 text-sm focus:outline-none";
 
   const classes = `${baseClass} 
     ${disabled

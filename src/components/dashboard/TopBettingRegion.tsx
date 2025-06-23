@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { FaDiceSix } from "react-icons/fa";
 import { fetchHistoricalRegion } from "~/utils/api/transactions";

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import BackIconButton from "../ui/icons/BackButton";
 import { UserSectionData } from "../../data/AdminSectionData";

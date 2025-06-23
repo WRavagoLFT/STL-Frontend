@@ -2,6 +2,8 @@
 // components as they have different data structures and requirements.
 // they are not meant to be used interchangeably or be reusable, hence the separation.
 
+"use client";
+
 import React, { useMemo, useState } from "react";
 import {
   Table,
@@ -14,14 +16,14 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
-import { SortableTableCell } from "../../../hooks/sortPaginationSearch";
+import { SortableTableCell } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import {
   filterDataEditLog,
   sortDataEditLog,
-} from "~/hooks/sortPaginationSearch";
+} from "~/utils/sortPaginationSearch";
 
 const EditLogsTablePage = <T extends Transactions>({
   data,

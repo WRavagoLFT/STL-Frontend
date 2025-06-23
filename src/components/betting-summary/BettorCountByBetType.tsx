@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { CircularProgress, Button, } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
@@ -5,18 +7,17 @@ import { fetchTransactions } from "~/utils/api/transactions";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "~/store/useAuthStore";
 
-// Returns the bet types series for a gameCategoryId
 const getBetTypeSeries = (gameCategoryId?: number) => {
   switch (gameCategoryId) {
-    case 1: // STL PARES
-    case 2: // STL SWER2
+    case 1:
+    case 2:
       return [
         { dataKey: "Tumbok", color: "#E5C7FF" },
         { dataKey: "Sahod", color: "#5050A5" },
         { dataKey: "Casas", color: "#7266C9" },
       ];
-    case 3: // STL SWER3
-    case 4: // STL SWER4
+    case 3:
+    case 4:
       return [
         { dataKey: "Tumbok", color: "#E5C7FF" },
         { dataKey: "Ramble", color: "#5050A5" },
@@ -26,10 +27,8 @@ const getBetTypeSeries = (gameCategoryId?: number) => {
   }
 };
 
-// Dynamic legend component based on gameCategoryId
 const CustomLegend = ({ gameCategoryId }: { gameCategoryId?: number }) => {
   const series = getBetTypeSeries(gameCategoryId);
-
   return (
     <div className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
       {series.map(({ dataKey, color }) => (
@@ -135,7 +134,6 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
     fetchData();
   }, [params.gameCategoryId]);
 
-  // Get series for rendering BarChart series
   const series = getBetTypeSeries(params.gameCategoryId);
 
   return (

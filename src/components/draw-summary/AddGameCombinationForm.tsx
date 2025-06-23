@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { GameCombination } from "~/types/types";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
@@ -337,6 +339,7 @@ const AddGameCombinationForm: React.FC<AddGameCombinationFormProps> = ({
         <ConfirmUserActionModalPage
           open={isConfirmModalOpen}
           onClose={handleModalClose}
+          mode="add"
           onConfirm={async () => {
             try {
               const dataToSubmit = {

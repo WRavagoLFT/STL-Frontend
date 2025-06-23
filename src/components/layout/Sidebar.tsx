@@ -1,11 +1,13 @@
+"use client";
+
 import React, { useState } from "react";
-import { useRouter } from "next/router";
 import { gameType, useSideBarStore } from "../../store/useSideBarStore";
 import { FaBars } from "react-icons/fa";
 import { useAuthStore } from "~/store/useAuthStore";
 import UserInfo from "./UserInfo";
 import SidebarMenuItem from "./SidebarMenuItem";
 import SidebarLogoSection from "./SidebarLogoSection";
+import { useRouter } from "next/navigation";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();

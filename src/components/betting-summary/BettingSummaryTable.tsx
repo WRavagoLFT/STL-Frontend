@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { fetchTransactions } from "~/utils/api/transactions";
 import { bettingTableColumns } from "~/config/bettingTableColumns";

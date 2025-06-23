@@ -1,9 +1,11 @@
+"use client";
+
 import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useRouter } from "next/router";
 import { LoginSectionData } from "../../data/LoginSectionData";
 import { loginUser } from "../../utils/api/login";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -69,7 +71,7 @@ const LoginPage = () => {
   const handleTogglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   return (
-    <div className="bg-[#F8F0E3] container-2xl w-full min-h-screen flex flex-col items-center justify-center lg:items-stretch lg:flex-row">
+   <div className="bg-[#F8F0E3] container-2xl w-full min-h-screen flex flex-col items-center justify-center lg:items-stretch lg:flex-row">
       {/* Left Section (Logo & Title) */}
       <div className="w-full lg:flex-1 flex flex-col justify-center items-center py-8 px-4 lg:py-0">
         <div className="text-center w-full max-w-md">

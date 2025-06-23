@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo, useCallback } from "react";
 import {
   FaSearch,
@@ -13,14 +15,14 @@ import {
   SortableTableCell,
   filterData,
   sortData,
-} from "../../../hooks/sortPaginationSearch";
+} from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { User, Operator, SortConfig, Device } from "~/types/types";
 import { getUserStatus } from "~/hooks/dashboarddata";
 import dayjs from "dayjs";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import Swal from "sweetalert2";
-import router from "next/router";
+import router, { useRouter } from "next/navigation";
 import { useModalStore } from "~/store/useModalStore";
 import useDetailTableStore from "~/store/useTableStore";
 import { useAuthStore } from "~/store/useAuthStore";
@@ -56,7 +58,7 @@ const DetailedTable = function <T extends User | Operator | Device>({
     setSelectedRow,
     resetMenu,
   } = useDetailTableStore();
-
+  const router = useRouter();
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [remarks, setRemarks] = useState<string>("");
   const [formData, setFormData] = useState<any>({});
@@ -109,6 +111,7 @@ const DetailedTable = function <T extends User | Operator | Device>({
     (row?: T) => {
       const targetRow = row || selectedRow;
       if (!targetRow) return;
+
       const {
         OperatorName,
         OperatorId,
@@ -120,13 +123,14 @@ const DetailedTable = function <T extends User | Operator | Device>({
         DeviceId,
         AssignedUser,
       } = targetRow;
+
       if (source === "operators" && OperatorName && OperatorId) {
         const slug = `${OperatorId}-${OperatorName.toLowerCase()
           .replace(/\s+/g, "-")
           .replace(/[^\w\-]+/g, "")}`;
         modalStore.setSelectedData(targetRow);
         modalStore.setOperatorId(OperatorId);
-        router.push(`/operators/${slug}`);
+        router.push(`/operators/operators-view/${slug}`);
       } else if (
         source === "users" &&
         (UserTypeId === 1 || UserTypeId === 2 || UserTypeId === 3)
@@ -151,7 +155,7 @@ const DetailedTable = function <T extends User | Operator | Device>({
           : modalStore.openModal("view", targetRow);
       }
     },
-    [selectedRow, source, router, onUpdateClick]
+    [selectedRow, source, onUpdateClick]
   );
 
   const handleSuspend = async (row: T) => {
@@ -221,7 +225,7 @@ const DetailedTable = function <T extends User | Operator | Device>({
         </div>
         {currentUserType !== 3 && pageType && (
           <button
-            className="bg-[#0038A8] hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm"
+            className="bg-[#0038A8] hover:bg-blue-700 text-white rounded-lg px-7 py-2 text-[0.8rem]"
             onClick={onAddClick}
           >
             Add{" "}
@@ -267,15 +271,15 @@ const DetailedTable = function <T extends User | Operator | Device>({
                       index === 1 ? "w-[30%]" : "w-[20%]"
                     }`}
                   >
-                    <div className="flex items-center justify-start gap-1">
-                      {col.filterable && (
-                        <SortableTableCell
-                          label={col.label}
-                          sortKey={String(col.key)}
-                          isFilterVisible={true}
-                        />
-                      )}
-                    </div>
+                    {col.filterable ? (
+                      <SortableTableCell
+                        label={col.label}
+                        sortKey={String(col.key)}
+                        isFilterVisible={true}
+                      />
+                    ) : (
+                      <span className="block h-4" /> // placeholder to keep height consistent
+                    )}
                   </th>
                 ))}
                 <th className="w-[10%]"></th>

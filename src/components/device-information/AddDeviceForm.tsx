@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Device } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
@@ -6,8 +8,8 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
-import { getUsageNotes } from "~/pages/Protected/device-information/device-information-view";
 import { addDeviceSchema } from "~/schemas/deviceSchema";
+import { getUsageNotes } from "./ParentDeviceView";
 
 interface AddDeviceFormProps {
   title?: string;
@@ -39,7 +41,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
   }, []);
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  // Open the confirm modal after submit
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
   
@@ -97,7 +98,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
         if (result.isConfirmed) {
           //console.log("User confirmed submission in SweetAlert dialog.");
 
-          // Remove null, undefined, or empty string values
           const cleanedData = Object.entries(values).reduce(
             (acc, [key, value]) => {
               if (value !== null && value !== undefined && value !== "") {
@@ -107,7 +107,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
             }, {} as { [key: string]: string | number | string[] }
           );
 
-          // Add assignedUser separately
           cleanedData.assignedUser = userid || 0;
 
           //console.log("Data prepared for final submission (cleaned):", cleanedData);
@@ -124,7 +123,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
 
   });
 
-  // Helpers to display errors
   const getError = (field: string) =>
     formik.touched[field as keyof typeof formik.touched] &&
     formik.errors[field as keyof typeof formik.errors]
@@ -134,7 +132,6 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
   return (
     <form onSubmit={formik.handleSubmit}>
       <div className="grid grid-cols-2 gap-6">
-        {/* Column 1 */}
         <div className="flex flex-col gap-x-6 gap-y-2">
           <div className="text-md font-bold">Device Information</div>
           <div>

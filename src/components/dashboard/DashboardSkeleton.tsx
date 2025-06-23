@@ -1,5 +1,4 @@
-import { Box, Grid } from "@mui/material";
-import { cardDashboardStyles } from "~/styles/theme";
+"use client";
 
 interface SkeletonCardProps {
   height?: string | number;
