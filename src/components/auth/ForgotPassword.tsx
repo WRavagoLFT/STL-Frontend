@@ -66,7 +66,6 @@ const ForgotPassword = () => {
 
   return (
     <div className="w-full min-h-screen flex flex-col items-center justify-center lg:items-stretch lg:flex-row bg-[#F8F0E3]">
-      {/* Loading Overlay (if needed) */}
       {isLoading && (
         <ActivityIndicator />
       )}
@@ -137,7 +136,7 @@ const ForgotPassword = () => {
 
                 <input
                   type="text"
-                  className={`w-full px-4 py-3 rounded-md border ${errors.username ? "border-[#CE1126]" : "border-[#0038A8]"} text-[#0038A8] focus:outline-none`}
+                  className={`w-full px-4 py-3 rounded-md border bg-[#F8F0E3] ${errors.username ? "border-[#CE1126]" : "border-[#0038A8]"} text-[#0038A8] focus:outline-none`}
                   placeholder="Enter Email Address"
                   value={credentials.username}
                   onChange={(e) =>

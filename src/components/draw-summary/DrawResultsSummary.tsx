@@ -12,17 +12,17 @@ interface GameScheduleItem {
 }
 
 export interface GameType {
-  GameTypeId: number; 
+  GameTypeId: number;
   GameType: string;
   GameCategoryId: number;
   GameScheduleId: number;
 }
 
-const DrawResultsSummaryPage = ({ 
-  firstDraw, 
-  secondDraw, 
-  thirdDraw, 
-  gameCategoryMap 
+const DrawResultsSummaryPage = ({
+  firstDraw,
+  secondDraw,
+  thirdDraw,
+  gameCategoryMap,
 }: {
   firstDraw?: string[];
   secondDraw?: string[];
@@ -61,15 +61,12 @@ const DrawResultsSummaryPage = ({
       }))
     : [];
 
-  //console.log('GAME SCHED', gameSchedule);
-  //console.log('GAME CATEG IN THE COMPONENT:', gameCategoryMap);
-  //console.log('GAME SCHED OPTIONS', gameScheduleOptions);
-  //console.log('GAME TYPES', gameTypes);
-
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleAddGameCombinationSubmit = async (data: GameCombination): Promise<void> => {
+  const handleAddGameCombinationSubmit = async (
+    data: GameCombination
+  ): Promise<void> => {
     try {
       const result = await addWinningCombination(data);
 
@@ -81,13 +78,12 @@ const DrawResultsSummaryPage = ({
           timer: 2000,
           showConfirmButton: false,
         });
-        setIsCreateModalOpen(false); // close modal only on success
+        setIsCreateModalOpen(false);
       } else {
         console.error("Failed to add user:", result.message);
 
         let htmlMessage = result.message || "Something went wrong.";
 
-        // If backend validation errors exist, format them into a list
         if (result.errors && Array.isArray(result.errors)) {
           htmlMessage += `<ul class="text-left" style="margin-top: 10px;">`;
           for (const err of result.errors) {
@@ -103,7 +99,10 @@ const DrawResultsSummaryPage = ({
         });
       }
     } catch (error) {
-      console.error("Unexpected error in handleAddUser:", (error as Error).message);
+      console.error(
+        "Unexpected error in handleAddUser:",
+        (error as Error).message
+      );
       Swal.fire({
         icon: "error",
         title: "Unexpected Error",
@@ -111,7 +110,7 @@ const DrawResultsSummaryPage = ({
       });
     }
   };
-  
+
   const renderDrawNumbers = (drawData?: string[]) => {
     if (!drawData || drawData.length === 0) {
       return <p className="text-gray-500 italic">No Data</p>;
@@ -133,33 +132,32 @@ const DrawResultsSummaryPage = ({
 
   return (
     <React.Fragment>
-      <div className="flex flex-col md:flex-row gap-6 flex-wrap md:space-x-6 md:items-stretch md:[&>div]:flex-1">
-        <div className="flex flex-col">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-4 lg:gap-6">
+        <div className="flex flex-col flex-1">
           <p className="text-sm font-light mb-1">First Draw</p>
           {renderDrawNumbers(firstDraw)}
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col flex-1">
           <p className="text-sm font-light mb-1">Second Draw</p>
           {renderDrawNumbers(secondDraw)}
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col flex-1">
           <p className="text-sm font-light mb-1">Third Draw</p>
           {renderDrawNumbers(thirdDraw)}
         </div>
       </div>
 
-      {(currentUserType !== 3 && currentUserType !== 6) && (
-        <div>
-          <div className="w-full flex justify-end mt-5">
-            <button
-              onClick={handleOpenModal}
-              className="bg-[#0038A8] hover:bg-blue-700 text-sm text-white py-3 px-6 rounded-md"
-            >
-              Input Draw Combination
-            </button>
-          </div>
+      {currentUserType !== 3 && currentUserType !== 6 && (
+        <div className="mt-5 w-full flex justify-center sm:justify-end">
+          <button
+            onClick={handleOpenModal}
+            className="bg-[#0038A8] hover:bg-blue-700 text-sm text-white py-3 px-6 rounded-md w-full sm:w-auto"
+          >
+            Input Draw Combination
+          </button>
+
           <AddGameCombinationModal
             open={isModalOpen}
             onClose={handleCloseModal}

@@ -71,7 +71,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-white border border-blue-900 rounded-md text-sm focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 bg-[#F8F0E3] border border-blue-900 rounded-md text-sm focus:outline-none"
             />
             <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400">
               <FaSearch size={16} />

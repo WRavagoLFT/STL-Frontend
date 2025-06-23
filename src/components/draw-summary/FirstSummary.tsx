@@ -14,7 +14,7 @@ const FirstSummaryPage = (data: { drawOrder: number; values: string[][] }) => {
       <div className="mt-4 space-y-2 text-center">
         {data.values.map((item, index) => (
           <div key={index}>
-            <div className="flex justify-center text-center gap-x-4 text-sm md:text-lg text-gray-300">
+            <div className="flex justify-center text-center gap-x-6 lg:gap-x-2 xl:gap-x-4 text-sm lg:text-lg text-gray-300">
               {item.map((item, idx) => (
                 <span key={idx}>{item}</span>
               ))}

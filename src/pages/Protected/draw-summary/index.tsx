@@ -61,7 +61,6 @@ const DrawSelectedPage = () => {
     { value: "12", label: "December" },
   ];
 
-  // fetch data
   const fetchData = async () => {
     const dataFetch = await fetchDrawSummary(
       Number(selectedProvince),
@@ -69,12 +68,10 @@ const DrawSelectedPage = () => {
       Number(selectedMonth)
     );
     setData(dataFetch.data);
-    //console.log(dataFetch)
   };
 
   const loadData = async () => {
     const regionFetch = await fetchRegions();
-    //console.log(regionFetch)
     if (regionFetch?.data && Array.isArray(regionFetch.data)) {
       setRegions(
         regionFetch.data
@@ -87,7 +84,6 @@ const DrawSelectedPage = () => {
     }
 
     const provinceFetch = await fetchProvinces();
-    //console.log(provinceFetch)
     setProvinces(provinceFetch.data);
 
     if (provinceFetch.data) {
@@ -107,11 +103,9 @@ const DrawSelectedPage = () => {
       );
     }
 
-    // default region
     setSelectedRegion("1");
     setSelectedProvince("1");
 
-    // Replace your existing game category code with this:
     const gameCategoryFetch = await fetchGameCategories();
     if (gameCategoryFetch?.data) {
       const options = gameCategoryFetch.data.map((gameCategory: any) => ({
@@ -122,13 +116,12 @@ const DrawSelectedPage = () => {
       gameCategoryFetch.data.forEach((gc: any) => {
         gameMap.set(gc.GameCategoryId.toString(), gc.GameCategory);
       });
-      setGameCategories(options); // for Select dropdown
-      setGameCategoryMap(gameMap); // for ID-name mapping
+      setGameCategories(options); 
+      setGameCategoryMap(gameMap); 
     }
   };
 
   useEffect(() => {
-    // Initial Fetch
     loadData();
     fetchData();
   }, []);
@@ -147,9 +140,9 @@ const DrawSelectedPage = () => {
       setFilteredProvinces(mappedProvinces);
 
       if (mappedProvinces.length > 0) {
-        setSelectedProvince(mappedProvinces[0].value); // use mapped value here
+        setSelectedProvince(mappedProvinces[0].value); 
       } else {
-        setSelectedProvince(""); // fallback
+        setSelectedProvince(""); 
       }
     }
   }, [selectedRegion, provinces]);
@@ -166,14 +159,12 @@ const DrawSelectedPage = () => {
   }, [selectedRegion, selectedProvince, selectedGameCategory, selectedMonth]);
 
   useEffect(() => {
-    //console.log(filteredProvinces)
   }, [filteredProvinces]);
 
   const getTodayResults = (drawOrder: number) => {
     try {
       if (drawOrder == 1) {
         const filtered = data.ResultSummary[todayDate - 1].FirstDraw;
-        //console.log(`accessing data.ResultSummary[${todayDate-1}][${todayDate}].FirstDraw`)
         const numbers = [filtered.NumberOne || "-", filtered.NumberTwo || "-"];
         if (Number(selectedGameCategory) > 2)
           numbers.push(filtered.NumberThree || "-");
@@ -265,9 +256,7 @@ const DrawSelectedPage = () => {
           </h1>
         </div>
 
-        {/* Input Selects */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* First Select */}
           <div className="w-full">
             <label
               htmlFor="region"
@@ -305,8 +294,6 @@ const DrawSelectedPage = () => {
               }}
             />
           </div>
-
-          {/* Second Select */}
           <div className="flex flex-col w-full">
             <label
               htmlFor="province"
@@ -330,8 +317,6 @@ const DrawSelectedPage = () => {
               classNamePrefix="custom-select"
             />
           </div>
-
-          {/* Third Select */}
           <div className="flex flex-col w-full">
             <label
               htmlFor="gameCategory"
@@ -354,8 +339,6 @@ const DrawSelectedPage = () => {
               classNamePrefix="custom-select"
             />
           </div>
-
-          {/* Fourth Select */}
           <div className="flex flex-col w-full">
             <label
               htmlFor="month"
@@ -382,7 +365,6 @@ const DrawSelectedPage = () => {
 
         <div className="flex flex-col items-center gap-4 mt-2">
           <div className="flex flex-col lg:flex-row w-full gap-6 lg:gap-12">
-            {/* Left Column */}
             <div className="flex flex-col w-full lg:w-2/3">
               <h1 className="text-xl md:text-3xl font-bold">
                 {
@@ -400,7 +382,7 @@ const DrawSelectedPage = () => {
               </h1>
 
               <div>
-                <p className="text-md font-bold mb-1">Draw Results</p>
+                <p className="text-base font-bold mb-1">Draw Results</p>
                 {data && (
                   <DrawResultsSummaryPage
                     firstDraw={getTodayResults(1) || []}
