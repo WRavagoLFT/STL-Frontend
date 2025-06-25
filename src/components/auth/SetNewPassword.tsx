@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState, useEffect } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoginSectionData } from "../../data/LoginSectionData";
@@ -8,7 +10,6 @@ import { updateForgottenPassword } from "~/utils/api/auth";
 import ActivityIndicator from "./ActivityIndicator";
 
 const SetNewPassword = () => {
-  const router = useRouter();
   const [credentials, setCredentials] = useState({
     newpassword: "",
     confirmPassword: "",
