@@ -6,12 +6,12 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-comparison/SummaryBettors&Bets";
+import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-comparison/SummaryTotalBetsAndBettors/SummaryBettors&Bets";
 import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettors&Bets";
 import ChartTopRegionByBetsandBettors from "~/components/betting-summary/bets-comparison/TopRegionBetting";
 import dayjs from "dayjs";
 import BackIconButton from "~/components/ui/icons/BackButton";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { categoryType, useBettingStore } from "~/store/useBettingStore";
 
@@ -31,7 +31,7 @@ const ParentComparisonBetting = ({
     dateFilter,
     firstDateSpecific,
     secondDateSpecific,
-    firstDateDuration,  
+    firstDateDuration,
     secondDateDuration,
     setCategoryFilter,
     setDateFilter,
@@ -41,6 +41,7 @@ const ParentComparisonBetting = ({
     setSecondDateDuration,
   } = useBettingStore();
 
+  const router = useRouter();
   const GAME_TITLES = [
     "STL",
     "STL Pares",
@@ -50,13 +51,21 @@ const ParentComparisonBetting = ({
   ];
   const title = GAME_TITLES[gameCategoryId];
 
-  const formattedFirstDateSpecific = firstDateSpecific ? dayjs(firstDateSpecific).format("MM/DD/YYYY") : null;
-  const formattedSecondDateSpecific = secondDateSpecific ? dayjs(secondDateSpecific).format("MM/DD/YYYY") : null;
-  const formattedFirstDateDuration = firstDateDuration ? dayjs(firstDateDuration).format("MM/DD/YYYY") : null;
-  const formattedSecondDateDuration = secondDateDuration ? dayjs(secondDateDuration).format("MM/DD/YYYY") : null;
+  const formattedFirstDateSpecific = firstDateSpecific
+    ? dayjs(firstDateSpecific).format("MM/DD/YYYY")
+    : null;
+  const formattedSecondDateSpecific = secondDateSpecific
+    ? dayjs(secondDateSpecific).format("MM/DD/YYYY")
+    : null;
+  const formattedFirstDateDuration = firstDateDuration
+    ? dayjs(firstDateDuration).format("MM/DD/YYYY")
+    : null;
+  const formattedSecondDateDuration = secondDateDuration
+    ? dayjs(secondDateDuration).format("MM/DD/YYYY")
+    : null;
 
   const categoryTypes: categoryType[] = [
-    "Total Bets and Bettors",
+    "Total Bettors and Bets",
     "Total Bets by Bet Type",
     "Total Bets by Game Type",
     "Top Betting Region by Total Bets",
@@ -66,13 +75,6 @@ const ParentComparisonBetting = ({
   ];
 
   useEffect(() => {
-    //console.log("Active Sidebar State:", activeGameType);
-    //console.log("categoryFilter:", categoryFilter);
-    //console.log("dateFilter:", dateFilter);
-    //console.log("firstDateSpecific:", firstDateSpecific);
-    //console.log("secondDateSpecific:", secondDateSpecific);
-    //console.log("firstDateDuration:", firstDateDuration);
-    //console.log("secondDateDuration:", secondDateDuration);
   }, [
     categoryFilter,
     dateFilter,
@@ -92,13 +94,17 @@ const ParentComparisonBetting = ({
             iconColor="#fff"
             size={30}
             onClick={() => {
-              if (mainSlug) {
+              if (slug) {
+                router.push(`/betting-summary/${slug}`);
+              } else if (mainSlug) {
                 router.push(`/betting-summary/${mainSlug}`);
+              } else {
+                router.push("/betting-summary");
               }
             }}
           />
           <div className="text-3xl ml-3 font-bold">
-            {(title === "Dashboard" ? "STL" : title)} Betting Summary Overview
+            {title === "Dashboard" ? "STL" : title} Betting Summary Overview
           </div>
         </div>
         <div className="flex flex-col gap-4 w-full h-full mt-8">

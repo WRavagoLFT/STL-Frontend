@@ -172,7 +172,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<BettorsandBetsSummaryProps> =
   ];
 
   const chartMap: Record<string, string> = {
-    "Total Bets and Bettors": "1",
+    "Total Bettors and Bets": "1",
     "Total Bets by Bet Type": "2",
     "Total Bets by Game Type": "3",
     "Total Bettors by Bet Type": "5",

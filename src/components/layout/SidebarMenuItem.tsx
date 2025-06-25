@@ -115,7 +115,10 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
     routeMap[label] ?? `/${label.toLowerCase().replace(/\s+/g, "-")}`;
   const isGroup = submenu !== null;
   const isGroupActive = pathname?.startsWith(slug);
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) =>
+    pathname === path ||
+    pathname?.startsWith(path) ||
+    pathname?.includes(`/comparison/${path.split("/").pop()}`);
 
   const handleLogout = async () => {
     if (label === "Logout") {

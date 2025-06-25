@@ -9,7 +9,7 @@ const getYesterdayDate = () => {
 };
 
 export type categoryType = 
-  'Total Bets and Bettors' |
+  'Total Bettors and Bets' |
   'Total Bets by Bet Type' |
   'Total Bettors by Bet Type' |
   'Total Bets by Game Type' |
@@ -66,7 +66,7 @@ interface BettingStore {
 export const useBettingStore = create<BettingStore>((set) => ({
     loading: false,
     activeGameType: '',
-    categoryFilter: 'Total Bets and Bettors',
+    categoryFilter: 'Total Bettors and Bets',
     dateFilter: 'Specific Date',
     firstDateSpecific: getYesterdayDate(),
     secondDateSpecific: getTodayDate(),
@@ -127,7 +127,7 @@ export const useBettingStore = create<BettingStore>((set) => ({
   
     resetFilters: () =>
       set({
-        categoryFilter: 'Total Bets and Bettors',
+        categoryFilter: 'Total Bettors and Bets',
         dateFilter: 'Specific Date',
         firstDateSpecific: null,
         secondDateSpecific: null,
@@ -145,7 +145,7 @@ export const getLegendItemsMap_Specific = (
   //console.log("categoryFilter:", categoryFilter);
 
   const legendItemsMap: Record<categoryType, { label: string; color: string }[]> = {
-    "Total Bets and Bettors": [
+    "Total Bettors and Bets": [
       {
         label: `Bettors - ${firstDateSpecific ? firstDateSpecific : "N/A"}`,
         color: "#E5C7FF",
@@ -302,7 +302,7 @@ export const getLegendItemsMap_Duration = (
 ): { label: string; color: string }[] => {
   //console.log("categoryFilter:", categoryFilter);
   const legendItemsMap: Record<categoryType, { label: string; color: string }[]> = {
-  "Total Bets and Bettors": [
+  "Total Bettors and Bets": [
     {
       label: `Bettors - ${firstDateSpecific ? firstDateSpecific : "N/A"} - ${secondDateSpecific ? secondDateSpecific : "N/A"}`,
       color: "#E5C7FF",
