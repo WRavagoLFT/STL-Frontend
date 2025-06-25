@@ -43,18 +43,18 @@ export const generateSeries = (
           `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeBettors' : 'secondDateBettors'] || 0)).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.firstRangeBetAmount : item.firstDateBets) || 0) / 100000),
+        data: typedChartData.map((item) => ((isDuration ? item.firstRangeBets : item.firstDateBets) || 0) / 100000),
         label: `Bets ${firstLabel}`,
         color: "#7266C9",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeBetAmount' : 'firstDateBets'] || 0)).toLocaleString()}`,
+          `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeBets' : 'firstDateBets'] || 0)).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.secondRangeBetAmount : item.secondDateBets) || 0) / 100000),
+        data: typedChartData.map((item) => ((isDuration ? item.secondRangeBets : item.secondDateBets) || 0) / 100000),
         label: `Bets ${secondLabel}`,
         color: "#3B3B81",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeBetAmount' : 'secondDateBets'] || 0)).toLocaleString()}`,
+          `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeBets' : 'secondDateBets'] || 0)).toLocaleString()}`,
       },
     ];
   } else if (urlParam === "2" || urlParam === "5") {

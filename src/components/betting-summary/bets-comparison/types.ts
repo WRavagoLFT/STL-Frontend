@@ -1,5 +1,5 @@
-import { formatDate } from './utils';
-import { GAME_CATEGORIES } from './constant';
+import { formatDate } from "./utils";
+import { GAME_CATEGORIES } from "./constant";
 
 export interface chartOne_Specific {
   TransactionDate: string;
@@ -54,51 +54,100 @@ export interface chartThreeSix_Range {
   DateRange: { start: string; end: string };
 }
 
-export type Chart1Data = {
+export interface Chart1Data {
+  // Specific Date
   firstDateBettors?: number;
   secondDateBettors?: number;
   firstDateBets?: number;
   secondDateBets?: number;
+  // Date Duration
   firstRangeBettors?: number;
   secondRangeBettors?: number;
-  firstRangeBets?: number;
-  secondRangeBets?: number;
-  drawOrder: number;
-};
+  firstRangeBetAmount?: number;
+  secondRangeBetAmount?: number;
+}
 
-export type Chart25Data = {
-  drawOrder?: number;
+export interface Chart25Data {
+  // Specific Date
   firstDateTumbok?: number;
   secondDateTumbok?: number;
   firstDateSahod?: number;
   secondDateSahod?: number;
+  // Date Duration
   firstRangeTumbok?: number;
   secondRangeTumbok?: number;
   firstRangeSahod?: number;
   secondRangeSahod?: number;
-};
+}
 
-export type Chart36Data = {
-  drawOrder: number;
-  firstDateSTLPares: number;
-  secondDateSTLPares: number;
-  firstDateSTLSwer2: number;
-  secondDateSTLSwer2: number;
-  firstDateSTLSwer3: number;
-  secondDateSTLSwer3: number;
-  firstDateSTLSwer4: number;
-  secondDateSTLSwer4: number;
-  firstRangeSTLPares: number;
-  secondRangeSTLPares: number;
-  firstRangeSTLSwer2: number;
-  secondRangeSTLSwer2: number;
-  firstRangeSTLSwer3: number;
-  secondRangeSTLSwer3: number;
-  firstRangeSTLSwer4: number;
-  secondRangeSTLSwer4: number;
-};
+export interface Chart36Data {
+  // Specific Date
+  firstDateSTLPares?: number;
+  secondDateSTLPares?: number;
+  firstDateSTLSwer2?: number;
+  secondDateSTLSwer2?: number;
+  firstDateSTLSwer3?: number;
+  secondDateSTLSwer3?: number;
+  firstDateSTLSwer4?: number;
+  secondDateSTLSwer4?: number;
+  // Date Duration
+  firstRangeSTLPares?: number;
+  secondRangeSTLPares?: number;
+  firstRangeSTLSwer2?: number;
+  secondRangeSTLSwer2?: number;
+  firstRangeSTLSwer3?: number;
+  secondRangeSTLSwer3?: number;
+  firstRangeSTLSwer4?: number;
+  secondRangeSTLSwer4?: number;
+}
 
 export type ChartData = Chart1Data | Chart25Data | Chart36Data;
+
+export interface RegionSpecificData {
+  TransactionDate: string;
+  DrawOrder?: null;
+  Region: string;
+  GameCategory?: string | null;
+  TotalBets: number;
+  TotalBetAmount: number;
+  TotalBettors: number;
+  TotalTumbok: number;
+  TotalSahod: number;
+  TotalRamble: number;
+  BetTypes?: {
+    Tumbok: number;
+    Sahod: number;
+    Ramble: number;
+  };
+}
+
+export interface SpecificPayload {
+  Region: RegionSpecificData[];
+}
+
+export interface RegionRangeData {
+  Region: string;
+  TotalBets: number;
+  TotalBetAmount: number;
+  TotalBettors: number;
+  TotalTumbok?: number;
+  TotalSahod?: number;
+  TotalRamble?: number;
+  BetTypes?: {
+    Tumbok: number;
+    Sahod: number;
+    Ramble: number;
+  };
+  GameCategory?: string | null;
+  DateOfWinningCombination: string;
+}
+
+export interface RangePayload {
+  Region: {
+    FirstRange: RegionRangeData[];
+    SecondRange: RegionRangeData[];
+  };
+}
 
 export interface BettorsandBetsSummaryProps {
   gameCategoryId?: number;
@@ -137,8 +186,14 @@ export const getLegendItemsMap_Specific = (
     case "Total Bets by Game Type":
     case "Total Bettors by Game Type":
       return GAME_CATEGORIES.flatMap((category) => [
-        { label: `${category.replace("STL", "STL ")} ${firstLabel}`, color: getCategoryColor(category.replace(/\s+/g, ""), true) },
-        { label: `${category.replace("STL", "STL ")} ${secondLabel}`, color: getCategoryColor(category.replace(/\s+/g, ""), false) },
+        {
+          label: `${category.replace("STL", "STL ")} ${firstLabel}`,
+          color: getCategoryColor(category.replace(/\s+/g, ""), true),
+        },
+        {
+          label: `${category.replace("STL", "STL ")} ${secondLabel}`,
+          color: getCategoryColor(category.replace(/\s+/g, ""), false),
+        },
       ]);
     default:
       return [];
@@ -174,8 +229,14 @@ export const getLegendItemsMap_Duration = (
     case "Total Bets by Game Type":
     case "Total Bettors by Game Type":
       return GAME_CATEGORIES.flatMap((category) => [
-        { label: `${category.replace("STL", "STL ")} ${firstLabel}`, color: getCategoryColor(category.replace(/\s+/g, ""), true) },
-        { label: `${category.replace("STL", "STL ")} ${secondLabel}`, color: getCategoryColor(category.replace(/\s+/g, ""), false) },
+        {
+          label: `${category.replace("STL", "STL ")} ${firstLabel}`,
+          color: getCategoryColor(category.replace(/\s+/g, ""), true),
+        },
+        {
+          label: `${category.replace("STL", "STL ")} ${secondLabel}`,
+          color: getCategoryColor(category.replace(/\s+/g, ""), false),
+        },
       ]);
     default:
       return [];
@@ -183,7 +244,10 @@ export const getLegendItemsMap_Duration = (
 };
 
 // Helper function to get category colors (moved here to avoid circular dependency)
-export const getCategoryColor = (category: string, isFirstDate: boolean): string => {
+export const getCategoryColor = (
+  category: string,
+  isFirstDate: boolean
+): string => {
   const colorMap: Record<string, string> = {
     STLPares: isFirstDate ? "#E5C7FF" : "#5050A5",
     STLSwer2: isFirstDate ? "#7266C9" : "#3B3B81",

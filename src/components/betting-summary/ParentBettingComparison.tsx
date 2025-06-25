@@ -7,7 +7,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-comparison/SummaryTotalBetsAndBettors/SummaryBettors&Bets";
-import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettors&Bets";
+import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettorsAndBets/RegionalSummaryBettors&Bets";
 import ChartTopRegionByBetsandBettors from "~/components/betting-summary/bets-comparison/TopRegionBetting";
 import dayjs from "dayjs";
 import BackIconButton from "~/components/ui/icons/BackButton";

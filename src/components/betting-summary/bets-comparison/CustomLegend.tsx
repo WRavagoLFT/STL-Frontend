@@ -27,16 +27,16 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   );
 
   return (
-    <div className="flex flex-col space-y-1 mt-1 mr-4">
+    <div>
       {chunkedLegendItems.map((chunk, rowIndex) => (
-        <div key={rowIndex} className="flex flex-row space-x-2 justify-start">
+        <div key={rowIndex} className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
           {chunk.map((item, index) => (
             <div key={index} className="flex items-center">
               <div
-                className="w-[14px] h-[14px] rounded-full mr-1.5"
+                  className="w-3.5 h-3.5 rounded-full mr-2"
                 style={{ backgroundColor: item.color }}
               />
-              <p className="text-[12px] font-normal leading-[14px]">
+              <p className="text-xs">
                 {item.label}
               </p>
             </div>

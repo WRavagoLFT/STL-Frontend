@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { BettorsandBetsSummaryProps } from "../types";
+import { BettorsandBetsSummaryProps } from "../../../../store/useBettingStore";
 import {
   fetchCompareHistoricalDate,
   fetchCompareHistoricalRange,
@@ -12,13 +12,15 @@ import { formatDate, getGameCategoryParam } from "../utils";
 import {
   processSpecificDatePayload,
   processDurationPayload,
-} from "./dataProcessors";
-import { generateSeries } from "./seriesGenerator";
-import GenericCSVExportButton from "../../../ui/buttons/CSVExportButtonDashboard";
+} from "./dataProcessorsRegional";
+import { generateSeries } from "./seriesGeneratorRegional";
 import CustomLegend from "../CustomLegend";
+import GenericCSVExportButton from "../../../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "~/store/useAuthStore";
 
-const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
+const ChartBettorsAndBetsRegionalSummary: React.FC<
+  BettorsandBetsSummaryProps
+> = ({
   gameCategoryId,
   categoryFilter,
   dateFilter,
@@ -42,10 +44,30 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   };
   const urlParam = chartMap[categoryFilter];
 
+  const philippineRegions = [
+    "NCR",
+    "CAR",
+    "I",
+    "II",
+    "III",
+    "IV-A",
+    "IV-B",
+    "V",
+    "VI",
+    "VII",
+    "VIII",
+    "IX",
+    "X",
+    "XI",
+    "XII",
+    "XIII",
+    "BARMM",
+  ];
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const gameCategoryParam = getGameCategoryParam(gameCategoryId);
+      const gameCategoryParam = getGameCategoryParam();
 
       if (
         dateFilter === "Specific Date" &&
@@ -62,7 +84,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
           }
         );
 
-        if (resp?.data?.DrawOrder) {
+        if (resp?.data?.Region) {
           const processedData = processSpecificDatePayload(
             urlParam,
             resp.data,
@@ -71,7 +93,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
           );
           setChartData(processedData);
         } else {
-          console.warn("Unexpected payload for Specific Date:", resp);
+          console.warn("Unexpected payload (Specific Date):", resp);
           setChartData([]);
         }
       } else if (
@@ -93,15 +115,15 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
           }
         );
 
-        if (resp?.data?.DrawOrder) {
+        if (resp?.data?.Region) {
           const processedData = processDurationPayload(urlParam, resp.data);
           setChartData(processedData);
         } else {
-          console.warn("Unexpected payload for Date Duration:", resp);
+          console.warn("Unexpected payload (Date Duration):", resp);
           setChartData([]);
         }
       } else {
-        console.log("No matching condition for fetching data.");
+        console.log("No valid condition met for data fetching.");
         setChartData([]);
       }
     } catch (err) {
@@ -128,6 +150,32 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     return new Intl.NumberFormat("en-US").format(num);
   };
 
+  const getCSVData = () => {
+    if (!chartData || chartData.length === 0) return [];
+
+    const series = generateSeries(
+      chartData,
+      urlParam,
+      dateFilter,
+      firstDateSpecific,
+      secondDateSpecific,
+      firstDateDuration,
+      secondDateDuration
+    );
+
+    return philippineRegions.map((region, index) => {
+      const row: Record<string, string | number> = { Region: region };
+
+      series.forEach((seriesItem) => {
+        const value = seriesItem.data[index] || 0;
+        const originalValue = value * 100000;
+        row[seriesItem.label || ""] = formatWithCommas(originalValue);
+      });
+
+      return row;
+    });
+  };
+
   const getCSVHeaders = () => {
     const series = generateSeries(
       chartData,
@@ -139,13 +187,10 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       secondDateDuration
     );
 
-    return ["Draw Order", ...series.map((s) => s.label || "")];
+    return ["Region", ...series.map((s) => s.label || "")];
   };
 
-  const getRowData = (item: string) => {
-    const drawOrders = ["First Draw", "Second Draw", "Third Draw"];
-    const index = drawOrders.indexOf(item); 
-
+  const getRowData = (item: any) => {
     const series = generateSeries(
       chartData,
       urlParam,
@@ -156,9 +201,14 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       secondDateDuration
     );
 
+    const regionIndex = philippineRegions.indexOf(item.Region);
+    if (regionIndex === -1) return [item.Region];
+
     return [
-      item,
-      ...series.map((s) => formatWithCommas(Number(s.data?.[index] || 0) * 100000)),
+      item.Region,
+      ...series.map((s) =>
+        formatWithCommas((s.data[regionIndex] || 0) * 100000)
+      ),
     ];
   };
 
@@ -167,7 +217,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       <div className="w-full mb-2 flex flex-col xl:flex-row xl:items-center xl:justify-between">
         <div className="flex flex-col leading-none">
           <p className="text-sm md:text-base lg:text-lg leading-none">
-            Summary {categoryFilter}
+            Regional Summary of {categoryFilter}
           </p>
           <CustomLegend
             gameCategoryId={gameCategoryId}
@@ -182,15 +232,16 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
         {currentUserType !== 3 && (
           <div className="mt-2 md:mt-4 xl:mt-0">
             <GenericCSVExportButton
-              data={["First Draw", "Second Draw", "Third Draw"]}
+              data={getCSVData()}
               headers={getCSVHeaders()}
-              title={`Summary of ${categoryFilter}`}
-              filename={`${categoryFilter.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}`}
+              title={`Regional Summary of ${categoryFilter}`}
+              filename={`Regional_Summary_${categoryFilter.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}`}
               getRowData={getRowData}
             />
           </div>
         )}
       </div>
+
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex justify-center items-center h-full">
@@ -199,10 +250,9 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
         ) : (
           <div className="min-w-[1000px] md:min-w-[600px]">
             <BarChart
-              height={350}
-              grid={{ vertical: true }}
-              layout="horizontal"
-              margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
+              height={400}
+              grid={{ horizontal: true }}
+              margin={{ left: 70, right: 20, top: 20, bottom: 80 }}
               series={generateSeries(
                 chartData,
                 urlParam,
@@ -212,18 +262,19 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
                 firstDateDuration,
                 secondDateDuration
               )}
-              yAxis={[
+              xAxis={[
                 {
                   scaleType: "band",
-                  data: ["First Draw", "Second Draw", "Third Draw"],
+                  data: philippineRegions,
+                  label: "Regions",
                 },
               ]}
-              xAxis={[
+              yAxis={[
                 {
                   label: "Total (x 100,000)",
                   scaleType: "linear",
                   min: 0,
-                  max: 1000,
+                  max: 100,
                   tickInterval: 50,
                   valueFormatter: (value: number) => value.toString(),
                   tickSize: 2,
@@ -239,4 +290,4 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   );
 };
 
-export default ChartBettorsAndBetsSummary;
+export default ChartBettorsAndBetsRegionalSummary;

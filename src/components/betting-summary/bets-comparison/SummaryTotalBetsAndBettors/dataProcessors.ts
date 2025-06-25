@@ -202,11 +202,11 @@ export const processDurationChart1Data = (payload: any): ChartData[] => {
         (sum: number, item: chartOne_Range) => sum + item.TotalBettors,
         0
       ),
-      firstRangeBets: firstRangeItems.reduce(
+      firstRangeBetAmount: firstRangeItems.reduce(
         (sum: number, item: chartOne_Range) => sum + item.TotalBetAmount,
         0
       ),
-      secondRangeBets: secondRangeItems.reduce(
+      secondRangeBetAmount: secondRangeItems.reduce(
         (sum: number, item: chartOne_Range) => sum + item.TotalBetAmount,
         0
       ),
