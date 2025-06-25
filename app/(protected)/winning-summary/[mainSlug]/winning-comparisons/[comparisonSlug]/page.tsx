@@ -7,10 +7,10 @@ import { WinningComparisonPage } from "~/components/winning-summary/ParentWinnin
 import { useParams } from "next/navigation";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     mainSlug: string;
     comparisonSlug: string;
-  };
+  }>;
 }
 
 const slugify = (text: string) => {
@@ -25,8 +25,8 @@ const slugify = (text: string) => {
     .replace(/\-\-+/g, "-");
 };
 
-export default function WinningComparisonSlugPage({ params }: PageProps) {
-  const { mainSlug, comparisonSlug } = useParams() as {
+export default async function WinningComparisonSlugPage({ params }: PageProps) {
+  const { mainSlug, comparisonSlug } = await params as {
     mainSlug: string;
     comparisonSlug: string;
   };  
