@@ -58,15 +58,13 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
         {isFilterVisible && (
           <div className="mt-1">
             {sortKey === "DateOfRegistration" ||
-            sortKey === "DateOfOperation" ? (
+            sortKey === "DateOfOperation" || sortKey === "date" ? (
               <input
                 type="date"
                 value={filters[sortKey] || ""}
                 onChange={(e) => handleFilterChange(sortKey)(e.target.value)}
-                className="w-full py-2 px-2 text-sm lg:text-base text-[#FFF] border-[#000] focus:outline-none font-normal border-b"
-                style={{
-                  colorScheme: "dark",
-                }}
+                max={dayjs().format("YYYY-MM-DD")} 
+                className="w-full px-2 py-1 bg-[#E97451] border-b border-white text-sm text-left focus:outline-none"
               />
             ) : (
               <input
@@ -74,7 +72,7 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
                 placeholder={`Filter by ${label}`}
                 value={filters[sortKey] || ""}
                 onChange={(e) => handleFilterChange(sortKey)(e.target.value)}
-                className="w-full py-2 px-2  text-sm lg:text-base text-[#FFF] border-[#000] focus:outline-none font-normal border-b"
+                className="w-full px-2 py-1 bg-[#E97451] border-b border-white text-sm text-left focus:outline-none"
               />
             )}
           </div>

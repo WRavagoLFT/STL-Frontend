@@ -25,13 +25,11 @@ html, body {
   color: #CE1126 !important;
 }
 
-/* input,
-select {
+/* input {
   background-color: transparent !important;
   color: inherit;
-}
+} */
 
-/* Base control */
 .custom-select__control {
   font-size: 0.875rem;
   padding: 2px;
@@ -43,7 +41,6 @@ select {
   outline: none !important;
 }
 
-/* Dropdown options */
 .custom-select__option {
   background-color: #F6BA12;
   color: #000000;
@@ -59,32 +56,25 @@ select {
   background-color: #FDE68A !important;
 }
 
-/* Menu container */
 .custom-select__menu {
   background-color: #F6BA12 !important;
   max-height: 400px;
   overflow-y: auto;
 }
 
-/* Dropdown indicator */
 .custom-select__dropdown-indicator {
   color: #000000 !important;
   padding: 4px;
 }
 
-/* Remove separator */
 .custom-select__indicator-separator {
   display: none !important;
 }
 
-/* Raise z-index if needed */
 .custom-select__menu-portal {
   z-index: 100 !important;
 }
 
-
-
-/* Small thin scrollbar */
 .sidebar-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
@@ -94,15 +84,14 @@ select {
 }
 
 .sidebar-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(200, 200, 200, 0.4); /* slightly darker */
+  background-color: rgba(200, 200, 200, 0.4); 
   border-radius: 10px;
 }
 
 .sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
-  background-color: rgba(200, 200, 200, 0.7); /* more visible on hover */
+  background-color: rgba(200, 200, 200, 0.7);
 }
 
-/* Firefox */
 .sidebar-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(200, 200, 200, 0.4) transparent;
@@ -117,26 +106,25 @@ select {
 }
 
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;  
+  scrollbar-width: none;     
 }
 
 .react-select-multi-select {
   background-color: transparent !important;
   border-radius: 0.5rem !important;
-  border: none !important;         /* use 'none' to remove border */
-  font-size: 14px !important;      /* specify units for font-size */
+  border: none !important;        
+  font-size: 14px !important;      
   padding: 0px !important;
   color: #2F2F2F !important;
 }
 
-/* Adjust dropdown option styles */
 .react-select-multi-select__option {
-  background-color: transparent !important;  /* Transparent background for options */
+  background-color: transparent !important; 
 }
 
 .react-select-multi-select__option--is-selected {
-  background-color: #0038A8 !important;      /* Highlight color when selected */
+  background-color: #0038A8 !important;      
   color: white !important;
 }
 

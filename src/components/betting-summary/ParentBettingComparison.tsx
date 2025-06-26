@@ -74,8 +74,7 @@ const ParentComparisonBetting = ({
     "Total Bettors by Game Type",
   ];
 
-  useEffect(() => {
-  }, [
+  useEffect(() => {}, [
     categoryFilter,
     dateFilter,
     firstDateSpecific,
@@ -94,9 +93,7 @@ const ParentComparisonBetting = ({
             iconColor="#fff"
             size={30}
             onClick={() => {
-              if (slug) {
-                router.push(`/betting-summary/${slug}`);
-              } else if (mainSlug) {
+              if (mainSlug) {
                 router.push(`/betting-summary/${mainSlug}`);
               } else {
                 router.push("/betting-summary");

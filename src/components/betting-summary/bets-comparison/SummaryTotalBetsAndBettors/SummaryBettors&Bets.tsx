@@ -144,7 +144,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
 
   const getRowData = (item: string) => {
     const drawOrders = ["First Draw", "Second Draw", "Third Draw"];
-    const index = drawOrders.indexOf(item); 
+    const index = drawOrders.indexOf(item);
 
     const series = generateSeries(
       chartData,
@@ -158,7 +158,9 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
 
     return [
       item,
-      ...series.map((s) => formatWithCommas(Number(s.data?.[index] || 0) * 100000)),
+      ...series.map((s) =>
+        formatWithCommas(Number(s.data?.[index] || 0) * 100000)
+      ),
     ];
   };
 

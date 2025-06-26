@@ -13,7 +13,6 @@ interface TableStoreState<T = any> {
   isFilterActive: boolean;
   setIsFilterActive: (val: boolean) => void;
   toggleFilter: () => void;
-  
 
   page: number;
   setPage: (page: number) => void;
@@ -23,7 +22,7 @@ interface TableStoreState<T = any> {
 
   modalOpen: boolean;
   setModalOpen: (val: boolean) => void;
-  
+
   modalType: 'create' | 'view' | null;
   setModalType: (type: 'create' | 'view' | null) => void;
 
@@ -37,6 +36,8 @@ interface TableStoreState<T = any> {
   setFilters: (
     filters: { [key: string]: string } | ((prevFilters: { [key: string]: string }) => { [key: string]: string })
   ) => void;
+
+  resetFilters: () => void; // Added resetFilters function
 
   handleFilterChange: (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => void;
 
@@ -63,6 +64,7 @@ const useDetailTableStore = create<TableStoreState>((set, get) => ({
 
   page: 0,
   setPage: (page) => set({ page }),
+
   modalOpen: false,
   setModalOpen: (val) => set({ modalOpen: val }),
 
@@ -80,6 +82,8 @@ const useDetailTableStore = create<TableStoreState>((set, get) => ({
     set((state) => ({
       filters: typeof newFilters === 'function' ? newFilters(state.filters) : newFilters,
     })),
+
+  resetFilters: () => set({ filters: {} }), 
 
   handleFilterChange: (key) => (e) => {
     const value = e.target.value;
@@ -111,7 +115,6 @@ const useDetailTableStore = create<TableStoreState>((set, get) => ({
     set({ sortConfig: { key, direction } });
   },
 
-  // Action menu state
   anchorEl: null,
   selectedRow: null,
   setAnchorEl: (el) => set({ anchorEl: el }),

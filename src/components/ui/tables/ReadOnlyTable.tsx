@@ -39,6 +39,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
     handleChangePage,
     handleChangeRowsPerPage,
     setSearchQuery,
+    resetFilters, 
   } = useDetailTableStore();
 
   const filteredData = useMemo(() => {
@@ -64,10 +65,10 @@ const ReadOnlyTablePage = <T extends Transactions>({
   }, [sortedData, page, rowsPerPage]);
 
   return (
-    <div className="overflow-x-auto w-full border border-[#0038A8] rounded-xl px-4 py-2">
-      <div className="flex flex-col sm:flex-row justify-between items-center py-2 gap-3">
-        <div className="flex items-center w-full sm:w-auto">
-          <div className="relative w-full sm:w-[350px]">
+    <div className="w-full border border-[#0038A8] rounded-xl px-4 py-2 overflow-x-auto relative">
+      <div className="flex flex-col sm:flex-row justify-between items-center py-2 gap-3 w-full">
+        <div className="flex items-center w-full max-w-[500px]">
+          <div className="relative w-full">
             <input
               type="text"
               placeholder="Search"
@@ -75,13 +76,19 @@ const ReadOnlyTablePage = <T extends Transactions>({
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-3 py-2 bg-[#F8F0E3] border border-blue-900 rounded-md text-sm focus:outline-none"
             />
-            <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400">
               <FaSearch size={16} />
             </div>
           </div>
           <button
-            onClick={() => setIsFilterActive(!isFilterActive)}
-            className="ml-2 text-gray-400 hover:text-gray-600"
+            onClick={() => {
+              setIsFilterActive(!isFilterActive);
+              if (isFilterActive) {
+                resetFilters(); // Reset filters when toggling off
+                // setSearchQuery(""); // Optional: Uncomment to reset search query too
+              }
+            }}
+            className="ml-2 text-gray-400 hover:text-gray-600 shrink-0"
           >
             {isFilterActive ? (
               <MdFilterListOff size={24} />
@@ -93,15 +100,13 @@ const ReadOnlyTablePage = <T extends Transactions>({
       </div>
 
       <div className="w-full overflow-x-auto">
-        <table className="table-fixed w-full">
-          <thead className="bg-[#E97451] text-white">
+        <table className="table-auto w-full min-w-[640px] text-xs sm:text-sm">
+          <thead className="bg-[#E97451] text-white sticky top-0 z-10">
             <tr>
-              {columns.map((col, index) => (
+              {columns.map((col) => (
                 <th
                   key={String(col.key)}
-                  className={`py-4 text-left font-normal overflow-hidden text-ellipsis ${
-                    index === 0 ? "w-1/3" : "w-1/6"
-                  }`}
+                  className="py-4 text-left font-normal overflow-hidden text-ellipsis min-w-[80px] sm:min-w-[100px] px-2"
                 >
                   <div className="flex items-center justify-start gap-1">
                     {col.sortable && (
@@ -117,15 +122,12 @@ const ReadOnlyTablePage = <T extends Transactions>({
               ))}
             </tr>
 
-            {/* Filter row */}
             {isFilterActive && (
               <tr>
-                {columns.map((col, index) => (
+                {columns.map((col) => (
                   <th
                     key={String(col.key)}
-                    className={`text-left pb-4 font-normal overflow-hidden text-ellipsis ${
-                      index === 0 ? "w-1/3" : "w-1/6"
-                    }`}
+                    className="text-left pb-4 font-normal overflow-hidden text-ellipsis min-w-[80px] sm:min-w-[100px] px-2"
                   >
                     <div className="flex items-center justify-center gap-1">
                       {col.filterable ? (
@@ -164,7 +166,10 @@ const ReadOnlyTablePage = <T extends Transactions>({
                     const key = String(col.key);
                     const value = (row as any)[key];
                     return (
-                      <td key={key} className="px-2 py-2">
+                      <td
+                        key={key}
+                        className="px-2 py-2 text-sm whitespace-normal min-w-[80px]"
+                      >
                         {col.render
                           ? col.render(row as unknown as T)
                           : col.filterValue
@@ -191,12 +196,12 @@ const ReadOnlyTablePage = <T extends Transactions>({
         </table>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between items-center p-3 text-sm">
+      <div className="flex flex-col sm:flex-row justify-between items-center p-3 text-sm gap-2">
         <div className="flex items-center gap-2">
           <label htmlFor="rowsPerPage">Rows per page:</label>
           <select
             id="rowsPerPage"
-            className="border border-gray-300 rounded px-1"
+            className="border border-gray-300 rounded px-1 text-sm"
             value={rowsPerPage}
             onChange={(e) =>
               handleChangeRowsPerPage({
@@ -211,8 +216,8 @@ const ReadOnlyTablePage = <T extends Transactions>({
             ))}
           </select>
         </div>
-        <div className="flex items-center gap-3 mt-2 sm:mt-0">
-          <span>
+        <div className="flex items-center gap-1 sm:gap-3 mt-2 sm:mt-0">
+          <span className="text-xs sm:text-sm">
             {Math.min(page * rowsPerPage + 1, filteredData.length)}–
             {Math.min((page + 1) * rowsPerPage, filteredData.length)} of{" "}
             {filteredData.length}
@@ -221,32 +226,32 @@ const ReadOnlyTablePage = <T extends Transactions>({
           <button
             onClick={(e) => handleChangePage(e, 0)}
             disabled={page === 0}
-            className="p-2 border rounded disabled:opacity-30"
+            className="p-1 sm:p-2 border rounded disabled:opacity-30"
             title="First Page"
           >
-            <FaAngleDoubleLeft />
+            <FaAngleDoubleLeft size={14} />
           </button>
 
           <button
             onClick={(e) => handleChangePage(e, page - 1)}
             disabled={page === 0}
-            className="p-2 border rounded disabled:opacity-30"
+            className="p-1 sm:p-2 border rounded disabled:opacity-30"
             title="Previous Page"
           >
-            <FaChevronLeft />
+            <FaChevronLeft size={14} />
           </button>
 
-          <span>
+          <span className="text-xs sm:text-sm">
             Page {page + 1} of {Math.ceil(filteredData.length / rowsPerPage)}
           </span>
 
           <button
             onClick={(e) => handleChangePage(e, page + 1)}
             disabled={page >= Math.ceil(filteredData.length / rowsPerPage) - 1}
-            className="p-2 border rounded disabled:opacity-30"
+            className="p-1 sm:p-2 border rounded disabled:opacity-30"
             title="Next Page"
           >
-            <FaChevronRight />
+            <FaChevronRight size={14} />
           </button>
 
           <button
@@ -257,10 +262,10 @@ const ReadOnlyTablePage = <T extends Transactions>({
               )
             }
             disabled={page >= Math.ceil(filteredData.length / rowsPerPage) - 1}
-            className="p-2 border rounded disabled:opacity-30"
+            className="p-1 sm:p-2 border rounded disabled:opacity-30"
             title="Last Page"
           >
-            <FaAngleDoubleRight />
+            <FaAngleDoubleRight size={14} />
           </button>
         </div>
       </div>
@@ -269,7 +274,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
         <CSVExportButtonTable
           pageType={pageType}
           columns={columns}
-          statsPerRegion={data}
+          statsPerRegion={sortedData}
           operatorMap={operatorMap ? Object.values(operatorMap) : []}
         />
       </div>

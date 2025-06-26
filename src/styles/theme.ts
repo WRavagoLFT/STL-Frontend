@@ -212,7 +212,6 @@ export const buttonStyles = {
   textTransform: "none",
   fontSize: 12,
   borderRadius: "8px",
-  width: "auto",
   fontWeight: 1,
 };
 

@@ -8,7 +8,7 @@ import ChartBettorsvsBetsPlacedSummary from "~/components/betting-summary/Bettor
 import ChartBettorsSummary from "~/components/betting-summary/BettorCountChart";
 import TableBettingSummary from "~/components/betting-summary/BettingSummaryTable";
 import ChartBettorsBetTypeSummary from "~/components/betting-summary/BettorCountByBetType";
-import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton"; 
+import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
 import { buttonStyles } from "~/styles/theme";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { useAuthStore } from "~/store/useAuthStore";
@@ -42,7 +42,7 @@ export const ParentBettingSummary = ({
     return () => clearTimeout(timer);
   }, [gameCategoryId]);
 
-  const slugify = (text: string) => 
+  const slugify = (text: string) =>
     text
       .toString()
       .toLowerCase()
@@ -50,12 +50,14 @@ export const ParentBettingSummary = ({
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")
       .replace(/\-\-+/g, "-")
-      .replace(/-(\d+)/g, "$1"); 
+      .replace(/-(\d+)/g, "$1");
 
   const handleViewComparisonClick = () => {
     const comparisonSlug = slugify(title);
     const mainSlug = slug || "dashboard";
-    router.push(`/betting-summary/${mainSlug}/betting-comparisons/${comparisonSlug}`);
+    router.push(
+      `/betting-summary/${mainSlug}/betting-comparisons/${comparisonSlug}`
+    );
   };
 
   const ChartSection = (
@@ -71,8 +73,13 @@ export const ParentBettingSummary = ({
 
   // pass the game category id
   const ComparisonButton = (
-    <div className="self-end my-3">
-      <Button variant="contained" sx={buttonStyles} onClick={handleViewComparisonClick}>
+    <div className="w-full xl:w-auto xl:self-end xl:ml-auto my-3 flex">
+      <Button
+        fullWidth
+        variant="contained"
+        sx={buttonStyles}
+        onClick={handleViewComparisonClick}
+      >
         View Comparison
       </Button>
     </div>
@@ -81,7 +88,7 @@ export const ParentBettingSummary = ({
   return (
     <>
       {isLoading ? (
-        <BettingSummarySkeleton /> 
+        <BettingSummarySkeleton />
       ) : (
         <div className="space-y-4 h-full mt-8 md:mt-0">
           <h1 className="text-3xl font-bold">{title} Betting Summary</h1>
@@ -91,7 +98,9 @@ export const ParentBettingSummary = ({
               {userTypeId === 6 ? (
                 <div className="w-full flex flex-col lg:flex-row lg:min-h-[400px] space-y-4 lg:space-y-0 lg:space-x-4">
                   <div className="w-full lg:w-1/3">
-                    <TableBettingActivityToday gameCategoryId={gameCategoryId} />
+                    <TableBettingActivityToday
+                      gameCategoryId={gameCategoryId}
+                    />
                   </div>
                   <div className="w-full lg:w-2/3 flex flex-col space-y-5">
                     {ChartSection}

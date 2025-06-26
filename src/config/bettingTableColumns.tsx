@@ -16,7 +16,23 @@ export const bettingTableColumns = (): Column<Transactions>[] => [
     sortable: true,
     filterable: true,
     filterKey: "DateOfTransaction",
-    render: (row: Transactions) => dayjs(row.DateOfTransaction).format("YYYY/MM/DD HH:mm:ss"),
+    render: (row: Transactions) => {
+      if (!row.DateOfTransaction || !dayjs(row.DateOfTransaction, [
+        "YYYY-MM-DD",
+        "DD/MM/YYYY",
+        "MM/DD/YYYY",
+        "YYYY-MM-DD HH:mm:ss",
+      ]).isValid()) {
+        console.warn("Invalid date in render:", row.DateOfTransaction);
+        return "Invalid Date";
+      }
+      return dayjs(row.DateOfTransaction, [
+        "YYYY-MM-DD",
+        "DD/MM/YYYY",
+        "MM/DD/YYYY",
+        "YYYY-MM-DD HH:mm:ss",
+      ]).format("YYYY/MM/DD HH:mm:ss");
+    },
   },
   {
     key: "drawTime",
@@ -49,8 +65,8 @@ export const bettingTableColumns = (): Column<Transactions>[] => [
       if (row.sahod) types.push("Sahod");
       if (row.ramble) types.push("Ramble");
       if (row.tresCasas) types.push("Tres Casas");
-      if (row.saisCasas) types.push("Tres Casas");
-      if (row.dyisCasas) types.push("Tres Casas");
+      if (row.saisCasas) types.push("Sais Casas");
+      if (row.dyisCasas) types.push("Dyis Casas");
 
       return types.join(" / ");
     },
@@ -89,5 +105,5 @@ export const bettingTableColumns = (): Column<Transactions>[] => [
         </Button>
       );
     },
-  }
+  },
 ];

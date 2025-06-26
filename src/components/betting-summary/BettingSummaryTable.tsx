@@ -1,9 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dayjs from "dayjs";
 import { fetchTransactions } from "~/utils/api/transactions";
 import { bettingTableColumns } from "~/config/bettingTableColumns";
 import ReadOnlyTablePage from "../ui/tables/ReadOnlyTable";
+import useDetailTableStore from "~/store/useTableStore";
 
 export interface Transactions {
   transactionNumber: string;
@@ -29,66 +31,111 @@ const TableBettingSummary = ({
 }) => {
   const tableColumns = bettingTableColumns();
   const [transactions, setTransactions] = useState<Transactions[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { filters } = useDetailTableStore();
 
   const fetchTransactionsData = async () => {
-    const response = await fetchTransactions();
+    setIsLoading(true);
+    try {
+      const response = await fetchTransactions();
 
-    if (!response.success || response.data.length === 0) return;
-
-    const todayFormatted = new Date().toLocaleDateString("en-CA", {
-      timeZone: "Asia/Manila",
-    });
-
-    const transactionsToday = response.data.filter(
-      (item: { DateOfTransaction: string }) => {
-        const transactionDate = new Date(item.DateOfTransaction)
-          .toISOString()
-          .split("T")[0];
-        return transactionDate === todayFormatted;
+      if (!response.success || response.data.length === 0) {
+        console.warn("No transactions found or API call failed");
+        setTransactions([]);
+        return;
       }
-    );
 
-    const filteredData =
-      gameCategoryId && gameCategoryId > 0
-        ? transactionsToday.filter(
-            (item: { GameCategoryId: number }) =>
-              item.GameCategoryId === gameCategoryId
-          )
-        : transactionsToday;
+      const selectedDate = filters.date || dayjs().format("YYYY-MM-DD");
 
-    const formattedData: Transactions[] = filteredData.map(
-      (transaction: any) => ({
-        transactionNumber: transaction.TransactionNumber,
-        date: transaction.DateOfTransaction,
-        drawTime:
-          transaction.DrawOrder === 1
-            ? "First Draw"
-            : transaction.DrawOrder === 2
-              ? "Second Draw"
-              : "Third Draw",
-        betAmount: transaction.BetAmount,
-        tumbok: transaction.Tumbok,
-        sahod: transaction.Sahod,
-        ramble: transaction.Ramble,
-        tresCasas: transaction.TresCasas,
-        saisCasas: transaction.SaisCasas,
-        dyisCasas: transaction.DyisCasas,
-        gameType: transaction.GameCategory,
-        selectedPair: `${transaction.CombinationOne}-${transaction.CombinationTwo}${
-          transaction.CombinationThree > 0
-            ? `-${transaction.CombinationThree}`
-            : ""
-        }${transaction.CombinationFour > 0 ? `-${transaction.CombinationFour}` : ""}`,
-        status: transaction.TransactionStatus,
-      })
-    );
+      let filteredTransactions = response.data;
 
-    setTransactions(formattedData);
+      if (selectedDate) {
+        filteredTransactions = response.data.filter(
+          (item: { DateOfTransaction: string }) => {
+            if (!item.DateOfTransaction) {
+              console.warn("Invalid DateOfTransaction:", item);
+              return false;
+            }
+            const transactionDate = dayjs(item.DateOfTransaction, [
+              "YYYY-MM-DD",
+              "DD/MM/YYYY",
+              "MM/DD/YYYY",
+              "YYYY-MM-DD HH:mm:ss",
+            ]);
+            if (!transactionDate.isValid()) {
+              console.warn("Unparseable date:", item.DateOfTransaction);
+              return false;
+            }
+            return transactionDate.format("YYYY-MM-DD") === selectedDate;
+          }
+        );
+      }
+
+      const filteredData =
+        gameCategoryId && gameCategoryId > 0
+          ? filteredTransactions.filter(
+              (item: { GameCategoryId: number }) =>
+                item.GameCategoryId === gameCategoryId
+            )
+          : filteredTransactions;
+
+      const formattedData: Transactions[] = filteredData.map(
+        (transaction: any) => {
+          const combinationOne =
+            typeof transaction.CombinationOne === "number"
+              ? transaction.CombinationOne
+              : 0;
+          const combinationTwo =
+            typeof transaction.CombinationTwo === "number"
+              ? transaction.CombinationTwo
+              : 0;
+          const combinationThree =
+            typeof transaction.CombinationThree === "number"
+              ? transaction.CombinationThree
+              : 0;
+          const combinationFour =
+            typeof transaction.CombinationFour === "number"
+              ? transaction.CombinationFour
+              : 0;
+
+          return {
+            transactionNumber: transaction.TransactionNumber,
+            date: transaction.DateOfTransaction,
+            drawTime:
+              transaction.DrawOrder === 1
+                ? "First Draw"
+                : transaction.DrawOrder === 2
+                  ? "Second Draw"
+                  : "Third Draw",
+            betAmount: transaction.BetAmount,
+            tumbok: transaction.Tumbok,
+            sahod: transaction.Sahod,
+            ramble: transaction.Ramble,
+            tresCasas: transaction.TresCasas,
+            saisCasas: transaction.SaisCasas,
+            dyisCasas: transaction.DyisCasas,
+            gameType: transaction.GameCategory,
+            selectedPair: `${combinationOne}-${combinationTwo}${
+              combinationThree > 0 ? `-${combinationThree}` : ""
+            }${combinationFour > 0 ? `-${combinationFour}` : ""}`,
+            status: transaction.TransactionStatus,
+            DateOfTransaction: transaction.DateOfTransaction,
+          };
+        }
+      );
+
+      setTransactions(formattedData);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      setTransactions([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchTransactionsData();
-  }, [gameCategoryId]);
+  }, [gameCategoryId, filters.date]);
 
   return (
     <div className="overflow-x-auto w-full">
