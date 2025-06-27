@@ -10,7 +10,6 @@ import TableBettingSummary from "~/components/betting-summary/BettingSummaryTabl
 import ChartBettorsBetTypeSummary from "~/components/betting-summary/BettorCountByBetType";
 import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
 import { buttonStyles } from "~/styles/theme";
-import { AccessGuard } from "~/components/auth/AccessGuard";
 import { useAuthStore } from "~/store/useAuthStore";
 import { useRouter } from "next/navigation";
 
@@ -71,7 +70,6 @@ export const ParentBettingSummary = ({
     </>
   );
 
-  // pass the game category id
   const ComparisonButton = (
     <div className="w-full xl:w-auto xl:self-end xl:ml-auto my-3 flex">
       <Button

@@ -142,7 +142,7 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
               {visibleItems.map((item, index) => (
                 <div
                   key={index}
-                  className="grid grid-cols-12 items-center py-2 px-2"
+                  className="grid grid-cols-12 items-center py-2 lg:py-3 px-2"
                 >
                   <div className="col-span-2 text-md font-semibold text-[#444]">
                     {item.rank}

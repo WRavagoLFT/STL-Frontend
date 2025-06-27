@@ -1,27 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { fetchWinners } from "~/utils/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
-import { useAuthStore } from "~/store/useAuthStore";
 import { TransactionData } from "~/types/types";
-
-interface Winner {
-  GameCategoryId: number;
-  DrawOrder: number;
-  PayoutAmount?: number;
-}
-
-type DrawNumber = 1 | 2 | 3;
-
-const drawLabelMap: Record<number, string> = {
-  1: "First Draw",
-  2: "Second Draw",
-  3: "Third Draw",
-};
+import { useAuthStore } from "~/store/useAuthStore";
 
 const CustomLegend = () => (
-  <div className="flex flex-row space-x-5 justify-start mt-0.5 mr-4">
+  <div className="flex flex-row space-x-5 justify-start mt-1 mr-4">
     <div className="flex items-center">
       <div className="w-3.5 h-3.5 rounded-full bg-[#E5C7FF] mr-2" />
       <p className="text-xs md:text-sm">Winners</p>
@@ -33,114 +21,126 @@ const CustomLegend = () => (
   </div>
 );
 
-const ChartWinnersvsWinningsSummary = ({
-  gameCategoryId,
-}: {
+const summary: Record<
+  number,
+  { gameName: string; winners: number; winnings: number }
+> = {
+  1: { gameName: "First Draw", winners: 0, winnings: 0 },
+  2: { gameName: "Second Draw", winners: 0, winnings: 0 },
+  3: { gameName: "Third Draw", winners: 0, winnings: 0 },
+};
+
+const ChartWinnersvsWinningsSummary = (params: {
   gameCategoryId?: number;
 }) => {
   const [loading, setLoading] = useState(true);
+  const [chartData, setChartData] = useState<
+    { draw: string; winners: number; winnings: number; ratio: number }[]
+  >([]);
   const [data, setData] = useState<
-    { draw: string; winners: number; winnings: number }[]
+    { gameName: string; winners: number; winnings: number }[]
   >([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
-  const fetchChartData = useCallback(async () => {
-    setLoading(true);
+  const fetchData = async () => {
     try {
-      const today = new Date().toLocaleDateString("en-CA", {
-        timeZone: "Asia/Manila",
+      const response = await fetchWinners({
+        from: new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Manila" }),
+        to: new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Manila" }),
+        gameCategoryId: params.gameCategoryId,
       });
 
-      const result = await fetchWinners({
-        from: today,
-        to: today,
-        gameCategoryId,
-      });
+      if (response.success && Array.isArray(response.data)) {
+        const today = new Date().toLocaleDateString("en-CA", {
+          timeZone: "Asia/Manila",
+        });
 
-      if (!result.success || !Array.isArray(result.data)) {
-        console.warn("[DEBUG] Invalid result from fetchWinners:", result);
-        setLoading(false);
-        return;
-      }
+        let filteredData = response.data.filter((item: TransactionData) => {
+          if (!item.DateOfTransaction) return false;
+          const localDate = new Date(item.DateOfTransaction).toLocaleDateString(
+            "en-CA",
+            { timeZone: "Asia/Manila" }
+          );
+          return localDate === today;
+        });
 
-      console.log("RESULT DATA:", result.data);
-
-      // Convert DateOfTransaction to PHT before filtering
-      let filtered = result.data.filter((item: TransactionData) => {
-        if (!item.DateOfTransaction) return false;
-
-        const localDate = new Date(item.DateOfTransaction).toLocaleDateString(
-          "en-CA",
-          { timeZone: "Asia/Manila" }
-        );
-
-        return localDate === today;
-      });
-
-      console.log("[DEBUG] Filtered by PHT DateOfTransaction:", filtered);
-
-      if (gameCategoryId) {
-        filtered = filtered.filter(
-          (item: TransactionData) => item.GameCategoryId === gameCategoryId
-        );
-      }
-
-      const drawSummary: Record<
-        DrawNumber,
-        { winners: number; winnings: number }
-      > = {
-        1: { winners: 0, winnings: 0 },
-        2: { winners: 0, winnings: 0 },
-        3: { winners: 0, winnings: 0 },
-      };
-
-      for (const item of filtered) {
-        const draw = item.DrawOrder as DrawNumber;
-        if (drawSummary[draw]) {
-          drawSummary[draw].winners += 1;
-          drawSummary[draw].winnings += item.PayoutAmount || 0;
+        if (params.gameCategoryId) {
+          filteredData = filteredData.filter(
+            (item: TransactionData) =>
+              item.GameCategoryId === params.gameCategoryId
+          );
         }
+
+        const localSummary: typeof summary = {
+          1: { gameName: "First Draw", winners: 0, winnings: 0 },
+          2: { gameName: "Second Draw", winners: 0, winnings: 0 },
+          3: { gameName: "Third Draw", winners: 0, winnings: 0 },
+        };
+
+        filteredData.forEach(
+          (item: {
+            DrawOrder: number;
+            PayoutAmount: number;
+          }) => {
+            if (localSummary[item.DrawOrder]) {
+              localSummary[item.DrawOrder].winners += 1;
+              localSummary[item.DrawOrder].winnings += item.PayoutAmount || 0;
+            }
+          }
+        );
+
+        const formattedData = Object.values(localSummary);
+
+        const scaledData = formattedData.map((item) => ({
+          ...item,
+          winnings: item.winnings,
+          ratio: item.winners === 0 ? 0 : item.winnings / item.winners,
+        }));
+
+        setData(scaledData);
+
+        const transformedChartData = scaledData.map((item) => ({
+          draw: item.gameName,
+          winners: item.winners,
+          winnings: item.winnings,
+          ratio: item.ratio,
+        }));
+
+        setChartData(transformedChartData);
+      } else {
+        console.error("API Request Failed:", response.message);
       }
-
-      const finalChartData = ([1, 2, 3] as DrawNumber[]).map((drawNum) => ({
-        draw: drawLabelMap[drawNum],
-        winners: drawSummary[drawNum].winners,
-        winnings: drawSummary[drawNum].winnings,
-        GameCategoryId: gameCategoryId ?? null,
-      }));
-
-      console.log("[DEBUG] Final chart data:", finalChartData);
-      setData(finalChartData);
     } catch (error) {
-      console.error("Error in fetchChartData:", error);
+      console.error("Error Fetching Data:", error);
     } finally {
       setLoading(false);
     }
-  }, [gameCategoryId]);
+  };
 
   useEffect(() => {
-    fetchChartData();
-  }, [fetchChartData]);
+    fetchData();
+  }, [params.gameCategoryId]);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
       <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col leading-none">
           <p className="text-sm md:text-base lg:text-lg leading-none">
-            Today&apos;s Winners and Winnings
+            Summary of Winners and Winnings Today
           </p>
           <CustomLegend />
         </div>
         {currentUserType !== 3 && (
           <div className="mt-2 md:mt-0">
             <GenericCSVExportButton
-              data={data}
-              headers={["Draw", "Winners", "Winnings"]}
+              data={chartData}
+              headers={["Draw", "Winners", "Winnings", "Winnings-to-Winner Ratio"]}
               title="Summary of Winners and Winnings per Draw"
               getRowData={(item) => [
                 item.draw,
-                item.winners.toString(),
+                item.winners,
                 item.winnings,
+                item.ratio,
               ]}
             />
           </div>
@@ -163,13 +163,14 @@ const ChartWinnersvsWinningsSummary = ({
                 legend: { hidden: true },
                 noDataOverlay: {
                   message:
-                    "Today's Winners and Winnings will be displayed once available.",
+                    "Summary of Winners and Winnings data will be displayed once available.",
                 },
               }}
+              dataset={chartData}
               series={[
                 {
                   data: data.map((item) => item.winners / 100000),
-                  color: "#BB86FC",
+                  color: "#E5C7FF",
                   label: "Winners",
                   valueFormatter: (value, context) =>
                     `${data[context.dataIndex].winners.toLocaleString()}`,
@@ -185,7 +186,7 @@ const ChartWinnersvsWinningsSummary = ({
               yAxis={[
                 {
                   scaleType: "band",
-                  data: data.map((d) => d.draw),
+                  data: chartData.map((item) => item.draw),
                 },
               ]}
               xAxis={[

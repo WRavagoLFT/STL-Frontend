@@ -1,8 +1,11 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
+import dayjs from "dayjs";
 import { fetchWinners } from "~/utils/api/winners";
-import ReadOnlyTablePage from "../ui/tables/ReadOnlyTable";
 import { winningTableColumns } from "~/config/winningTableColumns";
-import axios from "axios";
+import ReadOnlyTablePage from "../ui/tables/ReadOnlyTable";
+import useDetailTableStore from "~/store/useTableStore";
 
 export interface Transactions {
   transactionNumber: string;
@@ -21,104 +24,130 @@ export interface Transactions {
   payoutAmount: number;
 }
 
-const TableWinningSummary = (params: { gameCategoryId?: number }) => {
+const TableWinningSummary = ({
+  gameCategoryId,
+}: {
+  gameCategoryId?: number;
+}) => {
   const tableColumns = winningTableColumns();
   const [transactions, setTransactions] = useState<Transactions[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { filters } = useDetailTableStore();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const gameCategoryId =
-          params.gameCategoryId && params.gameCategoryId > 0
-            ? params.gameCategoryId
-            : undefined;
+  const fetchWinnersData = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetchWinners({
+        from: filters.date || dayjs().format("YYYY-MM-DD"),
+        to: filters.date || dayjs().format("YYYY-MM-DD"),
+        ...(gameCategoryId && gameCategoryId > 0 ? { gameCategoryId } : {}),
+      });
 
-        const today = new Date().toLocaleDateString("en-CA", {
-          timeZone: "Asia/Manila",
-        });
+      if (!response.success || response.data.length === 0) {
+        console.warn("No winners found or API call failed");
+        setTransactions([]);
+        return;
+      }
 
-        const fetchParams: {
-          from: string;
-          to: string;
-          gameCategoryId?: number;
-        } = {
-          from: today,
-          to: today,
-          ...(gameCategoryId && { gameCategoryId }),
-        };
+      const selectedDate = filters.date || dayjs().format("YYYY-MM-DD");
 
-        //console.log("Fetching winners with params:", fetchParams);
-        const response = await fetchWinners(fetchParams);
-        //console.log("API Response:", response);
+      let filteredTransactions = response.data;
 
-        if (response.success) {
-          const dataToUse = gameCategoryId
-            ? response.data.filter(
-                (item: any) => item.GameCategoryId === gameCategoryId
-              )
-            : response.data;
+      if (selectedDate) {
+        filteredTransactions = response.data.filter(
+          (item: { DateOfTransaction: string }) => {
+            if (!item.DateOfTransaction) {
+              console.warn("Invalid DateOfTransaction:", item);
+              return false;
+            }
+            const transactionDate = dayjs(item.DateOfTransaction, [
+              "YYYY-MM-DD",
+              "DD/MM/YYYY",
+              "MM/DD/YYYY",
+              "YYYY-MM-DD HH:mm:ss",
+            ]);
+            if (!transactionDate.isValid()) {
+              console.warn("Unparseable date:", item.DateOfTransaction);
+              return false;
+            }
+            return transactionDate.format("YYYY-MM-DD") === selectedDate;
+          }
+        );
+      }
 
-          const transformedData = dataToUse.map((transaction: any) => ({
+      const filteredData =
+        gameCategoryId && gameCategoryId > 0
+          ? filteredTransactions.filter(
+              (item: { GameCategoryId: number }) =>
+                item.GameCategoryId === gameCategoryId
+            )
+          : filteredTransactions;
+
+      const formattedData: Transactions[] = filteredData.map(
+        (transaction: any) => {
+          const combinationOne =
+            typeof transaction.WinningCombinationOne === "number"
+              ? transaction.WinningCombinationOne
+              : 0;
+          const combinationTwo =
+            typeof transaction.WinningCombinationTwo === "number"
+              ? transaction.WinningCombinationTwo
+              : 0;
+          const combinationThree =
+            typeof transaction.WinningCombinationThree === "number"
+              ? transaction.WinningCombinationThree
+              : 0;
+          const combinationFour =
+            typeof transaction.WinningCombinationFour === "number"
+              ? transaction.WinningCombinationFour
+              : 0;
+
+          return {
             transactionNumber: transaction.TransactionNumber,
-            date: new Date(transaction.DateOfTransaction).toLocaleDateString(),
+            date: transaction.DateOfTransaction,
             drawTime:
               transaction.DrawOrder === 1
                 ? "First Draw"
                 : transaction.DrawOrder === 2
-                ? "Second Draw"
-                : "Third Draw",
-            betAmount: transaction.BetAmount,
+                  ? "Second Draw"
+                  : "Third Draw",
             region: transaction.Region,
             province: transaction.Province,
+            betAmount: transaction.BetAmount,
             tumbok: transaction.Tumbok,
             sahod: transaction.Sahod,
             ramble: transaction.Ramble,
-            payoutAmount: transaction.PayoutAmount,
+            winType: transaction.WinType || "", // Handle winType if applicable
             gameType: transaction.GameCategory,
-            selectedPair: `${transaction.WinningCombinationOne}-${transaction.WinningCombinationTwo}${
-              transaction.WinningCombinationThree > 0
-                ? `-${transaction.WinningCombinationThree}`
-                : ""
-            }${
-              transaction.WinningCombinationFour > 0
-                ? `-${transaction.WinningCombinationFour}`
-                : ""
-            }`,
+            selectedPair: `${combinationOne}-${combinationTwo}${
+              combinationThree > 0 ? `-${combinationThree}` : ""
+            }${combinationFour > 0 ? `-${combinationFour}` : ""}`,
             status: transaction.TransactionStatus,
-          }));
-
-          setTransactions(transformedData);
-          console.log('WINNING TABLE SUMMARY:', transformedData);
-        } else {
-          console.error("API returned failure:", response.message);
-          setError(response.message || "Failed to fetch transactions");
+            payoutAmount: transaction.PayoutAmount,
+            DateOfTransaction: transaction.DateOfTransaction,
+          };
         }
-      } catch (err) {
-        setError("An error occurred while fetching transactions");
-        console.error("Caught error in fetchData:", err);
+      );
 
-        if (axios.isAxiosError(err)) {
-          console.error("Axios error response:", err.response?.data);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+      setTransactions(formattedData);
+      console.log("WINNING TABLE SUMMARY:", formattedData);
+    } catch (error) {
+      console.error("Error fetching winners:", error);
+      setTransactions([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    fetchData();
-  }, [params.gameCategoryId]);
+  useEffect(() => {
+    fetchWinnersData();
+  }, [gameCategoryId, filters.date]);
 
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
-
-  // if (error) {
-  //   return <div>Error: {error}</div>;
-  // }
-
-  return <ReadOnlyTablePage data={transactions} columns={tableColumns} />;
+  return (
+    <div className="overflow-x-auto w-full">
+      <ReadOnlyTablePage data={transactions} columns={tableColumns} />
+    </div>
+  );
 };
 
 export default TableWinningSummary;

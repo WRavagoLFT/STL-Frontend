@@ -8,10 +8,10 @@ import TableWinningActivityToday from "~/components/winning-summary/WinningActiv
 import ChartWinnersvsWinningsSummary from "~/components/winning-summary/WinnersvsWinningsChart";
 import TableWinningSummary from "~/components/winning-summary/WinningSummaryTable";
 import ChartWinnersBetTypeSummary from "~/components/winning-summary/WinnerCountBetTypeChart";
+import WinningSummarySkeleton from "~/components/winning-summary/WinningSummarySkeleton";
 import { buttonStyles } from "~/styles/theme";
-import { AccessGuard } from "~/components/auth/AccessGuard";
 import { useAuthStore } from "~/store/useAuthStore";
-import { ChartWinnersSummary } from "~/components/winning-summary/WinnerCountChart";
+import  ChartWinnersSummary  from "~/components/winning-summary/WinnerCountChart";
 
 const GAME_TITLES = [
   "STL",
@@ -31,12 +31,17 @@ export const ParentWinningSummaryPage = ({
   const router = useRouter();
   const [title, setTitle] = useState("STL");
   const userTypeId = useAuthStore((state) => state.userTypeId);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setTitle(GAME_TITLES[gameCategoryId] || "STL");
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    return () => clearTimeout(timer);
   }, [gameCategoryId]);
 
-  const slugify = (text: string) => 
+  const slugify = (text: string) =>
     text
       .toString()
       .toLowerCase()
@@ -44,12 +49,14 @@ export const ParentWinningSummaryPage = ({
       .replace(/\s+/g, "-")
       .replace(/[^\w\-]+/g, "")
       .replace(/\-\-+/g, "-")
-      .replace(/-(\d+)/g, "$1"); 
+      .replace(/-(\d+)/g, "$1");
 
   const handleViewComparisonClick = () => {
     const comparisonSlug = slugify(title);
     const mainSlug = slug || "dashboard";
-    router.push(`/winning-summary/${mainSlug}/winning-comparisons/${comparisonSlug}`);
+    router.push(
+      `/winning-summary/${mainSlug}/winning-comparisons/${comparisonSlug}`
+    );
   };
 
   const ChartSection = (
@@ -64,42 +71,53 @@ export const ParentWinningSummaryPage = ({
   );
 
   const ComparisonButton = (
-    <div className="self-end my-3">
-      <Button variant="contained" sx={buttonStyles} onClick={handleViewComparisonClick}>
+    <div className="w-full xl:w-auto xl:self-end xl:ml-auto my-3 flex">
+      <Button
+        fullWidth
+        variant="contained"
+        sx={buttonStyles}
+        onClick={handleViewComparisonClick}
+      >
         View Comparison
       </Button>
     </div>
   );
 
   return (
-    <AccessGuard allowedUserTypes={[3, 4, 6]}>
-      <div className="space-y-4 h-full mt-8 md:mt-0">
-        <h1 className="text-3xl font-bold">{title} Winning Summary</h1>
-        <DashboardCardsPage gameCategoryId={gameCategoryId} />
-        <div className="flex flex-col items-center space-y-4">
-          <div className="w-full space-y-4">
-            {userTypeId === 6 ? (
-              <div className="w-full flex flex-col lg:flex-row lg:min-h-[500px] space-y-4 lg:space-y-0 lg:space-x-4">
-                <div className="w-full lg:w-1/3">
-                  <TableWinningActivityToday gameCategoryId={gameCategoryId} />
-                </div>
-                <div className="w-full lg:w-2/3 flex flex-col space-y-6">
-                  {ChartSection}
-                  {ComparisonButton}
-                </div>
+    <>
+      {isLoading ? (
+        <WinningSummarySkeleton />
+      ) : (
+          <div className="space-y-4 h-full mt-8 md:mt-0">
+            <h1 className="text-3xl font-bold">{title} Winning Summary</h1>
+            <DashboardCardsPage gameCategoryId={gameCategoryId} />
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-full space-y-4">
+                {userTypeId === 6 ? (
+                  <div className="w-full flex flex-col lg:flex-row lg:min-h-[500px] space-y-4 lg:space-y-0 lg:space-x-4">
+                    <div className="w-full lg:w-1/3">
+                      <TableWinningActivityToday
+                        gameCategoryId={gameCategoryId}
+                      />
+                    </div>
+                    <div className="w-full lg:w-2/3 flex flex-col space-y-6">
+                      {ChartSection}
+                      {ComparisonButton}
+                    </div>
+                  </div>
+                ) : (
+                  (userTypeId === 3 || userTypeId === 4) && (
+                    <div className="w-full flex flex-col space-y-6">
+                      {ChartSection}
+                      {ComparisonButton}
+                    </div>
+                  )
+                )}
+                <TableWinningSummary gameCategoryId={gameCategoryId} />
               </div>
-            ) : (
-              (userTypeId === 3 || userTypeId === 4) && (
-                <div className="w-full flex flex-col space-y-6">
-                  {ChartSection}
-                  {ComparisonButton}
-                </div>
-              )
-            )}
-            <TableWinningSummary gameCategoryId={gameCategoryId} />
-          </div>
-        </div>
-      </div>
-    </AccessGuard>
+            </div>
+          </div>     
+      )}
+    </>
   );
 };
