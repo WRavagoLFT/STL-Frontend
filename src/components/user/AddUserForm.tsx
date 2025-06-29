@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Branch, Operator, User } from "~/types/types";
+import { Branch } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { useFormik } from "formik";
@@ -11,16 +11,18 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { generateValidPassword } from "~/utils/passwordgenerate";
 import Swal from "sweetalert2";
 import { toFormikValidationSchema } from "~/utils/formikHelpers";
+import { AddUserPayload, UsersItem } from "~/lib/api/users/users.service";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
 
 interface AddUserFormProps {
   title?: string;
-  operatorMap: Record<number, Operator>;
-  onSubmit: (data: User) => void;
-  initialData?: Partial<User>;
+  operatorMap: Record<number, OperatorsItem>;
+  onSubmit: (data: AddUserPayload) => void;
+  initialData?: Partial<AddUserPayload>;
   userTypeId: number;
   onClose?: () => void;
   pcsoBranchMap: { data: Branch[] };
-  kaboMap: User | null;
+  kaboMap: UsersItem | null;
 }
 
 const AddUserForm: React.FC<AddUserFormProps> = ({
@@ -442,7 +444,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
           mode= "add"
           onConfirm={async () => {
             try {
-              await onSubmit(formData as unknown as User); // submit from the parent component handled after password verification
+              await onSubmit(formData as unknown as AddUserPayload); // submit from the parent component handled after password verification
               closeConfirmModal(); // close confirm modal
               if (onClose) onClose(); // optionally close the parent modal
             } catch (err) {

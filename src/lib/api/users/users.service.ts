@@ -48,6 +48,27 @@ export interface UsersItem {
   Region?: any;
 }
 
+export interface AddUserPayload {
+  firstName: string;
+  lastName: string;
+  suffix: string;
+  password: string;
+  phoneNumber: number;
+  email: string;
+  userTypeId: number;
+  operatorId: number;
+
+  region: string;
+  province: string;
+  city: string;
+  barangay: string;
+  street: string;
+
+  pcsoBranchId: number;
+  cityName: number;
+  kaboId: number;
+}
+
 export interface UsersResponse {
   success: boolean;
   data: UsersItem[];
@@ -57,6 +78,11 @@ export interface UsersResponse {
 export const fetchUsers = async (): Promise<UsersResponse> => {
   const url = validateRelativeUrl("/users/getUsers");
   const response = await axiosInstance.get<UsersResponse>(url);
+  return response.data;
+};
+
+export const addUsers = async (payload: AddUserPayload): Promise<UsersResponse> => {
+  const response = await axiosInstance.post<UsersResponse>("/auth/register", payload);
   return response.data;
 };
 

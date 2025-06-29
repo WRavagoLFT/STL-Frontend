@@ -14,7 +14,7 @@ import { userTableColumns } from "~/config/userTableColumns";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
 import type { User } from "~/types/types";
 import Swal from "sweetalert2";
-import { addUser, suspendUser, UsersItem } from "~/lib/api/users/users.service";
+import { addUser, AddUserPayload, suspendUser, UsersItem } from "~/lib/api/users/users.service";
 const ChartsDataPage = React.lazy(() => import("~/components/ui/charts/UserChartsData"));
 const CardsPage = React.lazy(() => import("~/components/user/CardsData"));
 
@@ -69,16 +69,18 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
     setSelectedUser(user);
     setIsUpdateModalOpen(true);
   };
+  
   const closeUpdateModal = () => {
     setSelectedUser(null);
     setIsUpdateModalOpen(false);
   };
+
   const openEditLogModal = (user: UsersItem) => {
     setSelectedUser(user);
     setShowEditLog(true);
   };
 
-  const handleAddUser = async (data: UsersItem): Promise<void> => {
+  const handleAddUser = async (data: AddUserPayload): Promise<void> => {
     try {
       const result = await addUser(data);
       if (result.success) {

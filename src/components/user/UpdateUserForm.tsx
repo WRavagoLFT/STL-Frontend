@@ -12,14 +12,16 @@ import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { updateUserSchema } from "~/schemas/userSchema";
 import { useAuthStore } from "~/store/useAuthStore";
 import Swal from "sweetalert2";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
+import { UsersItem } from "~/lib/api/users/users.service";
 
 interface UpdateUserFormProps {
   title?: string;
-  operatorMap: Record<number, Operator>;
+  operatorMap: Record<number, OperatorsItem>;
   onSubmit: (data: User & { remarks?: string }) => void;
   initialData?: Partial<User>;
   userTypeId: number;
-  selectedUser?: User | null;
+  selectedUser?: UsersItem | null;
   onViewEditLogs?: (userId: number) => void;
   onClose?: () => void;
 }
