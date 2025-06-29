@@ -3,7 +3,9 @@ import dayjs, { Dayjs } from "dayjs";
 import { FaSort, FaSortUp, FaSortDown, FaCalendarAlt } from "react-icons/fa";
 import { SortableTableCellProps } from "../types/interfaces";
 import useDetailTableStore from "../store/useTableStore";
-import { User, Operator, SortConfig, EditLogFields } from "~/types/types";
+import { SortConfig, EditLogFields } from "~/types/types";
+import { UsersItem } from "~/lib/api/users/users.service";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
 
 export const SortableTableCell: React.FC<SortableTableCellProps> = ({
   label,
@@ -82,7 +84,7 @@ export const SortableTableCell: React.FC<SortableTableCellProps> = ({
   );
 };
 
-export function sortData<T extends User | Operator>(
+export function sortData<T extends UsersItem | OperatorsItem>(
   data: T[],
   sortConfig: SortConfig<T>
 ): T[] {
@@ -94,11 +96,11 @@ export function sortData<T extends User | Operator>(
 
     if (sortConfig.key === "fullName") {
       valueA =
-        `${(a as User).FirstName} ${(a as User).LastName} ${(a as User).Suffix || ""}`
+        `${(a as UsersItem).FirstName} ${(a as UsersItem).LastName} ${(a as UsersItem).Suffix || ""}`
           .trim()
           .toLowerCase();
       valueB =
-        `${(b as User).FirstName} ${(b as User).LastName} ${(b as User).Suffix || ""}`
+        `${(b as UsersItem).FirstName} ${(b as UsersItem).LastName} ${(b as UsersItem).Suffix || ""}`
           .trim()
           .toLowerCase();
     } else {
@@ -150,8 +152,8 @@ export const filterData = (
   data: any[],
   filterKeys: string[],
   filters: { [key: string]: string },
-  operatorMap?: { [key: number]: Operator }
-): (User | Operator)[] => {
+  operatorMap?: { [key: number]: OperatorsItem }
+): (UsersItem | OperatorsItem)[] => {
   const searchValue = filters.searchQuery?.toLowerCase() || "";
 
   return data.filter((item) => {

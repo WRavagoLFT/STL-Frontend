@@ -12,9 +12,8 @@ import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
 import { userTableColumns } from "~/config/userTableColumns";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
-import type { User } from "~/types/types";
 import Swal from "sweetalert2";
-import { addUser, AddUserPayload, suspendUser, UsersItem } from "~/lib/api/users/users.service";
+import { addUsers, AddUserPayload, suspendUser, UsersItem, editLogUser, UpdateUserPayload } from "~/lib/api/users/users.service";
 const ChartsDataPage = React.lazy(() => import("~/components/ui/charts/UserChartsData"));
 const CardsPage = React.lazy(() => import("~/components/user/CardsData"));
 
@@ -82,7 +81,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
 
   const handleAddUser = async (data: AddUserPayload): Promise<void> => {
     try {
-      const result = await addUser(data);
+      const result = await addUsers(data);
       if (result.success) {
         await loadUsers(
           roleConfig,
@@ -148,7 +147,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
     }
   };
 
-  const handleUpdate = async (formData: User) => {
+  const handleUpdate = async (formData: UpdateUserPayload) => {
     await handleUpdateUser(
       formData,
       () =>

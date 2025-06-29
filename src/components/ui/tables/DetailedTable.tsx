@@ -99,7 +99,7 @@ const DetailedTable = function <T extends UsersItem | OperatorsItem | Device>({
   const sortedData = useMemo(
     () =>
       sortConfig
-        ? sortData(filteredData, sortConfig as SortConfig<User | OperatorsItem>)
+        ? sortData(filteredData, sortConfig as SortConfig<UsersItem | OperatorsItem>)
         : [],
     [filteredData, sortConfig]
   );
@@ -121,7 +121,6 @@ const DetailedTable = function <T extends UsersItem | OperatorsItem | Device>({
         LastName,
         UserId,
         UserTypeId,
-        DeviceName,
         DeviceId,
         AssignedUser,
       } = targetRow;

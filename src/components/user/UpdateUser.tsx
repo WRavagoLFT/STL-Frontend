@@ -1,19 +1,18 @@
 import React from "react";
 import ModalWrapper from "../ui/modals/ModalWrapper";
-import { Operator, User } from "~/types/types";
 import UpdateUserForm from "./UpdateUserForm";
 import { OperatorsItem } from "~/lib/api/operators/operators.service";
-import { UsersItem } from "~/lib/api/users/users.service";
+import { UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
 
 type UpdateUserModalProps = {
   open?: boolean;
   onClose?: () => void;
-  onSubmit: (data: User) => void;
+  onSubmit: (data: UpdateUserPayload) => void;
   operatorMap?: Record<number, OperatorsItem>;
   userTypeId: number;
   selectedUser?: UsersItem | null;
   onViewEditLogs?: (userId: number) => void;
-  user?: User;
+  user?: UsersItem;
   slug?: string;
 };
 

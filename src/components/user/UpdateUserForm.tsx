@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Operator, User } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { getUserStatus } from "~/hooks/dashboarddata";
@@ -13,13 +12,13 @@ import { updateUserSchema } from "~/schemas/userSchema";
 import { useAuthStore } from "~/store/useAuthStore";
 import Swal from "sweetalert2";
 import { OperatorsItem } from "~/lib/api/operators/operators.service";
-import { UsersItem } from "~/lib/api/users/users.service";
+import { UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
 
 interface UpdateUserFormProps {
   title?: string;
   operatorMap: Record<number, OperatorsItem>;
-  onSubmit: (data: User & { remarks?: string }) => void;
-  initialData?: Partial<User>;
+  onSubmit: (data: UpdateUserPayload & { remarks?: string }) => void;
+  initialData?: Partial<UsersItem>;
   userTypeId: number;
   selectedUser?: UsersItem | null;
   onViewEditLogs?: (userId: number) => void;
@@ -86,7 +85,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
     { label: "Esq.", value: "Esq." },
   ];
 
-  const mapSelectedUserToFormData = (user: User) => ({
+  const mapSelectedUserToFormData = (user: UsersItem) => ({
     userId: user?.UserId || 0,
     firstName: user?.FirstName || "",
     lastName: user?.LastName || "",
@@ -520,7 +519,7 @@ const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
         mode="update"
         onConfirm={async () => {
           try {
-            await onSubmit(formData as unknown as User); // submit from the parent component handled after password verification
+            await onSubmit(formData as unknown as UpdateUserPayload); // submit from the parent component handled after password verification
             closeConfirmModal(); // close confirm modal
             if (onClose) onClose(); // optionally close the parent modal
           } catch (err) {

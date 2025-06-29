@@ -8,20 +8,6 @@ const validateRelativeUrl = (url: string) => {
   return url;
 };
 
-// Utility error handler
-const handleError = (label: string, error: any) => {
-  const message =
-    error?.response?.data?.message || error?.message || "Unknown error";
-
-  console.error(`[${label}] Error:`, message);
-
-  return {
-    success: false,
-    message,
-    data: error?.response?.data || {},
-  };
-};
-
 export interface UsersItem {
   UserId: number;
   FirstName: string;
@@ -46,9 +32,32 @@ export interface UsersItem {
   BranchName: string;
   BranchRegion: number;
   Region?: any;
+  AssignedArea?: string;
+  OperatorId?: number;
 }
 
 export interface AddUserPayload {
+  firstName: string;
+  lastName: string;
+  suffix: string;
+  password: string;
+  phoneNumber: number;
+  email: string;
+  userTypeId: number;
+  operatorId: number;
+
+  region: string;
+  province: string;
+  city: string;
+  barangay: string;
+  street: string;
+
+  pcsoBranchId: number;
+  cityName: number;
+  kaboId: number;
+}
+
+export interface UpdateUserPayload {
   firstName: string;
   lastName: string;
   suffix: string;
@@ -82,78 +91,27 @@ export const fetchUsers = async (): Promise<UsersResponse> => {
 };
 
 export const addUsers = async (payload: AddUserPayload): Promise<UsersResponse> => {
-  const response = await axiosInstance.post<UsersResponse>("/auth/register", payload);
+  const url = validateRelativeUrl("users/addUser");
+  const response = await axiosInstance.post<UsersResponse>(url, payload);
   return response.data;
 };
 
-// Add user (POST)
-export const addUser = async (userData: Record<string, any>) => {
-  try {
-    const url = validateRelativeUrl("/users/addUser");
-    const response = await axiosInstance.post(url, userData, {
-      withCredentials: true,
-    });
-
-    return {
-      success: true,
-      message: "User added successfully",
-      data: response.data?.data || {},
-    };
-  } catch (error) {
-    return handleError("addUser", error);
-  }
+export const updateUser = async (payload: UpdateUserPayload): Promise<UsersResponse> => {
+  const url = validateRelativeUrl("users/edituser");
+  const response = await axiosInstance.patch<UsersResponse>(url, payload);
+  return response.data;
 };
 
-// Update user (PATCH)
-export const updateUser = async (userData: Record<string, any>) => {
-  try {
-    const url = validateRelativeUrl("/users/edituser");
-    const response = await axiosInstance.patch(url, userData);
-
-    return {
-      success: true,
-      message: "User updated successfully",
-      data: response.data?.data || {},
-    };
-  } catch (error) {
-    return handleError("updateUser", error);
-  }
+export const editLogUser = async (userId: number): Promise<UsersResponse> => {
+  const url = validateRelativeUrl(`/users/getEditLog?userId=${userId}`);
+  const response = await axiosInstance.get<UsersResponse>(url);
+  return response.data;
 };
 
-// Get edit log for a user (GET)
-export const editLogUser = async (userId: number) => {
-  try {
-    const url = validateRelativeUrl("/users/getEditLog");
-    const response = await axiosInstance.get(url, {
-      params: { userId },
-    });
-
-    return {
-      success: true,
-      message: "Edit log fetched",
-      data: response.data?.data || [],
-    };
-  } catch (error) {
-    return handleError("editLogUser", error);
-  }
-};
-
-// Suspend user (PATCH)
-export const suspendUser = async (userId: number, remarks?: string) => {
-  try {
-    const url = validateRelativeUrl(`/users/${userId}/suspend`);
-    const payload = { userId, remarks };
-
-    const response = await axiosInstance.patch(url, payload);
-
-    return {
-      success: true,
-      message: "User suspended",
-      data: response.data?.data || {},
-    };
-  } catch (error) {
-    return handleError("suspendUser", error);
-  }
+export const suspendUser = async (userId: number, remarks?: string): Promise<UsersResponse> => {
+  const url = validateRelativeUrl(`/users/${userId}/suspend`);
+  const response = await axiosInstance.get<UsersResponse>(url);
+  return response.data;
 };
 
 // Fetch user by ID function
