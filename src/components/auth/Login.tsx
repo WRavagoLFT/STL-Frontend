@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoginSectionData } from "../../data/LoginSectionData";
-import { loginUser } from "../../lib/api/login";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import ActivityIndicator from "./ActivityIndicator";
+import { loginUser } from "~/lib/api/login";
 
 const loginSchema = z.object({
   email: z

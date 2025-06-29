@@ -1,4 +1,4 @@
-import axiosInstance from "./axiosInstance";
+import axiosInstance from "~/lib/api/axiosInstance";
 import { useAuthStore } from "~/store/useAuthStore";
 
 export const handleRouter = async (router: any) => {

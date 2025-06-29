@@ -1,4 +1,4 @@
-import axiosInstance from "../../utils/axiosInstance";
+import axiosInstance from "./axiosInstance";
 
 const validateRelativeUrl = (url: string) => {
   if (url.startsWith("http://") || url.startsWith("https://")) {

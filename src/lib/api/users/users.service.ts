@@ -33,9 +33,9 @@ export interface UsersItem {
   PhoneNumber: string;
   SupervisorName: string | null;
   DeviceId: string | null;
-  LastLogin: string | null;
-  LastTokenRefresh: string | null;
-  DateOfRegistration: string;
+  LastLogin?: string | null;
+  LastTokenRefresh?: string | null;
+  DateOfRegistration?: string;
   UserStatusId: number;
   IsDeleted: number;
   IsVerified: number;
@@ -45,6 +45,7 @@ export interface UsersItem {
   BranchId: number;
   BranchName: string;
   BranchRegion: number;
+  Region?: any;
 }
 
 export interface UsersResponse {
@@ -54,7 +55,8 @@ export interface UsersResponse {
 }
 
 export const fetchUsers = async (): Promise<UsersResponse> => {
-  const response = await axiosInstance.get<UsersResponse>("/users/getUsers");
+  const url = validateRelativeUrl("/users/getUsers");
+  const response = await axiosInstance.get<UsersResponse>(url);
   return response.data;
 };
 

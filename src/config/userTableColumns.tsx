@@ -2,11 +2,11 @@ import React from "react";
 import dayjs from "dayjs";
 import Button from "@mui/material/Button";
 import { getUserStatus } from "~/hooks/dashboarddata";
-import { User } from "~/types/types";
 import { Column } from "~/types/interfaces";
+import { UsersItem } from "~/lib/api/users/users.service";
 
-export const userTableColumns = (roleId: number): Column<User>[] => {
-  const columns: Column<User>[] = [
+export const userTableColumns = (roleId: number): Column<UsersItem>[] => {
+  const columns: Column<UsersItem>[] = [
     {
       key: "fullName",
       label: "Name",
@@ -18,7 +18,7 @@ export const userTableColumns = (roleId: number): Column<User>[] => {
       label: "Creation Date",
       sortable: true,
       filterable: true,
-      render: (user: User) =>
+      render: (user: UsersItem) =>
         user.DateOfRegistration
           ? dayjs(user.DateOfRegistration).format("YYYY/MM/DD HH:mm:ss")
           : "",
@@ -28,14 +28,14 @@ export const userTableColumns = (roleId: number): Column<User>[] => {
       label: "Created By",
       sortable: true,
       filterable: true,
-      render: (log: User) => log.CreatedBy ? log.CreatedBy : "No value",
+      render: (log: UsersItem) => log.CreatedBy ? log.CreatedBy : "No value",
     },
     {
       key: "Status",
       label: "Status",
       sortable: true,
       filterable: true,
-      render: (user: User) => {
+      render: (user: UsersItem) => {
         const sevenDaysAgo = dayjs().subtract(7, "days");
         const status = getUserStatus(user, sevenDaysAgo);
         return (

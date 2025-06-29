@@ -29,28 +29,53 @@ const handleError = (label: string, error: any) => {
   return { success: false, message, data: error?.response?.data || {} };
 };
 
-// Fetch all operators
-export const fetchOperators = async () => {
-  try {
-    const url = validateRelativeUrl("/operators/getOperators");
-    const response = await axiosInstance.get(url, { withCredentials: true });
-    return response.data;
-  } catch (error) {
-    return handleError("fetchOperators", error);
-  }
-};
+export interface OperatorsItem {
+  OperatorId: number;
+  OperatorName: string;
+  CreatedAt: string; // ISO Date string
+  CreatedBy: string;
+  Status: number;
+  OperatorEmail: string;
+  DateOfOperation: string; // ISO Date string
+  AreaOfOperations: string | null;
+  OperatorAddress: string;
+  OperatorContactNos: string;
+  OperatorRepresentative: string;
+  IsDeleted: number;
+  Email: string;
+  Executive: string;
+  ContactNo: string;
+  Managers: {
+    Name: string;
+  }[];
+  Cities: {
+    CityId: number;
+    CityName: string;
+  }[];
+  Region: {
+    RegionId: number;
+    RegionName: string;
+    RegionFull: string;
+    PSGC: string;
+  };
+  GameTypes: {
+    GameCategory: string;
+    GameCategoryId: number;
+  }[];
+  LastUpdatedBy: string;
+  LastUpdatedDate: string; // ISO Date string
+}
 
-// Fetch a specific operator by ID
-export const fetchOperator = async (operatorId: string | number) => {
-  try {
-    const url = validateRelativeUrl("/operators/getOperator");
-    const response = await axiosInstance.get(url, {
-      params: { operatorId },
-    });
-    return response.data;
-  } catch (error) {
-    return handleError("fetchOperator", error);
-  }
+export interface OperatorsResponse {
+  success: boolean;
+  data: OperatorsItem[];
+  message?: string;
+}
+
+export const fetchOperators = async (): Promise<OperatorsResponse> => {
+  const url = validateRelativeUrl("/operators/getOperators");
+  const response = await axiosInstance.get<OperatorsResponse>(url);
+  return response.data;
 };
 
 // Add operator (POST)

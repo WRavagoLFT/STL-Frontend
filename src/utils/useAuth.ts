@@ -5,7 +5,7 @@ import { useAuthStore } from "~/store/useAuthStore";
 import { getCurrentUser } from "~/lib/api/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { User } from "~/types/types";
-import axiosInstance from "./axiosInstance";
+import axiosInstance from "~/lib/api/axiosInstance";
 
 export function useAuth() {
   const router = useRouter();

@@ -1,13 +1,14 @@
-import { RoleConfig, User } from "~/types/types";
+import { RoleConfig } from "~/types/types";
 import { fetchPCSOBranch } from "~/lib/api/location";
 import { fetchUsers, UsersItem } from "~/lib/api/users/users.service";
+import { fetchOperators, OperatorsItem } from "~/lib/api/operators/operators.service";
 
 export const loadUsers = async (
   roleConfig: RoleConfig | null | undefined,
   roleKey: string,
   setData: (users: UsersItem[]) => void,
   setKaboMap: (data: any) => void,
-  setOperatorMap: (data: any) => void,
+  setOperatorMap: (data: OperatorsItem[]) => void,
   setPscoBranchMap: (data: any) => void,
   setLoading: (loading: boolean) => void
 ) => {
@@ -20,20 +21,26 @@ export const loadUsers = async (
       return;
     }
 
-    // Fetch user list (unified fetch)
     const userResponse = await fetchUsers();
-    const users = userResponse.data;
-    setData(users);
+    const allUsers = userResponse.data;
 
-    // Optional: set kaboMap if needed for kubrador
+    // Filter users based on the roleId
+    const filteredUsers = allUsers
+      .filter((user) => user.UserTypeId === roleConfig.roleId)
+      .map((user) => ({
+        ...user,
+        fullName: `${user.FirstName} ${user.LastName}`,
+      }));
+
+    setData(filteredUsers);
+
     if (roleKey === "kubrador") {
-      setKaboMap(users.filter(user => user.UserTypeId === 2));
+      setKaboMap(allUsers.filter((user) => user.UserTypeId === 2));
     }
 
-    // Fetch related maps
     const [operatorRes, pcsoBranchRes] = await Promise.all([
-      fetchOperatorMap(),
-      fetchPCSOBranch()
+      fetchOperators(),
+      fetchPCSOBranch(),
     ]);
 
     setOperatorMap(operatorRes.data);
@@ -45,5 +52,6 @@ export const loadUsers = async (
     setLoading(false);
   }
 };
+
 
 

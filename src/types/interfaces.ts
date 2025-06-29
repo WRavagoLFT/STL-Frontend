@@ -2,6 +2,7 @@ import { z, ZodSchema } from "zod";
 import { User, Operator, Share } from "./types";
 import { userSchema } from "~/schemas/userSchema";
 import { MultiValue } from "react-select";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -74,7 +75,7 @@ export interface ChartsDataPageProps<T extends { region: string }> {
   userType?: string;
   getUserStatus?: (user: T, date: string) => string;
   pageType?: "executive" | "manager" | "operator" | "kabo" | "kubrador" | "Device Information";
-  operatorMap?: Record<number, Operator>;
+  operatorMap?: Record<number, OperatorsItem>;
 }
 
 export interface DetailedTableProps<T> {
@@ -85,7 +86,7 @@ export interface DetailedTableProps<T> {
   pageType?: "executive" | "manager" | "operator" | "kabo" | "kubrador" | "Device Information";
   showExportButton?: boolean;
   onExportCSV?: () => void;
-  operatorMap?: Record<number, Operator>;
+  operatorMap?: Record<number, OperatorsItem>;
   statsPerRegion?: any[];
   roleId?: number;
   onClose?: () => void;

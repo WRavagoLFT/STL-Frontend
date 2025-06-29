@@ -1,6 +1,6 @@
 import { GameCombination } from '~/types/types';
-import axiosInstance from '../../utils/axiosInstance';
 import axios, { AxiosError } from 'axios'; // Import AxiosError for better typing
+import axiosInstance from './axiosInstance';
 
 const validateRelativeUrl = (url: string) => {
     if (url.startsWith('http://') || url.startsWith('https://')) {

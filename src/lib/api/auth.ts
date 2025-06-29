@@ -1,6 +1,6 @@
 import axios, { AxiosError } from "axios";
-import axiosInstance from "../../utils/axiosInstance";
 import { User } from "~/types/types";
+import axiosInstance from "./axiosInstance";
 
 // Utility to prevent accidental absolute URL usage
 const validateRelativeUrl = (url: string) => {

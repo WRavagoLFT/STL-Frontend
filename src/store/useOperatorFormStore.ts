@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
 import { Operator } from "~/types/types";
 
 interface OperatorFormStore {
@@ -8,8 +9,8 @@ interface OperatorFormStore {
   cities: Operator[];
   areaOfOperations: Operator[];
 
-  data: Operator[];               // <-- Add main operator data here
-  setData: (data: Operator[]) => void;
+  data: OperatorsItem[];               // <-- Add main operator data here
+  setData: (data: OperatorsItem[]) => void;
 
   setGameTypes: (gameTypes: Operator[]) => void;
   setRegions: (regions: Operator[]) => void;
