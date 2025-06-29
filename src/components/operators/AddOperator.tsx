@@ -1,10 +1,10 @@
 import React from "react";
-import { Operator } from "~/types/types";
 import AddOperatorForm from "./AddOperatorForm";
+import { AddOperatorPayload } from "~/lib/api/operators/operators.service";
 
 type AddOperatorPageProps = {
   onClose?: () => void;
-  onSubmit: (data: Operator) => void;
+  onSubmit: (data: AddOperatorPayload) => void;
   gameTypes: any[];
   regions: any[];
   provinces: any[];

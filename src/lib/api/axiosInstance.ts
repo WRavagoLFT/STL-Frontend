@@ -79,6 +79,10 @@ axiosInstance.interceptors.response.use(
         });
       }
     }
+    if (status === 401) {
+      window.location.href = "/not-found"; // or use router.push if in a React component
+      return Promise.reject(error);
+    }
 
     return Promise.reject(error);
   }

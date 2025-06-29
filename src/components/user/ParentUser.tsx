@@ -174,7 +174,6 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
             LastLogin: user.LastLogin ?? undefined,
             LastTokenRefresh: user.LastTokenRefresh ?? undefined,
             DateOfRegistration: user.DateOfRegistration ?? undefined,
-            //IsActive: user.IsActive ?? undefined,
             UserStatusId: user.UserStatusId ?? undefined,
           }))}
           roleLabel={label}
@@ -239,7 +238,6 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
             selectedUser={selectedUser}
           />
         )}
-        
       </div>
     </Suspense>
   );

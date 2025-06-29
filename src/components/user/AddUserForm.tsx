@@ -348,7 +348,7 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
               options={kaboOptions}
               value={
                 kaboOptions.find(
-                  (opt) => opt.value === formik.values.kaboId?.toString()
+                  (opt: any) => opt.value === formik.values.kaboId?.toString()
                 ) || null
               }
               onChange={(e) => {

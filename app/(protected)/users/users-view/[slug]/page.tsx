@@ -2,16 +2,15 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { User } from "~/types/types";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import { fetchUserById } from "~/lib/api/users.service";
 import UsersViewPage from "~/components/user/UsersViewPage";
+import { fetchUserById, UsersItem } from "~/lib/api/users/users.service";
 
 const UserSlugPage = () => {
   const params = useParams();
   const slug = params.slug as string;
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UsersItem | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

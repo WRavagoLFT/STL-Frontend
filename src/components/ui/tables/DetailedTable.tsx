@@ -17,7 +17,7 @@ import {
   sortData,
 } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
-import { User, SortConfig, Device } from "~/types/types";
+import { SortConfig, Device } from "~/types/types";
 import { getUserStatus } from "~/hooks/dashboarddata";
 import dayjs from "dayjs";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
