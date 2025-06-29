@@ -6,7 +6,7 @@ import { Operator } from "~/types/types";
 import RetailReceiptOperatorsPage from "~/components/operators/RetailReceipts";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import router, { useRouter } from "next/navigation";
-import { editLogOperator, updateOperator } from "~/utils/api/operators";
+import { editLogOperator, updateOperator } from "~/lib/api/operators";
 import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { operatorEditColumns } from "~/config/operatorEditLogTableColumns";
 import { AccessGuard } from "~/components/auth/AccessGuard";

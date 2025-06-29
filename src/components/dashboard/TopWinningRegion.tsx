@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { fetchWinners } from "~/utils/api/winners";
+import { fetchWinners } from "~/lib/api/winners";
 import { FaMoneyBillAlt } from "react-icons/fa";
 import router from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";

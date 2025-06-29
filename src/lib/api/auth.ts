@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import axiosInstance from "../axiosInstance";
+import axiosInstance from "../../utils/axiosInstance";
 import { User } from "~/types/types";
 
 // Utility to prevent accidental absolute URL usage

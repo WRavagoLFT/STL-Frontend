@@ -13,7 +13,7 @@ import { useRetailReceiptProcessor } from "~/components/retail-receipts/useRetai
 import {
   fetchRetailReceiptsMetrics,
   fetchRetailReceiptsData,
-} from "~/utils/api/transactions";
+} from "~/lib/api/transactions";
 import Select, { ActionMeta, SingleValue } from "react-select";
 
 import RetailReceiptSkeleton from "~/components/retail-receipts/RetailReceiptSkeleton";

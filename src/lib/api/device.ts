@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import axiosInstance from '../axiosInstance';
+import axiosInstance from '../../utils/axiosInstance';
 
 const validateRelativeUrl = (url: string) => {
     if (url.startsWith('http://') || url.startsWith('https://')) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuthStore } from "~/store/useAuthStore";
-import { getCurrentUser } from "~/utils/api/auth";
+import { getCurrentUser } from "~/lib/api/auth";
 import { useRouter, usePathname } from "next/navigation";
 import { User } from "~/types/types";
 import axiosInstance from "./axiosInstance";

@@ -1,12 +1,11 @@
 import { RoleConfig, User } from "~/types/types";
-import { fetchPCSOBranch } from "~/utils/api/location";
-import { fetchOperatorMap, fetchUsersByRole } from "~/utils/api/users";
-import axiosInstance from "~/utils/axiosInstance";
+import { fetchPCSOBranch } from "~/lib/api/location";
+import { fetchUsers, UsersItem } from "~/lib/api/users/users.service";
 
 export const loadUsers = async (
   roleConfig: RoleConfig | null | undefined,
   roleKey: string,
-  setData: (users: User[]) => void,
+  setData: (users: UsersItem[]) => void,
   setKaboMap: (data: any) => void,
   setOperatorMap: (data: any) => void,
   setPscoBranchMap: (data: any) => void,
@@ -21,39 +20,24 @@ export const loadUsers = async (
       return;
     }
 
-    let users: User[] = [];
-
-    if (roleKey === "kabo") {
-      const response = await fetchUsersByRole(roleConfig.roleId, null, null);
-      users = response.success ? response.data : [];
-      setData(users);
-      return;
-    }
-
-    if (roleKey === "kubrador") {
-      const response = await axiosInstance.get("/users/getUsers?userType=2");
-      setKaboMap(response.data);
-
-      const result = await fetchUsersByRole(roleConfig.roleId, null, null);
-      users = result.success ? result.data : [];
-      setData(users);
-      return;
-    }
-
-    const operatorRes = await fetchOperatorMap();
-    setOperatorMap(operatorRes.data);
-
-    const pcsoBranchMap = await fetchPCSOBranch();
-    setPscoBranchMap(pcsoBranchMap);
-
-    const result = await fetchUsersByRole(
-      roleConfig.roleId,
-      operatorRes.data,
-      pcsoBranchMap
-    );
-
-    users = result.success ? result.data : [];
+    // Fetch user list (unified fetch)
+    const userResponse = await fetchUsers();
+    const users = userResponse.data;
     setData(users);
+
+    // Optional: set kaboMap if needed for kubrador
+    if (roleKey === "kubrador") {
+      setKaboMap(users.filter(user => user.UserTypeId === 2));
+    }
+
+    // Fetch related maps
+    const [operatorRes, pcsoBranchRes] = await Promise.all([
+      fetchOperatorMap(),
+      fetchPCSOBranch()
+    ]);
+
+    setOperatorMap(operatorRes.data);
+    setPscoBranchMap(pcsoBranchRes);
   } catch (error) {
     console.error("Error in loadUsers:", (error as Error).message);
     setData([]);
@@ -61,4 +45,5 @@ export const loadUsers = async (
     setLoading(false);
   }
 };
+
 

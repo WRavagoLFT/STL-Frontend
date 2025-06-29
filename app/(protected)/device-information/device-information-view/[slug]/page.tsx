@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Device } from "~/types/types";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import { fetchDeviceById } from "~/utils/api/device";
+import { fetchDeviceById } from "~/lib/api/device";
 import { DevicesViewPage } from "~/components/device-information/ParentDeviceView";
 
 const fetchAndSetDevice = async (

@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { Device } from "~/types/types";
-import { editLogDevice, fetchUsageNotes } from "~/utils/api/device";
+import { editLogDevice, fetchUsageNotes } from "~/lib/api/device";
 import { useRouter } from "next/navigation";
 import { deviceEditColumns } from "~/config/deviceEditLogTableColumns";
 import EditLogsTablePage from "~/components/ui/tables/EditLogTable";

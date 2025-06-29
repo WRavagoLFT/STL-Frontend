@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { verifyPass } from "~/utils/api/auth";
+import { verifyPass } from "~/lib/api/auth";
 import { LoginSectionData } from "~/data/LoginSectionData";
 
 export interface ConfirmUserActionModalProps {

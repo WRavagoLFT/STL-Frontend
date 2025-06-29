@@ -1,6 +1,6 @@
 import { User } from "~/types/types";
 import Swal from "sweetalert2";
-import { updateUser } from "~/utils/api/users";
+import { updateUser } from "~/lib/api/users.service";
 
 export const handleUpdateUser = async (
   data: User,

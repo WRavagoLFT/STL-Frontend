@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { LoginSectionData } from "../../data/LoginSectionData";
 import { useAuthStore } from "../../store/useForgetAuthStore";
-import { forgetPassEmail, verifyOtp } from "~/utils/api/auth";
+import { forgetPassEmail, verifyOtp } from "~/lib/api/auth";
 import ActivityIndicator from "./ActivityIndicator";
 import { useRouter } from "next/navigation";
 

@@ -8,7 +8,7 @@ import BackIconButton from "~/components/ui/icons/BackButton";
 import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
 import { useOperatorFormStore } from "~/store/useOperatorFormStore";
 import { Operator } from "~/types/types";
-import { addOperator, fetchOperators } from "~/utils/api/operators";
+import { addOperator, fetchOperators } from "~/lib/api/operators";
 
 export default function ParentAddOperator() {
   const {

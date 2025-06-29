@@ -1,4 +1,4 @@
-import axiosInstance from "../axiosInstance";
+import axiosInstance from "../../utils/axiosInstance";
 
 // Helper to validate URL paths
 const validateRelativeUrl = (url: string) => {

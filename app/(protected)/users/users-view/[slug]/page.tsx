@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { User } from "~/types/types";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import { fetchUserById } from "~/utils/api/users";
+import { fetchUserById } from "~/lib/api/users.service";
 import UsersViewPage from "~/components/user/UsersViewPage";
 
 const UserSlugPage = () => {

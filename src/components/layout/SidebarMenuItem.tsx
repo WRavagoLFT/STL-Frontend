@@ -16,7 +16,7 @@ import {
   FaMobileAlt,
   FaDoorOpen,
 } from "react-icons/fa";
-import { logoutUser } from "~/utils/api/auth";
+import { logoutUser } from "~/lib/api/auth";
 import ActivityIndicator from "../auth/ActivityIndicator";
 import { usePathname, useRouter } from "next/navigation";
 

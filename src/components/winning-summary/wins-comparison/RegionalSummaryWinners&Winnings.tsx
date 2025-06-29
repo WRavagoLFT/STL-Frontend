@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { WinnersandWinningsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from "../../../store/useWinningStore";
-import { fetchCompareHistoricalWinnersDate, fetchCompareHistoricalWinnersRange } from "~/utils/api/winners";
+import { fetchCompareHistoricalWinnersDate, fetchCompareHistoricalWinnersRange } from "~/lib/api/winners";
 
 type Chart1Data = {
   // Specific Date

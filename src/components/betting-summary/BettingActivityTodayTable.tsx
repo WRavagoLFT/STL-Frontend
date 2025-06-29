@@ -5,7 +5,7 @@ import { CircularProgress } from "@mui/material";
 import {
   fetchHistoricalRegion,
   fetchHistoricalSummary,
-} from "~/utils/api/transactions";
+} from "~/lib/api/transactions";
 import { historicalSummaryByRegionCategory } from "~/utils/transforms";
 import { FaDiceSix } from "react-icons/fa";
 

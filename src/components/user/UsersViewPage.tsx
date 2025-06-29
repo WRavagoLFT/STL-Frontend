@@ -12,7 +12,7 @@ import Input from "~/components/ui/inputs/TextInputs";
 import useUserStore from "~/store/useUserStore";
 import { useAuthStore } from "~/store/useAuthStore";
 import { FaMobileAlt } from "react-icons/fa";
-import { editLogUser } from "~/utils/api/users";
+import { editLogUser } from "~/lib/api/users.service";
 import { loadUsers } from "~/hooks/useLoadUsers";
 import dayjs from "dayjs";
 import { handleAddDevice } from "~/hooks/handleAddDeviceAction";

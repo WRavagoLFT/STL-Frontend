@@ -12,7 +12,7 @@ import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
 import { userTableColumns } from "~/config/userTableColumns";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
-import { addUser, suspendUser, editLogUser } from "~/utils/api/users";
+import { addUser, suspendUser, editLogUser } from "~/lib/api/users.service";
 import type { User } from "~/types/types";
 import Swal from "sweetalert2";
 

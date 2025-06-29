@@ -6,7 +6,7 @@ import { LoginSectionData } from "../../data/LoginSectionData";
 import { useRouter } from "next/router";
 import Swal from "sweetalert2";
 import { useAuthStore } from "../../store/useForgetAuthStore";
-import { updateForgottenPassword } from "~/utils/api/auth";
+import { updateForgottenPassword } from "~/lib/api/auth";
 import ActivityIndicator from "./ActivityIndicator";
 
 const SetNewPassword = () => {

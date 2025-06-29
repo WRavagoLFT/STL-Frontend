@@ -1,4 +1,3 @@
-import { Branch, Operator, User } from "~/types/types";
 import axiosInstance from "../axiosInstance";
 
 // Helper to validate URL paths
@@ -23,105 +22,40 @@ const handleError = (label: string, error: any) => {
   };
 };
 
-// fetching of users and operator map
-export const fetchUsersByRole = async (
-  roleId: number,
-  operatorMap: Record<number, Operator> | null = null,
-  pscoBranchMap: Record<number, Branch> | null = null
-): Promise<{ success: boolean; message: string; data: User[] }> => {
-  if (!roleId) {
-    return {
-      success: false,
-      message: "No roleId provided",
-      data: [],
-    };
-  }
+export interface UsersItem {
+  UserId: number;
+  FirstName: string;
+  LastName: string;
+  Suffix: string | null;
+  UserTypeId: number;
+  CreatedBy: number | null;
+  Email: string;
+  PhoneNumber: string;
+  SupervisorName: string | null;
+  DeviceId: string | null;
+  LastLogin: string | null;
+  LastTokenRefresh: string | null;
+  DateOfRegistration: string;
+  UserStatusId: number;
+  IsDeleted: number;
+  IsVerified: number;
+  VerifiedAt: string | null;
+  LastUpdatedBy: number | null;
+  LastUpdatedDate: string | null;
+  BranchId: number;
+  BranchName: string;
+  BranchRegion: number;
+}
 
-  const url = validateRelativeUrl("/users/getUsers");
-  try {
-    const response = await axiosInstance.get(url, {
-      params: { roleId },
-    });
-
-    const rawUsers: User[] = response.data?.data ?? [];
-
-    if (!response.data.success) {
-      return {
-        success: false,
-        message: "API returned unsuccessful",
-        data: [],
-      };
-    }
-
-    const buildFullName = (user: User) =>
-      [user.FirstName, user.LastName].filter(Boolean).join(" ");
-
-    const users = rawUsers
-      .filter((user) => user.UserTypeId === roleId)
-      .map((user) => {
-        const operatorId = user.OperatorId;
-        const operatorDetails =
-          typeof operatorId === "number"
-            ? (operatorMap?.[operatorId] ?? null)
-            : null;
-
-        return {
-          ...user,
-          fullName: buildFullName(user),
-          OperatorDetails: operatorDetails,
-        };
-      });
-
-    return {
-      success: true,
-      message: "Users fetched successfully",
-      data: users,
-    };
-  } catch (error) {
-    return handleError("fetchUsers", error);
-  }
-};
-
-export const fetchOperatorMap = async (): Promise<{
+export interface UsersResponse {
   success: boolean;
-  message: string;
-  data: Record<number, Operator>;
-}> => {
-  const operatorUrl = validateRelativeUrl("/operators/getOperators");
+  data: UsersItem[];
+  message?: string;
+}
 
-  try {
-    const response = await axiosInstance.get(operatorUrl, {
-      withCredentials: true,
-    });
-
-    const operators: Operator[] = response.data?.data ?? [];
-
-    if (!response.data.success || !operators.length) {
-      return {
-        success: false,
-        message: "No operators found or request failed",
-        data: {},
-      };
-    }
-
-    const operatorMap = operators.reduce<Record<number, Operator>>(
-      (map, operator) => {
-        if (typeof operator.OperatorId === "number") {
-          map[operator.OperatorId] = operator;
-        }
-        return map;
-      },
-      {}
-    );
-
-    return {
-      success: true,
-      message: "Fetched operators successfully",
-      data: operatorMap,
-    };
-  } catch (error) {
-    return handleError("fetchOperatorMap", error);
-  }
+export const fetchUsers = async (): Promise<UsersResponse> => {
+  const response = await axiosInstance.get<UsersResponse>("/users/getUsers");
+  return response.data;
 };
 
 // Add user (POST)

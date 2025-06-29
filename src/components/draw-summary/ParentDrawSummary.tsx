@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchProvinces, fetchRegions } from "~/utils/api/location";
-import { fetchGameCategories } from "~/utils/api/gamecategories";
-import { fetchDrawSummary } from "~/utils/api/transactions";
+import { fetchProvinces, fetchRegions } from "~/lib/api/location";
+import { fetchGameCategories } from "~/lib/api/gamecategories";
+import { fetchDrawSummary } from "~/lib/api/transactions";
 import Select from "react-select";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { useAuthStore } from "~/store/useAuthStore";
