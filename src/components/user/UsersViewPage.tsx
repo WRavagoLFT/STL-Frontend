@@ -20,11 +20,13 @@ import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
 import { useRouter } from "next/navigation";
 import { useLoadDevices } from "../device-information/ParentDevice";
 import { editLogUser, UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
+import { fetchAndSetDevice } from "../../../app/(protected)/device-information/device-information-view/[slug]/page";
 
 type UsersViewPageProps = {
-  user?: UsersItem;
+  user: UsersItem;
   slug: string;
   onSubmit?: (data: UpdateUserPayload) => void;
+  deviceId?: number; // <- not Device
 };
 
 const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
@@ -45,20 +47,20 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const titleInfo =
-    user?.data.UserTypeId === 1 // Property 'UserTypeId' does not exist on type 'string'.ts(2339)
+    user?.UserTypeId === 1
       ? "Kubrador Information"
-      : user?.data.UserTypeId === 2 // Property 'UserTypeId' does not exist on type 'string'.ts(2339)
+      : user?.UserTypeId === 2
       ? "Kabo Information"
       : "User Information";
 
   const backUrl =
-    user?.data.UserTypeId === 1 // Property 'UserTypeId' does not exist on type 'string'.ts(2339)
+    user?.UserTypeId === 1
       ? "/users/kubrador"
-      : user?.data.UserTypeId === 2 // Property 'UserTypeId' does not exist on type 'string'.ts(2339)
+      : user?.UserTypeId === 2
       ? "/users/kabo"
       : "/";
-      
-  //console.log(user);
+        
+  console.log(user);
   //console.log(slug);
   //  THIS IS NULL
   //console.log('ROLE CONFIG', roleConfig); 
@@ -91,16 +93,16 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
     //console.log("activeTab changed:", activeTab);
     //console.log("user?.data.DeviceId:", user?.data?.DeviceId);
     
-    const shouldFetch = activeTab === "device" && !!user?.data?.DeviceId;
+    const shouldFetch = activeTab === "device" && !!user?.DeviceId;
     if (shouldFetch) {
-      const slugString = `${user.data.DeviceId}-device`;
+      const slugString = `${user.DeviceId}-device`;
       //console.log("fetching device with slug:", slugString);
       fetchAndSetDevice(slugString, setDevice, setLoading);
     }
-  }, [activeTab, user?.data?.DeviceId]);
+  }, [activeTab, user?.DeviceId]);
 
   const fetchLogs = useCallback(async () => {
-    const userId = user?.data?.UserId;
+    const userId = user?.UserId;
 
     if (activeTab === "history" && userId) {
       try {
@@ -118,7 +120,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
     } else {
       console.warn("[WARN] Skipping fetchLogs: either not in 'history' tab or UserId is missing.");
     }
-  }, [activeTab, user?.data?.UserId]);
+  }, [activeTab, user?.UserId]);
 
   useEffect(() => {
     fetchLogs();
@@ -137,7 +139,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
           size={30}
         />
         <div className="text-2xl md:text-3xl font-bold truncate">
-          {user?.data?.FirstName || "N/A"} {user?.data?.LastName || "N/A"}
+          {user?.FirstName || "N/A"} {user?.LastName || "N/A"}
         </div>
       </div>
 
@@ -186,8 +188,8 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
         <div className="my-6">
           <UpdateUserForm
             operatorMap={{}}
-            userTypeId={user?.data?.UserTypeId ?? 0}
-            selectedUser={user?.data}
+            userTypeId={user?.UserTypeId ?? 0}
+            selectedUser={user}
             onSubmit={onUserUpdateSubmit}
           />
         </div>
@@ -197,7 +199,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
         currentUserType !== 3 ? (
           <div className="my-6">
             <AddDeviceForm
-              userid={user?.data?.UserId}
+              userid={user?.UserId}
               onSubmit={onAddDeviceSubmit}
             />
           </div>
@@ -215,8 +217,8 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
           {device ? (
             <UpdateDeviceForm
               device={device}
-              deviceId={user?.data?.DeviceId}
-              userid={user?.data?.UserId}
+              deviceId={user?.DeviceId ?? undefined}
+              userid={user?.UserId}
               onSubmit={onUpdateDeviceSubmit}
             />
           ) : null}
@@ -237,7 +239,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
                   name="CreatedBy"
                   id="CreatedBy"
                   className="mt-1 w-full"
-                  value={user?.data?.CreatedBy || "N/A"}
+                  value={user?.CreatedBy || "N/A"}
                   disabled
                 />
               </div>
@@ -253,8 +255,8 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
                   id="DateOfRegistration"
                   className="mt-1 w-full"
                   value={
-                    user?.data?.DateOfRegistration
-                      ? dayjs(user.data.DateOfRegistration).format("YYYY/MM/DD HH:mm:ss")
+                    user?.DateOfRegistration
+                      ? dayjs(user.DateOfRegistration).format("YYYY/MM/DD HH:mm:ss")
                       : "N/A"
                   }
                   disabled
@@ -271,7 +273,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
                   name="LastUpdatedBy"
                   id="LastUpdatedBy"
                   className="mt-1 w-full"
-                  value={user?.data?.LastUpdatedBy || "N/A"}
+                  value={user?.LastUpdatedBy || "N/A"}
                   disabled
                 />
               </div>
@@ -287,8 +289,8 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
                   id="LastUpdatedDate"
                   className="mt-1 w-full"
                   value={
-                    user?.data?.LastUpdatedDate
-                      ? dayjs(user.data.LastUpdatedDate).format("YYYY/MM/DD HH:mm:ss")
+                    user?.LastUpdatedDate
+                      ? dayjs(user.LastUpdatedDate).format("YYYY/MM/DD HH:mm:ss")
                       : "N/A"
                   }
                   disabled

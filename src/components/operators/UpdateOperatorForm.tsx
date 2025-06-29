@@ -53,7 +53,6 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const { user, setUser, errors, setErrors, handleManagerChange } = useUpdateModalState();
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isDisabled, setIsDisabled] = useState(true);
   const [showEditButton, setShowEditButton] = useState(true);

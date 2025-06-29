@@ -7,7 +7,7 @@ import { AccessGuard } from "~/components/auth/AccessGuard";
 import { fetchDeviceById } from "~/lib/api/device";
 import { DevicesViewPage } from "~/components/device-information/ParentDeviceView";
 
-const fetchAndSetDevice = async (
+export const fetchAndSetDevice = async (
   slug: string,
   setDevice: (d: Device | null) => void,
   setLoading: (l: boolean) => void

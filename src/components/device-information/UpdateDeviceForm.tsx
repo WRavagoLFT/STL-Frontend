@@ -18,7 +18,7 @@ interface UpdateDeviceFormProps {
   onSubmit: (data: Device) => void;
   onClose?: () => void;
   device?: Device;
-  deviceId?: Device;
+  deviceId?: string;
   slug?: string;
   userid?: number;
 }

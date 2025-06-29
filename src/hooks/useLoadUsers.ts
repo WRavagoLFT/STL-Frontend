@@ -24,7 +24,6 @@ export const loadUsers = async (
     const userResponse = await fetchUsers();
     const allUsers = userResponse.data;
 
-    // Filter users based on the roleId
     const filteredUsers = allUsers
       .filter((user) => user.UserTypeId === roleConfig.roleId)
       .map((user) => ({
@@ -38,13 +37,24 @@ export const loadUsers = async (
       setKaboMap(allUsers.filter((user) => user.UserTypeId === 2));
     }
 
-    const [operatorRes, pcsoBranchRes] = await Promise.all([
-      fetchOperators(),
-      fetchPCSOBranch(),
-    ]);
+    // Conditionally fetch operators
+    if (roleKey !== "kabo" && roleKey !== "kubrador") {
+      try {
+        const operatorRes = await fetchOperators();
+        setOperatorMap(operatorRes.data);
+      } catch (err) {
+        console.warn("[loadUsers] Skipped Operator fetch due to permissions.");
+      }
 
-    setOperatorMap(operatorRes.data);
-    setPscoBranchMap(pcsoBranchRes);
+      // Conditionally fetch PCSO branches
+      try {
+        const pcsoBranchRes = await fetchPCSOBranch();
+        setPscoBranchMap(pcsoBranchRes);
+      } catch (err) {
+        console.warn("[loadUsers] Skipped PCSO branch fetch due to permissions.");
+      }
+    }
+
   } catch (error) {
     console.error("Error in loadUsers:", (error as Error).message);
     setData([]);
@@ -52,6 +62,7 @@ export const loadUsers = async (
     setLoading(false);
   }
 };
+
 
 
 

@@ -35,7 +35,6 @@ export interface UsersItem {
   AssignedArea?: string;
   OperatorId?: number;
   userId?: number;
-  data?: string;
 }
 
 export interface AddUserPayload {
