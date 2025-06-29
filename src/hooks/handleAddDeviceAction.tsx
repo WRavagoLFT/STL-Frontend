@@ -1,7 +1,6 @@
 import { Device } from "~/types/types";
-import { addDevice } from "~/utils/api/device";
+import { addDevice } from "~/lib/api/device";
 import Swal from "sweetalert2";
-import { NextRouter } from "next/router";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export const handleAddDevice = async (

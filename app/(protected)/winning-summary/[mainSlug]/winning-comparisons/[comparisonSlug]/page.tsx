@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { fetchGameCategories } from "~/utils/api/gamecategories";
+import { fetchGameCategories } from "~/lib/api/gamecategories";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { WinningComparisonPage } from "~/components/winning-summary/ParentWinningComparison";
 import { useParams } from "next/navigation";

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
@@ -18,11 +18,6 @@ const OperatorsPage = () => {
   const [hasFetched, setHasFetched] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const dashboardData = data.map((op) => ({
-    ...op,
-    region: op.OperatorRegion?.RegionName ?? "Unknown",
-  }));
-
   useEffect(() => {
     const loadFormOptions = async () => {
       setLoading(true);
@@ -37,33 +32,52 @@ const OperatorsPage = () => {
   }, [hasFetched]);
 
   return (
-    <>
-      {loading ? (
-        <UsersSkeletonPage />
-      ) : (
-        <div className="mx-auto px-0 py-1">
-          <h1 className="text-3xl font-bold mb-3">
-            Small Town Lottery Operators
-          </h1>
+    <Suspense fallback={<UsersSkeletonPage />}>
+      <div className="mx-auto px-0 py-1">
+        <h1 className="text-3xl font-bold mb-3">
+          Small Town Lottery Operators
+        </h1>
 
-          <CardsPage dashboardData={data} textlabel={textlabel} />
+        <CardsPage 
+          dashboardData={data.map((op) => ({
+            LastLogin: op.LastLogin ?? undefined,
+            LastTokenRefresh: op.LastTokenRefresh ?? undefined,
+            UserStatusId: op.UserStatusId ?? undefined,
+            DateOfRegistration: op.DateOfOperation ?? undefined,
+            IsActive: op.Status ?? undefined,
+          }))}
+          textlabel={textlabel} 
+        />
 
-          <ChartsDataPage
-            userType="operator"
-            pageType="operator"
-            dashboardData={dashboardData}
-          />
+        <ChartsDataPage
+          userType="operator"
+          pageType="operator"
+          dashboardData={data.map((op) => ({
+            LastLogin: op.LastLogin ?? undefined,
+            LastTokenRefresh: op.LastTokenRefresh ?? undefined,
+            UserStatusId: op.UserStatusId ?? undefined,
+            DateOfRegistration: op.DateOfOperation ?? "",
+            IsActive: op.Status ?? 0,
+            region: typeof op.OperatorRegion === "object" 
+              ? op.OperatorRegion.RegionName 
+              : "Unknown",
+            OperatorName: op.OperatorName,
+            BranchRegion: Number(op.BranchRegion) || undefined,
+            OperatorRegion: typeof op.OperatorRegion === "object" 
+              ? op.OperatorRegion 
+              : undefined,
+          }))}
+        />
 
-          <DetailedTable
-            data={data}
-            columns={tableColumns}
-            pageType="operator"
-            source="operators"
-            onAddClick={() => router.push("/operators/operators-add")}
-          />
-        </div>
-      )}
-    </>
+        <DetailedTable
+          data={data}
+          columns={tableColumns}
+          pageType="operator"
+          source="operators"
+          onAddClick={() => router.push("/operators/operators-add")}
+        />
+      </div>
+    </Suspense>
   );
 };
 

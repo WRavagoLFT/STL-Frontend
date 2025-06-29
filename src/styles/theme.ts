@@ -213,6 +213,7 @@ export const buttonStyles = {
   fontSize: 12,
   borderRadius: "8px",
   fontWeight: 1,
+  color: 'white'
 };
 
 export const buttonStylesretail = {

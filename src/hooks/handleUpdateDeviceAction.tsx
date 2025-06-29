@@ -1,5 +1,5 @@
 import { Device } from "~/types/types";
-import { updateDevice } from "~/utils/api/device";
+import { updateDevice } from "~/lib/api/device";
 import Swal from "sweetalert2";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 

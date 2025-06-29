@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { FaDiceSix } from "react-icons/fa";
-import { fetchHistoricalRegion } from "~/utils/api/transactions";
+import { fetchHistoricalRegion } from "~/lib/api/transactions";
 import router from "next/router";
 import { useAuthStore } from "~/store/useAuthStore";
 

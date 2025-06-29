@@ -7,7 +7,7 @@ import { BettorsandBetsSummaryProps } from "../../../../store/useBettingStore";
 import {
   fetchCompareHistoricalDate,
   fetchCompareHistoricalRange,
-} from "~/utils/api/transactions";
+} from "~/lib/api/transactions";
 import { formatDate, getGameCategoryParam } from "../utils";
 import {
   processSpecificDatePayload,

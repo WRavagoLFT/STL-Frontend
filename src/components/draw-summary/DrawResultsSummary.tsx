@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import { useAuthStore } from "~/store/useAuthStore";
 import AddGameCombinationModal from "./AddGameCobination";
-import { fetchGameSchedule, fetchGameTypes } from "~/utils/api/gamecategories";
+import { fetchGameSchedule, fetchGameTypes } from "~/lib/api/gamecategories";
 import { GameCombination } from "~/types/types";
-import { addWinningCombination } from "~/utils/api/winningcombinations";
+import { addWinningCombination } from "~/lib/api/winningcombinations";
 import Swal from "sweetalert2";
 
 interface GameScheduleItem {

@@ -1,6 +1,6 @@
-import axiosInstance from "../axiosInstance";
 import axios from "axios";
-import { handleRouter } from "../routerHandlers";
+import { handleRouter } from "../../utils/routerHandlers";
+import axiosInstance from "./axiosInstance";
 
 export const loginUser = async (
   payload: { email: string; password: string },

@@ -6,9 +6,8 @@ import Swal from "sweetalert2";
 import AddOperatorPage from "~/components/operators/AddOperator";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
+import { addOperator, AddOperatorPayload, fetchOperators } from "~/lib/api/operators/operators.service";
 import { useOperatorFormStore } from "~/store/useOperatorFormStore";
-import { Operator } from "~/types/types";
-import { addOperator, fetchOperators } from "~/utils/api/operators";
 
 export default function ParentAddOperator() {
   const {
@@ -25,7 +24,7 @@ export default function ParentAddOperator() {
     fetchFormOptionsData();
   }, []);
 
-  const handleAddOperator = async (data: Operator): Promise<void> => {
+  const handleAddOperator = async (data: AddOperatorPayload): Promise<void> => {
     try {
       const result = await addOperator(data);
       if (result.success) {

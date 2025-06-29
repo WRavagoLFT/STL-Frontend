@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Operator } from '~/types/types';
+import { OperatorsItem } from '~/lib/api/operators/operators.service';
 
 interface SortConfig<T> {
   key: string;
@@ -29,8 +29,8 @@ interface TableStoreState<T = any> {
   sortConfig: SortConfig<T>;
   setSortConfig: (config: SortConfig<T>) => void;
 
-  operatorMap: { [key: number]: Operator };
-  setOperatorMap: (operatorMap: { [key: number]: Operator }) => void;
+  operatorMap: { [key: number]: OperatorsItem };
+  setOperatorMap: (operatorMap: { [key: number]: OperatorsItem }) => void;
 
   filters: { [key: string]: string };
   setFilters: (

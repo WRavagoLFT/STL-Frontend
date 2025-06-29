@@ -5,12 +5,12 @@ import Select from "react-select";
 import useUpdateModalState from "../../store/useUpdateModalStore";
 import Input from "../ui/inputs/TextInputs";
 import dayjs from "dayjs";
-import { Operator } from "~/types/types";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "~/utils/formikHelpers";
 import { updateOperatorSchema } from "~/schemas/operatorSchema";
+import { OperatorsItem, UpdateOperatorPayload } from "~/lib/api/operators/operators.service";
 
 type GameTypeOption = {
   value: number;
@@ -30,7 +30,7 @@ type AreaOfOperationsTypeOptions = {
 type OperatorUpdatePageProps = {
   open?: boolean;
   onClose?: () => void;
-  onSubmit: (data: Operator) => void;
+  onSubmit: (data: UpdateOperatorPayload) => void;
   gameTypes: any[];
   regions: any[];
   provinces: any[];
@@ -53,7 +53,6 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
   onClose,
   onSubmit,
 }) => {
-  const { user, setUser, errors, setErrors, handleManagerChange } = useUpdateModalState();
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [isDisabled, setIsDisabled] = useState(true);
   const [showEditButton, setShowEditButton] = useState(true);
@@ -843,7 +842,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
         mode="update"
         onConfirm={async () => {
           try {
-            await onSubmit(formData as unknown as Operator); // submit from the parent component handled after password verification
+            await onSubmit(formData as unknown as UpdateOperatorPayload); // submit from the parent component handled after password verification
             closeConfirmModal(); // close confirm modal
             if (onClose) onClose(); // optionally close the parent modal
           } catch (err) {

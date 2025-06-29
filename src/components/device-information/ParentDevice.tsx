@@ -13,7 +13,7 @@ import DetailedTable from "~/components/ui/tables/DetailedTable";
 import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
 import { devicesTableColumns } from "~/config/devicesTableColumns";
 import { Device } from "~/types/types";
-import { fetchDevices } from "~/utils/api/device";
+import { fetchDevices } from "~/lib/api/device";
 
 type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 

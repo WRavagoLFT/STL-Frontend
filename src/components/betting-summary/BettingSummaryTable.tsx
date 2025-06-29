@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { fetchTransactions } from "~/utils/api/transactions";
+import { fetchTransactions } from "~/lib/api/transactions";
 import { bettingTableColumns } from "~/config/bettingTableColumns";
 import ReadOnlyTablePage from "../ui/tables/ReadOnlyTable";
 import useDetailTableStore from "~/store/useTableStore";

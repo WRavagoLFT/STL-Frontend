@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { fetchWinners } from "~/utils/api/winners";
+import { fetchWinners } from "~/lib/api/winners";
 import { winningTableColumns } from "~/config/winningTableColumns";
 import ReadOnlyTablePage from "../ui/tables/ReadOnlyTable";
 import useDetailTableStore from "~/store/useTableStore";

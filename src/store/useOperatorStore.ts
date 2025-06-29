@@ -1,27 +1,27 @@
 import { create } from "zustand";
-import { Operator } from "../types/types";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
 import { Column } from "~/types/interfaces";
 
 export interface OperatorsState {
-  data: Operator[];
-  columns: Column<Operator>[];
-  operators: Operator[];
-  operatorMap: Record<number, Operator>;
+  data: OperatorsItem[];
+  columns: Column<OperatorsItem>[];
+  operators: OperatorsItem[];
+  operatorMap: Record<number, OperatorsItem>;
   loading: boolean;
   error: string | null;
   modalOpen: boolean;
   //fields: Field[];
-  selectedData: Operator | null;
+  selectedData: OperatorsItem | null;
 
-  setData: (data: Operator[]) => void;
-  setColumns: (columns: Column<Operator>[]) => void;
-  setOperators: (operators: Operator[]) => void;
-  setOperatorMap: (operatorMap: Record<number, Operator>) => void;
+  setData: (data: OperatorsItem[]) => void;
+  setColumns: (columns: Column<OperatorsItem>[]) => void;
+  setOperators: (operators: OperatorsItem[]) => void;
+  setOperatorMap: (operatorMap: Record<number, OperatorsItem>) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   setModalOpen: (open: boolean) => void;
   //setFields: (fields: Field[]) => void;
-  setSelectedData: (data: Operator | null) => void;
+  setSelectedData: (data: OperatorsItem | null) => void;
 }
 
 export const useOperatorsData = create<OperatorsState>((set) => ({

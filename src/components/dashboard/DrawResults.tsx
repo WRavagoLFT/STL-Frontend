@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { FaBroadcastTower } from "react-icons/fa";
-import { getTodaysWinningCombination } from "../../utils/api/winningcombinations";
-import { fetchRegions, fetchProvinces } from "../../utils/api/location";
-import { fetchGameCategories } from "~/utils/api/gamecategories";
+import { getTodaysWinningCombination } from "../../lib/api/winningcombinations";
+import { fetchRegions, fetchProvinces } from "../../lib/api/location";
+import { fetchGameCategories } from "~/lib/api/gamecategories";
 import Select from "react-select";
 import router from "next/router";
 

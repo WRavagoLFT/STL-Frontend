@@ -18,11 +18,36 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+const MAX_REFRESH_RETRIES = 5;
+const RETRY_DELAY_MS = 1000;
+
+const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+const retryTokenRefresh = async () => {
+  for (let attempt = 1; attempt <= MAX_REFRESH_RETRIES; attempt++) {
+    try {
+      await axiosInstance.post("/auth/tokenRefresh", {}, { withCredentials: true });
+      return true; // success
+    } catch (err: any) {
+      const isNetworkError = err.code === "ERR_NETWORK" || !err.response;
+
+      console.warn(`Retry attempt ${attempt} for token refresh`);
+
+      if (!isNetworkError || attempt === MAX_REFRESH_RETRIES) {
+        throw err; // stop retrying
+      }
+
+      await delay(RETRY_DELAY_MS);
+    }
+  }
+
+  return false; // all retries failed
+};
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
     const message = error?.response?.data?.message;
     const status = error?.response?.status;
 
@@ -31,14 +56,16 @@ axiosInstance.interceptors.response.use(
     if (isTokenExpired) {
       if (!isRefreshing) {
         isRefreshing = true;
+
         try {
-          await axiosInstance.post("/auth/tokenRefresh", {}, { withCredentials: true });
+          const success = await retryTokenRefresh();
 
           isRefreshing = false;
           refreshSubscribers.forEach((cb) => cb());
           refreshSubscribers = [];
 
-          return axiosInstance(originalRequest); // Retry original request
+          if (success) return axiosInstance(originalRequest);
+          else throw new Error("Token refresh failed after retries");
         } catch (refreshError) {
           isRefreshing = false;
           refreshSubscribers = [];
@@ -47,16 +74,13 @@ axiosInstance.interceptors.response.use(
           return Promise.reject(refreshError);
         }
       } else {
-        // Queue the request until refresh is done
         return new Promise((resolve) => {
           refreshSubscribers.push(() => resolve(axiosInstance(originalRequest)));
         });
       }
     }
-
     if (status === 401) {
-      console.warn("Unauthorized: redirecting to home.");
-      window.location.href = "/not-found";
+      window.location.href = "/not-found"; // or use router.push if in a React component
       return Promise.reject(error);
     }
 

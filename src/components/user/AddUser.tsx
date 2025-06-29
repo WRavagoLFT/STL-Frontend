@@ -1,16 +1,18 @@
 import React from "react";
 import ModalWrapper from "../ui/modals/ModalWrapper";
 import AddUserForm from "./AddUserForm";
-import { Branch, Operator, User } from "~/types/types";
+import { Branch } from "~/types/types";
+import { AddUserPayload, UsersItem } from "~/lib/api/users/users.service";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
 
 type AddUserModalProps = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: User) => void;
-  operatorMap: Record<number, Operator>;
+  onSubmit: (data: AddUserPayload) => void;
+  operatorMap: Record<number, OperatorsItem>;
   userTypeId: number;
   pcsoBranchMap: { data: Branch[] };
-  kaboMap: User | null;
+  kaboMap: UsersItem | null;
 };
 
 export default function AddUserModal({ open, onClose, operatorMap, onSubmit, userTypeId, pcsoBranchMap, kaboMap }: AddUserModalProps) {

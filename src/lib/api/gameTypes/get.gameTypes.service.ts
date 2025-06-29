@@ -1,5 +1,5 @@
-import axiosInstance from '../../axiosInstance';
 import { AxiosError } from 'axios';
+import axiosInstance from '../axiosInstance';
 
 /**
  * A service function to fetch data from the Game Types API endpoint.

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchHistoricalSummary } from "../../utils/api/transactions";
-import { fetchWinners } from "../../utils/api/winners";
+import { fetchHistoricalSummary } from "../../lib/api/transactions";
+import { fetchWinners } from "../../lib/api/winners";
 import Card from "../ui/dashboardcards/Cards";
 
 const DashboardCardsPage = ({

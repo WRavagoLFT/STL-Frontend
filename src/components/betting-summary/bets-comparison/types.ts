@@ -65,6 +65,9 @@ export interface Chart1Data {
   secondRangeBettors?: number;
   firstRangeBetAmount?: number;
   secondRangeBetAmount?: number;
+
+  firstRangeBets?: number;
+  secondRangeBets?: number;
 }
 
 export interface Chart25Data {

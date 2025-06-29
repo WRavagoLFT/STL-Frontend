@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { Operator } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import Select from "react-select";
@@ -12,11 +11,12 @@ import { operatorSchema } from "~/schemas/operatorSchema";
 import Swal from "sweetalert2";
 import { generateValidPassword } from "~/utils/passwordgenerate";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { AddOperatorPayload, OperatorsItem } from "~/lib/api/operators/operators.service";
 
 interface AddOperatorFormProps {
   title?: string;
-  onSubmit: (data: Operator) => void;
-  initialData?: Partial<Operator>;
+  onSubmit: (data: AddOperatorPayload) => void;
+  initialData?: Partial<AddOperatorPayload>;
   gameTypes: any[];
   regions: any[];
   provinces: any[];
@@ -169,6 +169,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       execEmail: initialData.execEmail || "",
       execPassword: initialData.execPassword || "",
     },
+
     validationSchema: toFormikValidationSchema(operatorSchema),
     onSubmit: async (values) => {
       const result = await Swal.fire({
@@ -845,7 +846,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
           mode="add"
           onConfirm={async () => {
             try {
-              await onSubmit(formData as unknown as Operator); // submit from the parent component handled after password verification
+              await onSubmit(formData as unknown as AddOperatorPayload); // submit from the parent component handled after password verification
               closeConfirmModal(); // close confirm modal
               if (onClose) onClose(); // optionally close the parent modal
             } catch (err) {

@@ -1,19 +1,20 @@
 import { create } from "zustand";
-import { Operator, User } from "~/types/types";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
+import { UsersItem } from "~/lib/api/users/users.service";
 
 type ModalType = "create" | "view" | "editlog" | "page" | null;
 
 interface ModalState {
   modalOpen: boolean;
   modalType: ModalType;
-  selectedData: User | Operator | null;
+  selectedData: UsersItem | OperatorsItem | null;
 
   operatorId: number | null;               // add operatorId here
   setOperatorId: (id: number | null) => void;  // add setter
 
-  openModal: (type: ModalType, data?: User | Operator | null) => void;
+  openModal: (type: ModalType, data?: UsersItem | OperatorsItem | null) => void;
   closeModal: () => void;
-  setSelectedData: (data: User | Operator | null) => void;
+  setSelectedData: (data: UsersItem | OperatorsItem | null) => void;
 }
 
 export const useModalStore = create<ModalState>((set) => ({

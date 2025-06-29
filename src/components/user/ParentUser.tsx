@@ -12,13 +12,9 @@ import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
 import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
 import { userTableColumns } from "~/config/userTableColumns";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
-import { addUser, suspendUser, editLogUser } from "~/utils/api/users";
-import type { User } from "~/types/types";
 import Swal from "sweetalert2";
-
-const ChartsDataPage = React.lazy(
-  () => import("~/components/ui/charts/UserChartsData")
-);
+import { addUsers, AddUserPayload, suspendUser, UsersItem, editLogUser, UpdateUserPayload } from "~/lib/api/users/users.service";
+const ChartsDataPage = React.lazy(() => import("~/components/ui/charts/UserChartsData"));
 const CardsPage = React.lazy(() => import("~/components/user/CardsData"));
 
 interface UsersPageProps {
@@ -42,13 +38,12 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
   const operatorMap = useUserRoleStore((state) => state.operatorMap);
   const setOperatorMap = useUserRoleStore((state) => state.setOperatorMap);
   const { data, setData } = useUserRoleStore();
-
   const [loading, setLoading] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedUser, setSelectedUser] = useState<UsersItem | null>(null);
   const [showEditLog, setShowEditLog] = useState(false);
-  const [kaboMap, setKaboMap] = useState<User | null>(null);
+  const [kaboMap, setKaboMap] = useState<UsersItem | null>(null);
   const [pcsoBranchMap, setPscoBranchMap] = useState<any>(null);
 
   useEffect(() => {
@@ -68,22 +63,25 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
 
   const openCreateModal = () => setIsCreateModalOpen(true);
   const closeCreateModal = () => setIsCreateModalOpen(false);
-  const openUpdateModal = (user: User) => {
+  
+  const openUpdateModal = (user: UsersItem) => {
     setSelectedUser(user);
     setIsUpdateModalOpen(true);
   };
+  
   const closeUpdateModal = () => {
     setSelectedUser(null);
     setIsUpdateModalOpen(false);
   };
-  const openEditLogModal = (user: User) => {
+
+  const openEditLogModal = (user: UsersItem) => {
     setSelectedUser(user);
     setShowEditLog(true);
   };
 
-  const handleAddUser = async (data: User): Promise<void> => {
+  const handleAddUser = async (data: AddUserPayload): Promise<void> => {
     try {
-      const result = await addUser(data);
+      const result = await addUsers(data);
       if (result.success) {
         await loadUsers(
           roleConfig,
@@ -113,7 +111,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
     }
   };
 
-  const handleSuspendUser = async (data: User & { remarks?: string }) => {
+  const handleSuspendUser = async (data: UsersItem & { remarks?: string }) => {
     try {
       if (!data.UserId) throw new Error("Missing UserId");
       const result = await suspendUser(data.UserId, data.remarks);
@@ -149,7 +147,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
     }
   };
 
-  const handleUpdate = async (formData: User) => {
+  const handleUpdate = async (formData: UpdateUserPayload) => {
     await handleUpdateUser(
       formData,
       () =>
@@ -166,21 +164,35 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
     );
   };
 
-  return loading ? (
-    <UsersSkeletonPage />
-  ) : (
+  return (
     <Suspense fallback={<UsersSkeletonPage />}>
       <div className="mx-auto px-0 py-8 md:py-0">
         <h1 className="text-3xl font-bold mb-3">{label}</h1>
         <CardsPage
-          dashboardData={data}
+          dashboardData={data.map((user) => ({
+            ...user,
+            LastLogin: user.LastLogin ?? undefined,
+            LastTokenRefresh: user.LastTokenRefresh ?? undefined,
+            DateOfRegistration: user.DateOfRegistration ?? undefined,
+            UserStatusId: user.UserStatusId ?? undefined,
+          }))}
           roleLabel={label}
           textlabel={textlabel}
         />
+
         {currentUserType !== 3 && (
-          <ChartsDataPage pageType={roleKey} dashboardData={data} />
+          <ChartsDataPage
+            pageType={roleKey}
+            dashboardData={
+              data.map((user) => ({
+                ...user,
+                region: user.Region?.RegionName || "Unknown",
+              }))
+            }
+          />
         )}
-        <DetailedTable<User>
+
+        <DetailedTable<UsersItem>
           data={data}
           columns={userTableColumns(roleId)}
           pageType={roleKey}
@@ -192,6 +204,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
           onUpdateClick={openUpdateModal}
           onSubmit={handleSuspendUser}
         />
+
         <AddUserModal
           open={isCreateModalOpen}
           onClose={closeCreateModal}
@@ -201,6 +214,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
           pcsoBranchMap={pcsoBranchMap}
           kaboMap={kaboMap}
         />
+
         {isUpdateModalOpen && selectedUser && (
           <UpdateUserModal
             open={isUpdateModalOpen}
@@ -212,6 +226,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
             onViewEditLogs={() => openEditLogModal(selectedUser)}
           />
         )}
+
         {showEditLog && selectedUser && (
           <EditModalPage
             open={showEditLog}

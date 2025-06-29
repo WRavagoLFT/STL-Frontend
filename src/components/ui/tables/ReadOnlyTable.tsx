@@ -19,7 +19,9 @@ import {
 } from "../../../utils/sortPaginationSearch";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
-import { User, Operator, SortConfig } from "~/types/types";
+import { SortConfig } from "~/types/types";
+import { UsersItem } from "~/lib/api/users/users.service";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
 
 const ReadOnlyTablePage = <T extends Transactions>({
   data,
@@ -55,7 +57,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
 
   const sortedData = useMemo(() => {
     if (!filteredData || !sortConfig) return [];
-    return sortData(filteredData, sortConfig as SortConfig<User | Operator>);
+    return sortData(filteredData, sortConfig as SortConfig<UsersItem | OperatorsItem>);
   }, [filteredData, sortConfig]);
 
   const paginatedData = useMemo(() => {

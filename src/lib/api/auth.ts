@@ -1,6 +1,5 @@
-import axios, { AxiosError } from "axios";
-import axiosInstance from "../axiosInstance";
-import { User } from "~/types/types";
+import axiosInstance from "./axiosInstance";
+import { UsersItem } from "./users/users.service";
 
 // Utility to prevent accidental absolute URL usage
 const validateRelativeUrl = (url: string) => {
@@ -12,7 +11,7 @@ const validateRelativeUrl = (url: string) => {
 
 export type UserResponse = {
   success: boolean;
-  data: User;
+  data: UsersItem;
 };
 
 export const getCurrentUser = async (): Promise<UserResponse> => {

@@ -3,6 +3,7 @@
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import UsersPage from "~/components/user/ParentUser";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type RoleKey = "kubrador" | "kabo" | "executives" | "managers";
 
@@ -43,23 +44,34 @@ const roleMap: Record<
 
 export default function Page() {
   const params = useParams();
-  const roleParam = (params?.role as string)?.toLowerCase() as RoleKey;
+  const [roleConfig, setRoleConfig] = useState<null | (typeof roleMap)[RoleKey]>(null);
+  const [roleKey, setRoleKey] = useState<null | string>(null);
 
-  const roleConfig = roleMap[roleParam];
-  const roleKey =
-    roleParam === "managers"
-      ? "manager"
-      : roleParam === "executives"
-      ? "executive"
-      : roleParam;
+  useEffect(() => {
+    const roleParam = (params?.role as string)?.toLowerCase() as RoleKey;
+    if (!roleParam || !roleMap[roleParam]) return;
 
-  if (!roleConfig) {
-    return <div className="p-4 text-lg font-medium">Role not found.</div>;
+    const config = roleMap[roleParam];
+    setRoleConfig(config);
+
+    const normalizedKey =
+      roleParam === "managers"
+        ? "manager"
+        : roleParam === "executives"
+        ? "executive"
+        : roleParam;
+
+    setRoleKey(normalizedKey);
+  }, [params]);
+
+  // Wait until both values are set
+  if (!roleConfig || !roleKey) {
+    return <div className="p-4 text-lg font-medium">Loading role data...</div>;
   }
 
   return (
     <AccessGuard allowedUserTypes={roleConfig.permittedUserTypes}>
-      <UsersPage roleConfig={roleConfig} roleKey={roleKey} />
+      <UsersPage roleConfig={roleConfig} roleKey={roleKey as any} />
     </AccessGuard>
   );
 }

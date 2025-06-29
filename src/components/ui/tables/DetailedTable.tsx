@@ -17,7 +17,7 @@ import {
   sortData,
 } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
-import { User, Operator, SortConfig, Device } from "~/types/types";
+import { SortConfig, Device } from "~/types/types";
 import { getUserStatus } from "~/hooks/dashboarddata";
 import dayjs from "dayjs";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
@@ -27,8 +27,10 @@ import { useModalStore } from "~/store/useModalStore";
 import useDetailTableStore from "~/store/useTableStore";
 import { useAuthStore } from "~/store/useAuthStore";
 import ConfirmUserActionModalPage from "../modals/ConfirmUserActionModal";
+import { UsersItem } from "~/lib/api/users/users.service";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
 
-const DetailedTable = function <T extends User | Operator | Device>({
+const DetailedTable = function <T extends UsersItem | OperatorsItem | Device>({
   data,
   columns,
   actionsRender,
@@ -97,7 +99,7 @@ const DetailedTable = function <T extends User | Operator | Device>({
   const sortedData = useMemo(
     () =>
       sortConfig
-        ? sortData(filteredData, sortConfig as SortConfig<User | Operator>)
+        ? sortData(filteredData, sortConfig as SortConfig<UsersItem | OperatorsItem>)
         : [],
     [filteredData, sortConfig]
   );
@@ -119,7 +121,6 @@ const DetailedTable = function <T extends User | Operator | Device>({
         LastName,
         UserId,
         UserTypeId,
-        DeviceName,
         DeviceId,
         AssignedUser,
       } = targetRow;

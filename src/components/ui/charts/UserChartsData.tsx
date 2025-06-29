@@ -7,7 +7,7 @@ import {
 import useDashboardStore from "../../../store/useDashboardStore";
 import ChartCard from "./UserCharts";
 import { getUserStatus } from "~/hooks/dashboarddata";
-import { fetchRegions } from "~/utils/api/location";
+import { fetchRegions } from "~/lib/api/location";
 
 const regionMap: Record<string, string> = {
   I: "Region I",

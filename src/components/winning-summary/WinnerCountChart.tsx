@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { fetchWinners } from "~/utils/api/winners";
+import { fetchWinners } from "~/lib/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "~/store/useAuthStore";
 import { TransactionData } from "~/types/types";

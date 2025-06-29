@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { User } from "~/types/types";
+import { UsersItem } from "~/lib/api/users/users.service";
 
 interface UserInfoProps {
-  user: User | null;
+  user: UsersItem | null;
   getUserRole: (userTypeId: number) => string;
   collapsed: boolean;
 }

@@ -1,6 +1,8 @@
 import { create } from 'zustand';
+import { OperatorsItem } from '~/lib/api/operators/operators.service';
+import { UsersItem } from '~/lib/api/users/users.service';
 import { Column } from '~/types/interfaces';
-import { User, Operator, RoleConfig } from '~/types/types';
+import { RoleConfig } from '~/types/types';
 
 interface Field {
   value: any;
@@ -14,20 +16,20 @@ interface UserRoleStore {
   roleId: number | null;
   setRoleId: (roleId: number | null) => void;
 
-  data: User[];
-  setData: (data: User[] | ((prev: User[]) => User[])) => void;
+  data: UsersItem[];
+  setData: (data: UsersItem[] | ((prev: UsersItem[]) => UsersItem[])) => void;
 
-  columns: Column<User>[];
-  setColumns: (columns: Column<User>[]) => void;
+  columns: Column<UsersItem>[];
+  setColumns: (columns: Column<UsersItem>[]) => void;
 
-  userSummaryColumns: Column<User>[];
-  setUserSummaryColumns: (columns: Column<User>[]) => void;
+  userSummaryColumns: Column<UsersItem>[];
+  setUserSummaryColumns: (columns: Column<UsersItem>[]) => void;
 
-  editLogColumns: Column<User>[];
-  setEditLogColumns: (columns: Column<User>[]) => void;
+  editLogColumns: Column<UsersItem>[];
+  setEditLogColumns: (columns: Column<UsersItem>[]) => void;
 
-  operatorMap: { [key: number]: Operator };
-  setOperatorMap: (operatorMap: { [key: number]: Operator }) => void;
+  operatorMap: { [key: number]: OperatorsItem };
+  setOperatorMap: (operatorMap: { [key: number]: OperatorsItem }) => void;
 
   kaboMap: { [key: number]: any };
   setKaboMap: (kaboMap: { [key: number]: any }) => void;

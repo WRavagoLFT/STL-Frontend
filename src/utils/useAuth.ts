@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useAuthStore } from "~/store/useAuthStore";
-import { getCurrentUser } from "~/utils/api/auth";
+import { getCurrentUser } from "~/lib/api/auth";
 import { useRouter, usePathname } from "next/navigation";
-import { User } from "~/types/types";
-import axiosInstance from "./axiosInstance";
+import axiosInstance from "~/lib/api/axiosInstance";
+import { UsersItem } from "~/lib/api/users/users.service";
 
 export function useAuth() {
   const router = useRouter();
@@ -45,7 +45,7 @@ export function useAuth() {
         const res = await getCurrentUser();
 
         if (res?.success && res.data && res.data.UserTypeId !== undefined) {
-          setUser(res.data as User);
+          setUser(res.data as UsersItem);
           setUserTypeId(res.data.UserTypeId);
         } else {
           clearUser();

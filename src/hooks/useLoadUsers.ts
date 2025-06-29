@@ -1,14 +1,14 @@
-import { RoleConfig, User } from "~/types/types";
-import { fetchPCSOBranch } from "~/utils/api/location";
-import { fetchOperatorMap, fetchUsersByRole } from "~/utils/api/users";
-import axiosInstance from "~/utils/axiosInstance";
+import { RoleConfig } from "~/types/types";
+import { fetchPCSOBranch } from "~/lib/api/location";
+import { fetchUsers, UsersItem } from "~/lib/api/users/users.service";
+import { fetchOperators, OperatorsItem } from "~/lib/api/operators/operators.service";
 
 export const loadUsers = async (
   roleConfig: RoleConfig | null | undefined,
   roleKey: string,
-  setData: (users: User[]) => void,
+  setData: (users: UsersItem[]) => void,
   setKaboMap: (data: any) => void,
-  setOperatorMap: (data: any) => void,
+  setOperatorMap: (data: OperatorsItem[]) => void,
   setPscoBranchMap: (data: any) => void,
   setLoading: (loading: boolean) => void
 ) => {
@@ -21,39 +21,40 @@ export const loadUsers = async (
       return;
     }
 
-    let users: User[] = [];
+    const userResponse = await fetchUsers();
+    const allUsers = userResponse.data;
 
-    if (roleKey === "kabo") {
-      const response = await fetchUsersByRole(roleConfig.roleId, null, null);
-      users = response.success ? response.data : [];
-      setData(users);
-      return;
-    }
+    const filteredUsers = allUsers
+      .filter((user) => user.UserTypeId === roleConfig.roleId)
+      .map((user) => ({
+        ...user,
+        fullName: `${user.FirstName} ${user.LastName}`,
+      }));
+
+    setData(filteredUsers);
 
     if (roleKey === "kubrador") {
-      const response = await axiosInstance.get("/users/getUsers?userType=2");
-      setKaboMap(response.data);
-
-      const result = await fetchUsersByRole(roleConfig.roleId, null, null);
-      users = result.success ? result.data : [];
-      setData(users);
-      return;
+      setKaboMap(allUsers.filter((user) => user.UserTypeId === 2));
     }
 
-    const operatorRes = await fetchOperatorMap();
-    setOperatorMap(operatorRes.data);
+    // Conditionally fetch operators
+    if (roleKey !== "kabo" && roleKey !== "kubrador") {
+      try {
+        const operatorRes = await fetchOperators();
+        setOperatorMap(operatorRes.data);
+      } catch (err) {
+        console.warn("[loadUsers] Skipped Operator fetch due to permissions.");
+      }
 
-    const pcsoBranchMap = await fetchPCSOBranch();
-    setPscoBranchMap(pcsoBranchMap);
+      // Conditionally fetch PCSO branches
+      try {
+        const pcsoBranchRes = await fetchPCSOBranch();
+        setPscoBranchMap(pcsoBranchRes);
+      } catch (err) {
+        console.warn("[loadUsers] Skipped PCSO branch fetch due to permissions.");
+      }
+    }
 
-    const result = await fetchUsersByRole(
-      roleConfig.roleId,
-      operatorRes.data,
-      pcsoBranchMap
-    );
-
-    users = result.success ? result.data : [];
-    setData(users);
   } catch (error) {
     console.error("Error in loadUsers:", (error as Error).message);
     setData([]);
@@ -61,4 +62,7 @@ export const loadUsers = async (
     setLoading(false);
   }
 };
+
+
+
 

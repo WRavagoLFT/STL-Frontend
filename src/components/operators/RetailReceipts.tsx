@@ -8,7 +8,7 @@ import NetAACIncomePage from "../retail-receipts/NetAACIncome";
 import GrossPSCOSharePage from "../retail-receipts/GrossPSCOShare";
 import PCSOTaxesPage from "../retail-receipts/PCSOTaxes";
 import NetPSCOIncomePage from "../retail-receipts/NetPSCOIncome";
-import { fetchRetailReceiptsData } from "~/utils/api/transactions";
+import { fetchRetailReceiptsData } from "~/lib/api/transactions";
 import Select, { ActionMeta, SingleValue } from "react-select";
 import Input from "../ui/inputs/TextInputs";
 
