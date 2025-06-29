@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import UpdateUserForm from "~/components/user/UpdateUserForm";
-import { Device, User } from "~/types/types";
+import { Device } from "~/types/types";
 import AddDeviceForm from "~/components/device-information/AddDeviceForm";
 import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
@@ -12,7 +12,6 @@ import Input from "~/components/ui/inputs/TextInputs";
 import useUserStore from "~/store/useUserStore";
 import { useAuthStore } from "~/store/useAuthStore";
 import { FaMobileAlt } from "react-icons/fa";
-import { editLogUser } from "~/lib/api/users.service";
 import { loadUsers } from "~/hooks/useLoadUsers";
 import dayjs from "dayjs";
 import { handleAddDevice } from "~/hooks/handleAddDeviceAction";
@@ -20,11 +19,12 @@ import { handleUpdateDevice } from "~/hooks/handleUpdateDeviceAction";
 import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
 import { useRouter } from "next/navigation";
 import { useLoadDevices } from "../device-information/ParentDevice";
+import { editLogUser, UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
 
 type UsersViewPageProps = {
-  user?: User;
+  user?: UsersItem;
   slug: string;
-  onSubmit?: (data: User) => void;
+  onSubmit?: (data: UpdateUserPayload) => void;
 };
 
 const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
@@ -45,16 +45,16 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const titleInfo =
-    user?.data.UserTypeId === 1
+    user?.data.UserTypeId === 1 // Property 'UserTypeId' does not exist on type 'string'.ts(2339)
       ? "Kubrador Information"
-      : user?.data.UserTypeId === 2
+      : user?.data.UserTypeId === 2 // Property 'UserTypeId' does not exist on type 'string'.ts(2339)
       ? "Kabo Information"
       : "User Information";
 
   const backUrl =
-    user?.data.UserTypeId === 1
+    user?.data.UserTypeId === 1 // Property 'UserTypeId' does not exist on type 'string'.ts(2339)
       ? "/users/kubrador"
-      : user?.data.UserTypeId === 2
+      : user?.data.UserTypeId === 2 // Property 'UserTypeId' does not exist on type 'string'.ts(2339)
       ? "/users/kabo"
       : "/";
       
@@ -80,7 +80,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
     await handleUpdateDevice(data, loadData, router, redirectPath);
   };
   
-  const onUserUpdateSubmit = async (formData: User) => {
+  const onUserUpdateSubmit = async (formData: UpdateUserPayload) => {
     await handleUpdateUser(
       formData,
       () => loadUsers(roleConfig, roleKey!, setData, setKaboMap, setOperatorMap, setPscoBranchMap, setLoading),
@@ -304,7 +304,4 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
 };
 
 export default UsersViewPage;
-function fetchAndSetDevice(slugString: string, setDevice: React.Dispatch<React.SetStateAction<Device | null>>, setLoading: React.Dispatch<React.SetStateAction<boolean>>) {
-  throw new Error("Function not implemented.");
-}
 

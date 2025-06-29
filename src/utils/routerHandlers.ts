@@ -7,6 +7,7 @@ export const handleRouter = async (router: any) => {
   try {
     const userResponse = await axiosInstance.get("/users/getCurrentUser");
     const user = userResponse.data?.data;
+    // console.log("Fetched user:", user);
 
     if (!user) {
       console.warn("No user returned from backend.");

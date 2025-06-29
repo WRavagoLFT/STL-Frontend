@@ -1,7 +1,7 @@
 import React from "react";
 import ModalWrapper from "../ui/modals/ModalWrapper";
 import AddUserForm from "./AddUserForm";
-import { Branch, Operator, User } from "~/types/types";
+import { Branch } from "~/types/types";
 import { AddUserPayload, UsersItem } from "~/lib/api/users/users.service";
 import { OperatorsItem } from "~/lib/api/operators/operators.service";
 

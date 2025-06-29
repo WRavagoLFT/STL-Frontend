@@ -1,9 +1,8 @@
-import { User } from "~/types/types";
 import Swal from "sweetalert2";
-import { updateUser } from "~/lib/api/users/users.service";
+import { updateUser, UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
 
 export const handleUpdateUser = async (
-  data: User,
+  data: UpdateUserPayload,
   loadData: () => Promise<void>,
   closeModal?: () => void
 ): Promise<void> => {

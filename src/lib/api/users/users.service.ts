@@ -34,6 +34,8 @@ export interface UsersItem {
   Region?: any;
   AssignedArea?: string;
   OperatorId?: number;
+  userId?: number;
+  data?: string;
 }
 
 export interface AddUserPayload {
@@ -76,6 +78,8 @@ export interface UpdateUserPayload {
   pcsoBranchId: number;
   cityName: number;
   kaboId: number;
+  userId?: number;
+  data: UsersItem;
 }
 
 export interface UsersResponse {
@@ -120,7 +124,6 @@ export const fetchUserById = async (userId: string | number) => {
     const url = validateRelativeUrl("/users/getUsers");
     const response = await axiosInstance.get(url, {
       params: { userId },
-      withCredentials: true,
     });
 
     if (Array.isArray(response.data.data)) {
