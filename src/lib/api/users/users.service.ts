@@ -9,6 +9,7 @@ const validateRelativeUrl = (url: string) => {
 };
 
 export interface UsersItem {
+  OperatorDetails: any;
   UserId: number;
   FirstName: string;
   LastName: string;

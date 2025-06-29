@@ -2,10 +2,10 @@ import dayjs from "dayjs";
 import React from "react";
 import Button from "@mui/material/Button";
 import { getUserStatus } from "~/hooks/dashboarddata";
-import { Operator } from "~/types/types";
 import { Column } from "~/types/interfaces";
+import { OperatorsItem } from "~/lib/api/operators/operators.service";
 
-export const operatorTableColumns = (): Column<Operator>[] => [
+export const operatorTableColumns = (): Column<OperatorsItem>[] => [
   {
     key: "OperatorName",
     label: "Name",
@@ -18,11 +18,11 @@ export const operatorTableColumns = (): Column<Operator>[] => [
     sortable: true,
     filterable: false,
     filterKey: "Cities",
-    filterValue: (row: Operator) =>
+    filterValue: (row: OperatorsItem) =>
       Array.isArray(row.Cities)
         ? row.Cities.map((c) => c.CityName).join(", ")
         : "",
-    render: (row: Operator) =>
+    render: (row: OperatorsItem) =>
       Array.isArray(row.Cities) && row.Cities.length
         ? row.Cities.map((city) => city.CityName).join(", ")
         : "No cities",
@@ -33,7 +33,7 @@ export const operatorTableColumns = (): Column<Operator>[] => [
     sortable: true,
     filterable: true,
     filterKey: "DateOfOperation",
-    render: (user: Operator) =>
+    render: (user: OperatorsItem) =>
       user.DateOfOperation
         ? dayjs(user.DateOfOperation).format("YYYY/MM/DD HH:mm:ss")
         : "",
@@ -43,14 +43,14 @@ export const operatorTableColumns = (): Column<Operator>[] => [
     label: "Created By",
     sortable: true,
     filterable: false,
-    render: (operator: Operator) => operator?.Executive || "No executive",
+    render: (operator: OperatorsItem) => operator?.Executive || "No executive",
   },
   {
     key: "Status",
     label: "Status",
     sortable: true,
     filterable: true,
-    render: (user: Operator) => {
+    render: (user: OperatorsItem) => {
       const sevenDaysAgo = dayjs().subtract(7, "days");
       const status = getUserStatus(user, sevenDaysAgo);
       return (

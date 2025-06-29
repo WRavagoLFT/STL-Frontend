@@ -56,8 +56,8 @@ const AddUserForm: React.FC<AddUserFormProps> = ({
   );
 
   //console.log("kaboMap:", kaboMap);
-  const kaboOptions = Array.isArray(kaboMap?.data)
-    ? kaboMap.data.map(user => ({
+  const kaboOptions = Array.isArray(kaboMap) 
+    ? kaboMap.map(user => ({
         value: user.UserId !== undefined ? user.UserId.toString() : "0",
         label: user.FirstName ?? "Unknown",
       }))

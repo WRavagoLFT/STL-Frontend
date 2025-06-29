@@ -20,7 +20,7 @@ import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
 import { useRouter } from "next/navigation";
 import { useLoadDevices } from "../device-information/ParentDevice";
 import { editLogUser, UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
-import { fetchAndSetDevice } from "../../../app/(protected)/device-information/device-information-view/[slug]/page";
+import { fetchAndSetDevice } from "~/hooks/useLoadDevice";
 
 type UsersViewPageProps = {
   user: UsersItem;

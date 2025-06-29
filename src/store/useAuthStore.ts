@@ -1,12 +1,12 @@
 import { create } from 'zustand';
-import { User } from '~/types/types';
+import { UsersItem } from '~/lib/api/users/users.service';
 
 interface AuthState {
-  user: User | null;
+  user: UsersItem | null;
   userValidated: boolean;
   isLoading: boolean;
   userTypeId: number | null;
-  setUser: (user: User) => void;
+  setUser: (user: UsersItem) => void;
   clearUser: () => void;
   setUserTypeId: (id: number) => void;
   setUserValidated: (valid: boolean) => void;

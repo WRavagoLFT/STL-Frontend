@@ -1,22 +1,21 @@
 import { create } from "zustand";
 import { OperatorsItem } from "~/lib/api/operators/operators.service";
-import { Operator } from "~/types/types";
 
 interface OperatorFormStore {
-  gameTypes: Operator[];
-  regions: Operator[];
-  provinces: Operator[];
-  cities: Operator[];
-  areaOfOperations: Operator[];
+  gameTypes: OperatorsItem[];
+  regions: OperatorsItem[];
+  provinces: OperatorsItem[];
+  cities: OperatorsItem[];
+  areaOfOperations: OperatorsItem[];
 
   data: OperatorsItem[];               // <-- Add main operator data here
   setData: (data: OperatorsItem[]) => void;
 
-  setGameTypes: (gameTypes: Operator[]) => void;
-  setRegions: (regions: Operator[]) => void;
-  setProvinces: (provinces: Operator[]) => void;
-  setCities: (cities: Operator[]) => void;
-  setAreaOfOperations: (areaOfOperations: Operator[]) => void;
+  setGameTypes: (gameTypes: OperatorsItem[]) => void;
+  setRegions: (regions: OperatorsItem[]) => void;
+  setProvinces: (provinces: OperatorsItem[]) => void;
+  setCities: (cities: OperatorsItem[]) => void;
+  setAreaOfOperations: (areaOfOperations: OperatorsItem[]) => void;
 }
 
 export const useOperatorFormStore = create<OperatorFormStore>((set) => ({

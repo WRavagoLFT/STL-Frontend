@@ -1,5 +1,5 @@
 import { z, ZodSchema } from "zod";
-import { User, Operator, Share } from "./types";
+import { Share } from "./types";
 import { userSchema } from "~/schemas/userSchema";
 import { MultiValue } from "react-select";
 import { OperatorsItem } from "~/lib/api/operators/operators.service";
@@ -144,14 +144,14 @@ export interface ReusableModalPageProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: () => void;
-  onSubmit: (data: Operator) => void;
+  onSubmit: (data: OperatorsItem) => void;
   children?: (props: { handleSubmit: () => void }) => React.ReactNode;
   loading?: boolean;
   formData?: Record<string, string>;
   setFormData?: (data: Record<string, string>) => void;
   additionalPayload?: Record<string, any>;
   initialUserOperatorData?: any;
-  operatorMap?: Record<number, Operator>;
+  operatorMap?: Record<number, OperatorsItem>;
   layout?: 'single' | 'double'; 
 
   gameTypes?: any[];
@@ -163,7 +163,7 @@ export interface ReusableModalPageProps {
   setSelectedProvince?: (provinceId?: string) => void;
   schema?: ZodSchema<any>;
   onViewEditLogs?: (operatorId: number) => void;
-  selectedUser?: Operator | null;
+  selectedUser?: OperatorsItem | null;
 }
 
 export interface ModalPageProps {
@@ -172,7 +172,7 @@ export interface ModalPageProps {
   additionalPayload?: Record<string, any>;
   onFieldChange?: (name: string, value: string) => void;
   initialUserData?: any;
-  operatorMap?: { [key: number]: Operator };
+  operatorMap?: { [key: number]: OperatorsItem };
   gameTypes?: FieldOption[];
   provinces?: FieldOption[];
   regions?: FieldOption[];
@@ -189,8 +189,8 @@ export interface ModalPageProps {
 }
 
 export interface UserFieldFormPageProps {
-  operatorMap: { [key: number]: Operator };
-  setOperatorMap: (operatorMap: { [key: number]: Operator }) => void;
+  operatorMap: { [key: number]: OperatorsItem };
+  setOperatorMap: (operatorMap: { [key: number]: OperatorsItem }) => void;
 }
 
 export interface CSVExportButtonProps {
