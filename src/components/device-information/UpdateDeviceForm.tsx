@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Device } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
@@ -12,12 +11,13 @@ import dayjs from "dayjs";
 import { updateDeviceSchema } from "~/schemas/deviceSchema";
 import { useAuthStore } from "~/store/useAuthStore";
 import { getUsageNotes } from "./ParentDeviceView";
+import { DeviceItem, UpdateDevicePayload } from "~/lib/api/device/device.service";
 
 interface UpdateDeviceFormProps {
   title?: string;
-  onSubmit: (data: Device) => void;
+  onSubmit: (data: UpdateDevicePayload) => void;
   onClose?: () => void;
-  device?: Device;
+  device?: DeviceItem;
   deviceId?: string;
   slug?: string;
   userid?: number;
@@ -83,6 +83,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
 
       remarks: device?.remarks || "",
     },
+
     validationSchema: toFormikValidationSchema(updateDeviceSchema),
     onSubmit: async (values) => {
       //console.log("Form submitted. Raw values from Formik:", values);
@@ -639,7 +640,7 @@ const UpdateDeviceForm: React.FC<UpdateDeviceFormProps> = ({
         mode="update"
         onConfirm={async () => {
           try {
-            await onSubmit(formData as unknown as Device); // submit from the parent component handled after password verification
+            await onSubmit(formData as unknown as UpdateDevicePayload); // submit from the parent component handled after password verification
             closeConfirmModal(); // close confirm modal
             if (onClose) onClose(); // optionally close the parent modal
           } catch (err) {

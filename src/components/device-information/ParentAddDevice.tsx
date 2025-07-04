@@ -4,12 +4,12 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import AddDeviceForm from "~/components/device-information/AddDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
-import { Device } from "~/types/types";
 import { handleAddDevice } from "~/hooks/handleAddDeviceAction";
 import { useLoadDevices } from "./ParentDevice";
+import { AddDevicePayload, DeviceItem } from "~/lib/api/device/device.service";
 
 export default function AddDevicePage() {
-  const [devices, setDevices] = useState<Device[]>([]);
+  const [devices, setDevices] = useState<DeviceItem[]>([]);
   const [deviceInfoData, setDeviceInfoData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +17,7 @@ export default function AddDevicePage() {
   const loadData = useLoadDevices(setLoading, setError, setDevices, setDeviceInfoData);
   const router = useRouter();
 
-  const onSubmit = async (data: Device) => {
+  const onSubmit = async (data: AddDevicePayload) => {
     const redirectPath = `/device-information`;
     await handleAddDevice(data, loadData, router, redirectPath);
   };

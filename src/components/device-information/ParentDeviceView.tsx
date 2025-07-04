@@ -3,19 +3,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
-import { Device } from "~/types/types";
-import { editLogDevice, fetchUsageNotes } from "~/lib/api/device";
 import { useRouter } from "next/navigation";
 import { deviceEditColumns } from "~/config/deviceEditLogTableColumns";
 import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
 import Input from "~/components/ui/inputs/TextInputs";
 import { handleUpdateDevice } from "~/hooks/handleUpdateDeviceAction";
 import { useLoadDevices } from "~/components/device-information/ParentDevice";
+import { DeviceItem, editLogDevice, fetchUsageNotes, UpdateDevicePayload } from "~/lib/api/device/device.service";
 
 type DevicesViewPageProps = {
   slug: string;
-  onSubmit?: (data: Device) => void;
-  device: Device;
+  onSubmit?: (data: UpdateDevicePayload) => void;
+  device: DeviceItem;
 };
 
 export const getUsageNotes = async (setUsageNotes: (data: any[]) => void) => {
@@ -30,7 +29,7 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
     "kabo"
   );
   console.log(device);
-  const [setDevice] = useState<Device | null>(null);
+  const [setDevice] = useState<DeviceItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [editData, setEditData] = useState<any[]>([]);
   const [columns, setColumns] = useState<any[]>([]);
@@ -44,7 +43,7 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
   
   const router = useRouter();
 
-  const onUpdateDeviceSubmit = async (data: Device) => {
+  const onUpdateDeviceSubmit = async (data: UpdateDevicePayload) => {
     const redirectPath = `/device-information/device-information-view/${slug}`;
     await handleUpdateDevice(data, loadData, router, redirectPath);
   };

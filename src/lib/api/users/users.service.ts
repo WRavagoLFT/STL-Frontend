@@ -118,7 +118,6 @@ export const suspendUser = async (userId: number, remarks?: string): Promise<Use
   return response.data;
 };
 
-// Fetch user by ID function
 export const fetchUserById = async (userId: string | number) => {
   try {
     const url = validateRelativeUrl("/users/getUsers");
@@ -126,32 +125,28 @@ export const fetchUserById = async (userId: string | number) => {
       params: { userId },
     });
 
-    if (Array.isArray(response.data.data)) {
-      const user = response.data.data.find((u: any) => u.UserId == userId);
+    const users = response.data.data;
 
-      if (user) {
-        // Compute status if missing
-        user.Status = user.IsActive ? "Active" : "Inactive";
+    if (!Array.isArray(users)) {
+      return response.data;
+    }
+    
+    const user = users.find((u: any) => u.UserId == userId);
 
-        // Format date in "YYYY/MM/DD" format
-        if (user.DateOfRegistration) {
-          const date = new Date(user.DateOfRegistration);
-          user.formattedDate = `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(2, "0")}/${String(date.getDate()).padStart(2, "0")}`;
-        } else {
-          user.formattedDate = "N/A";
-        }
-      }
-
-      return {
-        success: !!user,
-        message: user ? "User found" : "User not found",
-        data: user || {},
-      };
+    if (!user) {
+      return { success: false, message: "User not found", data: {} };
     }
 
-    return response.data;
+    return {
+      success: true,
+      message: "User found",
+      data: {
+        ...user,
+      },
+    };
   } catch (error) {
     console.error("Error fetching user by ID:", (error as Error).message);
     return { success: false, message: (error as Error).message, data: {} };
   }
 };
+

@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Device } from "~/types/types";
 import Input from "../ui/inputs/TextInputs";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
@@ -10,11 +9,12 @@ import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { addDeviceSchema } from "~/schemas/deviceSchema";
 import { getUsageNotes } from "./ParentDeviceView";
+import { AddDevicePayload } from "~/lib/api/device/device.service";
 
 interface AddDeviceFormProps {
   title?: string;
-  onSubmit: (data: Device) => void;
-  initialData?: Partial<Device>;
+  onSubmit: (data: AddDevicePayload) => void;
+  initialData?: Partial<AddDevicePayload>;
   onClose?: () => void;
   userid?: number;
 }
@@ -475,7 +475,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
           mode="add"
           onConfirm={async () => {
             try {
-              await onSubmit(formData as unknown as Device); // submit from the parent component handled after password verification
+              await onSubmit(formData as unknown as AddDevicePayload); // submit from the parent component handled after password verification
               closeConfirmModal(); // close confirm modal
               if (onClose) onClose(); // optionally close the parent modal
             } catch (err) {

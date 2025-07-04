@@ -1,27 +1,20 @@
-import { Device } from "~/types/types";
-import { addDevice } from "~/lib/api/device";
 import Swal from "sweetalert2";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import {
+  addDevice,
+  AddDevicePayload,
+} from "~/lib/api/device/device.service";
 
 export const handleAddDevice = async (
-  data: Device,
+  data: AddDevicePayload,
   loadData: () => Promise<void>,
   router: AppRouterInstance,
   redirectPath: string
 ): Promise<void> => {
-  //console.log("[handleAddDevice] - Submitting Device Data:", data);
-
   try {
-    //console.log("[handleAddDevice] - Sending request to addDevice API...");
     const result = await addDevice(data);
-    //console.log("[handleAddDevice] - API Response from addDevice:", result);
-
     if (result.success) {
-      //console.log("[handleAddDevice] - Device successfully added. Triggering data reload...");
-
       await loadData();
-      //console.log("[handleAddDevice] - Data reload complete.");
-
       Swal.fire({
         icon: "success",
         title: "Success!",
@@ -29,13 +22,12 @@ export const handleAddDevice = async (
         timer: 2000,
         showConfirmButton: false,
       });
-
-      //console.log("[handleAddDevice] - Redirecting to /device-information...");
       router.push(redirectPath);
-      
     } else {
-      console.error("[handleAddDevice] - Failed to add device. Message:", result.message);
-
+      console.error(
+        "[handleAddDevice] - Failed to add device. Message:",
+        result.message
+      );
       Swal.fire({
         icon: "error",
         title: "Add Failed",
@@ -46,7 +38,6 @@ export const handleAddDevice = async (
     const err = error as Error;
     console.error("[handleAddDevice] - Unexpected error:", err.message);
     console.error("[handleAddDevice] - Full error object:", err);
-
     Swal.fire({
       icon: "error",
       title: "Unexpected Error",

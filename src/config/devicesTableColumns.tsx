@@ -1,10 +1,10 @@
 import dayjs from "dayjs";
 import { Column } from "~/types/interfaces";
-import { Device } from "~/types/types";
 import Button from "@mui/material/Button";
 import { getUserStatus } from "~/hooks/dashboarddata";
+import { DeviceItem } from "~/lib/api/device/device.service";
 
-export const devicesTableColumns = (): Column<Device>[] => [
+export const devicesTableColumns = (): Column<DeviceItem>[] => [
   {
     key: "IssuedBy",
     label: "Issued By",
@@ -41,7 +41,7 @@ export const devicesTableColumns = (): Column<Device>[] => [
     label: "Status",
     sortable: true,
     filterable: true,
-    render: (device: Device) => {
+    render: (device: DeviceItem) => {
       const sevenDaysAgo = dayjs().subtract(7, "days");
       const status = getUserStatus(device, sevenDaysAgo);
       return (
