@@ -1,13 +1,13 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import ChartsDataPage from "~/components/ui/charts/UserChartsData";
 import { operatorTableColumns } from "~/config/operatorTableColumns";
 import CardsPage from "~/components/user/CardsData";
 import { useOperatorFormStore } from "~/store/useOperatorFormStore";
-import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
+import { fetchFormOptionsData, fetchOperatorsData } from "~/hooks/userLoadOperators";
 import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
 
 const OperatorsPage = () => {
@@ -18,18 +18,32 @@ const OperatorsPage = () => {
   const [hasFetched, setHasFetched] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const loadFormOptions = async () => {
-      setLoading(true);
-      await fetchFormOptionsData();
-      setHasFetched(true);
-      setLoading(false);
-    };
+  const loadFormOptions = useCallback(async () => {
+    setLoading(true);
+    await fetchFormOptionsData();
+    setHasFetched(true);
+    setLoading(false);
+  }, []);
 
+  const loadOperators = useCallback(async () => {
+    await fetchOperatorsData();
+  }, []);
+
+  // Form options fetch
+  useEffect(() => {
     if (!hasFetched) {
       loadFormOptions();
     }
-  }, [hasFetched]);
+  }, [hasFetched, loadFormOptions]);
+
+  // Operators fetch
+  useEffect(() => {
+    if (hasFetched) {
+      loadOperators();
+    }
+  }, [hasFetched, loadOperators]);
+
+  //console.log(data);
 
   return (
     <Suspense fallback={<UsersSkeletonPage />}>
@@ -58,13 +72,13 @@ const OperatorsPage = () => {
             UserStatusId: op.UserStatusId ?? undefined,
             DateOfRegistration: op.DateOfOperation ?? "",
             IsActive: op.Status ?? 0,
-            region: typeof op.OperatorRegion === "object" 
-              ? op.OperatorRegion.RegionName 
+            region: typeof op.Region === "object"
+              ? op.Region.RegionName 
               : "Unknown",
             OperatorName: op.OperatorName,
             BranchRegion: Number(op.BranchRegion) || undefined,
-            OperatorRegion: typeof op.OperatorRegion === "object" 
-              ? op.OperatorRegion 
+            OperatorRegion: typeof op.Region === "object"
+              ? op.Region 
               : undefined,
           }))}
         />

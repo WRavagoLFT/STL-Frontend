@@ -81,7 +81,6 @@ export const operatorSchema = z.object({
       .min(1, { message: "Game Type are required." })
   ),
 
-  
   regions: z.preprocess(
     (val) => {
       if (Array.isArray(val)) {
@@ -98,6 +97,7 @@ export const operatorSchema = z.object({
       )
       .min(1, { message: "At least one Region is required." })
   ),
+
   provinces: z.preprocess(
     (val) => {
       if (Array.isArray(val)) {
@@ -114,6 +114,7 @@ export const operatorSchema = z.object({
       )
       .min(1, { message: "At least one Province is required." })
   ),
+
   cities: z.preprocess(
     (val) => {
       if (Array.isArray(val)) {
@@ -141,7 +142,7 @@ export const operatorSchema = z.object({
     .string({ required_error: "Area of operations is required." })
     .min(1, "At least one area of operation is required."),
 });
-    
+
 export const updateOperatorSchema = z.object({
   name: z
     .string({ required_error: "Operator Name is required." })
@@ -161,6 +162,13 @@ export const updateOperatorSchema = z.object({
     .min(1, "Email is required.")
     .refine((val) => /\S+@\S+\.\S+/.test(val), {
       message: "Please enter a valid email address e.g. xxx@email.com",
+    }),
+  contactNumber: z
+    .string({ required_error: "Phone Number is required." })
+    .min(1, "Phone Number is required.")
+    .refine((val) => /^09\d{9}$/.test(val), {
+      message:
+        "Please enter a valid phone number starting with 09 and 11 digits long (e.g. 09XXXXXXXXX).",
     }),
   gameTypes: z.preprocess(
     (val) => {
@@ -192,4 +200,3 @@ export const updateOperatorSchema = z.object({
     .min(1, "Remarks is required.")
     .max(100, "Remarks cannot exceed 100 characters."),
 });
-
