@@ -1,21 +1,14 @@
-// they have separate functions for filtering and sorting to the other table 
-// components as they have different data structures and requirements.
-// they are not meant to be used interchangeably or be reusable, hence the separation.
-
 "use client";
 
 import React, { useMemo, useState } from "react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import PersonOffIcon from "@mui/icons-material/PersonOff";
+  FaSearch,
+  FaUserSlash,
+  FaChevronLeft,
+  FaChevronRight,
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight,
+} from "react-icons/fa";
 import { SortableTableCell } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
 import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
@@ -32,9 +25,8 @@ const EditLogsTablePage = <T extends Transactions>({
   operatorMap,
 }: DetailedTableProps<T>) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isFilterActive, setIsFilterActive] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [filters, setFilters] = useState<Record<string, string>>({});
 
   const [sortConfig, setSortConfig] = useState<{
@@ -42,17 +34,10 @@ const EditLogsTablePage = <T extends Transactions>({
     direction: "asc" | "desc";
   } | null>(null);
 
-  // Filter + Sort
   const sortedAndFilteredData = useMemo(() => {
-    //console.log("Data length before filtering:", data.length);
-    //console.log("Current search query:", searchQuery);
-    //console.log("Current filters:", filters);
-
     const filterKeys = columns
       .filter((col) => col.filterable)
       .map((col) => (col.filterKey ?? col.key).toString()) as string[];
-
-    //console.log("Filter keys used:", filterKeys);
 
     const filtered = filterDataEditLog(
       data as any[],
@@ -61,134 +46,177 @@ const EditLogsTablePage = <T extends Transactions>({
       searchQuery
     );
 
-    //console.log("Data length after filtering:", filtered.length);
-
     const sorted = sortDataEditLog(
       filtered,
       sortConfig ?? { key: "defaultKey", direction: "asc" }
     );
 
-    //console.log("Data length after sorting:", sorted.length);
     return sorted;
   }, [data, filters, columns, searchQuery, sortConfig]);
 
-  const handleChangePage = (newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // optionally reset to first page
-  };
-
-  // Pagination
   const paginatedData = useMemo(() => {
     const start = page * rowsPerPage;
     const end = start + rowsPerPage;
     return sortedAndFilteredData.slice(start, end);
   }, [sortedAndFilteredData, page, rowsPerPage]);
 
+  const totalDataCount = sortedAndFilteredData.length;
+
   return (
-    <>
-      <TableContainer>
-        <div className="flex justify-between items-center py-3 px-1">
-          <div className="flex items-center">
-            <div className="relative w-[350px]">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-[8px] bg-transparent border border-[#0038A8] rounded-md text-sm focus:outline-none"
-              />
-              <div className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400">
-                <SearchIcon style={{ fontSize: 20 }} />
-              </div>
+    <div className="w-full border border-[#0038A8] rounded-xl px-4 py-2 overflow-x-auto relative">
+      <div className="flex flex-col sm:flex-row justify-between items-center py-2 gap-3 w-full">
+        <div className="flex items-center w-full max-w-[400px]">
+          <div className="relative w-full">
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-[#F8F0E3] border border-blue-900 rounded-md text-sm focus:outline-none"
+            />
+            <div className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400">
+              <FaSearch size={16} />
             </div>
           </div>
         </div>
+      </div>
 
-        <Table>
-          <TableHead>
-            <TableRow sx={{ "&:hover": { backgroundColor: "#F08060" } }}>
-              {columns.map((col) =>
-                col.sortable || col.filterable ? (
-                  <SortableTableCell
-                    key={String(col.key)}
-                    label={col.label}
-                    sortKey={String(col.key)}
-                    isFilterVisible={isFilterActive && col.filterable}
-                  />
-                ) : (
-                  <TableCell key={String(col.key)}>{col.label}</TableCell>
-                )
-              )}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {paginatedData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={columns.length + 1} align="center">
-                  <div className="flex flex-col items-center py-7 text-[#0038A8]">
-                    <PersonOffIcon style={{ fontSize: 50 }} />
-                    <h6 className="mt-2 font-sm text-lg">No data available</h6>
+      <div className="w-full overflow-x-auto">
+        <table className="table-auto w-full min-w-[640px] text-xs sm:text-sm">
+          <thead className="bg-[#E97451] text-white sticky top-0 z-10">
+            <tr>
+              {columns.map((col) => (
+                <th
+                  key={String(col.key)}
+                  className="py-4 text-left font-normal overflow-hidden text-ellipsis min-w-[80px] sm:min-w-[100px] px-2"
+                >
+                  <div className="flex items-center justify-start gap-1">
+                    {col.sortable && (
+                      <SortableTableCell
+                        label=""
+                        sortKey={String(col.key)}
+                        isFilterVisible={false}
+                      />
+                    )}
+                    <span>{col.label}</span>
                   </div>
-                </TableCell>
-              </TableRow>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {paginatedData.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="text-center py-10 text-blue-900"
+                >
+                  <div className="flex flex-col items-center">
+                    <FaUserSlash size={40} />
+                    <p className="mt-2 text-lg">No data available</p>
+                  </div>
+                </td>
+              </tr>
             ) : (
               paginatedData.map((row, rowIndex) => (
-                <TableRow key={rowIndex}>
+                <tr
+                  key={rowIndex}
+                  className="hover:bg-[#E0DCBD] border-b border-[#ACA993]"
+                >
                   {columns.map((col) => {
                     const key = String(col.key);
                     const value = (row as any)[key];
-
                     return (
-                      <TableCell key={key} sx={{ paddingY: 0.5 }}>
+                      <td
+                        key={key}
+                        className="px-2 py-2 text-sm whitespace-normal min-w-[80px]"
+                      >
                         {col.render
                           ? col.render(row as unknown as T)
                           : col.filterValue
                             ? typeof col.filterValue === "function"
                               ? col.filterValue(row as unknown as T)
                               : col.filterValue
-                            : Array.isArray(value)
-                              ? value
-                                  .map((v) => v?.CityName ?? v?.toString())
-                                  .join(", ")
-                              : (value?.toString() ?? "")}
-                      </TableCell>
+                            : typeof value === "string" ||
+                                typeof value === "number"
+                              ? value.toString()
+                              : Array.isArray(value)
+                                ? value
+                                    .map(
+                                      (v: any) => v?.CityName ?? v?.toString()
+                                    )
+                                    .join(", ")
+                                : ""}
+                      </td>
                     );
                   })}
-                </TableRow>
+                </tr>
               ))
             )}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
+      </div>
 
-        <div className="p-0 pt-2">
-          <TablePagination
-            rowsPerPageOptions={[10, 25, 50, 100]}
-            component="div"
-            count={sortedAndFilteredData.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={(_, newPage) => handleChangePage(newPage)}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
+      <div className="flex flex-col sm:flex-row justify-end items-center p-3 text-sm gap-2">
+
+        <div className="flex items-center gap-1 sm:gap-3 mt-2 sm:mt-0">
+          <span className="text-xs sm:text-sm">
+            {Math.min(page * rowsPerPage + 1, totalDataCount)}–
+            {Math.min((page + 1) * rowsPerPage, totalDataCount)} of{" "}
+            {totalDataCount}
+          </span>
+
+          <button
+            onClick={() => setPage(0)}
+            disabled={page === 0}
+            className="p-1 sm:p-2 border rounded disabled:opacity-30"
+            title="First Page"
+          >
+            <FaAngleDoubleLeft size={14} />
+          </button>
+
+          <button
+            onClick={() => setPage(page - 1)}
+            disabled={page === 0}
+            className="p-1 sm:p-2 border rounded disabled:opacity-30"
+            title="Previous Page"
+          >
+            <FaChevronLeft size={14} />
+          </button>
+
+          <span className="text-xs sm:text-sm">
+            Page {page + 1} of {Math.ceil(totalDataCount / rowsPerPage)}
+          </span>
+
+          <button
+            onClick={() => setPage(page + 1)}
+            disabled={page >= Math.ceil(totalDataCount / rowsPerPage) - 1}
+            className="p-1 sm:p-2 border rounded disabled:opacity-30"
+            title="Next Page"
+          >
+            <FaChevronRight size={14} />
+          </button>
+
+          <button
+            onClick={() => setPage(Math.ceil(totalDataCount / rowsPerPage) - 1)}
+            disabled={page >= Math.ceil(totalDataCount / rowsPerPage) - 1}
+            className="p-1 sm:p-2 border rounded disabled:opacity-30"
+            title="Last Page"
+          >
+            <FaAngleDoubleRight size={14} />
+          </button>
         </div>
-      </TableContainer>
+      </div>
 
-      {/* <div className="flex justify-end pt-2">
+      <div className="flex justify-end py-1">
         <CSVExportButtonTable
-          pageType={pageType ?? "unknown"}
+          pageType={pageType}
           columns={columns}
-          statsPerRegion={data}
+          statsPerRegion={sortedAndFilteredData}
           operatorMap={operatorMap ? Object.values(operatorMap) : []}
         />
-      </div> */}
-    </>
+      </div>
+    </div>
   );
 };
 
