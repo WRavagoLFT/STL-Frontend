@@ -110,11 +110,6 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
           </div>
           <p className="text-base ml-3">Top Winning Regions Today</p>
         </div>
-        <div className="mt-2 md:mt-0">
-          <button className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg">
-            View Comparison
-          </button>
-        </div>
       </div>
 
       <div className="border-b border-[#0038A8]" />

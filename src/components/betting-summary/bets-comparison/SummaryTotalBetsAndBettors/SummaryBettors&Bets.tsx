@@ -26,6 +26,8 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
+  secondDurationFrom,
+  secondDurationTo,
 }) => {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -76,19 +78,19 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
         }
       } else if (
         dateFilter === "Date Duration" &&
-        firstDateSpecific &&
-        secondDateSpecific &&
         firstDateDuration &&
-        secondDateDuration
+        secondDateDuration &&
+        secondDurationFrom &&
+        secondDurationTo
       ) {
         const resp = await fetchCompareHistoricalRange(
           "/transactions/compareHistoricalRange/chartType/",
           urlParam,
           {
-            firstStart: formatDate(firstDateSpecific),
-            firstEnd: formatDate(secondDateSpecific),
-            secondStart: formatDate(firstDateDuration),
-            secondEnd: formatDate(secondDateDuration),
+            firstStart: formatDate(firstDateDuration),
+            firstEnd: formatDate(secondDateDuration),
+            secondStart: formatDate(secondDurationFrom),
+            secondEnd: formatDate(secondDurationTo),
             ...gameCategoryParam,
           }
         );
@@ -116,6 +118,8 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     secondDateSpecific,
     firstDateDuration,
     secondDateDuration,
+    secondDurationFrom,
+    secondDurationTo,
     urlParam,
     gameCategoryId,
   ]);
@@ -136,7 +140,9 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       firstDateSpecific,
       secondDateSpecific,
       firstDateDuration,
-      secondDateDuration
+      secondDateDuration,
+      secondDurationFrom, // Added
+      secondDurationTo // Added
     );
 
     return ["Draw Order", ...series.map((s) => s.label || "")];
@@ -153,7 +159,9 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       firstDateSpecific,
       secondDateSpecific,
       firstDateDuration,
-      secondDateDuration
+      secondDateDuration,
+      secondDurationFrom, // Added
+      secondDurationTo // Added
     );
 
     return [
@@ -179,6 +187,8 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
             secondDateSpecific={secondDateSpecific}
             firstDateDuration={firstDateDuration}
             secondDateDuration={secondDateDuration}
+            secondDurationFrom={secondDurationFrom}
+            secondDurationTo={secondDurationTo}
           />
         </div>
         {currentUserType !== 3 && (
@@ -212,7 +222,9 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
                 firstDateSpecific,
                 secondDateSpecific,
                 firstDateDuration,
-                secondDateDuration
+                secondDateDuration,
+                secondDurationFrom, 
+                secondDurationTo 
               )}
               yAxis={[
                 {

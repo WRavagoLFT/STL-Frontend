@@ -65,7 +65,6 @@ export interface Chart1Data {
   secondRangeBettors?: number;
   firstRangeBetAmount?: number;
   secondRangeBetAmount?: number;
-
   firstRangeBets?: number;
   secondRangeBets?: number;
 }
@@ -124,10 +123,6 @@ export interface RegionSpecificData {
   };
 }
 
-export interface SpecificPayload {
-  Region: RegionSpecificData[];
-}
-
 export interface RegionRangeData {
   Region: string;
   TotalBets: number;
@@ -160,6 +155,8 @@ export interface BettorsandBetsSummaryProps {
   secondDateSpecific: string | null;
   firstDateDuration: string | null;
   secondDateDuration: string | null;
+  secondDurationFrom: string | null; 
+  secondDurationTo: string | null;   
 }
 
 export const getLegendItemsMap_Specific = (
@@ -205,13 +202,13 @@ export const getLegendItemsMap_Specific = (
 
 export const getLegendItemsMap_Duration = (
   categoryFilter: string,
-  firstDateSpecific: string | null,
-  secondDateSpecific: string | null,
   firstDateDuration: string | null,
-  secondDateDuration: string | null
+  secondDateDuration: string | null,
+  secondDurationFrom: string | null,
+  secondDurationTo: string | null
 ): { label: string; color: string }[] => {
-  const firstLabel = `${formatDate(firstDateSpecific)} - ${formatDate(secondDateSpecific)}`;
-  const secondLabel = `${formatDate(firstDateDuration)} - ${formatDate(secondDateDuration)}`;
+  const firstLabel = `${formatDate(firstDateDuration)} - ${formatDate(secondDateDuration)}`;
+  const secondLabel = `${formatDate(secondDurationFrom)} - ${formatDate(secondDurationTo)}`;
 
   switch (categoryFilter) {
     case "Total Bettors and Bets":
@@ -246,7 +243,7 @@ export const getLegendItemsMap_Duration = (
   }
 };
 
-// Helper function to get category colors (moved here to avoid circular dependency)
+// Helper function to get category colors
 export const getCategoryColor = (
   category: string,
   isFirstDate: boolean

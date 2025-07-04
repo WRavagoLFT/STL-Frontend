@@ -1,5 +1,5 @@
-import React from 'react';
-import { BettorsandBetsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from './types';
+import React from "react";
+import { BettorsandBetsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from "./types";
 
 const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   categoryFilter,
@@ -8,11 +8,19 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
+  secondDurationFrom,
+  secondDurationTo,
 }) => {
   const legendItems =
     dateFilter === "Specific Date"
       ? getLegendItemsMap_Specific(categoryFilter, firstDateSpecific, secondDateSpecific)
-      : getLegendItemsMap_Duration(categoryFilter, firstDateSpecific, secondDateSpecific, firstDateDuration, secondDateDuration);
+      : getLegendItemsMap_Duration(
+          categoryFilter,
+          firstDateDuration,
+          secondDateDuration,
+          secondDurationFrom,
+          secondDurationTo
+        );
 
   const chunkedLegendItems = legendItems.reduce(
     (result, item, index) => {
@@ -33,12 +41,10 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
           {chunk.map((item, index) => (
             <div key={index} className="flex items-center">
               <div
-                  className="w-3.5 h-3.5 rounded-full mr-2"
+                className="w-3.5 h-3.5 rounded-full mr-2"
                 style={{ backgroundColor: item.color }}
               />
-              <p className="text-xs">
-                {item.label}
-              </p>
+              <p className="text-xs">{item.label}</p>
             </div>
           ))}
         </div>

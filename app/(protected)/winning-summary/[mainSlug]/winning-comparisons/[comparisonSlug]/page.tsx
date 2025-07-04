@@ -1,20 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { fetchGameCategories } from "~/lib/api/gamecategories";
 import { AccessGuard } from "~/components/auth/AccessGuard";
-import { WinningComparisonPage } from "~/components/winning-summary/ParentWinningComparison";
-import { useParams } from "next/navigation";
+import WinningComparisonPage from "~/components/winning-summary/ParentWinningComparison";
 
-interface PageProps {
-  params: Promise<{
-    mainSlug: string;
-    comparisonSlug: string;
-  }>;
-}
-
-const slugify = (text: string) => {
-  return text
+const slugify = (text: string) =>
+  text
     .replace(/Swer2/i, "Swer 2")
     .replace(/Swer3/i, "Swer 3")
     .replace(/Swer4/i, "Swer 4")
@@ -23,37 +16,44 @@ const slugify = (text: string) => {
     .replace(/\s+/g, "-")
     .replace(/[^\w\-]+/g, "")
     .replace(/\-\-+/g, "-");
-};
 
-export default async function WinningComparisonSlugPage({ params }: PageProps) {
-  const { mainSlug, comparisonSlug } = await params as {
+const normalize = (text: string) => slugify(text).replace(/-/g, "");
+
+export default function WinningComparisonSlugPageClient() {
+  const router = useRouter();
+  const { mainSlug, comparisonSlug } = useParams() as {
     mainSlug: string;
     comparisonSlug: string;
-  };  
+  };
 
   const [category, setCategory] = useState<{
     GameCategoryId: number;
     Digits: number;
   } | null>(null);
-
   const [loading, setLoading] = useState(true);
+  const [invalid, setInvalid] = useState(false);
 
   useEffect(() => {
     const fetchCategory = async () => {
-      if (!comparisonSlug) return;
-
-      setLoading(true);
       const result = await fetchGameCategories();
+      // console.log("[Client] Game Categories:", result);
 
       if (result.success && Array.isArray(result.data)) {
-        const normalizedSlug = comparisonSlug.replace(/-/g, "").toLowerCase();
+        const normalizedSlug = normalize(comparisonSlug);
 
         const matched = result.data.find((cat: any) => {
-          const categorySlug = slugify(cat.GameCategory).replace(/-/g, "");
-          return categorySlug === normalizedSlug;
+          const catSlug = normalize(cat.GameCategory);
+          return catSlug === normalizedSlug;
         });
 
-        setCategory(matched || null);
+        if (matched) {
+          setCategory(matched);
+        } else if (comparisonSlug !== "stl") {
+          setInvalid(true);
+        }
+      } else {
+        console.warn("Failed to fetch categories on client.");
+        setInvalid(true);
       }
 
       setLoading(false);
@@ -62,26 +62,15 @@ export default async function WinningComparisonSlugPage({ params }: PageProps) {
     fetchCategory();
   }, [comparisonSlug]);
 
-  const isDashboard = comparisonSlug === "stl";
-  const isValid = !!category || isDashboard;
+  useEffect(() => {
+    if (!loading && invalid) {
+      router.replace("/not-found");
+    }
+  }, [loading, invalid]);
 
-  if (loading) {
+  if (loading)
     return <div className="p-4 text-center text-gray-600">Loading...</div>;
-  }
-
-  if (!isValid) {
-    return (
-      <div className="p-4 text-center text-red-500">
-        <h1 className="text-xl font-semibold">Invalid Page</h1>
-        <p>
-          No matching game category for slug: <strong>{comparisonSlug}</strong>
-        </p>
-        <p>
-          Only <code>/dashboard</code> is allowed if no game category is found.
-        </p>
-      </div>
-    );
-  }
+  if (invalid) return null;
 
   return (
     <AccessGuard allowedUserTypes={[6]}>

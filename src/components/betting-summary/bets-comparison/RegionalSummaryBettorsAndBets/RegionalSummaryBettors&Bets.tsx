@@ -28,6 +28,8 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
+  secondDurationFrom,
+  secondDurationTo,
 }) => {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -98,19 +100,19 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
         }
       } else if (
         dateFilter === "Date Duration" &&
-        firstDateSpecific &&
-        secondDateSpecific &&
         firstDateDuration &&
-        secondDateDuration
+        secondDateDuration &&
+        secondDurationFrom &&
+        secondDurationTo
       ) {
         const resp = await fetchCompareHistoricalRange(
           "/transactions/compareHistoricalRange/chartType/",
           urlParam,
           {
-            firstStart: formatDate(firstDateSpecific),
-            firstEnd: formatDate(secondDateSpecific),
-            secondStart: formatDate(firstDateDuration),
-            secondEnd: formatDate(secondDateDuration),
+            firstStart: formatDate(firstDateDuration),
+            firstEnd: formatDate(secondDateDuration),
+            secondStart: formatDate(secondDurationFrom),
+            secondEnd: formatDate(secondDurationTo),
             ...gameCategoryParam,
           }
         );
@@ -138,6 +140,8 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
     secondDateSpecific,
     firstDateDuration,
     secondDateDuration,
+    secondDurationFrom,
+    secondDurationTo,
     urlParam,
     gameCategoryId,
   ]);
@@ -160,7 +164,9 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
       firstDateSpecific,
       secondDateSpecific,
       firstDateDuration,
-      secondDateDuration
+      secondDateDuration,
+      secondDurationFrom, 
+      secondDurationTo 
     );
 
     return philippineRegions.map((region, index) => {
@@ -184,7 +190,9 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
       firstDateSpecific,
       secondDateSpecific,
       firstDateDuration,
-      secondDateDuration
+      secondDateDuration,
+      secondDurationFrom, 
+      secondDurationTo 
     );
 
     return ["Region", ...series.map((s) => s.label || "")];
@@ -198,7 +206,9 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
       firstDateSpecific,
       secondDateSpecific,
       firstDateDuration,
-      secondDateDuration
+      secondDateDuration,
+      secondDurationFrom, 
+      secondDurationTo 
     );
 
     const regionIndex = philippineRegions.indexOf(item.Region);
@@ -227,6 +237,8 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
             secondDateSpecific={secondDateSpecific}
             firstDateDuration={firstDateDuration}
             secondDateDuration={secondDateDuration}
+            secondDurationFrom={secondDurationFrom}
+            secondDurationTo={secondDurationTo}
           />
         </div>
         {currentUserType !== 3 && (
@@ -260,7 +272,9 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
                 firstDateSpecific,
                 secondDateSpecific,
                 firstDateDuration,
-                secondDateDuration
+                secondDateDuration,
+                secondDurationFrom, 
+                secondDurationTo 
               )}
               xAxis={[
                 {
@@ -274,7 +288,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
                   label: "Total (x 100,000)",
                   scaleType: "linear",
                   min: 0,
-                  max: 100,
+                  max: 1000,
                   tickInterval: 50,
                   valueFormatter: (value: number) => value.toString(),
                   tickSize: 2,

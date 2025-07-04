@@ -9,14 +9,16 @@ export const generateSeries = (
   firstDateSpecific: string | null,
   secondDateSpecific: string | null,
   firstDateDuration: string | null,
-  secondDateDuration: string | null
+  secondDateDuration: string | null,
+  secondDurationFrom: string | null,
+  secondDurationTo: string | null
 ) => {
   const isDuration = dateFilter === "Date Duration";
   const firstLabel = isDuration
-    ? `${formatDate(firstDateSpecific)} - ${formatDate(secondDateSpecific)}`
+    ? `${formatDate(firstDateDuration)} - ${formatDate(secondDateDuration)}`
     : formatDate(firstDateSpecific);
   const secondLabel = isDuration
-    ? `${formatDate(firstDateDuration)} - ${formatDate(secondDateDuration)}`
+    ? `${formatDate(secondDurationFrom)} - ${formatDate(secondDurationTo)}`
     : formatDate(secondDateSpecific);
 
   console.log('generateSeries - chartData:', chartData, 'urlParam:', urlParam);
