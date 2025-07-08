@@ -146,5 +146,27 @@ export type GameCombination = {
   //gameTypeId?: number;
 }
 
-
-
+export interface WebDashboard {
+    Metrics: {
+        TotalBettors: number,
+        TotalWinners: number,
+        TotalBetsPlaced: number,
+        TotalPayout: number,
+        TotalRevenue: number,
+    },
+    TopBettingRegions: {
+        Region: string,
+        TotalBetAmount: number
+    }[],
+    TopWinningRegions: {
+        Region: string,
+        TotalPayout: number
+    }[],
+    Summary: {
+        DrawOrder: number,
+        Bettors: number,
+        Bets: number,
+        Winners: number,
+        Payout: number
+    }[]
+}

@@ -16,9 +16,18 @@ interface RegionData {
   TotalBetAmount: number;
 }
 
-const TopBettingRegionPage = () => {
+interface BettingRegionData {
+  Region: string;
+  TotalBetAmount: number;
+}
+
+interface BettingRegionProps {
+  data: BettingRegionData[];
+}
+
+const TopBettingRegionPage = (data: BettingRegionProps) => {
   const [rankedRegions, setRankedRegions] = useState<
-    { region: RegionData; rank: number; trend: number }[]
+    { region: BettingRegionData; rank: number; trend: number }[]
   >([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
   const bettingLabel =
@@ -26,74 +35,84 @@ const TopBettingRegionPage = () => {
       ? "Top Betting Area Today"
       : "Top Betting Regions Today";
 
+  // const getBettingRegions = async () => {
+  //   try {
+  //     const today = new Date().toLocaleDateString("en-CA", {
+  //       timeZone: "Asia/Manila",
+  //     });
+  //     const response = await fetchHistoricalRegion({ date: today });
+  //     //console.log("DATE TODAY:", today);
+
+  //     if (!response.success || !response.data || response.data.length === 0) {
+  //       console.warn("No data returned from API.");
+  //       return;
+  //     }
+
+  //     const filteredData = response.data.filter((entry: any) => {
+  //       const entryDate = entry.TransactionDate?.split("T")[0]; // 'YYYY-MM-DD'
+  //       return entryDate === today;
+  //     });
+
+  //     if (filteredData.length === 0) {
+  //       console.warn("No matching entries for today's date.");
+  //       return;
+  //     }
+
+  //     // Group by Region and sum TotalBetAmount
+  //     const regionMap = new Map<string, RegionData>();
+
+  //     filteredData.forEach((entry: any) => {
+  //       const regionName = entry.Region || "Unknown";
+  //       const payout = entry.TotalPayout || 0;
+  //       const betAmount = entry.TotalBetAmount || 0;
+
+  //       if (betAmount === 0) return; // Skip regions with 0 total bets
+
+  //       if (regionMap.has(regionName)) {
+  //         const existing = regionMap.get(regionName)!;
+  //         existing.TotalPayout += payout;
+  //         existing.TotalBettors += entry.TotalBettors || 0;
+  //         existing.TotalBetAmount += betAmount;
+  //       } else {
+  //         regionMap.set(regionName, {
+  //           RegionId: entry.RegionId,
+  //           Region: regionName,
+  //           RegionFull: entry.RegionFull || regionName,
+  //           TotalPayout: payout,
+  //           TotalBettors: entry.TotalBettors || 0,
+  //           TotalBetAmount: betAmount,
+  //         });
+  //       }
+  //     });
+
+  //     const sortedRegions = Array.from(regionMap.values()).sort(
+  //       (a, b) => b.TotalBetAmount - a.TotalBetAmount
+  //     );
+
+  //     const ranked = sortedRegions.map((region, index) => ({
+  //       region,
+  //       rank: index + 1,
+  //       trend: 0,
+  //     }));
+
+  //     setRankedRegions(ranked);
+  //   } catch (error) {
+  //     console.error("Failed to fetch winning regions:", error);
+  //   }
+  // };
+
   const getBettingRegions = async () => {
-    try {
-      const today = new Date().toLocaleDateString("en-CA", {
-        timeZone: "Asia/Manila",
-      });
-      const response = await fetchHistoricalRegion({ date: today });
-      //console.log("DATE TODAY:", today);
 
-      if (!response.success || !response.data || response.data.length === 0) {
-        console.warn("No data returned from API.");
-        return;
-      }
-
-      const filteredData = response.data.filter((entry: any) => {
-        const entryDate = entry.TransactionDate?.split("T")[0]; // 'YYYY-MM-DD'
-        return entryDate === today;
-      });
-
-      if (filteredData.length === 0) {
-        console.warn("No matching entries for today's date.");
-        return;
-      }
-
-      // Group by Region and sum TotalBetAmount
-      const regionMap = new Map<string, RegionData>();
-
-      filteredData.forEach((entry: any) => {
-        const regionName = entry.Region || "Unknown";
-        const payout = entry.TotalPayout || 0;
-        const betAmount = entry.TotalBetAmount || 0;
-
-        if (betAmount === 0) return; // Skip regions with 0 total bets
-
-        if (regionMap.has(regionName)) {
-          const existing = regionMap.get(regionName)!;
-          existing.TotalPayout += payout;
-          existing.TotalBettors += entry.TotalBettors || 0;
-          existing.TotalBetAmount += betAmount;
-        } else {
-          regionMap.set(regionName, {
-            RegionId: entry.RegionId,
-            Region: regionName,
-            RegionFull: entry.RegionFull || regionName,
-            TotalPayout: payout,
-            TotalBettors: entry.TotalBettors || 0,
-            TotalBetAmount: betAmount,
-          });
-        }
-      });
-
-      const sortedRegions = Array.from(regionMap.values()).sort(
-        (a, b) => b.TotalBetAmount - a.TotalBetAmount
-      );
-
-      const ranked = sortedRegions.map((region, index) => ({
-        region,
-        rank: index + 1,
-        trend: 0,
-      }));
-
-      setRankedRegions(ranked);
-    } catch (error) {
-      console.error("Failed to fetch winning regions:", error);
-    }
-  };
+  }
 
   useEffect(() => {
-    getBettingRegions();
+    //getBettingRegions();
+    if (!data || !data.data || data.data.length === 0) {
+      console.warn("No data provided for Top Betting Regions.");
+      return;
+    }
+    data.data.sort((a, b) => b.TotalBetAmount - a.TotalBetAmount);
+    setRankedRegions(data.data.map((item, index) => ({ region: item, rank: index + 1, trend: 0 })));
   }, []);
 
   return (
@@ -126,7 +145,7 @@ const TopBettingRegionPage = () => {
         ) : (
           rankedRegions.slice(0, 5).map((item, index) => (
             <div
-              key={item.region.RegionId ?? item.region.Region}
+              key={ /*item.region.RegionId ??  */ item.region.Region}
               className={`flex items-center py-2 ${
                 index === rankedRegions.length - 1 ? "border-none" : ""
               }`}

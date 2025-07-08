@@ -30,71 +30,88 @@ const summary: Record<
   3: { gameName: "Third Draw", bettors: 0, bets: 0, winners: 0 },
 };
 
-const SummaryBettorsBetsPlacedPage = () => {
-  const [data, setData] = useState<
-    { gameName: string; bettors: number; bets: number; winners: number }[]
-  >([]);
+interface BettingSummaryData {
+  DrawOrder: number;
+  Bettors: number,
+  Bets: number
+}
+
+interface BettingSummaryProps {
+  data: BettingSummaryData[]
+}
+
+const SummaryBettorsBetsPlacedPage = (data: BettingSummaryProps) => {
+  // const [data, setData] = useState<
+  //   { gameName: string; bettors: number; bets: number; winners: number }[]
+  // >([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
-  const fetchData = async () => {
-    try {
-      const response = await fetchHistoricalSummary();
+  // const fetchData = async () => {
+  //   try {
+  //     const response = await fetchHistoricalSummary();
 
-      if (response.success) {
-        const today = new Date().toLocaleDateString("en-CA", {
-          timeZone: "Asia/Manila",
-        });
+  //     if (response.success) {
+  //       const today = new Date().toLocaleDateString("en-CA", {
+  //         timeZone: "Asia/Manila",
+  //       });
 
-        const filteredData = response.data.filter((item: TransactionData) =>
-          item.TransactionDate.startsWith(today)
-        );
+  //       const filteredData = response.data.filter((item: TransactionData) =>
+  //         item.TransactionDate.startsWith(today)
+  //       );
 
-        const localSummary: typeof summary = {
-          1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
-          2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
-          3: { gameName: "Third Draw", bettors: 0, bets: 0, winners: 0 },
-        };
+  //       const localSummary: typeof summary = {
+  //         1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
+  //         2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
+  //         3: { gameName: "Third Draw", bettors: 0, bets: 0, winners: 0 },
+  //       };
 
-        filteredData.forEach((item: TransactionData) => {
-          if (localSummary[item.DrawOrder]) {
-            localSummary[item.DrawOrder].bettors += item.TotalBettors || 0;
-            localSummary[item.DrawOrder].bets += item.TotalBetAmount || 0;
-            localSummary[item.DrawOrder].winners += item.TotalWinners || 0;
-          }
-        });
+  //       filteredData.forEach((item: TransactionData) => {
+  //         if (localSummary[item.DrawOrder]) {
+  //           localSummary[item.DrawOrder].bettors += item.TotalBettors || 0;
+  //           localSummary[item.DrawOrder].bets += item.TotalBetAmount || 0;
+  //           localSummary[item.DrawOrder].winners += item.TotalWinners || 0;
+  //         }
+  //       });
 
-        const formattedData = Object.values(localSummary);
+  //       const formattedData = Object.values(localSummary);
 
-        const scaledData = formattedData.map((item) => ({
-          ...item,
-          bets: item.bets,
-          ratio: item.bettors === 0 ? 0 : item.bets / item.bettors,
-        }));
+  //       const scaledData = formattedData.map((item) => ({
+  //         ...item,
+  //         bets: item.bets,
+  //         ratio: item.bettors === 0 ? 0 : item.bets / item.bettors,
+  //       }));
 
-        setData(scaledData);
+  //       setData(scaledData);
 
-        const transformedChartData = scaledData.map((item) => ({
-          draw: item.gameName,
-          bettors: item.bettors,
-          bets: item.bets,
-          ratio: item.ratio,
-        }));
+  //       const transformedChartData = scaledData.map((item) => ({
+  //         draw: item.gameName,
+  //         bettors: item.bettors,
+  //         bets: item.bets,
+  //         ratio: item.ratio,
+  //       }));
 
-        setChartData(transformedChartData);
-      } else {
-        console.error("API Request Failed:", response.message);
-      }
-    } catch (error) {
-      console.error("Error Fetching Data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //       setChartData(transformedChartData);
+  //     } else {
+  //       console.error("API Request Failed:", response.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error Fetching Data:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
-    fetchData();
+    // fetchData();
+
+    setChartData(data.data.map((item) => ({
+      gameName: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw",
+      bettors: item.Bettors,
+      bets: item.Bets
+    })))
+    setLoading(false)
   }, []);
 
   return (
@@ -109,7 +126,7 @@ const SummaryBettorsBetsPlacedPage = () => {
         {currentUserType !== 3 && (
           <div className="mt-2 md:mt-0">
             <GenericCSVExportButton
-              data={data}
+              data={chartData}
               headers={["Game Name", "Bettors", "Bets"]}
               title="Bettors and Bets Summary"
               getRowData={(item) => [item.gameName, item.bettors, item.bets]}
@@ -139,24 +156,24 @@ const SummaryBettorsBetsPlacedPage = () => {
               }}
               series={[
                 {
-                  data: data.map((item) => item.bettors / 100000),
+                  data: chartData.map((item) => item.bettors / 100000),
                   color: "#BB86FC",
                   label: "Bettors",
                   valueFormatter: (value, context) =>
-                    `${data[context.dataIndex].bettors.toLocaleString()}`,
+                    `${chartData[context.dataIndex].bettors.toLocaleString()}`,
                 },
                 {
-                  data: data.map((item) => item.bets / 100000),
+                  data: chartData.map((item) => item.bets / 100000),
                   color: "#5050A5",
                   label: "Bets",
                   valueFormatter: (value, context) =>
-                    `₱${data[context.dataIndex].bets.toLocaleString()}`,
+                    `₱${chartData[context.dataIndex].bets.toLocaleString()}`,
                 },
               ]}
               yAxis={[
                 {
                   scaleType: "band",
-                  data: data.map((item) => item.gameName),
+                  data: chartData.map((item) => item.gameName),
                   tickLabelProps: { style: { fontSize: "14px" } },
                 } as any,
               ]}

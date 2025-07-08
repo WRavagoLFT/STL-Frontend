@@ -15,7 +15,16 @@ interface RegionData {
   trend?: number;
 }
 
-const TopWinningRegionPage = () => {
+interface WinningRegionData {
+  Region: string;
+  TotalPayout: number;
+}
+
+interface WinningRegionProps {
+  data: WinningRegionData[];
+}
+
+const TopWinningRegionPage = (data: WinningRegionProps) => {
   const [rankedRegions, setRankedRegions] = useState<
     { region: RegionData; rank: number; trend: number }[]
   >([]);
@@ -25,67 +34,74 @@ const TopWinningRegionPage = () => {
       ? "Top Winning Area Today"
       : "Top Winning Regions Today";
 
-  const getWinningRegions = async () => {
-    try {
-      const today = new Date().toLocaleDateString("en-CA", {
-        timeZone: "Asia/Manila",
-      });
-      const response = await fetchWinners({
-        from: today,
-        to: today,
-      });
+  // const getWinningRegions = async () => {
+  //   try {
+  //     const today = new Date().toLocaleDateString("en-CA", {
+  //       timeZone: "Asia/Manila",
+  //     });
+  //     const response = await fetchWinners({
+  //       from: today,
+  //       to: today,
+  //     });
 
-      if (!response.success || !response.data || response.data.length === 0) {
-        console.warn("No winners found in API response.");
-        return;
-      }
+  //     if (!response.success || !response.data || response.data.length === 0) {
+  //       console.warn("No winners found in API response.");
+  //       return;
+  //     }
 
-      //console.log('TOTAL WINNERS IN THE TOP WINNING REGION:', response.data);
+  //     //console.log('TOTAL WINNERS IN THE TOP WINNING REGION:', response.data);
 
-      const filteredData = response.data;
+  //     const filteredData = response.data;
 
-      // Group by Region and sum PayoutAmount
-      const regionMap = new Map<string, RegionData>();
+  //     // Group by Region and sum PayoutAmount
+  //     const regionMap = new Map<string, RegionData>();
 
-      filteredData.forEach((entry: any) => {
-        const regionName = entry.Region || "Unknown";
-        const payout = entry.PayoutAmount || 0;
+  //     filteredData.forEach((entry: any) => {
+  //       const regionName = entry.Region || "Unknown";
+  //       const payout = entry.PayoutAmount || 0;
 
-        if (payout === 0) return;
+  //       if (payout === 0) return;
 
-        if (regionMap.has(regionName)) {
-          const existing = regionMap.get(regionName)!;
-          existing.TotalPayout += payout;
-          existing.TotalWinners = (existing.TotalWinners || 0) + 1;
-        } else {
-          regionMap.set(regionName, {
-            RegionId: entry.RegionId,
-            Region: regionName,
-            RegionFull: entry.RegionFull || regionName,
-            TotalPayout: payout,
-            TotalWinners: 1,
-          });
-        }
-      });
+  //       if (regionMap.has(regionName)) {
+  //         const existing = regionMap.get(regionName)!;
+  //         existing.TotalPayout += payout;
+  //         existing.TotalWinners = (existing.TotalWinners || 0) + 1;
+  //       } else {
+  //         regionMap.set(regionName, {
+  //           RegionId: entry.RegionId,
+  //           Region: regionName,
+  //           RegionFull: entry.RegionFull || regionName,
+  //           TotalPayout: payout,
+  //           TotalWinners: 1,
+  //         });
+  //       }
+  //     });
 
-      const sortedRegions = Array.from(regionMap.values()).sort(
-        (a, b) => b.TotalPayout - a.TotalPayout
-      );
+  //     const sortedRegions = Array.from(regionMap.values()).sort(
+  //       (a, b) => b.TotalPayout - a.TotalPayout
+  //     );
 
-      const ranked = sortedRegions.map((region, index) => ({
-        region,
-        rank: index + 1,
-        trend: 0, // Default stub, update later if needed
-      }));
+  //     const ranked = sortedRegions.map((region, index) => ({
+  //       region,
+  //       rank: index + 1,
+  //       trend: 0, // Default stub, update later if needed
+  //     }));
 
-      setRankedRegions(ranked);
-    } catch (error) {
-      console.error("Failed to fetch winning regions:", error);
-    }
-  };
+  //     setRankedRegions(ranked);
+  //   } catch (error) {
+  //     console.error("Failed to fetch winning regions:", error);
+  //   }
+  // };
 
   useEffect(() => {
-    getWinningRegions();
+    // getWinningRegions();
+    
+    if (!data || !data.data || data.data.length === 0) {
+      console.warn("No data provided for Top Betting Regions.");
+      return;
+    }
+    data.data.sort((a, b) => b.TotalPayout - a.TotalPayout);
+    setRankedRegions(data.data.map((item, index) => ({ region: item, rank: index + 1, trend: 0 })));
   }, []);
 
   return (
@@ -144,7 +160,7 @@ const TopWinningRegionPage = () => {
               </div>
 
               <p className="text-[#0038A8] flex-1 ml-2 text-md whitespace-nowrap overflow-hidden text-ellipsis">
-                {item.region.RegionFull}
+                {item.region.Region}
               </p>
 
               <p className="text-[#212121] text-right flex-1 text-md">

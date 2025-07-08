@@ -1,3 +1,4 @@
+import { WebDashboard } from "~/types/types";
 import axiosInstance from "./axiosInstance";
 
 const validateRelativeUrl = (url: string) => {
@@ -171,10 +172,23 @@ export const fetchCompareHistoricalRange = async (
   }
 };
 
-
-
-
-
-
-
-  
+export const fetchWebDashboard = async ( filters?: {
+  region?: number, 
+  province?: number, 
+  city?: number, 
+  gameCategory?: number, 
+  gameSchedule?: number, 
+  from?: string, 
+  to?: string,
+  operator?: number
+}) => {
+  try {
+    const url = validateRelativeUrl("/transactions/dashboard/web");
+    const response = await axiosInstance.get(url, { params: filters });
+    console.log("Web Dashboard Response:", response.data);
+    return response.data;
+  }
+  catch (error) {
+    return handleError("fetchWebDashboard", error);
+  }
+}
