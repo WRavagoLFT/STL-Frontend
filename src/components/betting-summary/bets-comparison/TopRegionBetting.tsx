@@ -328,7 +328,9 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
         firstDateSpecific={firstDateSpecific}
         secondDateSpecific={secondDateSpecific}
         firstDateDuration={firstDateDuration}
-        secondDateDuration={secondDateDuration}
+        secondDateDuration={secondDateDuration} 
+        secondDurationFrom={null} 
+        secondDurationTo={null}      
       />
       <div className="h-full flex flex-col flex-grow">
         {loading ? (

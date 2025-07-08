@@ -69,8 +69,6 @@ export const ParentDashboard = () => {
     fetchData();
   }, []);
 
-
-
   return (
     <>
       {loading ? (

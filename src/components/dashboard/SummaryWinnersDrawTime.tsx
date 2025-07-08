@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { fetchWinners } from "~/lib/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "~/store/useAuthStore";
 
@@ -46,74 +45,10 @@ interface WinnersProps {
 
 const SummaryWinnersDrawTimePage = (data: WinnersProps) => {
   const [loading, setLoading] = useState(true);
-  // const [data, setData] = useState<
-  //   { draw: string; winners: number; winnings: number }[]
-  // >([]);
   const [chartData, setChartData] = useState<{ draw: string; winners: number; winnings: number }[]>([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
-  // const fetchAndProcessData = useCallback(async () => {
-  //   setLoading(true);
-  //   try {
-  //     const today = new Date().toLocaleDateString("en-CA", {
-  //       timeZone: "Asia/Manila",
-  //     });
-  //     //console.log("[DEBUG] Today's date (PHT):", today);
-
-  //     const result = await fetchWinners({ from: today, to: today });
-
-  //     if (!result.success || !Array.isArray(result.data)) {
-  //       console.warn("[DEBUG] No valid data from fetchWinners");
-  //       setLoading(false);
-  //       return;
-  //     }
-
-  //     const filteredData: Winner[] = result.data.filter(
-  //       (item: { DateOfTransaction?: string }) => {
-  //         if (!item.DateOfTransaction) return false;
-
-  //         const localDate = new Date(item.DateOfTransaction).toLocaleDateString("en-CA", {
-  //           timeZone: "Asia/Manila",
-  //         });
-
-  //         return localDate === today;
-  //       }
-  //     );
-
-  //     const drawSummary: Record<
-  //       DrawNumber,
-  //       { winners: number; winnings: number }
-  //     > = {
-  //       1: { winners: 0, winnings: 0 },
-  //       2: { winners: 0, winnings: 0 },
-  //       3: { winners: 0, winnings: 0 },
-  //     };
-
-  //     for (const item of filteredData) {
-  //       const draw = item.DrawOrder as DrawNumber;
-  //       if (drawSummary[draw]) {
-  //         drawSummary[draw].winners += 1;
-  //         drawSummary[draw].winnings += item.PayoutAmount || 0;
-  //       }
-  //     }
-
-  //     const finalData = ([1, 2, 3] as DrawNumber[]).map((drawNum) => ({
-  //       draw: drawLabelMap[drawNum] || `Draw ${drawNum}`,
-  //       winners: drawSummary[drawNum].winners,
-  //       winnings: drawSummary[drawNum].winnings,
-  //     }));
-
-  //     //console.log("[DEBUG] Final Chart Data:", finalData);
-  //     setData(finalData);
-  //   } catch (error) {
-  //     console.error("Error fetching summary winners draw time:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, []);
-
   useEffect(() => {
-    // fetchAndProcessData();
     setChartData(data.data.map((item) => ({ 
       draw: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw", 
       winners: item.Winners, 

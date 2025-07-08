@@ -117,7 +117,7 @@ const LoginPage = () => {
                 onChange={(e) =>
                   setCredentials({ ...credentials, email: e.target.value })
                 }
-                className={`w-full px-3 py-2 pr-10 rounded border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none
+                className={`w-full px-3 py-2 pr-10 rounded-lg border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none
               ${errors.email || errors.general ? "border-[#CE1126]" : "border-[#0038A8]"}`}
                 suppressHydrationWarning
               />
@@ -144,7 +144,7 @@ const LoginPage = () => {
                       password: e.target.value,
                     })
                   }
-                  className={`w-full px-3 py-2 pr-10 rounded border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none ${
+                  className={`w-full px-3 py-2 pr-10 rounded-lg border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none ${
                     errors.password || errors.general
                       ? "border-[#CE1126]"
                       : "border-[#0038A8]"

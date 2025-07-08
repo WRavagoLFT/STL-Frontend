@@ -318,13 +318,15 @@ const ParentComparisonBetting = ({
         {categoryFilter === "Top Betting Region by Total Bets" ||
         categoryFilter === "Top Betting Region by Total Bettors" ? (
           <ChartTopRegionByBetsandBettors
-            gameCategoryId={gameCategoryId}
-            categoryFilter={categoryFilter}
-            dateFilter={dateFilter}
-            firstDateSpecific={formattedFirstDateSpecific}
-            secondDateSpecific={formattedSecondDateSpecific}
-            firstDateDuration={formattedFirstDateDuration}
-            secondDateDuration={formattedSecondDateDuration}
+              gameCategoryId={gameCategoryId}
+              categoryFilter={categoryFilter}
+              dateFilter={dateFilter}
+              firstDateSpecific={formattedFirstDateSpecific}
+              secondDateSpecific={formattedSecondDateSpecific}
+              firstDateDuration={formattedFirstDateDuration}
+              secondDateDuration={formattedSecondDateDuration} 
+              secondDurationFrom={null} 
+              secondDurationTo={null}          
           />
         ) : (
           <>
