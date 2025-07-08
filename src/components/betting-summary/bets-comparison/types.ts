@@ -28,6 +28,8 @@ export interface chartOne_Range {
 }
 
 export interface chartTwoFive_Range {
+  TotalSaisCasas: number;
+  TotalTresCasas: number;
   DrawOrder: number;
   Region: null;
   GameCategory: null;

@@ -284,6 +284,8 @@ export const processDurationChart2Data = (payload: any): ChartData[] => {
 
     return {
       drawOrder,
+
+      // Tumbok
       firstRangeTumbok: firstRangeItems.reduce(
         (sum: number, item: chartTwoFive_Range) =>
           sum + (item.BetTypes?.Tumbok || 0),
@@ -294,6 +296,8 @@ export const processDurationChart2Data = (payload: any): ChartData[] => {
           sum + (item.BetTypes?.Tumbok || 0),
         0
       ),
+
+      // Sahod
       firstRangeSahod: firstRangeItems.reduce(
         (sum: number, item: chartTwoFive_Range) =>
           sum + (item.BetTypes?.Sahod || 0),
@@ -302,6 +306,24 @@ export const processDurationChart2Data = (payload: any): ChartData[] => {
       secondRangeSahod: secondRangeItems.reduce(
         (sum: number, item: chartTwoFive_Range) =>
           sum + (item.BetTypes?.Sahod || 0),
+        0
+      ),
+
+      // Casas
+      firstRangeCasas: firstRangeItems.reduce(
+        (sum: number, item: chartTwoFive_Range) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalSaisCasas || 0),
+        0
+      ),
+      secondRangeCasas: secondRangeItems.reduce(
+        (sum: number, item: chartTwoFive_Range) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalSaisCasas || 0),
         0
       ),
     };

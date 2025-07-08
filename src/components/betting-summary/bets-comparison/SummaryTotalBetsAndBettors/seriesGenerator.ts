@@ -109,18 +109,22 @@ export const generateSeries = (
           `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeRamble' : 'secondDateRamble'] || 0)).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.firstRangeCasas : item.firstDateCasas) || 0) / 100000),
+        data: typedChartData.map(
+          (item) => ((isDuration ? item.firstRangeCasas : item.firstDateCasas) || 0) / 100000
+        ),
         label: `Casas ${firstLabel}`,
         color: "#7266C9",
         valueFormatter: (_value: number | null, context: any) =>
-          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeCasas' : 'firstDateCasas'] || 0)).toLocaleString()}`,
+          `₱${(typedChartData[context.dataIndex]?.[isDuration ? "firstRangeCasas" : "firstDateCasas"] || 0).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.secondRangeCasas : item.secondDateCasas) || 0) / 100000),
+        data: typedChartData.map(
+          (item) => ((isDuration ? item.secondRangeCasas : item.secondDateCasas) || 0) / 100000
+        ),
         label: `Casas ${secondLabel}`,
         color: "#3B3B81",
         valueFormatter: (_value: number | null, context: any) =>
-          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeCasas' : 'secondDateCasas'] || 0)).toLocaleString()}`,
+          `₱${(typedChartData[context.dataIndex]?.[isDuration ? "secondRangeCasas" : "secondDateCasas"] || 0).toLocaleString()}`,
       },
     ];
   } else if (urlParam === "3" || urlParam === "6") {
