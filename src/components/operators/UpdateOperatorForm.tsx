@@ -119,7 +119,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
     if (!initialUserOperatorData || !initialUserOperatorData.data) return {};
 
     const data = initialUserOperatorData.data;
-    console.log(initialUserOperatorData.data);
+    //console.log(initialUserOperatorData.data);
 
     return {
       operatorId: data.OperatorId || '', 
@@ -128,7 +128,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       operatorEmail: data.OperatorEmail || '',
       operatorRepresentative: data.OperatorRepresentative || '',
 
-      operatorContactNos: data.OperatorContactNos || '',
+      contactNumber: data.OperatorContactNos || '',
       contactNo: data.ContactNo || '',
 
       email: data.Email || '',
@@ -267,7 +267,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
   });
 
   useEffect(() => {
-    console.log("Validation Errors:", formik.errors);
+    //console.log("Validation Errors:", formik.errors);
     //console.log("Touched Fields:", formik.touched);
   }, [formik.errors, formik.touched]);
   
@@ -382,7 +382,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       <div className="mt-3">
         <div className="text-base font-bold mb-2">Owner Information</div>
         <div className="grid grid-cols-2 gap-4">
-          {/* Operator Name */}
+          {/* Exec Name */}
           <div className="col-span-2">
             <label
               htmlFor="execFirstName"
@@ -398,7 +398,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
             />
           </div>
 
-          {/* Contact Number */}
+          {/* Exec Contact Number */}
           <div>
             <label
               htmlFor="contactNo"
@@ -450,20 +450,23 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
             />
           </div>
 
-          {/* Exec Contact Number */}
+          {/* Operator Contact Number */}
           <div>
             <label
-              htmlFor="operatorContactNos"
+              htmlFor="contactNumber"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Phone Number
             </label>
             <Input
-              id="operatorContactNos"
+              id="contactNumber"
               type="text"
-              {...formik.getFieldProps("operatorContactNos")}
+              {...formik.getFieldProps("contactNumber")}
               disabled={isDisabled}
             />
+            {getError("contactNumber") && (
+              <p className="text-xs text-red-600 mt-1">{getError("contactNumber")}</p>
+            )}
           </div>
 
           {/* Address */}
@@ -484,14 +487,14 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
           {/* Email */}
           <div>
             <label
-              htmlFor="execEmail"
+              htmlFor="operatorEmail"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
               Operator's Email Address
             </label>
             <Input
-              id="execEmail"
-              {...formik.getFieldProps("execEmail")}
+              id="operatorEmail"
+              {...formik.getFieldProps("operatorEmail")}
               disabled={isDisabled}
             />
           </div>

@@ -12,59 +12,63 @@ import Card from "~/components/ui/dashboardcards/Cards";
 import DetailedTable from "~/components/ui/tables/DetailedTable";
 import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
 import { devicesTableColumns } from "~/config/devicesTableColumns";
-import { Device } from "~/types/types";
-import { fetchDevices } from "~/lib/api/device";
+import { DeviceItem, fetchDevices } from "~/lib/api/device/device.service";
+
+export interface DeviceInfoSummary {
+  TotalDevices: number;
+  TotalActiveDevices: number;
+  TotalDamagedDevices: number;
+  TotalInactiveDevices: number;
+  TotalNewDevices: number;
+}
 
 type SetState<T> = React.Dispatch<React.SetStateAction<T>>;
 
 export const useLoadDevices = (
   setLoading: SetState<boolean>,
   setError: SetState<string | null>,
-  setDevices: SetState<Device[]>,
+  setDevices: SetState<DeviceItem[]>,
   setDeviceInfoData: SetState<any>
 ) =>
-  useCallback(async () => {
+    useCallback(async () => {
+    setLoading(true);
+
     try {
-      setLoading(true);
       const result = await fetchDevices();
 
-      if (result.success === false) {
-        setError(result.message || "Failed to fetch devices.");
+      if (!result || result.success === false) {
+        setError(result?.message || "Failed to fetch devices.");
         setDevices([]);
         setDeviceInfoData(null);
-      } else {
-        const fetchedDevices = result.data ?? result;
-
-        setDevices(fetchedDevices);
-
-        const summary = {
-          TotalDevices: fetchedDevices.length,
-          TotalActiveDevices: fetchedDevices.filter(
-            (d: Device) => d.DeviceStatus === "Active"
-          ).length,
-          TotalDamagedDevices: fetchedDevices.filter(
-            (d: Device) => d.DeviceStatus === "Damaged"
-          ).length,
-          TotalInactiveDevices: fetchedDevices.filter(
-            (d: Device) => d.DeviceStatus === "Inactive"
-          ).length,
-          TotalNewDevices: fetchedDevices.filter(
-            (d: Device) => d.DeviceStatus === "New"
-          ).length,
-        };
-
-        setDeviceInfoData(summary);
+        return;
       }
-    } catch (err) {
-      console.error(err);
+
+      const fetchedDevices: DeviceItem[] = result.data ?? [];
+
+      setDevices(fetchedDevices);
+
+      const summary: DeviceInfoSummary = {
+        TotalDevices: fetchedDevices.length,
+        TotalActiveDevices: fetchedDevices.filter(d => d.DeviceStatus === "Active").length,
+        TotalDamagedDevices: fetchedDevices.filter(d => d.DeviceStatus === "Damaged").length,
+        TotalInactiveDevices: fetchedDevices.filter(d => d.DeviceStatus === "Inactive").length,
+        TotalNewDevices: fetchedDevices.filter(d => d.DeviceStatus === "New").length,
+      };
+
+      setDeviceInfoData(summary);
+      setError(null); // clear previous error
+    } catch (error) {
+      console.error("Device fetch error:", error);
       setError("Unexpected error occurred.");
+      setDevices([]);
+      setDeviceInfoData(null);
     } finally {
       setLoading(false);
     }
   }, [setLoading, setError, setDevices, setDeviceInfoData]);
 
 export const ParentDevicePage = () => {
-  const [devices, setDevices] = useState<Device[]>([]);
+  const [devices, setDevices] = useState<DeviceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -82,7 +86,7 @@ export const ParentDevicePage = () => {
     setLoading,
     setError,
     setDevices,
-    setDeviceInfoData
+    setDeviceInfoData 
   );
 
   // for dashboard data

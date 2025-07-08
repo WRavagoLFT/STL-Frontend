@@ -17,7 +17,7 @@ import {
   sortData,
 } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
-import { SortConfig, Device } from "~/types/types";
+import { SortConfig } from "~/types/types";
 import { getUserStatus } from "~/hooks/dashboarddata";
 import dayjs from "dayjs";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
@@ -29,8 +29,9 @@ import { useAuthStore } from "~/store/useAuthStore";
 import ConfirmUserActionModalPage from "../modals/ConfirmUserActionModal";
 import { UsersItem } from "~/lib/api/users/users.service";
 import { OperatorsItem } from "~/lib/api/operators/operators.service";
+import { DeviceItem } from "~/lib/api/device/device.service";
 
-const DetailedTable = function <T extends UsersItem | OperatorsItem | Device>({
+const DetailedTable = function <T extends UsersItem | OperatorsItem | DeviceItem>({
   data,
   columns,
   actionsRender,

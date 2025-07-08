@@ -4,7 +4,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import UpdateUserForm from "~/components/user/UpdateUserForm";
-import { Device } from "~/types/types";
 import AddDeviceForm from "~/components/device-information/AddDeviceForm";
 import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
 import { userEditColumns } from "~/config/userEditLogTableColumns";
@@ -21,18 +20,19 @@ import { useRouter } from "next/navigation";
 import { useLoadDevices } from "../device-information/ParentDevice";
 import { editLogUser, UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
 import { fetchAndSetDevice } from "~/hooks/useLoadDevice";
+import { AddDevicePayload, DeviceItem, UpdateDevicePayload } from "~/lib/api/device/device.service";
 
 type UsersViewPageProps = {
   user: UsersItem;
   slug: string;
   onSubmit?: (data: UpdateUserPayload) => void;
-  deviceId?: number; // <- not Device
+  deviceId?: number;
 };
 
 const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"kabo" | "device" | "history">("kabo");
-  const [device, setDevice] = useState<Device | null>(null);
+  const [device, setDevice] = useState<DeviceItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [editData, setEditData] = useState<any[]>([]);
   const [columns, setColumns] = useState<any[]>([]);
@@ -60,7 +60,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
       ? "/users/kabo"
       : "/";
         
-  console.log(user);
+  //console.log(user);
   //console.log(slug);
   //  THIS IS NULL
   //console.log('ROLE CONFIG', roleConfig); 
@@ -72,12 +72,13 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
     (deviceInfo) => {} // optional
   );
   
-  const onAddDeviceSubmit = async (data: Device) => {
+  const onAddDeviceSubmit = async (data: AddDevicePayload) => {
     const redirectPath = `/users/users-view/${slug}`;
     await handleAddDevice(data, loadData, router, redirectPath);
   }; 
 
-  const onUpdateDeviceSubmit = async (data: Device) => {
+  const onUpdateDeviceSubmit = async (data: UpdateDevicePayload
+  ) => {
     const redirectPath = `/users/users-view/${slug}`;
     await handleUpdateDevice(data, loadData, router, redirectPath);
   };

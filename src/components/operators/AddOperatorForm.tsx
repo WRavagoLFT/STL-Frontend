@@ -11,7 +11,7 @@ import { operatorSchema } from "~/schemas/operatorSchema";
 import Swal from "sweetalert2";
 import { generateValidPassword } from "~/utils/passwordgenerate";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { AddOperatorPayload, OperatorsItem } from "~/lib/api/operators/operators.service";
+import { AddOperatorPayload } from "~/lib/api/operators/operators.service";
 
 interface AddOperatorFormProps {
   title?: string;
@@ -107,7 +107,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
     }));
   };
 
-  const handleMultiSelect = (
+  const handleMultiSelect = async (
     name: string,
     selectedOptions: OptionType[],
     formik: FormikProps<any>
@@ -126,10 +126,12 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       setFilteredProvinces(filteredProvinces);
       setFilteredCities([]);
 
-      formik.setFieldValue("regions", selectedValues);
-      formik.setFieldTouched("regions", true, true);
-      formik.setFieldValue("provinces", []);
-      formik.setFieldValue("cities", []);
+      await formik.setFieldValue("regions", selectedValuesNum);
+      await formik.setFieldTouched("regions", true, true);
+      await formik.setFieldValue("provinces", []);
+      await formik.setFieldValue("cities", []);
+      await formik.validateField("regions");
+
     } else if (name === "provinces") {
       const filteredCities = cities
         .filter((city) => selectedValuesNum.includes(city.ProvinceId))
@@ -140,12 +142,20 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
       setFilteredCities(filteredCities);
 
-      formik.setFieldValue("provinces", selectedValues);
-      formik.setFieldTouched("provinces", true, true);
-      formik.setFieldValue("cities", []);
+      await formik.setFieldValue("provinces", selectedValuesNum);
+      await formik.setFieldTouched("provinces", true, true);
+      await formik.setFieldValue("cities", []);
+      await formik.validateField("provinces");
+
+    } else if (name === "cities") {
+      await formik.setFieldValue("cities", selectedValuesNum);
+      await formik.setFieldTouched("cities", true, true);
+      await formik.validateField("cities");
+
     } else {
-      formik.setFieldValue(name, selectedValues);
-      formik.setFieldTouched(name, true, true);
+      await formik.setFieldValue(name, selectedValuesNum);
+      await formik.setFieldTouched(name, true, true);
+      await formik.validateField(name);
     }
   };
 
@@ -316,13 +326,12 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
             Password
           </label>
           <div className="flex space-x-2">
-            {/* Password Input with Eye Toggle */}
             <div className="relative flex-1">
               <Input
                 type={showPassword ? "text" : "password"}
                 id="execPassword"
                 placeholder="Generate Password"
-                className="pr-10" // padding for eye icon
+                className="pr-10"
                 {...formik.getFieldProps("execPassword")}
                 error={
                   !!(formik.touched.execPassword && formik.errors.execPassword)
@@ -350,6 +359,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
               Generate
             </button>
           </div>
+          
           {/* Error Message */}
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {formik.touched.execPassword && formik.errors.execPassword
@@ -809,7 +819,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
               }}
               />
               <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
-                {getError("excludedCities") || "\u00A0"}
+                {getError("cities") || "\u00A0"}
               </p>
             </div>
           )}

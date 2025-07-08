@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Device } from "~/types/types";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import { DevicesViewPage } from "~/components/device-information/ParentDeviceView";
 import { fetchAndSetDevice } from "~/hooks/useLoadDevice";
+import { DeviceItem } from "~/lib/api/device/device.service";
 
 const DeviceSlugPage = () => {
   const { slug } = useParams();
-  const [device, setDevice] = useState<Device | null>(null);
+  const [device, setDevice] = useState<DeviceItem | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
