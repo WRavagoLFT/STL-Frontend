@@ -3,9 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { fetchHistoricalSummary } from "../../lib/api/transactions";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
-import { TransactionData } from "~/types/types";
 import { useAuthStore } from "~/store/useAuthStore";
 
 const CustomLegend = () => (
@@ -41,71 +39,11 @@ interface BettingSummaryProps {
 }
 
 const SummaryBettorsBetsPlacedPage = (data: BettingSummaryProps) => {
-  // const [data, setData] = useState<
-  //   { gameName: string; bettors: number; bets: number; winners: number }[]
-  // >([]);
   const [chartData, setChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
-  // const fetchData = async () => {
-  //   try {
-  //     const response = await fetchHistoricalSummary();
-
-  //     if (response.success) {
-  //       const today = new Date().toLocaleDateString("en-CA", {
-  //         timeZone: "Asia/Manila",
-  //       });
-
-  //       const filteredData = response.data.filter((item: TransactionData) =>
-  //         item.TransactionDate.startsWith(today)
-  //       );
-
-  //       const localSummary: typeof summary = {
-  //         1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
-  //         2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
-  //         3: { gameName: "Third Draw", bettors: 0, bets: 0, winners: 0 },
-  //       };
-
-  //       filteredData.forEach((item: TransactionData) => {
-  //         if (localSummary[item.DrawOrder]) {
-  //           localSummary[item.DrawOrder].bettors += item.TotalBettors || 0;
-  //           localSummary[item.DrawOrder].bets += item.TotalBetAmount || 0;
-  //           localSummary[item.DrawOrder].winners += item.TotalWinners || 0;
-  //         }
-  //       });
-
-  //       const formattedData = Object.values(localSummary);
-
-  //       const scaledData = formattedData.map((item) => ({
-  //         ...item,
-  //         bets: item.bets,
-  //         ratio: item.bettors === 0 ? 0 : item.bets / item.bettors,
-  //       }));
-
-  //       setData(scaledData);
-
-  //       const transformedChartData = scaledData.map((item) => ({
-  //         draw: item.gameName,
-  //         bettors: item.bettors,
-  //         bets: item.bets,
-  //         ratio: item.ratio,
-  //       }));
-
-  //       setChartData(transformedChartData);
-  //     } else {
-  //       console.error("API Request Failed:", response.message);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error Fetching Data:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   useEffect(() => {
-    // fetchData();
-
     setChartData(data.data.map((item) => ({
       gameName: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw",
       bettors: item.Bettors,
