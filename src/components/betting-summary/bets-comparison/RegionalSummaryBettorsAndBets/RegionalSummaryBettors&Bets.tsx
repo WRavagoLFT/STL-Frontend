@@ -274,7 +274,8 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
                 firstDateDuration,
                 secondDateDuration,
                 secondDurationFrom, 
-                secondDurationTo 
+                secondDurationTo,
+                gameCategoryId ?? null
               )}
               xAxis={[
                 {

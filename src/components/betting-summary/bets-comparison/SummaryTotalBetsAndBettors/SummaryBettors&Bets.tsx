@@ -261,7 +261,8 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
                 firstDateDuration,
                 secondDateDuration,
                 secondDurationFrom,
-                secondDurationTo
+                secondDurationTo,
+                gameCategoryId ?? null
               )}
               yAxis={[
                 {
