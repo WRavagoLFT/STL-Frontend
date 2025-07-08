@@ -54,12 +54,14 @@ export const processChart1Data = (
   });
 };
 
+// bet type
 export const processChart2Data = (
   payload: any,
   firstDate: string,
   secondDate: string
 ): ChartData[] => {
   const drawOrders = [1, 2, 3];
+
   return drawOrders.map((drawOrder) => {
     const allDrawItems = payload.DrawOrder.filter(
       (item: any) => item.DrawOrder === drawOrder
@@ -77,41 +79,49 @@ export const processChart2Data = (
 
       // Tumbok
       firstDateTumbok: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+        (sum: any, item: { BetTypes: { Tumbok: any; }; }) => sum + (item.BetTypes?.Tumbok || 0),
         0
       ),
       secondDateTumbok: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+        (sum: any, item: { BetTypes: { Tumbok: any; }; }) => sum + (item.BetTypes?.Tumbok || 0),
         0
       ),
 
       // Sahod
       firstDateSahod: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+        (sum: any, item: { BetTypes: { Sahod: any; }; }) => sum + (item.BetTypes?.Sahod || 0),
         0
       ),
       secondDateSahod: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+        (sum: any, item: { BetTypes: { Sahod: any; }; }) => sum + (item.BetTypes?.Sahod || 0),
         0
       ),
 
       // Ramble
       firstDateRamble: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
+        (sum: any, item: { BetTypes: { Ramble: any; }; }) => sum + (item.BetTypes?.Ramble || 0),
         0
       ),
       secondDateRamble: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
+        (sum: any, item: { BetTypes: { Ramble: any; }; }) => sum + (item.BetTypes?.Ramble || 0),
         0
       ),
 
-      // Casas
+      // Casas (aggregated from root-level totals)
       firstDateCasas: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Casas || 0),
+        (sum: any, item: { TotalTresCasas: any; TotalSaisCasas: any; TotalDyisCasas: any; }) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
         0
       ),
       secondDateCasas: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Casas || 0),
+        (sum: any, item: { TotalTresCasas: any; TotalSaisCasas: any; TotalDyisCasas: any; }) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
         0
       ),
     };
