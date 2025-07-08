@@ -45,18 +45,18 @@ export const generateSeries = (
           `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeBettors' : 'secondDateBettors'] || 0)).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.firstRangeBetAmount : item.firstDateBets) || 0) / 100000),
+        data: typedChartData.map((item) => ((isDuration ? item.secondRangeTotalBetAmount : item.firstDateBets) || 0) / 100000),
         label: `Bets ${firstLabel}`,
         color: "#7266C9",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeBetAmount' : 'firstDateBets'] || 0)).toLocaleString()}`,
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeTotalBetAmount' : 'firstDateBets'] || 0)).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.secondRangeBetAmount : item.secondDateBets) || 0) / 100000),
+        data: typedChartData.map((item) => ((isDuration ? item.firstRangeTotalBetAmount : item.secondDateBets) || 0) / 100000),
         label: `Bets ${secondLabel}`,
         color: "#3B3B81",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeBetAmount' : 'secondDateBets'] || 0)).toLocaleString()}`,
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeTotalBetAmount' : 'secondDateBets'] || 0)).toLocaleString()}`,
       },
     ];
   } else if (urlParam === "2" || urlParam === "5") {
@@ -71,28 +71,56 @@ export const generateSeries = (
         label: `Tumbok ${firstLabel}`,
         color: "#E5C7FF",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeTumbok' : 'firstDateTumbok'] || 0)).toLocaleString()}`,
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeTumbok' : 'firstDateTumbok'] || 0)).toLocaleString()}`,
       },
       {
         data: typedChartData.map((item) => ((isDuration ? item.secondRangeTumbok : item.secondDateTumbok) || 0) / 100000),
         label: `Tumbok ${secondLabel}`,
         color: "#5050A5",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeTumbok' : 'secondDateTumbok'] || 0)).toLocaleString()}`,
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeTumbok' : 'secondDateTumbok'] || 0)).toLocaleString()}`,
       },
       {
         data: typedChartData.map((item) => ((isDuration ? item.firstRangeSahod : item.firstDateSahod) || 0) / 100000),
         label: `Sahod ${firstLabel}`,
         color: "#7266C9",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeSahod' : 'firstDateSahod'] || 0)).toLocaleString()}`,
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeSahod' : 'firstDateSahod'] || 0)).toLocaleString()}`,
       },
       {
         data: typedChartData.map((item) => ((isDuration ? item.secondRangeSahod : item.secondDateSahod) || 0) / 100000),
         label: `Sahod ${secondLabel}`,
         color: "#3B3B81",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeSahod' : 'secondDateSahod'] || 0)).toLocaleString()}`,
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeSahod' : 'secondDateSahod'] || 0)).toLocaleString()}`,
+      },
+      {
+        data: typedChartData.map((item) => ((isDuration ? item.firstRangeRamble : item.firstDateRamble) || 0) / 100000),
+        label: `Ramble ${firstLabel}`,
+        color: "#7266C9",
+        valueFormatter: (_value: number | null, context: any) =>
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeRamble' : 'firstDateRamble'] || 0)).toLocaleString()}`,
+      },
+      {
+        data: typedChartData.map((item) => ((isDuration ? item.secondRangeRamble : item.secondDateRamble) || 0) / 100000),
+        label: `Ramble ${secondLabel}`,
+        color: "#3B3B81",
+        valueFormatter: (_value: number | null, context: any) =>
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeRamble' : 'secondDateRamble'] || 0)).toLocaleString()}`,
+      },
+      {
+        data: typedChartData.map((item) => ((isDuration ? item.firstRangeCasas : item.firstDateCasas) || 0) / 100000),
+        label: `Casas ${firstLabel}`,
+        color: "#7266C9",
+        valueFormatter: (_value: number | null, context: any) =>
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeCasas' : 'firstDateCasas'] || 0)).toLocaleString()}`,
+      },
+      {
+        data: typedChartData.map((item) => ((isDuration ? item.secondRangeCasas : item.secondDateCasas) || 0) / 100000),
+        label: `Casas ${secondLabel}`,
+        color: "#3B3B81",
+        valueFormatter: (_value: number | null, context: any) =>
+          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeCasas' : 'secondDateCasas'] || 0)).toLocaleString()}`,
       },
     ];
   } else if (urlParam === "3" || urlParam === "6") {

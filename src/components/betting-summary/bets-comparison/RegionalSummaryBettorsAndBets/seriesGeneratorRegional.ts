@@ -36,24 +36,11 @@ export const generateSeries = (
       return [];
     }
 
-    console.log('Chart1Data values:', {
-      firstRangeBettors: typedChartData.map(item => item.firstRangeBettors),
-      secondRangeBettors: typedChartData.map(item => item.secondRangeBettors),
-      firstRangeBets: typedChartData.map(item => item.firstRangeBets),
-      secondRangeBets: typedChartData.map(item => item.secondRangeBets),
-      firstRangeBetAmount: typedChartData.map(item => item.firstRangeBetAmount),
-      secondRangeBetAmount: typedChartData.map(item => item.secondRangeBetAmount),
-      firstDateBettors: typedChartData.map(item => item.firstDateBettors),
-      secondDateBettors: typedChartData.map(item => item.secondDateBettors),
-      firstDateBets: typedChartData.map(item => item.firstDateBets),
-      secondDateBets: typedChartData.map(item => item.secondDateBets),
-    });
-
     return [
       {
         data: typedChartData.map((item) => {
           const value = isDuration ? item.firstRangeBettors : item.firstDateBettors;
-          return value ?? 0;
+          return (value ?? 0) / 100000;
         }),
         label: `Bettors ${firstLabel}`,
         color: "#E5C7FF",
@@ -63,7 +50,7 @@ export const generateSeries = (
       {
         data: typedChartData.map((item) => {
           const value = isDuration ? item.secondRangeBettors : item.secondDateBettors;
-          return value ?? 0;
+          return (value ?? 0) / 100000;
         }),
         label: `Bettors ${secondLabel}`,
         color: "#5050A5",
@@ -72,31 +59,31 @@ export const generateSeries = (
       },
       {
         data: typedChartData.map((item) => {
-          const value = isDuration ? item.firstRangeBets : item.firstDateBets;
+          const value = isDuration ? item.firstRangeTotalBetAmount : item.firstDateBets;
           if (value === undefined || value === null) {
             console.warn(`Missing ${isDuration ? 'firstRangeBets' : 'firstDateBets'} for item:`, item);
             return 0;
           }
-          return value;
+          return value / 100000;
         }),
         label: `Bets ${firstLabel}`,
         color: "#7266C9",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeBets' : 'firstDateBets'] || 0)).toLocaleString()}`,
+          `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeTotalBetAmount' : 'firstDateBets'] || 0)).toLocaleString()}`,
       },
       {
         data: typedChartData.map((item) => {
-          const value = isDuration ? item.secondRangeBets : item.secondDateBets;
+          const value = isDuration ? item.secondRangeTotalBetAmount : item.secondDateBets;
           if (value === undefined || value === null) {
             console.warn(`Missing ${isDuration ? 'secondRangeBets' : 'secondDateBets'} for item:`, item);
             return 0;
           }
-          return value;
+          return value / 100000;
         }),
         label: `Bets ${secondLabel}`,
         color: "#3B3B81",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeBets' : 'secondDateBets'] || 0)).toLocaleString()}`,
+          `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeTotalBetAmount' : 'secondDateBets'] || 0)).toLocaleString()}`,
       },
     ];
   } else if (urlParam === "2" || urlParam === "5") {
@@ -107,28 +94,28 @@ export const generateSeries = (
     }
     return [
       {
-        data: typedChartData.map((item) => (isDuration ? item.firstRangeTumbok : item.firstDateTumbok) ?? 0),
+        data: typedChartData.map((item) => ((isDuration ? item.firstRangeTumbok : item.firstDateTumbok) ?? 0) / 100000),
         label: `Tumbok ${firstLabel}`,
         color: "#E5C7FF",
         valueFormatter: (_value: number | null, context: any) =>
           `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeTumbok' : 'firstDateTumbok'] || 0)).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => (isDuration ? item.secondRangeTumbok : item.secondDateTumbok) ?? 0),
+        data: typedChartData.map((item) => ((isDuration ? item.secondRangeTumbok : item.secondDateTumbok) ?? 0) / 100000),
         label: `Tumbok ${secondLabel}`,
         color: "#5050A5",
         valueFormatter: (_value: number | null, context: any) =>
           `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeTumbok' : 'secondDateTumbok'] || 0)).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => (isDuration ? item.firstRangeSahod : item.firstDateSahod) ?? 0),
+        data: typedChartData.map((item) => ((isDuration ? item.firstRangeSahod : item.firstDateSahod) ?? 0) / 100000),
         label: `Sahod ${firstLabel}`,
         color: "#7266C9",
         valueFormatter: (_value: number | null, context: any) =>
           `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeSahod' : 'firstDateSahod'] || 0)).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => (isDuration ? item.secondRangeSahod : item.secondDateSahod) ?? 0),
+        data: typedChartData.map((item) => ((isDuration ? item.secondRangeSahod : item.secondDateSahod) ?? 0) / 100000),
         label: `Sahod ${secondLabel}`,
         color: "#3B3B81",
         valueFormatter: (_value: number | null, context: any) =>
@@ -147,14 +134,14 @@ export const generateSeries = (
       const categoryKey = category.replace(/\s+/g, "");
       return [
         {
-          data: typedChartData.map((item) => ((item[`${keyPrefix}${categoryKey}` as keyof Chart36Data] as number) ?? 0)),
+          data: typedChartData.map((item) => (((item[`${keyPrefix}${categoryKey}` as keyof Chart36Data] as number) ?? 0) / 100000)),
           label: `${category.replace("STL", "STL ")} ${firstLabel}`,
           color: getCategoryColor(category.replace(/\s+/g, ""), true),
           valueFormatter: (_value: number | null, context: any) =>
             `${((typedChartData[context.dataIndex]?.[`${keyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0).toLocaleString()}`,
         },
         {
-          data: typedChartData.map((item) => ((item[`${secondKeyPrefix}${categoryKey}` as keyof Chart36Data] as number) ?? 0)),
+          data: typedChartData.map((item) => (((item[`${secondKeyPrefix}${categoryKey}` as keyof Chart36Data] as number) ?? 0) / 100000)),
           label: `${category.replace("STL", "STL ")} ${secondLabel}`,
           color: getCategoryColor(category.replace(/\s+/g, ""), false),
           valueFormatter: (_value: number | null, context: any) =>

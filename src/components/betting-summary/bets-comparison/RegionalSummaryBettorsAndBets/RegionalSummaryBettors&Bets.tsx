@@ -288,7 +288,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
                   label: "Total (x 100,000)",
                   scaleType: "linear",
                   min: 0,
-                  max: 1000,
+                  max: 500,
                   tickInterval: 50,
                   valueFormatter: (value: number) => value.toString(),
                   tickSize: 2,

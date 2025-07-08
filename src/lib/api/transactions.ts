@@ -48,6 +48,7 @@ export const fetchTransactions = async (filters?: {
   try {
     const url = validateRelativeUrl("/transactions/getTransactions");
     const response = await axiosInstance.get(url, { params: filters });
+    console.log("Response data:", response.data);
     return response.data;
   } catch (error) {
     return handleError("fetchTransactions", error);
@@ -143,6 +144,7 @@ export const fetchCompareHistoricalDate = async (
     const response = await axiosInstance.get(url, {
       params: query,
     });
+    console.log("Response data:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching historical date comparison:", (error as Error).message);
@@ -160,7 +162,9 @@ export const fetchCompareHistoricalRange = async (
     const response = await axiosInstance.get(url, {
       params: query,
     });
+    console.log("Response data:", response.data);
     return response.data;
+    
   } catch (error) {
     console.error("Error fetching historical data:", (error as Error).message);
     return { success: false, message: (error as Error).message, data: [] };

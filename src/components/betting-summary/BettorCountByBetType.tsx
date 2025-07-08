@@ -58,32 +58,22 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
         const today = new Date().toLocaleDateString("en-CA", {
           timeZone: "Asia/Manila",
         });
-        //console.log("[DEBUG] Today's date (PHT):", today);
-
         const response = await fetchTransactions({ from: today, to: today });
-        //console.log("[DEBUG] Raw response from fetchTransactions:", response);
 
         let res = response.data.filter(
           (item: { DateOfTransaction: string; GameCategoryId: number }) =>
             item.DateOfTransaction.startsWith(today)
         );
-        //console.log("[DEBUG] Filtered transactions for today:", res);
 
         if (params.gameCategoryId && params.gameCategoryId > 0) {
           res = res.filter(
             (item: { GameCategoryId: number }) =>
               item.GameCategoryId === params.gameCategoryId
           );
-          // console.log(
-          //   `[DEBUG] Filtered by GameCategoryId (${params.gameCategoryId}):`,
-          //   res
-          // );
         }
 
         if (response.success && Array.isArray(res)) {
           const series = getBetTypeSeries(params.gameCategoryId);
-          //console.log("[DEBUG] Bet type series:", series);
-
           const aggregatedData: Record<number, Record<string, number>> = {};
 
           res.forEach((item: any) => {
@@ -99,8 +89,6 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
               aggregatedData[item.DrawOrder][keyLower] += item[dataKey] || 0;
             });
           });
-
-          //console.log("[DEBUG] Aggregated data:", aggregatedData);
 
           const formattedData = [1, 2, 3].map((drawNum) => {
             const entry: { draw: string; [key: string]: number | string } = {
@@ -120,8 +108,6 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
 
             return entry;
           });
-
-          //console.log("[DEBUG] Final formatted data:", formattedData);
           setData(formattedData);
         }
       } catch (error) {

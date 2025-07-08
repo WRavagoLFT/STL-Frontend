@@ -63,10 +63,8 @@ export interface Chart1Data {
   // Date Duration
   firstRangeBettors?: number;
   secondRangeBettors?: number;
-  firstRangeBetAmount?: number;
-  secondRangeBetAmount?: number;
-  firstRangeBets?: number;
-  secondRangeBets?: number;
+  firstRangeTotalBetAmount?: number;
+  secondRangeTotalBetAmount?: number;
 }
 
 export interface Chart25Data {
@@ -75,11 +73,19 @@ export interface Chart25Data {
   secondDateTumbok?: number;
   firstDateSahod?: number;
   secondDateSahod?: number;
+  firstDateRamble?: number;
+  secondDateRamble?: number;
+  firstDateCasas?: number;
+  secondDateCasas?: number;
   // Date Duration
   firstRangeTumbok?: number;
   secondRangeTumbok?: number;
   firstRangeSahod?: number;
   secondRangeSahod?: number;
+  firstRangeRamble?: number;
+  secondRangeRamble?: number;
+  firstRangeCasas?: number;
+  secondRangeCasas?: number;
 }
 
 export interface Chart36Data {
@@ -120,6 +126,7 @@ export interface RegionSpecificData {
     Tumbok: number;
     Sahod: number;
     Ramble: number;
+    Casas: number;
   };
 }
 
@@ -135,6 +142,7 @@ export interface RegionRangeData {
     Tumbok: number;
     Sahod: number;
     Ramble: number;
+    Casas: number;
   };
   GameCategory?: string | null;
   DateOfWinningCombination: string;
@@ -155,8 +163,8 @@ export interface BettorsandBetsSummaryProps {
   secondDateSpecific: string | null;
   firstDateDuration: string | null;
   secondDateDuration: string | null;
-  secondDurationFrom: string | null; 
-  secondDurationTo: string | null;   
+  secondDurationFrom: string | null;
+  secondDurationTo: string | null;
 }
 
 export const getLegendItemsMap_Specific = (
@@ -182,6 +190,10 @@ export const getLegendItemsMap_Specific = (
         { label: `Tumbok ${secondLabel}`, color: "#5050A5" },
         { label: `Sahod ${firstLabel}`, color: "#7266C9" },
         { label: `Sahod ${secondLabel}`, color: "#3B3B81" },
+        { label: `Ramble ${firstLabel}`, color: "#875AC4" },
+        { label: `Ramble ${secondLabel}`, color: "#6F58C9" },
+        { label: `Casas ${firstLabel}`, color: "#563D99" },
+        { label: `Casas ${secondLabel}`, color: "#3E2466" },
       ];
     case "Total Bets by Game Type":
     case "Total Bettors by Game Type":
@@ -225,6 +237,10 @@ export const getLegendItemsMap_Duration = (
         { label: `Tumbok ${secondLabel}`, color: "#5050A5" },
         { label: `Sahod ${firstLabel}`, color: "#7266C9" },
         { label: `Sahod ${secondLabel}`, color: "#3B3B81" },
+        { label: `Ramble ${firstLabel}`, color: "#875AC4" },
+        { label: `Ramble ${secondLabel}`, color: "#6F58C9" },
+        { label: `Casas ${firstLabel}`, color: "#563D99" },
+        { label: `Casas ${secondLabel}`, color: "#3E2466" },
       ];
     case "Total Bets by Game Type":
     case "Total Bettors by Game Type":

@@ -150,7 +150,7 @@ const SummaryBettorsBetsPlacedPage = () => {
                   color: "#5050A5",
                   label: "Bets",
                   valueFormatter: (value, context) =>
-                    `${data[context.dataIndex].bets.toLocaleString()}`,
+                    `₱${data[context.dataIndex].bets.toLocaleString()}`,
                 },
               ]}
               yAxis={[
