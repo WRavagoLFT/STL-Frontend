@@ -133,6 +133,8 @@ export interface RegionSpecificData {
 }
 
 export interface RegionRangeData {
+  TotalSaisCasas: number;
+  TotalTresCasas: number;
   Region: string;
   TotalBets: number;
   TotalBetAmount: number;

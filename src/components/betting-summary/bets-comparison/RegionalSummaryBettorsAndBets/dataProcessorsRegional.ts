@@ -284,12 +284,15 @@ const processDurationChart2Data = (payload: RangePayload) => {
     const firstRangeItems = payload.Region.FirstRange.filter(
       (item) => item.Region === region || item.Region === `Region ${region}`
     );
+
     const secondRangeItems = payload.Region.SecondRange.filter(
       (item) => item.Region === region || item.Region === `Region ${region}`
     );
 
     return {
       region,
+
+      // Tumbok
       firstRangeTumbok: firstRangeItems.reduce(
         (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
         0
@@ -298,12 +301,32 @@ const processDurationChart2Data = (payload: RangePayload) => {
         (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
         0
       ),
+
+      // Sahod
       firstRangeSahod: firstRangeItems.reduce(
         (sum, item) => sum + (item.BetTypes?.Sahod || 0),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
         (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+        0
+      ),
+
+      // Casas
+      firstRangeCasas: firstRangeItems.reduce(
+        (sum, item) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalSaisCasas || 0),
+        0
+      ),
+      secondRangeCasas: secondRangeItems.reduce(
+        (sum, item) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalSaisCasas || 0),
         0
       ),
     };
