@@ -114,6 +114,9 @@ export interface Chart36Data {
 export type ChartData = Chart1Data | Chart25Data | Chart36Data;
 
 export interface RegionSpecificData {
+  TotalDyisCasas: number;
+  TotalTresCasas: number;
+  TotalSaisCasas: number;
   TransactionDate: string;
   DrawOrder?: null;
   Region: string;
@@ -133,6 +136,7 @@ export interface RegionSpecificData {
 }
 
 export interface RegionRangeData {
+  TotalDyisCasas: number;
   TotalSaisCasas: number;
   TotalTresCasas: number;
   Region: string;

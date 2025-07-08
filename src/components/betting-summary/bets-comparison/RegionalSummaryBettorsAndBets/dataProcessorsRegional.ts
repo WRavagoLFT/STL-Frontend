@@ -83,6 +83,8 @@ const processChart2Data = (
 
     return {
       region,
+
+      // Tumbok
       firstDateTumbok: firstDateItems.reduce(
         (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
         0
@@ -91,6 +93,8 @@ const processChart2Data = (
         (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
         0
       ),
+
+      // Sahod
       firstDateSahod: firstDateItems.reduce(
         (sum, item) => sum + (item.BetTypes?.Sahod || 0),
         0
@@ -99,14 +103,24 @@ const processChart2Data = (
         (sum, item) => sum + (item.BetTypes?.Sahod || 0),
         0
       ),
+
+      // Casas (aggregate from root-level fields)
       firstDateCasas: firstDateItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Casas || 0),
+        (sum, item) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalSaisCasas || 0),
         0
       ),
       secondDateCasas: secondDateItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Casas || 0),
+        (sum, item) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalSaisCasas || 0),
         0
-      )
+      ),
     };
   });
 };
@@ -164,6 +178,8 @@ const processChart5Data = (
 
     return {
       region,
+
+      // Tumbok
       firstDateTumbok: firstDateItems.reduce(
         (sum, item) => sum + (item.TotalTumbok || 0),
         0
@@ -172,12 +188,32 @@ const processChart5Data = (
         (sum, item) => sum + (item.TotalTumbok || 0),
         0
       ),
+
+      // Sahod
       firstDateSahod: firstDateItems.reduce(
         (sum, item) => sum + (item.TotalSahod || 0),
         0
       ),
       secondDateSahod: secondDateItems.reduce(
         (sum, item) => sum + (item.TotalSahod || 0),
+        0
+      ),
+
+      // Casas (aggregated from root-level fields)
+      firstDateCasas: firstDateItems.reduce(
+        (sum, item) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
+        0
+      ),
+      secondDateCasas: secondDateItems.reduce(
+        (sum, item) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
         0
       ),
     };
@@ -372,6 +408,8 @@ const processDurationChart5Data = (payload: RangePayload) => {
 
     return {
       region,
+
+      // Tumbok
       firstRangeTumbok: firstRangeItems.reduce(
         (sum, item) => sum + (item.TotalTumbok || 0),
         0
@@ -380,12 +418,32 @@ const processDurationChart5Data = (payload: RangePayload) => {
         (sum, item) => sum + (item.TotalTumbok || 0),
         0
       ),
+
+      // Sahod
       firstRangeSahod: firstRangeItems.reduce(
         (sum, item) => sum + (item.TotalSahod || 0),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
         (sum, item) => sum + (item.TotalSahod || 0),
+        0
+      ),
+
+      // Casas
+      firstRangeCasas: firstRangeItems.reduce(
+        (sum, item) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
+        0
+      ),
+      secondRangeCasas: secondRangeItems.reduce(
+        (sum, item) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
         0
       ),
     };

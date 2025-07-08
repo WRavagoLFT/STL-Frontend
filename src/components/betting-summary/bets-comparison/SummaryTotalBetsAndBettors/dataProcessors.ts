@@ -170,6 +170,7 @@ export const processChart5Data = (
   secondDate: string
 ): ChartData[] => {
   const drawOrders = [1, 2, 3];
+
   return drawOrders.map((drawOrder) => {
     const allDrawItems = payload.DrawOrder.filter(
       (item: any) => item.DrawOrder === drawOrder
@@ -184,6 +185,8 @@ export const processChart5Data = (
 
     return {
       drawOrder,
+
+      // Tumbok
       firstDateTumbok: firstDateItems.reduce(
         (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
         0
@@ -192,12 +195,32 @@ export const processChart5Data = (
         (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
         0
       ),
+
+      // Sahod
       firstDateSahod: firstDateItems.reduce(
         (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
         0
       ),
       secondDateSahod: secondDateItems.reduce(
         (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+        0
+      ),
+
+      // Casas (from root-level totals)
+      firstDateCasas: firstDateItems.reduce(
+        (sum: number, item: any) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
+        0
+      ),
+      secondDateCasas: secondDateItems.reduce(
+        (sum: number, item: any) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
         0
       ),
     };
@@ -361,6 +384,7 @@ export const processDurationChart3Data = (payload: any): ChartData[] => {
 
 export const processDurationChart5Data = (payload: any): ChartData[] => {
   const drawOrders = [1, 2, 3];
+
   return drawOrders.map((drawOrder) => {
     const firstRangeItems = payload.DrawOrder.FirstRange.filter(
       (item: chartTwoFive_Range) => item.DrawOrder === drawOrder
@@ -371,24 +395,42 @@ export const processDurationChart5Data = (payload: any): ChartData[] => {
 
     return {
       drawOrder,
+
+      // Tumbok
       firstRangeTumbok: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Tumbok || 0),
+        (sum: any, item: { BetTypes: { Tumbok: any; }; }) => sum + (item.BetTypes?.Tumbok || 0),
         0
       ),
       secondRangeTumbok: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Tumbok || 0),
+        (sum: any, item: { BetTypes: { Tumbok: any; }; }) => sum + (item.BetTypes?.Tumbok || 0),
         0
       ),
+
+      // Sahod
       firstRangeSahod: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Sahod || 0),
+        (sum: any, item: { BetTypes: { Sahod: any; }; }) => sum + (item.BetTypes?.Sahod || 0),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Sahod || 0),
+        (sum: any, item: { BetTypes: { Sahod: any; }; }) => sum + (item.BetTypes?.Sahod || 0),
+        0
+      ),
+
+      // Casas (aggregated from root-level fields)
+      firstRangeCasas: firstRangeItems.reduce(
+        (sum: any, item: { TotalTresCasas: any; TotalSaisCasas: any; TotalDyisCasas: any; }) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
+        0
+      ),
+      secondRangeCasas: secondRangeItems.reduce(
+        (sum: any, item: { TotalTresCasas: any; TotalSaisCasas: any; TotalDyisCasas: any; }) =>
+          sum +
+          (item.TotalTresCasas || 0) +
+          (item.TotalSaisCasas || 0) +
+          (item.TotalDyisCasas || 0),
         0
       ),
     };
