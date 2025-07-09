@@ -1,0 +1,79 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { fetchGameCategories } from "~/lib/api/gamecategories";
+import ParentComparisonBetting from "~/components/betting-summary/ParentBettingComparison";
+import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
+
+const slugify = (text: string) =>
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-");
+
+const normalize = (text: string) => slugify(text).replace(/-/g, "");
+
+export default function BettingComparisonSlugPageClient({
+  slug,
+}: {
+  slug: string;
+}) {
+  const router = useRouter();
+  const { mainSlug, comparisonSlug } = useParams() as {
+    mainSlug: string;
+    comparisonSlug: string;
+  };
+
+  const [category, setCategory] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [invalid, setInvalid] = useState(false);
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      const result = await fetchGameCategories();
+      //console.log("[Client] Game Categories:", result);
+
+      if (result.success && Array.isArray(result.data)) {
+        const normalizedSlug = normalize(comparisonSlug);
+
+        const matched = result.data.find((cat: any) => {
+          const catSlug = normalize(cat.GameCategory);
+          return catSlug === normalizedSlug;
+        });
+
+        if (matched) {
+          setCategory(matched);
+        } else if (comparisonSlug !== "stl") {
+          setInvalid(true);
+        }
+      } else {
+        console.warn("Failed to fetch categories on client.");
+        setInvalid(true);
+      }
+
+      setLoading(false);
+    };
+
+    fetchCategory();
+  }, [comparisonSlug]);
+
+  useEffect(() => {
+    if (!loading && invalid) {
+      router.replace("/not-found");
+    }
+  }, [loading, invalid]);
+
+  if (loading) return <BettingSummarySkeleton />;
+  if (invalid) return null;
+
+  return (
+    <ParentComparisonBetting
+      gameCategoryId={category?.GameCategoryId}
+      slug={comparisonSlug}
+      mainSlug={mainSlug}
+    />
+  );
+}
