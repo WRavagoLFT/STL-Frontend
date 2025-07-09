@@ -56,18 +56,27 @@ const TableBettingSummary = ({
               console.warn("Invalid DateOfTransaction:", item);
               return false;
             }
+
             const transactionDate = dayjs(item.DateOfTransaction, [
               "YYYY-MM-DD",
               "DD/MM/YYYY",
               "MM/DD/YYYY",
               "YYYY-MM-DD HH:mm:ss",
             ]);
+
             if (!transactionDate.isValid()) {
               console.warn("Unparseable date:", item.DateOfTransaction);
               return false;
             }
+
             return transactionDate.format("YYYY-MM-DD") === selectedDate;
           }
+        );
+
+        // Debug: log only filtered transactions for today or selected date
+        console.log(
+          `Filtered transactions for ${selectedDate}:`,
+          filteredTransactions
         );
       }
 

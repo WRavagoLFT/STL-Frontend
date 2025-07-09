@@ -1,5 +1,9 @@
 import React from "react";
-import { BettorsandBetsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from "./types";
+import {
+  BettorsandBetsSummaryProps,
+  getLegendItemsMap_Specific,
+  getLegendItemsMap_Duration,
+} from "./types";
 
 const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   categoryFilter,
@@ -10,10 +14,16 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   secondDateDuration,
   secondDurationFrom,
   secondDurationTo,
+  gameCategoryId,
 }) => {
-  const legendItems =
+  // Get full legend item list
+  const rawLegendItems =
     dateFilter === "Specific Date"
-      ? getLegendItemsMap_Specific(categoryFilter, firstDateSpecific, secondDateSpecific)
+      ? getLegendItemsMap_Specific(
+          categoryFilter,
+          firstDateSpecific,
+          secondDateSpecific
+        )
       : getLegendItemsMap_Duration(
           categoryFilter,
           firstDateDuration,
@@ -22,6 +32,26 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
           secondDurationTo
         );
 
+  // Filter based on rules
+  const legendItems = rawLegendItems.filter((item) => {
+    const isBetsOrBettors =
+      categoryFilter === "Total Bets by Bet Type" ||
+      categoryFilter === "Total Bettors by Bet Type";
+
+    const label = item.label;
+
+    if (isBetsOrBettors && (gameCategoryId === 1 || gameCategoryId === 2)) {
+      return !label.startsWith("Ramble");
+    }
+
+    if (isBetsOrBettors && (gameCategoryId === 3 || gameCategoryId === 4)) {
+      return !label.startsWith("Sahod") && !label.startsWith("Casas");
+    }
+
+    return true;
+  });
+
+  // Chunk into rows of 4
   const chunkedLegendItems = legendItems.reduce(
     (result, item, index) => {
       const chunkIndex = Math.floor(index / 4);
@@ -37,7 +67,10 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   return (
     <div>
       {chunkedLegendItems.map((chunk, rowIndex) => (
-        <div key={rowIndex} className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4">
+        <div
+          key={rowIndex}
+          className="flex flex-row text-sm space-x-5 justify-start mt-1 mr-4"
+        >
           {chunk.map((item, index) => (
             <div key={index} className="flex items-center">
               <div

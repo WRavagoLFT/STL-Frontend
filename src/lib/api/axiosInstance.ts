@@ -24,7 +24,7 @@ const RETRY_DELAY_MS = 1000;
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
 const retryTokenRefresh = async () => {
-  for (let attempt = 1; attempt <= MAX_REFRESH_RETRIES; attempt++) {
+  for (let attempt = 5; attempt <= MAX_REFRESH_RETRIES; attempt++) {
     try {
       await axiosInstance.post("/auth/tokenRefresh", {}, { withCredentials: true });
       return true; // success
@@ -70,7 +70,7 @@ axiosInstance.interceptors.response.use(
           isRefreshing = false;
           refreshSubscribers = [];
           console.error("Token refresh failed:", refreshError);
-          window.location.href = "/auth/login";
+          window.location.href = "/not-found";
           return Promise.reject(refreshError);
         }
       } else {
@@ -79,13 +79,13 @@ axiosInstance.interceptors.response.use(
         });
       }
     }
-    if (status === 401) {
-      window.location.href = "/not-found"; // or use router.push if in a React component
-      return Promise.reject(error);
-    }
+    // if (status === 401) {
+    //   window.location.href = "/not-found"; // or use router.push if in a React component
+    //   return Promise.reject(error);
+    // }
 
     return Promise.reject(error);
-  }
+  } 
 );
 
 export default axiosInstance;

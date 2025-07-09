@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CircularProgress, Button, } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { fetchTransactions } from "~/lib/api/transactions";
+import { fetchHistoricalSummary } from "~/lib/api/transactions";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "~/store/useAuthStore";
 
@@ -50,7 +50,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
   >([]);
   const [loading, setLoading] = useState(false);
   const currentUserType = useAuthStore((state) => state.userTypeId);
-  
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -58,11 +58,13 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
         const today = new Date().toLocaleDateString("en-CA", {
           timeZone: "Asia/Manila",
         });
-        const response = await fetchTransactions({ from: today, to: today });
+        const response = await fetchHistoricalSummary();
+
+        //console.log("HISTORICAL REGION:", response.data);
 
         let res = response.data.filter(
-          (item: { DateOfTransaction: string; GameCategoryId: number }) =>
-            item.DateOfTransaction.startsWith(today)
+          (item: { TransactionDate?: string; GameCategoryId: number }) =>
+            item.TransactionDate?.startsWith(today)
         );
 
         if (params.gameCategoryId && params.gameCategoryId > 0) {
@@ -72,42 +74,52 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
           );
         }
 
+        //console.log("Filtered items for today (" + today + "):", res);
+
         if (response.success && Array.isArray(res)) {
-          const series = getBetTypeSeries(params.gameCategoryId);
-          const aggregatedData: Record<number, Record<string, number>> = {};
+          const aggregatedData: Record<number, { [key: string]: number }> = {};
 
           res.forEach((item: any) => {
-            if (!aggregatedData[item.DrawOrder]) {
-              aggregatedData[item.DrawOrder] = {};
-              series.forEach(({ dataKey }) => {
-                aggregatedData[item.DrawOrder][dataKey.toLowerCase()] = 0;
-              });
+            const draw = item.DrawOrder;
+            if (!aggregatedData[draw]) {
+              aggregatedData[draw] = {
+                totalTumbok: 0,
+                totalSahod: 0,
+                totalCasas: 0,
+                totalRamble: 0,
+              };
             }
 
-            series.forEach(({ dataKey }) => {
-              const keyLower = dataKey.toLowerCase();
-              aggregatedData[item.DrawOrder][keyLower] += item[dataKey] || 0;
-            });
+            aggregatedData[draw].totalTumbok += item.TotalTumbok || 0;
+            aggregatedData[draw].totalSahod += item.TotalSahod || 0;
+            aggregatedData[draw].totalCasas += item.TotalCasas || 0;
+            aggregatedData[draw].totalRamble += item.TotalRamble || 0;
           });
 
           const formattedData = [1, 2, 3].map((drawNum) => {
-            const entry: { draw: string; [key: string]: number | string } = {
-              draw:
-                drawNum === 1
-                  ? "First Draw"
-                  : drawNum === 2
+            const drawLabel =
+              drawNum === 1
+                ? "First Draw"
+                : drawNum === 2
                   ? "Second Draw"
-                  : "Third Draw",
+                  : "Third Draw";
+
+            const values = aggregatedData[drawNum] || {
+              totalTumbok: 0,
+              totalSahod: 0,
+              totalCasas: 0,
+              totalRamble: 0,
             };
 
-            series.forEach(({ dataKey }) => {
-              const keyLower = dataKey.toLowerCase();
-              entry[keyLower] =
-                (aggregatedData[drawNum]?.[keyLower] || 0) / 100000;
-            });
-
-            return entry;
+            return {
+              draw: drawLabel,
+              tumbok: values.totalTumbok / 100000,
+              sahod: values.totalSahod / 100000,
+              casas: values.totalCasas / 100000,
+              ramble: values.totalRamble / 100000,
+            };
           });
+
           setData(formattedData);
         }
       } catch (error) {
@@ -147,11 +159,11 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
       </div>
 
       <div className="h-full w-full">
-         {loading ? (
+        {loading ? (
           <div className="flex items-center justify-center h-[300px]">
             <CircularProgress />
           </div>
-        ) : ( 
+        ) : (
           <BarChart
             height={300}
             grid={{ vertical: true }}

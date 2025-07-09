@@ -45,15 +45,23 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   const urlParam = chartMap[categoryFilter];
 
   const fetchData = useCallback(async () => {
+    console.log("fetchData called");
     setLoading(true);
+
     try {
       const gameCategoryParam = getGameCategoryParam(gameCategoryId);
+      console.log("Game category param:", gameCategoryParam);
+      console.log("Date filter mode:", dateFilter);
 
       if (
         dateFilter === "Specific Date" &&
         firstDateSpecific &&
         secondDateSpecific
       ) {
+        console.log("🗓 Fetching for Specific Date");
+        console.log("First Date:", firstDateSpecific);
+        console.log("Second Date:", secondDateSpecific);
+
         const resp = await fetchCompareHistoricalDate(
           "/transactions/compareHistoricalDate/chartType/",
           urlParam,
@@ -64,6 +72,8 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
           }
         );
 
+        console.log("API response (Specific Date):", resp);
+
         if (resp?.data?.DrawOrder) {
           const processedData = processSpecificDatePayload(
             urlParam,
@@ -71,6 +81,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
             firstDateSpecific,
             secondDateSpecific
           );
+          console.log("Processed chart data (Specific Date):", processedData);
           setChartData(processedData);
         } else {
           console.warn("Unexpected payload for Specific Date:", resp);
@@ -83,6 +94,20 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
         secondDurationFrom &&
         secondDurationTo
       ) {
+        console.log("Fetching for Date Duration");
+        console.log(
+          "First Duration:",
+          firstDateDuration,
+          "to",
+          secondDateDuration
+        );
+        console.log(
+          "Second Duration:",
+          secondDurationFrom,
+          "to",
+          secondDurationTo
+        );
+
         const resp = await fetchCompareHistoricalRange(
           "/transactions/compareHistoricalRange/chartType/",
           urlParam,
@@ -95,15 +120,26 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
           }
         );
 
+        console.log("API response (Date Duration):", resp);
+
         if (resp?.data?.DrawOrder) {
           const processedData = processDurationPayload(urlParam, resp.data);
+          console.log("Processed chart data (Date Duration):", processedData);
           setChartData(processedData);
         } else {
           console.warn("Unexpected payload for Date Duration:", resp);
           setChartData([]);
         }
       } else {
-        console.log("No matching condition for fetching data.");
+        console.warn("No valid condition matched. Skipping fetch.");
+        console.log("Available values ->", {
+          firstDateSpecific,
+          secondDateSpecific,
+          firstDateDuration,
+          secondDateDuration,
+          secondDurationFrom,
+          secondDurationTo,
+        });
         setChartData([]);
       }
     } catch (err) {
@@ -111,6 +147,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       setChartData([]);
     } finally {
       setLoading(false);
+      console.log("fetchData completed");
     }
   }, [
     dateFilter,
@@ -223,8 +260,9 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
                 secondDateSpecific,
                 firstDateDuration,
                 secondDateDuration,
-                secondDurationFrom, 
-                secondDurationTo 
+                secondDurationFrom,
+                secondDurationTo,
+                gameCategoryId ?? null
               )}
               yAxis={[
                 {
