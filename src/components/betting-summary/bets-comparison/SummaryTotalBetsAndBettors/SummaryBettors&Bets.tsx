@@ -1,18 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { BettorsandBetsSummaryProps } from "../types";
-import {
-  fetchCompareHistoricalDate,
-  fetchCompareHistoricalRange,
-} from "~/lib/api/transactions";
+import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from "~/lib/api/transactions";
 import { formatDate, getGameCategoryParam } from "../utils";
-import {
-  processSpecificDatePayload,
-  processDurationPayload,
-} from "./dataProcessors";
+import { processSpecificDatePayload, processDurationPayload } from "./dataProcessors";
 import { generateSeries } from "./seriesGenerator";
 import GenericCSVExportButton from "../../../ui/buttons/CSVExportButtonDashboard";
 import CustomLegend from "../CustomLegend";
@@ -45,23 +39,15 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   const urlParam = chartMap[categoryFilter];
 
   const fetchData = useCallback(async () => {
-    console.log("fetchData called");
     setLoading(true);
-
     try {
       const gameCategoryParam = getGameCategoryParam(gameCategoryId);
-      console.log("Game category param:", gameCategoryParam);
-      console.log("Date filter mode:", dateFilter);
 
       if (
         dateFilter === "Specific Date" &&
         firstDateSpecific &&
         secondDateSpecific
       ) {
-        console.log("🗓 Fetching for Specific Date");
-        console.log("First Date:", firstDateSpecific);
-        console.log("Second Date:", secondDateSpecific);
-
         const resp = await fetchCompareHistoricalDate(
           "/transactions/compareHistoricalDate/chartType/",
           urlParam,
@@ -72,19 +58,15 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
           }
         );
 
-        console.log("API response (Specific Date):", resp);
-
         if (resp?.data?.DrawOrder) {
-          const processedData = processSpecificDatePayload(
+          const processed = processSpecificDatePayload(
             urlParam,
             resp.data,
             firstDateSpecific,
             secondDateSpecific
           );
-          console.log("Processed chart data (Specific Date):", processedData);
-          setChartData(processedData);
+          setChartData(processed);
         } else {
-          console.warn("Unexpected payload for Specific Date:", resp);
           setChartData([]);
         }
       } else if (
@@ -94,20 +76,6 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
         secondDurationFrom &&
         secondDurationTo
       ) {
-        console.log("Fetching for Date Duration");
-        console.log(
-          "First Duration:",
-          firstDateDuration,
-          "to",
-          secondDateDuration
-        );
-        console.log(
-          "Second Duration:",
-          secondDurationFrom,
-          "to",
-          secondDurationTo
-        );
-
         const resp = await fetchCompareHistoricalRange(
           "/transactions/compareHistoricalRange/chartType/",
           urlParam,
@@ -120,34 +88,20 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
           }
         );
 
-        console.log("API response (Date Duration):", resp);
-
         if (resp?.data?.DrawOrder) {
-          const processedData = processDurationPayload(urlParam, resp.data);
-          console.log("Processed chart data (Date Duration):", processedData);
-          setChartData(processedData);
+          const processed = processDurationPayload(urlParam, resp.data);
+          setChartData(processed);
         } else {
-          console.warn("Unexpected payload for Date Duration:", resp);
           setChartData([]);
         }
       } else {
-        console.warn("No valid condition matched. Skipping fetch.");
-        console.log("Available values ->", {
-          firstDateSpecific,
-          secondDateSpecific,
-          firstDateDuration,
-          secondDateDuration,
-          secondDurationFrom,
-          secondDurationTo,
-        });
         setChartData([]);
       }
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.error("Error fetching chart data:", err);
       setChartData([]);
     } finally {
       setLoading(false);
-      console.log("fetchData completed");
     }
   }, [
     dateFilter,
@@ -165,12 +119,8 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
     fetchData();
   }, [fetchData]);
 
-  const formatWithCommas = (num: number): string => {
-    return new Intl.NumberFormat("en-US").format(num);
-  };
-
-  const getCSVHeaders = () => {
-    const series = generateSeries(
+  const chartSeries = useMemo(() => {
+    return generateSeries(
       chartData,
       urlParam,
       dateFilter,
@@ -178,32 +128,33 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       secondDateSpecific,
       firstDateDuration,
       secondDateDuration,
-      secondDurationFrom, // Added
-      secondDurationTo // Added
+      secondDurationFrom,
+      secondDurationTo,
+      gameCategoryId ?? null
     );
+  }, [
+    chartData,
+    urlParam,
+    dateFilter,
+    firstDateSpecific,
+    secondDateSpecific,
+    firstDateDuration,
+    secondDateDuration,
+    secondDurationFrom,
+    secondDurationTo,
+    gameCategoryId,
+  ]);
 
-    return ["Draw Order", ...series.map((s) => s.label || "")];
-  };
+  const formatWithCommas = (num: number): string =>
+    new Intl.NumberFormat("en-US").format(num);
 
-  const getRowData = (item: string) => {
-    const drawOrders = ["First Draw", "Second Draw", "Third Draw"];
-    const index = drawOrders.indexOf(item);
+  const getCSVHeaders = () => ["Draw Order", ...chartSeries.map((s) => s.label || "")];
 
-    const series = generateSeries(
-      chartData,
-      urlParam,
-      dateFilter,
-      firstDateSpecific,
-      secondDateSpecific,
-      firstDateDuration,
-      secondDateDuration,
-      secondDurationFrom, // Added
-      secondDurationTo // Added
-    );
-
+  const getRowData = (label: string) => {
+    const index = ["First Draw", "Second Draw", "Third Draw"].indexOf(label);
     return [
-      item,
-      ...series.map((s) =>
+      label,
+      ...chartSeries.map((s) =>
         formatWithCommas(Number(s.data?.[index] || 0) * 100000)
       ),
     ];
@@ -228,18 +179,22 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
             secondDurationTo={secondDurationTo}
           />
         </div>
+
         {currentUserType !== 3 && (
           <div className="mt-2 md:mt-4 xl:mt-0">
             <GenericCSVExportButton
               data={["First Draw", "Second Draw", "Third Draw"]}
               headers={getCSVHeaders()}
               title={`Summary of ${categoryFilter}`}
-              filename={`${categoryFilter.replace(/\s+/g, "_")}_${new Date().toISOString().slice(0, 10)}`}
+              filename={`${categoryFilter.replace(/\s+/g, "_")}_${new Date()
+                .toISOString()
+                .slice(0, 10)}`}
               getRowData={getRowData}
             />
           </div>
         )}
       </div>
+
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex justify-center items-center h-full">
@@ -252,18 +207,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
               grid={{ vertical: true }}
               layout="horizontal"
               margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-              series={generateSeries(
-                chartData,
-                urlParam,
-                dateFilter,
-                firstDateSpecific,
-                secondDateSpecific,
-                firstDateDuration,
-                secondDateDuration,
-                secondDurationFrom,
-                secondDurationTo,
-                gameCategoryId ?? null
-              )}
+              series={chartSeries}
               yAxis={[
                 {
                   scaleType: "band",

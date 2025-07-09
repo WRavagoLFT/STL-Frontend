@@ -76,7 +76,6 @@ export const generateSeries = (
 
     const series: any[] = [];
 
-    // Always show Tumbok
     series.push(
       {
         data: typedChartData.map((item) => ((isDuration ? item.firstRangeTumbok : item.firstDateTumbok) || 0) / 100000),
@@ -95,7 +94,6 @@ export const generateSeries = (
     );
 
     if (gameCategoryId === 1 || gameCategoryId === 2) {
-      // Add Sahod and Casas
       series.push(
         {
           data: typedChartData.map((item) => ((isDuration ? item.firstRangeSahod : item.firstDateSahod) || 0) / 100000),
@@ -133,7 +131,6 @@ export const generateSeries = (
     }
 
     if (gameCategoryId === 3 || gameCategoryId === 4) {
-      // Add Ramble
       series.push(
         {
           data: typedChartData.map((item) => ((isDuration ? item.firstRangeRamble : item.firstDateRamble) || 0) / 100000),

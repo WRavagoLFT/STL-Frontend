@@ -16,7 +16,6 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
   secondDurationTo,
   gameCategoryId,
 }) => {
-  // Get full legend item list
   const rawLegendItems =
     dateFilter === "Specific Date"
       ? getLegendItemsMap_Specific(
@@ -32,7 +31,6 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
           secondDurationTo
         );
 
-  // Filter based on rules
   const legendItems = rawLegendItems.filter((item) => {
     const isBetsOrBettors =
       categoryFilter === "Total Bets by Bet Type" ||
@@ -51,7 +49,6 @@ const CustomLegend: React.FC<BettorsandBetsSummaryProps> = ({
     return true;
   });
 
-  // Chunk into rows of 4
   const chunkedLegendItems = legendItems.reduce(
     (result, item, index) => {
       const chunkIndex = Math.floor(index / 4);

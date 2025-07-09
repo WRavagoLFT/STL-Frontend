@@ -1,3 +1,5 @@
+// app\(protected)\betting-summary\[mainSlug]\page.tsx
+
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
