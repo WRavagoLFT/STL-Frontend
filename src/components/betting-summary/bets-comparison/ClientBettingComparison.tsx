@@ -1,10 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { fetchGameCategories } from "~/lib/api/gamecategories";
 import ParentComparisonBetting from "~/components/betting-summary/ParentBettingComparison";
 import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
+
+type GameCategory = {
+  GameCategoryId: number;
+  GameCategory: string;
+  Digits: number;
+};
 
 const slugify = (text: string) =>
   text
@@ -16,45 +22,47 @@ const slugify = (text: string) =>
 
 const normalize = (text: string) => slugify(text).replace(/-/g, "");
 
-export default function BettingComparisonSlugPageClient({
-  slug,
-}: {
-  slug: string;
-}) {
-  const router = useRouter();
-  const { mainSlug, comparisonSlug } = useParams() as {
-    mainSlug: string;
-    comparisonSlug: string;
-  };
+interface ClientBettingComparisonProps {
+  mainSlug: string;
+  comparisonSlug: string;
+}
 
-  const [category, setCategory] = useState<any>(null);
+export default function ClientBettingComparison({
+  mainSlug,
+  comparisonSlug,
+}: ClientBettingComparisonProps) {
+  const router = useRouter();
+  const [category, setCategory] = useState<GameCategory | null>(null);
   const [loading, setLoading] = useState(true);
   const [invalid, setInvalid] = useState(false);
 
   useEffect(() => {
     const fetchCategory = async () => {
-      const result = await fetchGameCategories();
-      //console.log("[Client] Game Categories:", result);
+      try {
+        const result = await fetchGameCategories();
 
-      if (result.success && Array.isArray(result.data)) {
-        const normalizedSlug = normalize(comparisonSlug);
+        if (result.success && Array.isArray(result.data)) {
+          const normalizedSlug = normalize(comparisonSlug);
 
-        const matched = result.data.find((cat: any) => {
-          const catSlug = normalize(cat.GameCategory);
-          return catSlug === normalizedSlug;
-        });
+          const matched = result.data.find((cat: GameCategory) => {
+            const catSlug = normalize(cat.GameCategory);
+            return catSlug === normalizedSlug;
+          });
 
-        if (matched) {
-          setCategory(matched);
-        } else if (comparisonSlug !== "stl") {
+          if (matched) {
+            setCategory(matched);
+          } else {
+            setInvalid(true);
+          }
+        } else {
           setInvalid(true);
         }
-      } else {
-        console.warn("Failed to fetch categories on client.");
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
         setInvalid(true);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
     fetchCategory();
@@ -64,14 +72,14 @@ export default function BettingComparisonSlugPageClient({
     if (!loading && invalid) {
       router.replace("/not-found");
     }
-  }, [loading, invalid]);
+  }, [loading, invalid, router]);
 
   if (loading) return <BettingSummarySkeleton />;
-  if (invalid) return null;
+  if (invalid || !category) return null;
 
   return (
     <ParentComparisonBetting
-      gameCategoryId={category?.GameCategoryId}
+      gameCategoryId={category.GameCategoryId}
       slug={comparisonSlug}
       mainSlug={mainSlug}
     />

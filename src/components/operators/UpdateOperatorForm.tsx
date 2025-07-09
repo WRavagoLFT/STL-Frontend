@@ -79,7 +79,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
 
   //console.log("hihihh", areaofoperations);
   //console.log("SELECTED USERRR:", selectedUser);
-  //console.log("initialUserData:", initialUserOperatorData);
+  console.log("initialUserData:", initialUserOperatorData);
   //console.log("provinces:", provinces);
 
   const gameTypeOptions: GameTypeOption[] = useMemo(() => {

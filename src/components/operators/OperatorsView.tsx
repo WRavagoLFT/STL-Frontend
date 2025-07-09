@@ -18,7 +18,7 @@ import {
   editLogOperator,
 } from "~/lib/api/operators/operators.service";
 
-export interface OperatorViewPageProps {
+interface OperatorViewPageProps {
   slug: string;
   operator: OperatorsItem;
 }
