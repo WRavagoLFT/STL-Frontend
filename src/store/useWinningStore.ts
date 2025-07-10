@@ -1,29 +1,35 @@
-import { create } from 'zustand';
-import { fetchHistoricalRegion } from '~/lib/api/transactions';
+import { create } from "zustand";
+import { fetchHistoricalRegion } from "~/lib/api/transactions";
 //import getTransactionsData from '~/utils/api/transactions/get.TransactionsData.service';
 
 const getTodayDate = () => new Date().toISOString().slice(0, 10);
+const getYesterdayDate = () => {
+  const date = new Date();
+  date.setDate(date.getDate() - 1);
+  return date.toISOString().slice(0, 10);
+};
 
-export type categoryType = 
-  'Total Winnings and Winners' |
-  'Total Winnings by Bet Type' |
-  'Total Winnings by Game Type' |
-  'Top Winning Region by Total Winnings' |
-  'Top Winner Region by Total Winners'|
-  'Total Winners by Bet Type' |
-  'Total Winners by Game Type'
-  ;
+export type categoryType =
+  | "Total Winnings and Winners"
+  | "Total Winnings by Bet Type"
+  | "Total Winnings by Game Type"
+  | "Top Winning Region by Total Winnings"
+  | "Top Winner Region by Total Winners"
+  | "Total Winners by Bet Type"
+  | "Total Winners by Game Type";
 
-type dateType = 'Specific Date' | 'Date Duration';
+type dateType = "Specific Date" | "Date Duration";
 
 export interface WinnersandWinningsSummaryProps {
-  gameCategoryId: number;
   categoryFilter: categoryType;
-  dateFilter: string;
+  dateFilter: dateType;
   firstDateSpecific: string | null;
   secondDateSpecific: string | null;
   firstDateDuration: string | null;
   secondDateDuration: string | null;
+  secondDurationFrom: string | null; // Added
+  secondDurationTo: string | null; // Added
+  gameCategoryId: number;
 }
 
 interface WinningStore {
@@ -45,7 +51,6 @@ interface WinningStore {
     totalPayout: number;
     totalRevenue: number;
   };
-  
 
   // For Submenus, Date type extracted from URL params
   setGameType: (gameType: string) => void;
@@ -63,9 +68,9 @@ interface WinningStore {
 
 export const useWinningStore = create<WinningStore>((set) => ({
   loading: false,
-  activeGameType: '',
-  categoryFilter: 'Total Winnings and Winners',
-  dateFilter: 'Specific Date',
+  activeGameType: "",
+  categoryFilter: "Total Winnings and Winners",
+  dateFilter: "Specific Date",
   firstDateSpecific: getTodayDate(),
   secondDateSpecific: getTodayDate(),
   firstDateDuration: null,
@@ -80,7 +85,8 @@ export const useWinningStore = create<WinningStore>((set) => ({
 
   setLoading: () => set((state) => ({ loading: !state.loading })),
   setGameType: (gameType) => set({ activeGameType: gameType }),
-  setCategoryFilter: (category: categoryType) => set({ categoryFilter: category }),
+  setCategoryFilter: (category: categoryType) =>
+    set({ categoryFilter: category }),
   setDateFilter: (type: dateType) => set({ dateFilter: type }),
   setFirstDateSpecific: (date) => set({ firstDateSpecific: date }),
   setSecondDateSpecific: (date) => set({ secondDateSpecific: date }),
@@ -89,20 +95,25 @@ export const useWinningStore = create<WinningStore>((set) => ({
 
   fetchAndAggregateDate: async () => {
     try {
-      const data = await fetchHistoricalRegion<{
-        TransactionDate: string;
-        TotalBettors: number;
-        RegionId: number;
-        Region: string;
-        RegionFull: string;
-        TotalBets: number;
-        TotalWinners: number;
-        TotalBetAmount: number;
-        TotalPayout: number;
-        TotalEarnings: number;
-      }[]>();
+      const data = await fetchHistoricalRegion<
+        {
+          TransactionDate: string;
+          TotalBettors: number;
+          RegionId: number;
+          Region: string;
+          RegionFull: string;
+          TotalBets: number;
+          TotalWinners: number;
+          TotalBetAmount: number;
+          TotalPayout: number;
+          TotalEarnings: number;
+        }[]
+      >();
 
-      console.log("Winning Dashboard Cards Data:", JSON.stringify(data, null, 2));
+      console.log(
+        "Winning Dashboard Cards Data:",
+        JSON.stringify(data, null, 2)
+      );
 
       if (data && Array.isArray(data)) {
         const totals = data.reduce(
@@ -134,8 +145,8 @@ export const useWinningStore = create<WinningStore>((set) => ({
 
   resetFilters: () =>
     set({
-      categoryFilter: 'Total Winnings and Winners',
-      dateFilter: 'Specific Date',
+      categoryFilter: "Total Winnings and Winners",
+      dateFilter: "Specific Date",
       firstDateSpecific: null,
       secondDateSpecific: null,
       firstDateDuration: null,
@@ -149,7 +160,10 @@ export const getLegendItemsMap_Specific = (
   firstDateSpecific: string | null,
   secondDateSpecific: string | null
 ): { label: string; color: string }[] => {
-  const legendItemsMap: Record<categoryType, { label: string; color: string }[]> = {
+  const legendItemsMap: Record<
+    categoryType,
+    { label: string; color: string }[]
+  > = {
     "Total Winnings and Winners": [
       {
         label: `Winners - ${firstDateSpecific || "N/A"}`,
@@ -305,7 +319,10 @@ export const getLegendItemsMap_Duration = (
   firstDateDuration: string | null,
   secondDateDuration: string | null
 ): { label: string; color: string }[] => {
-  const legendItemsMap: Record<categoryType, { label: string; color: string }[]> = {
+  const legendItemsMap: Record<
+    categoryType,
+    { label: string; color: string }[]
+  > = {
     "Total Winnings and Winners": [
       {
         label: `Winners - ${firstDateSpecific ? firstDateSpecific : "N/A"} - ${secondDateSpecific ? secondDateSpecific : "N/A"}`,
@@ -448,7 +465,7 @@ export const getLegendItemsMap_Duration = (
         color: "#3E2466",
       },
     ],
-  }
+  };
 
-return legendItemsMap[categoryFilter]
-}
+  return legendItemsMap[categoryFilter];
+};
