@@ -6,7 +6,7 @@ import BackIconButton from "~/components/ui/icons/BackButton";
 import { useRouter } from "next/navigation";
 import { categoryType, useWinningStore } from "~/store/useWinningStore";
 import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinners&Winnings";
-import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinners&Winnings";
+import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinnersAndWinnings/RegionalSummaryWinners&Winnings";
 import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
 import { AccessGuard } from "~/components/auth/AccessGuard";
 import dayjs from "dayjs";
@@ -14,13 +14,15 @@ import Swal from "sweetalert2";
 
 type dateType = "Specific Date" | "Date Duration";
 
-type Props = {
+const ParentWinningComparison = ({
+  gameCategoryId = 0,
+  slug,
+  mainSlug,
+}: {
   gameCategoryId?: number;
   slug?: string;
   mainSlug?: string;
-};
-
-const WinningComparisonPage = ({ gameCategoryId = 0, slug, mainSlug }: Props) => {
+}) => {
   const {
     categoryFilter,
     dateFilter,
@@ -46,7 +48,7 @@ const WinningComparisonPage = ({ gameCategoryId = 0, slug, mainSlug }: Props) =>
   ];
   const title = GAME_TITLES[gameCategoryId] || "STL";
 
-  // Local state for Second Duration to avoid overwriting global state
+  // Local state for Second Duration
   const [secondDurationFrom, setSecondDurationFrom] = useState<string>("");
   const [secondDurationTo, setSecondDurationTo] = useState<string>("");
 
@@ -65,6 +67,14 @@ const WinningComparisonPage = ({ gameCategoryId = 0, slug, mainSlug }: Props) =>
   const formattedSecondDateDuration = useMemo(
     () => (secondDateDuration ? dayjs(secondDateDuration).format("MM/DD/YYYY") : null),
     [secondDateDuration]
+  );
+  const formattedSecondDurationFrom = useMemo(
+    () => (secondDurationFrom ? dayjs(secondDurationFrom).format("MM/DD/YYYY") : null),
+    [secondDurationFrom]
+  );
+  const formattedSecondDurationTo = useMemo(
+    () => (secondDurationTo ? dayjs(secondDurationTo).format("MM/DD/YYYY") : null),
+    [secondDurationTo]
   );
 
   const categoryTypes: categoryType[] = [
@@ -136,7 +146,7 @@ const WinningComparisonPage = ({ gameCategoryId = 0, slug, mainSlug }: Props) =>
           </h1>
         </div>
         <div className="mt-8 space-y-4">
-          {/* Filter Section */}
+          {/* First Row: Filters */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
               <label
@@ -317,6 +327,8 @@ const WinningComparisonPage = ({ gameCategoryId = 0, slug, mainSlug }: Props) =>
               secondDateSpecific={formattedSecondDateSpecific}
               firstDateDuration={formattedFirstDateDuration}
               secondDateDuration={formattedSecondDateDuration}
+              secondDurationFrom={formattedSecondDurationFrom}
+              secondDurationTo={formattedSecondDurationTo}
             />
           ) : (
             <>
@@ -328,6 +340,8 @@ const WinningComparisonPage = ({ gameCategoryId = 0, slug, mainSlug }: Props) =>
                 secondDateSpecific={formattedSecondDateSpecific}
                 firstDateDuration={formattedFirstDateDuration}
                 secondDateDuration={formattedSecondDateDuration}
+                secondDurationFrom={formattedSecondDurationFrom}
+                secondDurationTo={formattedSecondDurationTo}
               />
               <ChartWinnersandWinningsRegionalSummary
                 gameCategoryId={gameCategoryId}
@@ -337,6 +351,8 @@ const WinningComparisonPage = ({ gameCategoryId = 0, slug, mainSlug }: Props) =>
                 secondDateSpecific={formattedSecondDateSpecific}
                 firstDateDuration={formattedFirstDateDuration}
                 secondDateDuration={formattedSecondDateDuration}
+                secondDurationFrom={formattedSecondDurationFrom}
+                secondDurationTo={formattedSecondDurationTo}
               />
             </>
           )}
@@ -346,4 +362,4 @@ const WinningComparisonPage = ({ gameCategoryId = 0, slug, mainSlug }: Props) =>
   );
 };
 
-export default WinningComparisonPage;
+export default ParentWinningComparison;

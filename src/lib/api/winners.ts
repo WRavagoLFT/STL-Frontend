@@ -23,7 +23,7 @@ export const fetchWinners = async (params?: {
         gameType: params?.gameCategoryId, // map gameCategoryId to gameType here
       },
     });
-
+    console.log("Response data of winners:", response.data); 
     return response.data;
   } catch (error) {
     console.error("Error fetching winners:", (error as Error).message);
@@ -41,6 +41,7 @@ export const fetchCompareHistoricalWinnersDate = async (
     const response = await axiosInstance.get(url, {
       params: query,
     });
+    console.log("Response data of fetchCompareHistoricalWinnersDate", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching historical date comparison:", (error as Error).message);
@@ -58,6 +59,7 @@ export const fetchCompareHistoricalWinnersRange = async (
     const response = await axiosInstance.get(url, {
       params: query,
     });
+    console.log("Response data of fetchCompareHistoricalWinnersRange", response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching historical data:", (error as Error).message);
