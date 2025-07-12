@@ -61,7 +61,6 @@ export type Chart1Data = {
   secondDateWinners?: number;
   firstDateWinnings?: number;
   secondDateWinnings?: number;
-
   firstRangeWinners?: number;
   secondRangeWinners?: number;
   firstRangeWinnings?: number;
@@ -69,7 +68,6 @@ export type Chart1Data = {
 };
 
 export type Chart25Data = {
-  // Specific Date
   firstDateTumbok?: number;
   secondDateTumbok?: number;
   firstDateSahod?: number;
@@ -78,7 +76,6 @@ export type Chart25Data = {
   secondDateRamble?: number;
   firstDateCasas?: number;
   secondDateCasas?: number;
-  // Date Duration
   firstRangeTumbok?: number;
   secondRangeTumbok?: number;
   firstRangeSahod?: number;
@@ -99,7 +96,6 @@ export type Chart36Data = {
   secondDateSTLSwer3: number;
   firstDateSTLSwer4: number;
   secondDateSTLSwer4: number;
-
   firstRangeSTLPares: number;
   secondRangeSTLPares: number;
   firstRangeSTLSwer2: number;
@@ -160,6 +156,11 @@ export interface RangePayload {
     FirstRange: RegionRangeData[];
     SecondRange: RegionRangeData[];
   };
+}
+
+export interface SpecificDatePayload {
+  DrawOrder: Array<chartOne_Specific | chartTwoFive_Range | chartThreeSix_Range>;
+  Region: Array<any>;
 }
 
 export interface WinnersandWinningsSummaryProps {
@@ -226,7 +227,7 @@ export const getLegendItemsMap_Duration = (
   firstDateDuration: string | null,
   secondDateDuration: string | null
 ): { label: string; color: string }[] => {
-  const firstLabel = `${formatDate(firstDateDuration)} - ${formatDate(secondDateDuration)}`;
+  const firstLabel = `${formatDate(firstDateSpecific)} - ${formatDate(firstDateDuration)}`;
   const secondLabel = `${formatDate(secondDateSpecific)} - ${formatDate(secondDateDuration)}`;
 
   switch (categoryFilter) {
@@ -266,7 +267,6 @@ export const getLegendItemsMap_Duration = (
   }
 };
 
-// Helper function to get category colors
 export const getCategoryColor = (
   category: string,
   isFirstDate: boolean

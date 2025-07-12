@@ -18,8 +18,10 @@ export const philippineRegions = [
   "BARMM",
 ];
 
+export const drawOrders = [1, 2, 3];
+
 export const chartMap: Record<string, string> = {
-  "Total Winnings and Winners": "1",
+  "Total Winners and Winnings": "1",
   "Total Winnings by Bet Type": "2",
   "Total Winnings by Game Type": "3",
   "Total Winners by Bet Type": "5",

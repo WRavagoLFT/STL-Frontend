@@ -32,6 +32,7 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
   secondDurationFrom,
   secondDurationTo,
 }) => {
+  console.log("gameCategoryId:", gameCategoryId);
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
@@ -42,7 +43,7 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
     setLoading(true);
     try {
       const gameCategoryParam = getGameCategoryParam();
-
+      console.log("gameCategoryParam:", gameCategoryParam);
       if (
         dateFilter === "Specific Date" &&
         firstDateSpecific &&
@@ -57,7 +58,7 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
             ...gameCategoryParam,
           }
         );
-
+        console.log("API Response (Specific Date):", resp);
         if (resp?.data?.Region) {
           const processedData = processSpecificDatePayload(
             urlParam,
@@ -67,6 +68,7 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
             (dateString1: string, dateString2: string) =>
               formatDate(dateString1) === formatDate(dateString2)
           );
+          console.log("Processed Data (Specific Date):", processedData);
           setChartData(processedData);
         } else {
           console.warn("Unexpected payload (Specific Date):", resp);
