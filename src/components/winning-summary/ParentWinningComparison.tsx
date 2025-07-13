@@ -5,7 +5,7 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import BackIconButton from "~/components/ui/icons/BackButton";
 import { useRouter } from "next/navigation";
 import { categoryType, useWinningStore } from "~/store/useWinningStore";
-import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinners&Winnings";
+import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinnersAndWinnings/SummaryWinners&Winnings";
 import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinnersAndWinnings/RegionalSummaryWinners&Winnings";
 import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
 import { AccessGuard } from "~/components/auth/AccessGuard";
