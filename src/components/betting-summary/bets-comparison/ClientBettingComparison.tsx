@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchGameCategories } from "~/lib/api/gamecategories";
-import ParentComparisonBetting from "~/components/betting-summary/ParentBettingComparison";
-import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
+import { fetchGameCategories } from "@/lib/api/gamecategories";
+import BettingSummarySkeleton from "../BettingSummarySkeleton";
+import ParentComparisonBetting from "../ParentBettingComparison";
+
 
 type GameCategory = {
   GameCategoryId: number;

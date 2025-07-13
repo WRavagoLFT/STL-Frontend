@@ -1,7 +1,7 @@
 // services/userService.ts
 
-import axiosInstance from "~/lib/api/axiosInstance";
-import { getGameTypesData } from "~/lib/api/gameTypes/get.gameTypes.service";
+import axiosInstance from "@/lib/api/axiosInstance";
+import { getGameTypesData } from "@/lib/api/gameTypes/get.gameTypes.service";
 
 export async function fetchOperatorById(operatorId: number | string) {
   if (!operatorId) {

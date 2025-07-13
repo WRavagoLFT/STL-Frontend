@@ -1,5 +1,5 @@
-import axiosInstance from "~/lib/api/axiosInstance";
-import { useAuthStore } from "~/store/useAuthStore";
+import axiosInstance from "@/lib/api/axiosInstance";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export const handleRouter = async (router: any) => {
   const { setUser } = useAuthStore.getState();

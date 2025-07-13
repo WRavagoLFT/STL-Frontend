@@ -2,9 +2,9 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { fetchGameCategories } from "~/lib/api/gamecategories";
 import { ParentBettingSummary } from "./ParentBettingSummary";
 import BettingSummarySkeleton from "./BettingSummarySkeleton";
+import { fetchGameCategories } from "@/lib/api/gamecategories";
 
 const normalizeSlug = (text: string) =>
   text

@@ -4,10 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { BettorsandBetsSummaryProps } from "../../../../store/useBettingStore";
-import {
-  fetchCompareHistoricalDate,
-  fetchCompareHistoricalRange,
-} from "~/lib/api/transactions";
 import { formatDate, getGameCategoryParam } from "../utils";
 import {
   processSpecificDatePayload,
@@ -16,7 +12,8 @@ import {
 import { generateSeries } from "./seriesGeneratorRegional";
 import CustomLegend from "../CustomLegend";
 import GenericCSVExportButton from "../../../ui/buttons/CSVExportButtonDashboard";
-import { useAuthStore } from "~/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from "@/lib/api/transactions";
 
 const ChartBettorsAndBetsRegionalSummary: React.FC<
   BettorsandBetsSummaryProps

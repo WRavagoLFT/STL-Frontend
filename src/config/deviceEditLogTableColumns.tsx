@@ -1,5 +1,5 @@
-import { EditLogFields } from "~/types/types";
-import { Column } from "~/types/interfaces";
+import { EditLogFields } from "@/types/types";
+import { Column } from "@/types/interfaces";
 import dayjs from "dayjs";
 
 export const deviceEditColumns = (): Column<EditLogFields>[] => [

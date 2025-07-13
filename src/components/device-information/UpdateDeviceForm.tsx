@@ -8,10 +8,11 @@ import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import dayjs from "dayjs";
-import { updateDeviceSchema } from "~/schemas/deviceSchema";
-import { useAuthStore } from "~/store/useAuthStore";
 import { getUsageNotes } from "./ParentDeviceView";
-import { DeviceItem, UpdateDevicePayload } from "~/lib/api/device/device.service";
+import { DeviceItem, UpdateDevicePayload } from "@/lib/api/device/device.service";
+import { useAuthStore } from "@/store/useAuthStore";
+import { updateDeviceSchema } from "@/schemas/deviceSchema";
+
 
 interface UpdateDeviceFormProps {
   title?: string;

@@ -7,7 +7,7 @@ import { WinnersandWinningsSummaryProps } from "../types";
 import {
   fetchCompareHistoricalWinnersDate,
   fetchCompareHistoricalWinnersRange,
-} from "~/lib/api/winners";
+} from "@/lib/api/winners";
 import { formatDate, getGameCategoryParam } from "../utils";
 import {
   processSpecificDatePayload,
@@ -17,7 +17,7 @@ import { generateSeries } from "./seriesGeneratorRegional";
 import { CustomLegend } from "../CustomLegend";
 import { philippineRegions, chartMap } from "../constant";
 import GenericCSVExportButton from "../../../ui/buttons/CSVExportButtonDashboard";
-import { useAuthStore } from "~/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const RegionalSummaryWinnersAndWinnings: React.FC<
   WinnersandWinningsSummaryProps

@@ -18,10 +18,10 @@ import {
   sortData,
 } from "../../../utils/sortPaginationSearch";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
-import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
-import { SortConfig } from "~/types/types";
-import { UsersItem } from "~/lib/api/users/users.service";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
+import { Transactions } from "@/components/betting-summary/BettingSummaryTable";
+import { SortConfig } from "@/types/types";
+import { UsersItem } from "@/lib/api/users/users.service";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
 
 const ReadOnlyTablePage = <T extends Transactions>({
   data,

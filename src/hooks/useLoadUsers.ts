@@ -1,7 +1,7 @@
-import { RoleConfig } from "~/types/types";
-import { fetchPCSOBranch } from "~/lib/api/location";
-import { fetchUsers, UsersItem } from "~/lib/api/users/users.service";
-import { fetchOperators, OperatorsItem } from "~/lib/api/operators/operators.service";
+import { RoleConfig } from "@/types/types";
+import { fetchPCSOBranch } from "@/lib/api/location";
+import { fetchUsers, UsersItem } from "@/lib/api/users/users.service";
+import { fetchOperators, OperatorsItem } from "@/lib/api/operators/operators.service";
 
 export const loadUsers = async (
   roleConfig: RoleConfig | null | undefined,

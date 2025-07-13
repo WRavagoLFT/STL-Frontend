@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@mui/material";
-import { buttonStyles } from "~/styles/theme";
+import { buttonStyles } from "@/styles/theme";
 import * as XLSX from "xlsx";
 
 interface GenericExportButtonProps {

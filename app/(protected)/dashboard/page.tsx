@@ -1,5 +1,6 @@
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import { ParentDashboard } from "~/components/dashboard/ParentDashboard";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import { ParentDashboard } from "@/components/dashboard/ParentDashboard";
+
 
 export default function Page() {
   return (

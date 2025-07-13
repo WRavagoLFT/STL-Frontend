@@ -3,11 +3,11 @@ import {
   ChartBarItem,
   ChartsDataPageProps,
   RegionUser,
-} from "~/types/interfaces";
+} from "@/types/interfaces";
 import useDashboardStore from "../../../store/useDashboardStore";
 import ChartCard from "./UserCharts";
-import { getUserStatus } from "~/hooks/dashboarddata";
-import { fetchRegions } from "~/lib/api/location";
+import { getUserStatus } from "@/hooks/dashboarddata";
+import { fetchRegions } from "@/lib/api/location";
 
 const regionMap: Record<string, string> = {
   I: "Region I",

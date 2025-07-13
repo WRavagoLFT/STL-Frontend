@@ -1,9 +1,9 @@
 import dayjs from "dayjs";
 import React from "react";
 import Button from "@mui/material/Button";
-import { getUserStatus } from "~/hooks/dashboarddata";
-import { Column } from "~/types/interfaces";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
+import { getUserStatus } from "@/hooks/dashboarddata";
+import { Column } from "@/types/interfaces";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
 
 export const operatorTableColumns = (): Column<OperatorsItem>[] => [
   {

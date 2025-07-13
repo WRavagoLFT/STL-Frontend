@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
-import { Column } from "~/types/interfaces";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
+import { Column } from "@/types/interfaces";
 
 export interface OperatorsState {
   data: OperatorsItem[];

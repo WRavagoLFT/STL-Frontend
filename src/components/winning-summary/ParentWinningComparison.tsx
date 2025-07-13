@@ -2,16 +2,16 @@
 
 import React, { useMemo, useState } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import BackIconButton from "~/components/ui/icons/BackButton";
-import { useRouter } from "next/navigation";
-import { categoryType, useWinningStore } from "~/store/useWinningStore";
-import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinnersAndWinnings/SummaryWinners&Winnings";
-import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinnersAndWinnings/RegionalSummaryWinners&Winnings";
-import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
-import { AccessGuard } from "~/components/auth/AccessGuard";
+
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
-
+import { categoryType, useWinningStore } from "@/store/useWinningStore";
+import { useRouter } from "next/router";
+import { AccessGuard } from "../auth/AccessGuard";
+import BackIconButton from "../ui/icons/BackButton";
+import ChartTopRegionByWinsandWinners from "./wins-comparison/TopRegionWinning";
+import ChartWinnersandWinningsSummary from "@/components/winning-summary/wins-comparison/SummaryWinnersAndWinnings/SummaryWinners&Winnings"
+import ChartWinnersandWinningsRegionalSummary from "@/components/winning-summary/wins-comparison/RegionalSummaryWinnersAndWinnings/RegionalSummaryWinners&Winnings"
 type dateType = "Specific Date" | "Date Duration";
 
 const ParentWinningComparison = ({

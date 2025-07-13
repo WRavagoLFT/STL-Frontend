@@ -7,7 +7,7 @@ import { WinnersandWinningsSummaryProps } from "../types";
 import {
   fetchCompareHistoricalWinnersDate,
   fetchCompareHistoricalWinnersRange,
-} from "~/lib/api/winners";
+} from "@/lib/api/winners";
 import { formatDate, getGameCategoryParam } from "../utils";
 import { processSpecificDatePayload, processDurationPayload } from "./dataProcessor";
 import { generateSeries } from "./seriesGenerator";
@@ -122,8 +122,10 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
         firstDateSpecific={firstDateSpecific}
         secondDateSpecific={secondDateSpecific}
         firstDateDuration={firstDateDuration}
-        secondDateDuration={secondDateDuration}
-      />
+        secondDateDuration={secondDateDuration} 
+        secondDurationFrom={null} 
+        secondDurationTo={null}      
+        />
 
       <div className="h-full flex flex-col flex-grow bg-transparent">
         {loading ? (

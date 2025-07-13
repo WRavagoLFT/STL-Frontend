@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { WinnersandWinningsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration } from "../../../store/useWinningStore";
-import { fetchCompareHistoricalWinnersDate, fetchCompareHistoricalWinnersRange } from "~/lib/api/winners";
+import { fetchCompareHistoricalWinnersDate, fetchCompareHistoricalWinnersRange } from "@/lib/api/winners";
 
 interface ChartData {
   region: string;
@@ -293,8 +293,10 @@ const ChartTopRegionByWinsandWinners: React.FC<
         firstDateSpecific={firstDateSpecific}
         secondDateSpecific={secondDateSpecific}
         firstDateDuration={firstDateDuration}
-        secondDateDuration={secondDateDuration}
-      />
+        secondDateDuration={secondDateDuration} 
+        secondDurationFrom={null} 
+        secondDurationTo={null}      
+        />
 
       <div className="h-full flex flex-col flex-grow">
         {loading ? (

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { fetchGameCategories } from "~/lib/api/gamecategories";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import ParentComparisonBetting from "~/components/betting-summary/ParentBettingComparison";
-import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
+import { fetchGameCategories } from "@/lib/api/gamecategories";
+import BettingSummarySkeleton from "@/components/betting-summary/BettingSummarySkeleton";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import ParentComparisonBetting from "@/components/betting-summary/ParentBettingComparison";
 
 const slugify = (text: string) =>
   text

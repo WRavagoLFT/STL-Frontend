@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { CircularProgress } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { BettorsandBetsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration, } from "../../../store/useBettingStore";
-import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from "~/lib/api/transactions";
+import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from "@/lib/api/transactions";
 
 interface ChartData {
   region: string;

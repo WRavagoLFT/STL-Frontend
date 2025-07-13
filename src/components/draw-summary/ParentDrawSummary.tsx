@@ -1,27 +1,26 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchProvinces, fetchRegions } from "~/lib/api/location";
-import { fetchGameCategories } from "~/lib/api/gamecategories";
-import { fetchDrawSummary } from "~/lib/api/transactions";
+import { fetchProvinces, fetchRegions } from "@/lib/api/location";
+import { fetchGameCategories } from "@/lib/api/gamecategories";
+import { fetchDrawSummary } from "@/lib/api/transactions";
 import Select from "react-select";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import { useAuthStore } from "~/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const DrawListSummaryPage = React.lazy(
-  () => import("~/components/draw-summary/DrawListSummary")
+  () => import("@/components/draw-summary/DrawListSummary")
 );
 const HotNumberPage = React.lazy(
-  () => import("~/components/draw-summary/HotNumbers")
+  () => import("@/components/draw-summary/HotNumbers")
 );
 const ColdNumberPage = React.lazy(
-  () => import("~/components/draw-summary/ColdNumbers")
+  () => import("@/components/draw-summary/ColdNumbers")
 );
 const DrawCounterTablePage = React.lazy(
-  () => import("~/components/draw-summary/DrawCounterTable")
+  () => import("@/components/draw-summary/DrawCounterTable")
 );
 const DrawResultsSummaryPage = React.lazy(
-  () => import("~/components/draw-summary/DrawResultsSummary")
+  () => import("@/components/draw-summary/DrawResultsSummary")
 );
 
 export const ParentDrawSummaryPage = () => {

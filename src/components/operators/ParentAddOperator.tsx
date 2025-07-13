@@ -3,11 +3,11 @@
 import router, { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import Swal from "sweetalert2";
-import AddOperatorPage from "~/components/operators/AddOperator";
-import BackIconButton from "~/components/ui/icons/BackButton";
-import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
-import { addOperator, AddOperatorPayload, fetchOperators } from "~/lib/api/operators/operators.service";
-import { useOperatorFormStore } from "~/store/useOperatorFormStore";
+import AddOperatorPage from "@/components/operators/AddOperator";
+import BackIconButton from "@/components/ui/icons/BackButton";
+import { fetchFormOptionsData } from "@/hooks/userLoadOperators";
+import { addOperator, AddOperatorPayload, fetchOperators } from "@/lib/api/operators/operators.service";
+import { useOperatorFormStore } from "@/store/useOperatorFormStore";
 
 export default function ParentAddOperator() {
   const {

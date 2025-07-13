@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import AddDeviceForm from "~/components/device-information/AddDeviceForm";
-import BackIconButton from "~/components/ui/icons/BackButton";
-import { handleAddDevice } from "~/hooks/handleAddDeviceAction";
+import { AddDevicePayload, DeviceItem } from "@/lib/api/device/device.service";
 import { useLoadDevices } from "./ParentDevice";
-import { AddDevicePayload, DeviceItem } from "~/lib/api/device/device.service";
+import { handleAddDevice } from "@/hooks/handleAddDeviceAction";
+import BackIconButton from "../ui/icons/BackButton";
+import AddDeviceForm from "./AddDeviceForm";
 
 export default function AddDevicePage() {
   const [devices, setDevices] = useState<DeviceItem[]>([]);

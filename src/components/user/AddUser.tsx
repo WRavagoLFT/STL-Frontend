@@ -1,9 +1,9 @@
 import React from "react";
 import ModalWrapper from "../ui/modals/ModalWrapper";
 import AddUserForm from "./AddUserForm";
-import { Branch } from "~/types/types";
-import { AddUserPayload, UsersItem } from "~/lib/api/users/users.service";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
+import { Branch } from "@/types/types";
+import { AddUserPayload, UsersItem } from "@/lib/api/users/users.service";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
 
 type AddUserModalProps = {
   open: boolean;

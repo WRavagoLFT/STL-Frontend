@@ -1,13 +1,11 @@
 "use client";
 
-import { useAuth } from "~/utils/useAuth";
 import { usePathname, useRouter } from "next/navigation";
 import { ThemeProvider, CssBaseline, CircularProgress } from "@mui/material";
 import { match } from "path-to-regexp";
-import lightTheme from "~/styles/theme";
-import Sidebar from "~/components/layout/Sidebar";
-import { useEffect, useState } from "react";
-import { AccessGuard } from "~/components/auth/AccessGuard";
+import lightTheme from "@/styles/theme";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import Sidebar from "@/components/layout/Sidebar";
 
 const staticPaths = [
   "/dashboard",

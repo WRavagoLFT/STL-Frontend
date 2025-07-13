@@ -3,9 +3,9 @@ import dayjs, { Dayjs } from "dayjs";
 import { FaSort, FaSortUp, FaSortDown, FaCalendarAlt } from "react-icons/fa";
 import { SortableTableCellProps } from "../types/interfaces";
 import useDetailTableStore from "../store/useTableStore";
-import { SortConfig, EditLogFields } from "~/types/types";
-import { UsersItem } from "~/lib/api/users/users.service";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
+import { SortConfig, EditLogFields } from "@/types/types";
+import { UsersItem } from "@/lib/api/users/users.service";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
 
 export const SortableTableCell: React.FC<SortableTableCellProps> = ({
   label,

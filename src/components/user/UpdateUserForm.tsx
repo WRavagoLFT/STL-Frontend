@@ -3,16 +3,16 @@
 import React, { useState } from "react";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
-import { getUserStatus } from "~/hooks/dashboarddata";
+import { getUserStatus } from "@/hooks/dashboarddata";
 import dayjs from "dayjs";
 import { useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
-import { updateUserSchema } from "~/schemas/userSchema";
-import { useAuthStore } from "~/store/useAuthStore";
+import { updateUserSchema } from "@/schemas/userSchema";
+import { useAuthStore } from "@/store/useAuthStore";
 import Swal from "sweetalert2";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
-import { UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
+import { UpdateUserPayload, UsersItem } from "@/lib/api/users/users.service";
 
 interface UpdateUserFormProps {
   title?: string;

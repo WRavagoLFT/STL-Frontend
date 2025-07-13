@@ -1,7 +1,7 @@
-import { useOperatorFormStore } from "~/store/useOperatorFormStore";
-import { fetchGameCategories } from "~/lib/api/gamecategories";
-import { fetchAreaOfOperations, fetchCities, fetchProvinces, fetchRegions } from "~/lib/api/location";
-import { fetchOperators } from "~/lib/api/operators/operators.service";
+import { useOperatorFormStore } from "@/store/useOperatorFormStore";
+import { fetchGameCategories } from "@/lib/api/gamecategories";
+import { fetchAreaOfOperations, fetchCities, fetchProvinces, fetchRegions } from "@/lib/api/location";
+import { fetchOperators } from "@/lib/api/operators/operators.service";
 
 export const fetchOperatorsData = async () => {
   try {

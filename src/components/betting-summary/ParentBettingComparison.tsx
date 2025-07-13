@@ -2,14 +2,14 @@
 
 import React, { useMemo, useState } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import BackIconButton from "~/components/ui/icons/BackButton";
 import { useRouter } from "next/navigation";
-import { categoryType, useBettingStore } from "~/store/useBettingStore";
-import ChartBettorsAndBetsSummary from "~/components/betting-summary/bets-comparison/SummaryTotalBetsAndBettors/SummaryBettors&Bets";
-import ChartBettorsAndBetsRegionalSummary from "~/components/betting-summary/bets-comparison/RegionalSummaryBettorsAndBets/RegionalSummaryBettors&Bets";
-import ChartTopRegionByBetsandBettors from "~/components/betting-summary/bets-comparison/TopRegionBetting";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
+import { categoryType, useBettingStore } from "@/store/useBettingStore";
+import BackIconButton from "../ui/icons/BackButton";
+import ChartTopRegionByBetsandBettors from "./bets-comparison/TopRegionBetting";
+import ChartBettorsAndBetsSummary from "./bets-comparison/SummaryTotalBetsAndBettors/SummaryBettors&Bets";
+import ChartBettorsAndBetsRegionalSummary from "./bets-comparison/RegionalSummaryBettorsAndBets/RegionalSummaryBettors&Bets";
 
 type dateType = "Specific Date" | "Date Duration";
 

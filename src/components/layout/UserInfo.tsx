@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { UsersItem } from "~/lib/api/users/users.service";
+import { UsersItem } from "@/lib/api/users/users.service";
 
 interface UserInfoProps {
   user: UsersItem | null;

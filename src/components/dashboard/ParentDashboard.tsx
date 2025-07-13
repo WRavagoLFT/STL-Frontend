@@ -3,9 +3,9 @@
 import React, { Suspense, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { DashboardSkeletonPage } from "./DashboardSkeleton";
-import { fetchWebDashboard } from "~/lib/api/transactions";
-import { WebDashboard } from "~/types/types";
-import { ApiResponse } from "~/types/interfaces";
+import { ApiResponse } from "@/types/interfaces";
+import { WebDashboard } from "@/types/types";
+import { fetchWebDashboard } from "@/lib/api/transactions";
 const DashboardCardsPage = dynamic(() => import("./DashboardCards"), {ssr: false, loading: () => <DashboardSkeletonPage />});
 const DrawResultsPage = dynamic(() => import("./DrawResults"), {ssr: false, loading: () => <DashboardSkeletonPage />});
 const TopBettingRegionPage = dynamic(() => import("./TopBettingRegion"), {ssr: false, loading: () => <DashboardSkeletonPage /> });

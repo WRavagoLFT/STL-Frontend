@@ -2,10 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import { DevicesViewPage } from "~/components/device-information/ParentDeviceView";
-import { fetchAndSetDevice } from "~/hooks/useLoadDevice";
-import { DeviceItem } from "~/lib/api/device/device.service";
+import { DeviceItem } from "@/lib/api/device/device.service";
+import { fetchAndSetDevice } from "@/hooks/useLoadDevice";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import { DevicesViewPage } from "@/components/device-information/ParentDeviceView";
+
 
 const DeviceSlugPage = () => {
   const { slug } = useParams();

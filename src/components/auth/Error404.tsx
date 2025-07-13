@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { useAuthStore } from "~/store/useAuthStore";
-import { LoginSectionData } from "~/data/LoginSectionData";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/store/useAuthStore";
+import { LoginSectionData } from "@/data/LoginSectionData";
 
 const Error404Page = () => {
   const router = useRouter();

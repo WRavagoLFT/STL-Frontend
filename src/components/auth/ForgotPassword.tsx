@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { FaArrowLeft } from "react-icons/fa";
 import { LoginSectionData } from "../../data/LoginSectionData";
 import { useAuthStore } from "../../store/useForgetAuthStore";
-import { forgetPassEmail } from "~/lib/api/auth";
 import ActivityIndicator from "./ActivityIndicator";
+import { forgetPassEmail } from "@/lib/api/auth";
 
 const ForgotPassword = () => {
   const router = useRouter();

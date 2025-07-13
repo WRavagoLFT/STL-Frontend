@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { fetchGameCategories } from "~/lib/api/gamecategories";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import { ParentWinningSummaryPage } from "~/components/winning-summary/ParentWinningSummary";
+import { fetchGameCategories } from "@/lib/api/gamecategories";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import { ParentWinningSummaryPage } from "@/components/winning-summary/ParentWinningSummary";
 
 // Normalize slug: "STL Swer 2" -> "stlswer2"
 const normalizeSlug = (text: string) =>

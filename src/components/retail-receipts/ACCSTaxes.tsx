@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ShareBreakdownPageProps } from "~/types/interfaces";
+import { ShareBreakdownPageProps } from "@/types/interfaces";
 
 const AACTaxesPage: React.FC<ShareBreakdownPageProps> = ({
   totalPercentage,

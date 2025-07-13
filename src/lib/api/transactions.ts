@@ -1,4 +1,4 @@
-import { WebDashboard } from "~/types/types";
+import { WebDashboard } from "@/types/types";
 import axiosInstance from "./axiosInstance";
 
 const validateRelativeUrl = (url: string) => {

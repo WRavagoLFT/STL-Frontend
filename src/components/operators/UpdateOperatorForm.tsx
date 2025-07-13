@@ -2,15 +2,14 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Select from "react-select";
-import useUpdateModalState from "../../store/useUpdateModalStore";
 import Input from "../ui/inputs/TextInputs";
 import dayjs from "dayjs";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import { useFormik } from "formik";
-import { toFormikValidationSchema } from "~/utils/formikHelpers";
-import { updateOperatorSchema } from "~/schemas/operatorSchema";
-import { OperatorsItem, UpdateOperatorPayload } from "~/lib/api/operators/operators.service";
+import { toFormikValidationSchema } from "@/utils/formikHelpers";
+import { updateOperatorSchema } from "@/schemas/operatorSchema";
+import { OperatorsItem, UpdateOperatorPayload } from "@/lib/api/operators/operators.service";
 
 type GameTypeOption = {
   value: number;

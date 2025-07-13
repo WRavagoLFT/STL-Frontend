@@ -3,7 +3,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import {
   updateDevice,
   UpdateDevicePayload,
-} from "~/lib/api/device/device.service";
+} from "@/lib/api/device/device.service";
 
 export const handleUpdateDevice = async (
   data: UpdateDevicePayload,

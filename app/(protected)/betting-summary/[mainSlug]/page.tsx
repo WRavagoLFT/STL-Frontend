@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { fetchGameCategories } from "~/lib/api/gamecategories";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import { ParentBettingSummary } from "~/components/betting-summary/ParentBettingSummary";
-import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
+import { fetchGameCategories } from "@/lib/api/gamecategories";
+import BettingSummarySkeleton from "@/components/betting-summary/BettingSummarySkeleton";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import { ParentBettingSummary } from "@/components/betting-summary/ParentBettingSummary";
 
 const normalizeSlug = (text: string) =>
   text

@@ -1,5 +1,5 @@
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import { ParentDrawSummaryPage } from "~/components/draw-summary/ParentDrawSummary";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import { ParentDrawSummaryPage } from "@/components/draw-summary/ParentDrawSummary";
 
 export default function Page() {
   return (

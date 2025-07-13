@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { fetchWinners } from "~/lib/api/winners";
 import { FaMoneyBillAlt } from "react-icons/fa";
 import router from "next/router";
-import { useAuthStore } from "~/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface RegionData {
   RegionId?: number;
@@ -34,68 +33,7 @@ const TopWinningRegionPage = (data: WinningRegionProps) => {
       ? "Top Winning Area Today"
       : "Top Winning Regions Today";
 
-  // const getWinningRegions = async () => {
-  //   try {
-  //     const today = new Date().toLocaleDateString("en-CA", {
-  //       timeZone: "Asia/Manila",
-  //     });
-  //     const response = await fetchWinners({
-  //       from: today,
-  //       to: today,
-  //     });
-
-  //     if (!response.success || !response.data || response.data.length === 0) {
-  //       console.warn("No winners found in API response.");
-  //       return;
-  //     }
-
-  //     //console.log('TOTAL WINNERS IN THE TOP WINNING REGION:', response.data);
-
-  //     const filteredData = response.data;
-
-  //     // Group by Region and sum PayoutAmount
-  //     const regionMap = new Map<string, RegionData>();
-
-  //     filteredData.forEach((entry: any) => {
-  //       const regionName = entry.Region || "Unknown";
-  //       const payout = entry.PayoutAmount || 0;
-
-  //       if (payout === 0) return;
-
-  //       if (regionMap.has(regionName)) {
-  //         const existing = regionMap.get(regionName)!;
-  //         existing.TotalPayout += payout;
-  //         existing.TotalWinners = (existing.TotalWinners || 0) + 1;
-  //       } else {
-  //         regionMap.set(regionName, {
-  //           RegionId: entry.RegionId,
-  //           Region: regionName,
-  //           RegionFull: entry.RegionFull || regionName,
-  //           TotalPayout: payout,
-  //           TotalWinners: 1,
-  //         });
-  //       }
-  //     });
-
-  //     const sortedRegions = Array.from(regionMap.values()).sort(
-  //       (a, b) => b.TotalPayout - a.TotalPayout
-  //     );
-
-  //     const ranked = sortedRegions.map((region, index) => ({
-  //       region,
-  //       rank: index + 1,
-  //       trend: 0, // Default stub, update later if needed
-  //     }));
-
-  //     setRankedRegions(ranked);
-  //   } catch (error) {
-  //     console.error("Failed to fetch winning regions:", error);
-  //   }
-  // };
-
-  useEffect(() => {
-    // getWinningRegions();
-    
+  useEffect(() => {    
     if (!data || !data.data || data.data.length === 0) {
       console.warn("No data provided for Top Betting Regions.");
       return;
@@ -107,15 +45,12 @@ const TopWinningRegionPage = (data: WinningRegionProps) => {
   return (
     <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
       <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
-        {/* Left side: icon + label */}
         <div className="flex items-center">
           <div className="bg-[#0038A8] rounded-lg p-1">
             <FaMoneyBillAlt size={20} color={"#F6BA12"} />
           </div>
           <p className="text-base ml-3">{winningLabel}</p>
         </div>
-
-        {/* Right side: button */}
         <div className="mt-2 md:mt-0">
           <button
             onClick={() => router.push("/winning-summary/dashboard")}

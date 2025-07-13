@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { GameCombination } from "~/types/types";
+import { GameCombination } from "@/types/types";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { useFormik } from "formik";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import Input from "../ui/inputs/TextInputs";
-import { addGameCombination } from "~/schemas/gameCombinationSchema";
-import { toFormikValidationSchema } from "~/utils/formikHelpers";
+import { addGameCombination } from "@/schemas/gameCombinationSchema";
+import { toFormikValidationSchema } from "@/utils/formikHelpers";
 
 interface AddGameCombinationFormProps {
   title?: string;

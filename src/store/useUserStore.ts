@@ -1,8 +1,8 @@
 import { create } from 'zustand';
-import { OperatorsItem } from '~/lib/api/operators/operators.service';
-import { UsersItem } from '~/lib/api/users/users.service';
-import { Column } from '~/types/interfaces';
-import { RoleConfig } from '~/types/types';
+import { OperatorsItem } from '@/lib/api/operators/operators.service';
+import { UsersItem } from '@/lib/api/users/users.service';
+import { Column } from '@/types/interfaces';
+import { RoleConfig } from '@/types/types';
 
 interface Field {
   value: any;

@@ -1,15 +1,16 @@
 "use client";
 
+import { DeviceItem, editLogDevice, fetchUsageNotes, UpdateDevicePayload } from "@/lib/api/device/device.service";
 import React, { useCallback, useEffect, useState } from "react";
-import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
-import BackIconButton from "~/components/ui/icons/BackButton";
+import { useLoadDevices } from "./ParentDevice";
 import { useRouter } from "next/navigation";
-import { deviceEditColumns } from "~/config/deviceEditLogTableColumns";
-import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
-import Input from "~/components/ui/inputs/TextInputs";
-import { handleUpdateDevice } from "~/hooks/handleUpdateDeviceAction";
-import { useLoadDevices } from "~/components/device-information/ParentDevice";
-import { DeviceItem, editLogDevice, fetchUsageNotes, UpdateDevicePayload } from "~/lib/api/device/device.service";
+import { handleUpdateDevice } from "@/hooks/handleUpdateDeviceAction";
+import { deviceEditColumns } from "@/config/deviceEditLogTableColumns";
+import BackIconButton from "../ui/icons/BackButton";
+import UpdateDeviceForm from "./UpdateDeviceForm";
+import Input from "../ui/inputs/TextInputs";
+import EditLogsTablePage from "../ui/tables/EditLogTable";
+
 
 type DevicesViewPageProps = {
   slug: string;

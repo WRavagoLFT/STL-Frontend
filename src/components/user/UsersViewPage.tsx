@@ -1,26 +1,26 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import UpdateDeviceForm from "~/components/device-information/UpdateDeviceForm";
-import BackIconButton from "~/components/ui/icons/BackButton";
-import UpdateUserForm from "~/components/user/UpdateUserForm";
-import AddDeviceForm from "~/components/device-information/AddDeviceForm";
-import EditLogsTablePage from "~/components/ui/tables/EditLogTable";
-import { userEditColumns } from "~/config/userEditLogTableColumns";
-import Input from "~/components/ui/inputs/TextInputs";
-import useUserStore from "~/store/useUserStore";
-import { useAuthStore } from "~/store/useAuthStore";
+import UpdateDeviceForm from "@/components/device-information/UpdateDeviceForm";
+import BackIconButton from "@/components/ui/icons/BackButton";
+import UpdateUserForm from "@/components/user/UpdateUserForm";
+import AddDeviceForm from "@/components/device-information/AddDeviceForm";
+import EditLogsTablePage from "@/components/ui/tables/EditLogTable";
+import { userEditColumns } from "@/config/userEditLogTableColumns";
+import Input from "@/components/ui/inputs/TextInputs";
+import useUserStore from "@/store/useUserStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { FaMobileAlt } from "react-icons/fa";
-import { loadUsers } from "~/hooks/useLoadUsers";
+import { loadUsers } from "@/hooks/useLoadUsers";
 import dayjs from "dayjs";
-import { handleAddDevice } from "~/hooks/handleAddDeviceAction";
-import { handleUpdateDevice } from "~/hooks/handleUpdateDeviceAction";
-import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
+import { handleAddDevice } from "@/hooks/handleAddDeviceAction";
+import { handleUpdateDevice } from "@/hooks/handleUpdateDeviceAction";
+import { handleUpdateUser } from "@/hooks/handleUpdateUserAction";
 import { useRouter } from "next/navigation";
 import { useLoadDevices } from "../device-information/ParentDevice";
-import { editLogUser, UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
-import { fetchAndSetDevice } from "~/hooks/useLoadDevice";
-import { AddDevicePayload, DeviceItem, UpdateDevicePayload } from "~/lib/api/device/device.service";
+import { editLogUser, UpdateUserPayload, UsersItem } from "@/lib/api/users/users.service";
+import { fetchAndSetDevice } from "@/hooks/useLoadDevice";
+import { AddDevicePayload, DeviceItem, UpdateDevicePayload } from "@/lib/api/device/device.service";
 
 type UsersViewPageProps = {
   user: UsersItem;

@@ -2,13 +2,13 @@
 
 import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DetailedTable from "~/components/ui/tables/DetailedTable";
-import ChartsDataPage from "~/components/ui/charts/UserChartsData";
-import { operatorTableColumns } from "~/config/operatorTableColumns";
-import CardsPage from "~/components/user/CardsData";
-import { useOperatorFormStore } from "~/store/useOperatorFormStore";
-import { fetchFormOptionsData, fetchOperatorsData } from "~/hooks/userLoadOperators";
-import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
+import DetailedTable from "@/components/ui/tables/DetailedTable";
+import ChartsDataPage from "@/components/ui/charts/UserChartsData";
+import { operatorTableColumns } from "@/config/operatorTableColumns";
+import CardsPage from "@/components/user/CardsData";
+import { useOperatorFormStore } from "@/store/useOperatorFormStore";
+import { fetchFormOptionsData, fetchOperatorsData } from "@/hooks/userLoadOperators";
+import { UsersSkeletonPage } from "@/components/user/UsersSkeleton";
 
 const OperatorsPage = () => {
   const { data } = useOperatorFormStore();

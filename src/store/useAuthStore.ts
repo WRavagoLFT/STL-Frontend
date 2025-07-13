@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { UsersItem } from '~/lib/api/users/users.service';
+import { UsersItem } from '@/lib/api/users/users.service';
 
 interface AuthState {
   user: UsersItem | null;

@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { fetchWinners } from "~/lib/api/winners";
-import { winningTableColumns } from "~/config/winningTableColumns";
+import { fetchWinners } from "@/lib/api/winners";
+import { winningTableColumns } from "@/config/winningTableColumns";
 import ReadOnlyTablePage from "../ui/tables/ReadOnlyTable";
-import useDetailTableStore from "~/store/useTableStore";
+import useDetailTableStore from "@/store/useTableStore";
 
 export interface Transactions {
   transactionNumber: string;
