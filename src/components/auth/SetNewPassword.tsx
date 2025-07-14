@@ -6,7 +6,7 @@ import { LoginSectionData } from "../../data/LoginSectionData";
 import Swal from "sweetalert2";
 import { useAuthStore } from "../../store/useForgetAuthStore";
 import ActivityIndicator from "./ActivityIndicator";
-import { updateForgottenPassword } from "@/lib/api/auth";
+import { updateForgottenPassword } from "@/lib/api/auth/auth.service";
 
 const SetNewPassword = () => {
   const [credentials, setCredentials] = useState({

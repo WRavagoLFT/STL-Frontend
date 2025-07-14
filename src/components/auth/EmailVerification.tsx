@@ -6,7 +6,7 @@ import { LoginSectionData } from "../../data/LoginSectionData";
 import { useAuthStore } from "../../store/useForgetAuthStore";
 import ActivityIndicator from "./ActivityIndicator";
 import { useRouter } from "next/navigation";
-import { forgetPassEmail, verifyOtp } from "@/lib/api/auth";
+import { forgetPassEmail, verifyOtp } from "@/lib/api/auth/auth.service";
 
 const EmailVerification = () => {
   const router = useRouter();

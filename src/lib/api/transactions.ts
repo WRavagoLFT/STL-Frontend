@@ -185,7 +185,7 @@ export const fetchWebDashboard = async ( filters?: {
   try {
     const url = validateRelativeUrl("/transactions/dashboard/web");
     const response = await axiosInstance.get(url, { params: filters });
-    console.log("Web Dashboard Response:", response.data);
+    //console.log("Web Dashboard Response:", response.data);
     return response.data;
   }
   catch (error) {

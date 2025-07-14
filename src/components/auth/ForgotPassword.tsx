@@ -6,7 +6,7 @@ import { FaArrowLeft } from "react-icons/fa";
 import { LoginSectionData } from "../../data/LoginSectionData";
 import { useAuthStore } from "../../store/useForgetAuthStore";
 import ActivityIndicator from "./ActivityIndicator";
-import { forgetPassEmail } from "@/lib/api/auth";
+import { forgetPassEmail } from "@/lib/api/auth/auth.service";
 
 const ForgotPassword = () => {
   const router = useRouter();

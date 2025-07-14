@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import clsx from "clsx";
 import {
   FaHome,
@@ -16,9 +16,9 @@ import {
   FaMobileAlt,
   FaDoorOpen,
 } from "react-icons/fa";
-import { logoutUser } from "@/lib/api/auth";
 import ActivityIndicator from "../auth/ActivityIndicator";
 import { usePathname, useRouter } from "next/navigation";
+import { logoutUser } from "@/lib/api/auth/auth.service";
 
 interface SidebarMenuItemProps {
   label: string;

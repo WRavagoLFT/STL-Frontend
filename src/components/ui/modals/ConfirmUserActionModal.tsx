@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { verifyPass } from "@/lib/api/auth";
 import { LoginSectionData } from "@/data/LoginSectionData";
+import { verifyPass } from "@/lib/api/auth/auth.service";
 
 export interface ConfirmUserActionModalProps {
   open: boolean;

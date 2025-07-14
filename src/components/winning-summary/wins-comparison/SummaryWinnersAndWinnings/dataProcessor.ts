@@ -39,10 +39,17 @@ export const processChart2Data = (
   secondDate: string,
   datesMatch: (dateString1: string, dateString2: string) => boolean
 ) => {
+  console.log("RAW PAYLOAD:", payload);
+  console.log("FIRST DATE:", firstDate);
+  console.log("SECOND DATE:", secondDate);
+
   return drawOrders.map((drawOrder) => {
     const allDrawItems = payload.DrawOrder.filter(
       (item: any) => item.DrawOrder === drawOrder
     );
+
+    console.log(`\n--- DRAW ORDER: ${drawOrder} ---`);
+    console.log("ALL DRAW ITEMS:", allDrawItems);
 
     const firstDateItems = allDrawItems.filter((item: any) =>
       datesMatch(item.TransactionDate, firstDate)
@@ -51,40 +58,66 @@ export const processChart2Data = (
       datesMatch(item.TransactionDate, secondDate)
     );
 
+    console.log("FIRST DATE ITEMS:", firstDateItems);
+    console.log("SECOND DATE ITEMS:", secondDateItems);
+
+    const firstDateTumbok = firstDateItems.reduce(
+      (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+      0
+    );
+    const secondDateTumbok = secondDateItems.reduce(
+      (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+      0
+    );
+
+    const firstDateSahod = firstDateItems.reduce(
+      (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+      0
+    );
+    const secondDateSahod = secondDateItems.reduce(
+      (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+      0
+    );
+
+    const firstDateRamble = firstDateItems.reduce(
+      (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
+      0
+    );
+    const secondDateRamble = secondDateItems.reduce(
+      (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
+      0
+    );
+
+    const firstDateCasas = firstDateItems.reduce(
+      (sum: number, item: any) =>
+        sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
+      0
+    );
+    const secondDateCasas = secondDateItems.reduce(
+      (sum: number, item: any) =>
+        sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
+      0
+    );
+
+    console.log("firstDateTumbok:", firstDateTumbok);
+    console.log("secondDateTumbok:", secondDateTumbok);
+    console.log("firstDateSahod:", firstDateSahod);
+    console.log("secondDateSahod:", secondDateSahod);
+    console.log("firstDateRamble:", firstDateRamble);
+    console.log("secondDateRamble:", secondDateRamble);
+    console.log("firstDateCasas:", firstDateCasas);
+    console.log("secondDateCasas:", secondDateCasas);
+
     return {
       drawOrder,
-      firstDateTumbok: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
-        0
-      ),
-      secondDateTumbok: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
-        0
-      ),
-      firstDateSahod: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
-        0
-      ),
-      secondDateSahod: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
-        0
-      ),
-      firstDateRamble: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
-        0
-      ),
-      secondDateRamble: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
-        0
-      ),
-      firstDateCasas: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
-        0
-      ),
-      secondDateCasas: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
-        0
-      ),
+      firstDateTumbok,
+      secondDateTumbok,
+      firstDateSahod,
+      secondDateSahod,
+      firstDateRamble,
+      secondDateRamble,
+      firstDateCasas,
+      secondDateCasas,
     };
   });
 };
