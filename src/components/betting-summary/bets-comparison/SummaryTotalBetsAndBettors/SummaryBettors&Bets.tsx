@@ -163,6 +163,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
       <div className="w-full mb-2 flex flex-col xl:flex-row xl:items-center xl:justify-between">
+        
         <div className="flex flex-col leading-none">
           <p className="text-sm md:text-base lg:text-lg leading-none">
             Summary {categoryFilter}

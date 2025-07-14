@@ -181,6 +181,6 @@ export const generateSeries = (
     });
   }
 
-  console.warn("Unknown urlParam:", urlParam);
+  //console.warn("Unknown urlParam:", urlParam);
   return [];
 };

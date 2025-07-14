@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { fetchGameCategories } from "@/lib/api/gamecategories";
 import { AccessGuard } from "@/components/auth/AccessGuard";
 import { ParentWinningSummaryPage } from "@/components/winning-summary/ParentWinningSummary";
+import WinningSummarySkeleton from "@/components/winning-summary/WinningSummarySkeleton";
 
 // Normalize slug: "STL Swer 2" -> "stlswer2"
 const normalizeSlug = (text: string) =>
@@ -72,7 +73,7 @@ export default function WinningSummarySlugPage() {
   }, [loading, invalid, router]);
 
   if (loading) {
-    return <div className="p-4 text-center text-gray-600">Loading...</div>;
+    return <WinningSummarySkeleton />;
   }
 
   if (invalid) return null;

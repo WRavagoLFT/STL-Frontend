@@ -61,7 +61,6 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
   firstDateDuration,
   secondDateDuration,
 }) => {
-  // Determine which legend items map to use based on the dateFilter
   const legendItems =
     dateFilter === "Specific Date"
       ? getLegendItemsMap_Specific(
@@ -198,7 +197,7 @@ const ChartTopRegionByWinsandWinners: React.FC<
 
       // Check if required date values are available
       if (!firstDateSpecific || !secondDateSpecific) {
-        console.warn("Missing required specific dates.");
+        //console.warn("Missing required specific dates.");
         setLoading(false);
         return;
       }
@@ -207,11 +206,11 @@ const ChartTopRegionByWinsandWinners: React.FC<
         const formattedFirst = formatDate(firstDateSpecific);
         const formattedSecond = formatDate(secondDateSpecific);
 
-        console.log("Fetching Specific Date with:", {
-          first: formattedFirst,
-          second: formattedSecond,
-          ...gameCategoryParam,
-        });
+        // console.log("Fetching Specific Date with:", {
+        //   first: formattedFirst,
+        //   second: formattedSecond,
+        //   ...gameCategoryParam,
+        // });
 
         const resp = await fetchCompareHistoricalWinnersDate(
           "/winners/compareHistoricalWinners/chartType/",
@@ -242,7 +241,7 @@ const ChartTopRegionByWinsandWinners: React.FC<
           ...gameCategoryParam,
         };
 
-        console.log("Fetching Date Duration with:", formatted);
+        //console.log("Fetching Date Duration with:", formatted);
 
         const resp = await fetchCompareHistoricalWinnersRange(
           "/winners/compareHistoricalWinnersRange/chartType/",

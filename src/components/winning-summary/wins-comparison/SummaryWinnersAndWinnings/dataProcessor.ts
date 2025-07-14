@@ -1,43 +1,34 @@
 import { SpecificDatePayload, chartOne_Range, chartTwoFive_Range, chartThreeSix_Range } from '../types';
 import { drawOrders } from '../constant';
-import { formatDate } from '../utils';
 
 export const processChart1Data = (
   payload: SpecificDatePayload,
   firstDate: string,
   secondDate: string,
-  datesMatch: (dateString1: string, dateString2: string) => boolean
+  _datesMatch: (dateString1: string, dateString2: string) => boolean // not used
 ) => {
+  const drawItems = Array.isArray(payload.DrawOrder[0])
+    ? payload.DrawOrder.flat()
+    : payload.DrawOrder;
+
   return drawOrders.map((drawOrder) => {
-    const allDrawItems = payload.DrawOrder.filter(
+    const drawOrderItems = drawItems.filter(
       (item: any) => item.DrawOrder === drawOrder
     );
 
-    const firstDateItems = allDrawItems.filter((item: any) =>
-      datesMatch(item.TransactionDate, firstDate)
-    );
-    const secondDateItems = allDrawItems.filter((item: any) =>
-      datesMatch(item.TransactionDate, secondDate)
-    );
+    const [firstItem, secondItem] = drawOrderItems;
+
+    const firstDateWinners = firstItem?.TotalWinners || 0;
+    const secondDateWinners = secondItem?.TotalWinners || 0;
+    const firstDateWinnings = firstItem?.TotalPayoutAmount || 0;
+    const secondDateWinnings = secondItem?.TotalPayoutAmount || 0;
 
     return {
       drawOrder,
-      firstDateWinners: firstDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalBettors,
-        0
-      ),
-      secondDateWinners: secondDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalBettors,
-        0
-      ),
-      firstDateWinnings: firstDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalBetAmount,
-        0
-      ),
-      secondDateWinnings: secondDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalBetAmount,
-        0
-      ),
+      firstDateWinners,
+      secondDateWinners,
+      firstDateWinnings,
+      secondDateWinnings,
     };
   });
 };
@@ -254,7 +245,7 @@ export const processSpecificDatePayload = (
     case "6":
       return processChart6Data(payload, firstDate, secondDate, datesMatch);
     default:
-      console.warn("Unknown urlParam:", urlParam);
+      //console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };
@@ -483,7 +474,7 @@ export const processDurationPayload = (urlParam: string, payload: any) => {
     case "6":
       return processDurationChart6Data(payload);
     default:
-      console.warn("Unknown urlParam:", urlParam);
+      //console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };

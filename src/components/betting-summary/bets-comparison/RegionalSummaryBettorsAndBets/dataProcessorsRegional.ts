@@ -154,7 +154,7 @@ export const processSpecificDatePayload = (
     case "5": return processChart5Data(payload, firstDate, secondDate);
     case "6": return processChart6Data(payload, firstDate, secondDate);
     default:
-      console.warn("Unknown urlParam:", urlParam);
+      //console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };

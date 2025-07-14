@@ -215,7 +215,7 @@ export const processSpecificDatePayload = (
     case "6":
       return processChart6Data(payload, firstDate, secondDate, datesMatch);
     default:
-      console.warn("Unknown urlParam:", urlParam);
+      //console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };
@@ -392,7 +392,7 @@ export const processDurationPayload = (urlParam: string, payload: any) => {
     case "6":
       return processDurationChart6Data(payload);
     default:
-      console.warn("Unknown urlParam:", urlParam);
+      //console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };
