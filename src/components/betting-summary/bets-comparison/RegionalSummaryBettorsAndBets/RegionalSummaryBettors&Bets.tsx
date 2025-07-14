@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { BettorsandBetsSummaryProps } from "../../../../store/useBettingStore";
@@ -31,6 +31,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
+  const hasFetchedRef = useRef(false);
 
   const chartMap: Record<string, string> = {
     "Total Bettors and Bets": "1",
@@ -144,7 +145,10 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
   ]);
 
   useEffect(() => {
-    fetchData();
+    if (!hasFetchedRef.current) {
+      fetchData();
+      hasFetchedRef.current = true;
+    }
   }, [fetchData]);
 
   const formatWithCommas = (num: number): string => {

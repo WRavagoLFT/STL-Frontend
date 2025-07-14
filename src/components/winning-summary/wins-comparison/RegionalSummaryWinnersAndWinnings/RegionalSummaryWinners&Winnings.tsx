@@ -42,9 +42,44 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const gameCategoryParam = getGameCategoryParam();
-      //console.log("gameCategoryParam:", gameCategoryParam);
+      const gameCategoryParam = getGameCategoryParam(gameCategoryId);
+
+      console.log("DATE FILTER:", urlParam);
+
+      // DATE DURATION HAS PRIORITY
       if (
+        dateFilter === "Date Duration" &&
+        firstDateDuration &&
+        secondDateDuration &&
+        secondDurationFrom &&
+        secondDurationTo
+      ) {
+        const resp = await fetchCompareHistoricalWinnersRange(
+          "/winners/compareHistoricalWinnersRange/chartType/",
+          urlParam,
+          {
+            firstStart: formatDate(firstDateDuration),
+            firstEnd: formatDate(secondDateDuration),
+            secondStart: formatDate(secondDurationFrom),
+            secondEnd: formatDate(secondDurationTo),
+            ...gameCategoryParam,
+          }
+        );
+
+        console.log(firstDateDuration, secondDateDuration, secondDurationFrom, secondDurationTo )
+
+        if (resp?.data?.DrawOrder) {
+          const processed = processDurationPayload(urlParam, resp.data);
+          setChartData(processed);
+        } 
+        
+        else {
+          console.warn("Unexpected payload (Date Duration):", resp);
+          setChartData([]);
+        }
+
+      // FALLBACK TO SPECIFIC DATE
+      } else if (
         dateFilter === "Specific Date" &&
         firstDateSpecific &&
         secondDateSpecific
@@ -58,54 +93,29 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
             ...gameCategoryParam,
           }
         );
-        //console.log("API Response (Specific Date):", resp);
-        if (resp?.data?.Region) {
-          const processedData = processSpecificDatePayload(
+
+        if (resp?.data?.DrawOrder) {
+          const processed = processSpecificDatePayload(
             urlParam,
             resp.data,
             firstDateSpecific,
             secondDateSpecific,
-            (dateString1: string, dateString2: string) =>
-              formatDate(dateString1) === formatDate(dateString2)
+              (dateString1: string, dateString2: string) =>
+            formatDate(dateString1) === formatDate(dateString2)
           );
-          //console.log("Processed Data (Specific Date):", processedData);
-          setChartData(processedData);
+          setChartData(processed);
         } else {
           console.warn("Unexpected payload (Specific Date):", resp);
           setChartData([]);
         }
-      } else if (
-        dateFilter === "Date Duration" &&
-        firstDateSpecific &&
-        secondDateSpecific &&
-        firstDateDuration &&
-        secondDateDuration
-      ) {
-        const resp = await fetchCompareHistoricalWinnersRange(
-          "/winners/compareHistoricalWinnersRange/chartType/",
-          urlParam,
-          {
-            firstStart: formatDate(firstDateSpecific),
-            firstEnd: formatDate(secondDateSpecific),
-            secondStart: formatDate(firstDateDuration),
-            secondEnd: formatDate(secondDateDuration),
-            ...gameCategoryParam,
-          }
-        );
 
-        if (resp?.data?.Region) {
-          const processedData = processDurationPayload(urlParam, resp.data);
-          setChartData(processedData);
-        } else {
-          //console.warn("Unexpected payload (Date Duration):", resp);
-          setChartData([]);
-        }
+      // INVALID OR INCOMPLETE STATE
       } else {
-        //console.log("No valid condition met for data fetching.");
+        console.log("No valid condition met for data fetching.");
         setChartData([]);
       }
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.error("Error fetching chart data:", err);
       setChartData([]);
     } finally {
       setLoading(false);
@@ -116,10 +126,12 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
     secondDateSpecific,
     firstDateDuration,
     secondDateDuration,
+    secondDurationFrom,
+    secondDurationTo,
     urlParam,
     gameCategoryId,
   ]);
-
+  
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -260,7 +272,7 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
                   label: "Regions",
                 },
               ]}
-              yAxis={[
+               yAxis={[
                 {
                   label: "Total (x 100,000)",
                   scaleType: "linear",

@@ -27,12 +27,12 @@ export const generateSeries = (
   if (urlParam === "1") {
     return [
       {
-        data: chartData.map((item) => (item.firstDateWinners || 0)),
+        data: chartData.map((item) => (item.firstDateWinners || 0 / 100000)),
         label: `Winners ${firstLabel}`,
         color: "#E5C7FF",
       },
       {
-        data: chartData.map((item) => (item.secondDateWinners || 0)),
+        data: chartData.map((item) => (item.secondDateWinners || 0 / 100000)),
         label: `Winners ${secondLabel}`,
         color: "#D2A7FF",
       },

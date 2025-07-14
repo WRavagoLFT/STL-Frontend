@@ -25,6 +25,8 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
+  secondDurationFrom,
+  secondDurationTo,
 }) => {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -34,8 +36,40 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const gameCategoryParam = getGameCategoryParam();
+      const gameCategoryParam = getGameCategoryParam(gameCategoryId);
+
+      console.log("DATE FILTER:", dateFilter);
+
+      // DATE DURATION HAS PRIORITY
       if (
+        dateFilter === "Date Duration" &&
+        firstDateDuration &&
+        secondDateDuration &&
+        secondDurationFrom &&
+        secondDurationTo
+      ) {
+        const resp = await fetchCompareHistoricalWinnersRange(
+          "/winners/compareHistoricalWinnersRange/chartType/",
+          urlParam,
+          {
+            firstStart: formatDate(firstDateDuration),
+            firstEnd: formatDate(secondDateDuration),
+            secondStart: formatDate(secondDurationFrom),
+            secondEnd: formatDate(secondDurationTo),
+            ...gameCategoryParam,
+          }
+        );
+
+        if (resp?.data?.DrawOrder) {
+          const processed = processDurationPayload(urlParam, resp.data);
+          setChartData(processed);
+        } else {
+          console.warn("Unexpected payload (Date Duration):", resp);
+          setChartData([]);
+        }
+
+      // FALLBACK TO SPECIFIC DATE
+      } else if (
         dateFilter === "Specific Date" &&
         firstDateSpecific &&
         secondDateSpecific
@@ -50,53 +84,28 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
           }
         );
 
-        console.log("URL PARAM: ", urlParam);
         if (resp?.data?.DrawOrder) {
-          const processedData = processSpecificDatePayload(
+          const processed = processSpecificDatePayload(
             urlParam,
             resp.data,
             firstDateSpecific,
             secondDateSpecific,
-            (dateString1: string, dateString2: string) =>
-              formatDate(dateString1) === formatDate(dateString2)
+              (dateString1: string, dateString2: string) =>
+            formatDate(dateString1) === formatDate(dateString2)
           );
-          setChartData(processedData);
+          setChartData(processed);
         } else {
           console.warn("Unexpected payload (Specific Date):", resp);
           setChartData([]);
         }
-      } else if (
-        dateFilter === "Date Duration" &&
-        firstDateSpecific &&
-        secondDateSpecific &&
-        firstDateDuration &&
-        secondDateDuration
-      ) {
-        const resp = await fetchCompareHistoricalWinnersRange(
-          "/winners/compareHistoricalWinnersRange/chartType/",
-          urlParam,
-          {
-            firstStart: formatDate(firstDateSpecific),
-            firstEnd: formatDate(firstDateDuration),
-            secondStart: formatDate(secondDateSpecific),
-            secondEnd: formatDate(secondDateDuration),
-            ...gameCategoryParam,
-          }
-        );
 
-        if (resp?.data?.DrawOrder) {
-          const processedData = processDurationPayload(urlParam, resp.data);
-          setChartData(processedData);
-        } else {
-          console.warn("Unexpected payload (Date Duration):", resp);
-          setChartData([]);
-        }
+      // INVALID OR INCOMPLETE STATE
       } else {
-        //console.log("No valid condition met for data fetching.");
+        console.log("No valid condition met for data fetching.");
         setChartData([]);
       }
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.error("Error fetching chart data:", err);
       setChartData([]);
     } finally {
       setLoading(false);
@@ -107,6 +116,8 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
     secondDateSpecific,
     firstDateDuration,
     secondDateDuration,
+    secondDurationFrom,
+    secondDurationTo,
     urlParam,
     gameCategoryId,
   ]);

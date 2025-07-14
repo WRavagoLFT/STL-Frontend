@@ -39,14 +39,14 @@ export const generateSeries = (
 
     return [
       {
-        data: typedChartData.map((item) => ((isDuration ? item.firstRangeWinners : item.firstDateWinners) || 0) / 100000),
+        data: typedChartData.map((item) => ((isDuration ? item.firstRangeWinners : item.firstDateWinners) || 0) ),
         label: `Winners ${firstLabel}`,
         color: "#E5C7FF",
         valueFormatter: (_value: number | null, context: any) =>
           `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeWinners' : 'firstDateWinners'] || 0)).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.secondRangeWinners : item.secondDateWinners) || 0) / 100000),
+        data: typedChartData.map((item) => ((isDuration ? item.secondRangeWinners : item.secondDateWinners) || 0) ),
         label: `Winners ${secondLabel}`,
         color: "#D2A7FF",
         valueFormatter: (_value: number | null, context: any) =>

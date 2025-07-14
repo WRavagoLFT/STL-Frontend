@@ -14,6 +14,7 @@ export interface chartOne_Specific {
   TotalRamble: number;
   TotalWinners: number;
   TotalPayoutAmount: number;
+  //BetTypes: number;
 }
 
 export interface chartOne_Range {
@@ -62,6 +63,7 @@ export interface chartThreeSix_Range {
   DateRange: { start: string; end: string };
   TotalWinners: number;
   TotalPayoutAmount: number;
+  BetTypes: number;
 }
 
 export type Chart1Data = {
@@ -161,6 +163,7 @@ export interface RegionRangeData {
 
 export interface RangePayload {
   Region: {
+    find(arg0: (item: { RegionName: string; }) => boolean): unknown;
     FirstRange: RegionRangeData[];
     SecondRange: RegionRangeData[];
   };

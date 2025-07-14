@@ -1,11 +1,12 @@
 import { SpecificDatePayload, chartOne_Range, chartTwoFive_Range, chartThreeSix_Range } from '../types';
 import { drawOrders } from '../constant';
+import { datesMatch } from '../utils';
 
 export const processChart1Data = (
   payload: SpecificDatePayload,
   firstDate: string,
   secondDate: string,
-  _datesMatch: (dateString1: string, dateString2: string) => boolean // not used
+  //_datesMatch: (dateString1: string, dateString2: string) => boolean // not used
 ) => {
   const drawItems = Array.isArray(payload.DrawOrder[0])
     ? payload.DrawOrder.flat()
@@ -52,10 +53,10 @@ export const processChart2Data = (
     console.log("ALL DRAW ITEMS:", allDrawItems);
 
     const firstDateItems = allDrawItems.filter((item: any) =>
-      datesMatch(item.TransactionDate, firstDate)
+      datesMatch(item.DateOfWinningCombination, firstDate)
     );
     const secondDateItems = allDrawItems.filter((item: any) =>
-      datesMatch(item.TransactionDate, secondDate)
+      datesMatch(item.DateOfWinningCombination, secondDate)
     );
 
     console.log("FIRST DATE ITEMS:", firstDateItems);
@@ -124,11 +125,14 @@ export const processChart2Data = (
 
 export const processChart3Data = (
   payload: SpecificDatePayload,
-  firstDate: string,
+  firstDate: string, // still accepted for possible labels
   secondDate: string,
-  datesMatch: (dateString1: string, dateString2: string) => boolean
+  _datesMatch: (dateString1: string, dateString2: string) => boolean
 ) => {
   const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
+
+  console.log("RAW PAYLOAD:", payload);
+  console.log("Processing chart data WITHOUT TransactionDate filtering.");
 
   return drawOrders.map((drawOrder) => {
     const result: any = { drawOrder };
@@ -139,21 +143,22 @@ export const processChart3Data = (
           item.DrawOrder === drawOrder && item.GameCategory === category
       );
 
-      const firstDateItems = allItems.filter((item: any) =>
-        datesMatch(item.TransactionDate, firstDate)
-      );
-      const secondDateItems = allItems.filter((item: any) =>
-        datesMatch(item.TransactionDate, secondDate)
-      );
+      console.log(`\nDrawOrder: ${drawOrder}, Category: ${category}`);
+      console.log("All Items:", allItems);
 
-      result[`firstDate${category.replace(/\s+/g, "")}`] = firstDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalBetAmount,
-        0
-      );
-      result[`secondDate${category.replace(/\s+/g, "")}`] = secondDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalBetAmount,
-        0
-      );
+      const firstItem = allItems[0];
+      const secondItem = allItems[1];
+
+      const keyPrefix = category.replace(/\s+/g, "");
+
+      const firstValue = (firstItem?.TotalPayoutAmount || 0) / 100000;
+      const secondValue = (secondItem?.TotalPayoutAmount || 0) / 100000;
+
+      result[`firstDate${keyPrefix}`] = firstValue;
+      result[`secondDate${keyPrefix}`] = secondValue;
+
+      console.log(`firstDate${keyPrefix}:`, firstValue);
+      console.log(`secondDate${keyPrefix}:`, secondValue);
     });
 
     return result;
@@ -172,10 +177,10 @@ export const processChart5Data = (
     );
 
     const firstDateItems = allDrawItems.filter((item: any) =>
-      datesMatch(item.TransactionDate, firstDate)
+      datesMatch(item.DateOfWinningCombination, firstDate)
     );
     const secondDateItems = allDrawItems.filter((item: any) =>
-      datesMatch(item.TransactionDate, secondDate)
+      datesMatch(item.DateOfWinningCombination, secondDate)
     );
 
     return {
@@ -234,10 +239,10 @@ export const processChart6Data = (
       );
 
       const firstDateItems = allItems.filter((item: any) =>
-        datesMatch(item.TransactionDate, firstDate)
+        datesMatch(item.DateOfWinningCombination, firstDate)
       );
       const secondDateItems = allItems.filter((item: any) =>
-        datesMatch(item.TransactionDate, secondDate)
+        datesMatch(item.DateOfWinningCombination, secondDate)
       );
 
       result[`firstDate${category.replace(/\s+/g, "")}`] = firstDateItems.reduce(
@@ -262,13 +267,13 @@ export const processSpecificDatePayload = (
   datesMatch: (dateString1: string, dateString2: string) => boolean
 ) => {
   if (!payload || !payload.DrawOrder) {
-    console.warn("Invalid payload structure", payload);
+    console.warn("Invalid payload structure", payload, );
     return [];
   }
 
   switch (urlParam) {
     case "1":
-      return processChart1Data(payload, firstDate, secondDate, datesMatch);
+      return processChart1Data(payload, firstDate, secondDate);
     case "2":
       return processChart2Data(payload, firstDate, secondDate, datesMatch);
     case "3":
@@ -284,32 +289,33 @@ export const processSpecificDatePayload = (
 };
 
 export const processDurationChart1Data = (payload: any) => {
+  const firstRange = payload?.DrawOrder?.FirstRange ?? [];
+  const secondRange = payload?.DrawOrder?.SecondRange ?? [];
+
   return drawOrders.map((drawOrder) => {
-    const firstRangeItems = payload.DrawOrder.FirstRange.filter(
-      (item: chartOne_Range) => item.DrawOrder === drawOrder
-    );
-    const secondRangeItems = payload.DrawOrder.SecondRange.filter(
-      (item: chartOne_Range) => item.DrawOrder === drawOrder
-    );
+    const firstItem = firstRange.find((item: any) => item.DrawOrder === drawOrder);
+    const secondItem = secondRange.find((item: any) => item.DrawOrder === drawOrder);
+
+    const firstDateWinners = firstItem?.TotalWinners || 0;
+    const secondDateWinners = secondItem?.TotalWinners || 0;
+    const firstDateWinnings = firstItem?.TotalPayoutAmount || 0;
+    const secondDateWinnings = secondItem?.TotalPayoutAmount || 0;
+
+    console.log(`DrawOrder ${drawOrder}:`, {
+      firstItem,
+      secondItem,
+      firstDateWinners,
+      secondDateWinners,
+      firstDateWinnings,
+      secondDateWinnings,
+    });
 
     return {
       drawOrder,
-      firstRangeWinners: firstRangeItems.reduce(
-        (sum: number, item: chartOne_Range) => sum + item.TotalBettors,
-        0
-      ),
-      secondRangeWinners: secondRangeItems.reduce(
-        (sum: number, item: chartOne_Range) => sum + item.TotalBettors,
-        0
-      ),
-      firstRangeWinnings: firstRangeItems.reduce(
-        (sum: number, item: chartOne_Range) => sum + item.TotalBetAmount,
-        0
-      ),
-      secondRangeWinnings: secondRangeItems.reduce(
-        (sum: number, item: chartOne_Range) => sum + item.TotalBetAmount,
-        0
-      ),
+      firstDateWinners,
+      secondDateWinners,
+      firstDateWinnings,
+      secondDateWinnings,
     };
   });
 };
