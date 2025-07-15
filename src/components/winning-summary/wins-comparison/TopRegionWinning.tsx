@@ -108,23 +108,8 @@ const ChartTopRegionByWinsandWinners: React.FC<
   const [chartData, setChartData] = useState<ChartData[]>([]);
 
   const philippineRegions = [
-    "NCR",
-    "CAR",
-    "I",
-    "II",
-    "III",
-    "IV-A",
-    "IV-B",
-    "V",
-    "VI",
-    "VII",
-    "VIII",
-    "IX",
-    "X",
-    "XI",
-    "XII",
-    "XIII",
-    "BARMM",
+    "NCR", "CAR", "I", "II", "III", "IV-A", "IV-B", "V",
+    "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "BARMM",
   ];
 
   const aggregateField = categoryFilter.includes("Winnings")
@@ -141,7 +126,8 @@ const ChartTopRegionByWinsandWinners: React.FC<
     "Top Winner Region by Total Winners": "4",
   };
 
-  const urlParam = chartMap[categoryFilter];
+  //const urlParam = chartMap[categoryFilter];
+  const urlParam = chartMap[categoryFilter] ?? "4";
 
   const getGameCategoryParam = () => {
     if (gameCategoryId && gameCategoryId >= 1 && gameCategoryId <= 4) {
@@ -150,7 +136,6 @@ const ChartTopRegionByWinsandWinners: React.FC<
     return {};
   };
 
-  // Specific Date
   const processSpecificPayloadData = (payload: {
     FirstDate: DateSpecific[];
     SecondDate: DateSpecific[];
@@ -160,57 +145,70 @@ const ChartTopRegionByWinsandWinners: React.FC<
       const firstItem = payload.FirstDate.find((r) => r.Region === apiLabel);
       const secondItem = payload.SecondDate.find((r) => r.Region === apiLabel);
 
+      // Use TotalWinners or TotalPayoutAmount based on filter
+      const field = categoryFilter.includes("Winnings")
+        ? "TotalPayoutAmount"
+        : "TotalWinners";
+
       return {
         region,
-        firstValue: firstItem?.Rank ?? 0,
-        secondValue: secondItem?.Rank ?? 0,
+        firstValue: firstItem?.[field] ?? 0,
+        secondValue: secondItem?.[field] ?? 0,
       };
     });
+
     setChartData(data);
   };
 
-  // SpecificDate
   const processRangePayloadData = (payload: {
     FirstRange: DateRange[];
     SecondRange: DateRange[];
   }) => {
+    console.log("Processing Date Duration Payload:", payload);
+
+    const field = categoryFilter.includes("Winnings")
+      ? "TotalPayoutAmount"
+      : "TotalWinners";
+
     const data: ChartData[] = philippineRegions.map((region) => {
       const apiLabel = apiRegionLabel(region);
       const firstItem = payload.FirstRange.find((r) => r.Region === apiLabel);
       const secondItem = payload.SecondRange.find((r) => r.Region === apiLabel);
 
+      console.log(
+        `${region}: First ${field} = ${firstItem?.[field] ?? 0}, Second ${field} = ${secondItem?.[field] ?? 0}`
+      );
+
       return {
         region,
-        firstValue: firstItem?.Rank ? firstItem.Rank : 0,
-        secondValue: secondItem?.Rank ? secondItem.Rank : 0,
+        firstValue: firstItem?.[field] ?? 0,
+        secondValue: secondItem?.[field] ?? 0,
       };
     });
+
     setChartData(data);
   };
 
-  // Date Payload Data
   const fetchData = useCallback(async () => {
     setLoading(true);
-
     try {
       const gameCategoryParam = getGameCategoryParam();
+      console.log("Filter Info:", {
+        dateFilter,
+        categoryFilter,
+        urlParam,
+        gameCategoryId,
+        gameCategoryParam,
+      });
 
-      // Check if required date values are available
-      if (!firstDateSpecific || !secondDateSpecific) {
-        //console.warn("Missing required specific dates.");
-        setLoading(false);
-        return;
-      }
-
-      if (dateFilter === "Specific Date") {
+      if (dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific) {
         const formattedFirst = formatDate(firstDateSpecific);
         const formattedSecond = formatDate(secondDateSpecific);
 
-        // console.log("Fetching Specific Date with:", {
-        //   first: formattedFirst,
-        //   second: formattedSecond,
-        //   ...gameCategoryParam,
-        // });
+        console.log("Fetching for Specific Date:", {
+          first: formattedFirst,
+          second: formattedSecond,
+        });
 
         const resp = await fetchCompareHistoricalWinnersDate(
           "/winners/compareHistoricalWinners/chartType/",
@@ -222,16 +220,20 @@ const ChartTopRegionByWinsandWinners: React.FC<
           }
         );
 
+        console.log("Response for Specific Date:", resp);
+
         if (resp?.data?.FirstDate && resp?.data?.SecondDate) {
           processSpecificPayloadData(resp.data);
         } else {
-          console.warn("No data received for Specific Date", resp);
+          console.warn("No data received (Specific Date)", resp);
         }
 
       } else if (
         dateFilter === "Date Duration" &&
         firstDateDuration &&
-        secondDateDuration
+        secondDateDuration &&
+        firstDateSpecific &&
+        secondDateSpecific
       ) {
         const formatted = {
           firstStart: formatDate(firstDateSpecific),
@@ -241,7 +243,7 @@ const ChartTopRegionByWinsandWinners: React.FC<
           ...gameCategoryParam,
         };
 
-        //console.log("Fetching Date Duration with:", formatted);
+        console.log("Fetching for Date Duration:", formatted);
 
         const resp = await fetchCompareHistoricalWinnersRange(
           "/winners/compareHistoricalWinnersRange/chartType/",
@@ -249,13 +251,16 @@ const ChartTopRegionByWinsandWinners: React.FC<
           formatted
         );
 
+        console.log("Response for Date Duration:", resp);
+
         if (resp?.data?.FirstRange && resp?.data?.SecondRange) {
           processRangePayloadData(resp.data);
         } else {
-          console.warn("No data received for Date Duration", resp);
+          console.warn("No data received (Date Duration)", resp);
         }
+
       } else {
-        console.warn("Missing date ranges for Date Duration");
+        console.warn("Missing date inputs for fetch");
       }
 
     } catch (err) {
@@ -272,12 +277,10 @@ const ChartTopRegionByWinsandWinners: React.FC<
     urlParam,
     aggregateField,
   ]);
-  
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
-  //console.log('Chart Data:', chartData);
 
   return (
     <div className="bg-[#F8F0E3] p-4 rounded-lg pb-8 w-full h-[685px] border border-[#0038A8]">

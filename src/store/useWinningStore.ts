@@ -70,7 +70,7 @@ export const useWinningStore = create<WinningStore>((set) => ({
   activeGameType: "",
   categoryFilter: "Total Winnings and Winners",
   dateFilter: "Specific Date",
-  firstDateSpecific: getTodayDate(),
+  firstDateSpecific: getYesterdayDate(),
   secondDateSpecific: getTodayDate(),
   firstDateDuration: null,
   secondDateDuration: null,

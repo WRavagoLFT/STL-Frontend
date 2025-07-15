@@ -40,17 +40,10 @@ export const processChart2Data = (
   secondDate: string,
   datesMatch: (dateString1: string, dateString2: string) => boolean
 ) => {
-  console.log("RAW PAYLOAD:", payload);
-  console.log("FIRST DATE:", firstDate);
-  console.log("SECOND DATE:", secondDate);
-
   return drawOrders.map((drawOrder) => {
     const allDrawItems = payload.DrawOrder.filter(
       (item: any) => item.DrawOrder === drawOrder
     );
-
-    console.log(`\n--- DRAW ORDER: ${drawOrder} ---`);
-    console.log("ALL DRAW ITEMS:", allDrawItems);
 
     const firstDateItems = allDrawItems.filter((item: any) =>
       datesMatch(item.DateOfWinningCombination, firstDate)
@@ -58,9 +51,6 @@ export const processChart2Data = (
     const secondDateItems = allDrawItems.filter((item: any) =>
       datesMatch(item.DateOfWinningCombination, secondDate)
     );
-
-    console.log("FIRST DATE ITEMS:", firstDateItems);
-    console.log("SECOND DATE ITEMS:", secondDateItems);
 
     const firstDateTumbok = firstDateItems.reduce(
       (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
@@ -100,15 +90,6 @@ export const processChart2Data = (
       0
     );
 
-    console.log("firstDateTumbok:", firstDateTumbok);
-    console.log("secondDateTumbok:", secondDateTumbok);
-    console.log("firstDateSahod:", firstDateSahod);
-    console.log("secondDateSahod:", secondDateSahod);
-    console.log("firstDateRamble:", firstDateRamble);
-    console.log("secondDateRamble:", secondDateRamble);
-    console.log("firstDateCasas:", firstDateCasas);
-    console.log("secondDateCasas:", secondDateCasas);
-
     return {
       drawOrder,
       firstDateTumbok,
@@ -125,14 +106,11 @@ export const processChart2Data = (
 
 export const processChart3Data = (
   payload: SpecificDatePayload,
-  firstDate: string, // still accepted for possible labels
+  firstDate: string,
   secondDate: string,
   _datesMatch: (dateString1: string, dateString2: string) => boolean
 ) => {
   const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
-
-  console.log("RAW PAYLOAD:", payload);
-  console.log("Processing chart data WITHOUT TransactionDate filtering.");
 
   return drawOrders.map((drawOrder) => {
     const result: any = { drawOrder };
@@ -142,9 +120,6 @@ export const processChart3Data = (
         (item: any) =>
           item.DrawOrder === drawOrder && item.GameCategory === category
       );
-
-      console.log(`\nDrawOrder: ${drawOrder}, Category: ${category}`);
-      console.log("All Items:", allItems);
 
       const firstItem = allItems[0];
       const secondItem = allItems[1];
@@ -156,11 +131,62 @@ export const processChart3Data = (
 
       result[`firstDate${keyPrefix}`] = firstValue;
       result[`secondDate${keyPrefix}`] = secondValue;
-
-      console.log(`firstDate${keyPrefix}:`, firstValue);
-      console.log(`secondDate${keyPrefix}:`, secondValue);
+      
     });
 
+    return result;
+  });
+};
+
+export const processChart6Data = (
+  payload: SpecificDatePayload,
+  firstDate: string,
+  secondDate: string,
+  datesMatch: (dateString1: string, dateString2: string) => boolean
+) => {
+  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
+
+  console.log("Raw DrawOrder payload:", payload.DrawOrder);
+  console.log("Comparing dates:", firstDate, "vs", secondDate);
+
+  return drawOrders.map((drawOrder) => {
+    const result: any = { drawOrder };
+
+    console.log(`\n Processing DrawOrder: ${drawOrder}`);
+
+    gameCategories.forEach((category) => {
+      const allItems = payload.DrawOrder.filter(
+        (item: any) =>
+          item.DrawOrder === drawOrder && item.GameCategory === category
+      );
+
+      const firstDateItems = allItems.filter((item: any) =>
+        datesMatch(item.DateOfWinningCombination, firstDate)
+      );
+      const secondDateItems = allItems.filter((item: any) =>
+        datesMatch(item.DateOfWinningCombination, secondDate)
+      );
+
+      const firstTotal = firstDateItems.reduce(
+        (sum: number, item: any) => sum + item.TotalWinnners,
+        0
+      );
+      const secondTotal = secondDateItems.reduce(
+        (sum: number, item: any) => sum + item.TotalWinnners,
+        0
+      );
+
+      result[`firstDate${category.replace(/\s+/g, "")}`] = firstTotal;
+      result[`secondDate${category.replace(/\s+/g, "")}`] = secondTotal;
+
+      console.log(`Category: ${category}`);
+      console.log(`FirstDate Items (${firstDate}):`, firstDateItems);
+      console.log(`Total Bettors (FirstDate):`, firstTotal);
+      console.log(`SecondDate Items (${secondDate}):`, secondDateItems);
+      console.log(`Total Bettors (SecondDate):`, secondTotal);
+    });
+
+    console.log("Final Result for drawOrder:", result);
     return result;
   });
 };
@@ -218,44 +244,6 @@ export const processChart5Data = (
         0
       ),
     };
-  });
-};
-
-export const processChart6Data = (
-  payload: SpecificDatePayload,
-  firstDate: string,
-  secondDate: string,
-  datesMatch: (dateString1: string, dateString2: string) => boolean
-) => {
-  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
-
-  return drawOrders.map((drawOrder) => {
-    const result: any = { drawOrder };
-
-    gameCategories.forEach((category) => {
-      const allItems = payload.DrawOrder.filter(
-        (item: any) =>
-          item.DrawOrder === drawOrder && item.GameCategory === category
-      );
-
-      const firstDateItems = allItems.filter((item: any) =>
-        datesMatch(item.DateOfWinningCombination, firstDate)
-      );
-      const secondDateItems = allItems.filter((item: any) =>
-        datesMatch(item.DateOfWinningCombination, secondDate)
-      );
-
-      result[`firstDate${category.replace(/\s+/g, "")}`] = firstDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalBettors,
-        0
-      );
-      result[`secondDate${category.replace(/\s+/g, "")}`] = secondDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalBettors,
-        0
-      );
-    });
-
-    return result;
   });
 };
 
