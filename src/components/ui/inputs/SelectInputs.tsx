@@ -28,19 +28,19 @@ const SelectInput: React.FC<Props> = ({
   error,
   disabled = false,
 }) => {
-const handleChange = (
-  selectedOption: SingleValue<OptionType>,
-  _actionMeta: ActionMeta<OptionType>
-) => {
-  const event = {
-    value: selectedOption?.value?.toString() || "",
-    target: {
-      name,
-      value: selectedOption?.value?.toString() || "", // Convert to string
-    },
+  const handleChange = (
+    selectedOption: SingleValue<OptionType>,
+    _actionMeta: ActionMeta<OptionType>
+  ) => {
+    const event = {
+      value: selectedOption?.value?.toString() || "",
+      target: {
+        name,
+        value: selectedOption?.value?.toString() || "", // Convert to string
+      },
+    };
+    onChange?.(event);
   };
-  onChange?.(event);
-};
 
   return (
     <Select
@@ -56,14 +56,16 @@ const handleChange = (
         control: (provided, state) => ({
           ...provided,
           borderColor: state.isDisabled
-            ? "#A1A1AA" // Gray border when disabled
+            ? "#A1A1AA"
             : error
-              ? "#EF4444 !important" // Red border if error
-              : "#0038A8 !important", // Default blue border
+              ? "#EF4444 !important"
+              : "#0038A8 !important",
           fontSize: "0.875rem",
-          padding: "2px",
-          color: state.isDisabled ? "#6B7280" : "inherit", // Gray text when disabled
-          backgroundColor: state.isDisabled ? "transparent" : "transparent", // Optional: lighter background when disabled
+          minHeight: "35px",
+          height: "32px",
+          borderRadius: "9px",
+          color: state.isDisabled ? "#6B7280" : "inherit",
+          backgroundColor: state.isDisabled ? "transparent" : "transparent",
           cursor: state.isDisabled ? "not-allowed" : "default",
           "&:hover": {
             borderColor: state.isDisabled
@@ -74,6 +76,7 @@ const handleChange = (
           },
           boxShadow: state.isFocused ? (error ? "none" : "none") : "none",
         }),
+
         menuPortal: (base) => ({
           ...base,
           zIndex: 1000000,
