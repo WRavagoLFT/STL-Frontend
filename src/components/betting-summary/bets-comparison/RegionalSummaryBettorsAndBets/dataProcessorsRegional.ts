@@ -112,7 +112,7 @@ const processRegionalGameCategoryChartData = (
       const allItems = payload.Region.flat().filter(
         (item) =>
           (item.Region === region || item.Region === `Region ${region}`) &&
-          item.GameCategory === category
+          (item.GameCategory === category || item.GameCategory === null)
       );
 
       const firstDateItems = allItems.filter((item) => datesMatch(item.TransactionDate, firstDate));

@@ -62,19 +62,29 @@ export const processChart2Data = (
     return {
       region,
       firstDateTumbok: firstDateItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+        (sum, item) => sum + (item.TotalTumbokPayouts || 0),
         0
       ),
       secondDateTumbok: secondDateItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+        (sum, item) => sum + (item.TotalTumbokPayouts || 0),
         0
       ),
       firstDateSahod: firstDateItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+        (sum, item) => sum + (item.TotalSahodPayouts || 0),
         0
       ),
       secondDateSahod: secondDateItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+        (sum, item) => sum + (item.TotalSahodPayouts || 0),
+        0
+      ),
+
+      // CASAS
+      firstDateCasas: firstDateItems.reduce(
+        (sum, item) => sum + (item.TotalSahodPayouts || 0),
+        0
+      ),
+      secondDateCasas: secondDateItems.reduce(
+        (sum, item) => sum + (item.TotalSahodPayouts || 0),
         0
       ),
     };
