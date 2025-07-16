@@ -34,6 +34,12 @@ export interface chartOne_Range {
 }
 
 export interface chartTwoFive_Range {
+  TotalRambleWinners: number;
+  TotalSahodWinners: number;
+  TotalTumbokWinners: number;
+  TotalRamblePayouts: number;
+  TotalSahodPayouts: number;
+  TotalTumbokPayouts: number;
   TotalSaisCasas: number;
   TotalTresCasas: number;
   DrawOrder: number;

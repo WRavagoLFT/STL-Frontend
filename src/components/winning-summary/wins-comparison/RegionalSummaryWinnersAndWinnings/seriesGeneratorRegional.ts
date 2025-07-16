@@ -94,7 +94,7 @@ export const generateSeries = (
       }
     );
 
-    if (gameCategoryId === 1 || gameCategoryId === 2) {
+    if (gameCategoryId === 1 || gameCategoryId === 2 || gameCategoryId == 0) {
       // Add Sahod and Casas
       series.push(
         {
@@ -128,7 +128,7 @@ export const generateSeries = (
       );
     }
 
-    if (gameCategoryId === 3 || gameCategoryId === 4) {
+    if (gameCategoryId === 3 || gameCategoryId === 4 || gameCategoryId == 0) {
       // Add Ramble
       series.push(
         {

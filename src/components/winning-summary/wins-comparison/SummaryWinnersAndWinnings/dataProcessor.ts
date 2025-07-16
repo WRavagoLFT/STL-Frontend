@@ -50,8 +50,7 @@ export const processChart2Data = (
     const allDrawItems = payload.DrawOrder.filter(
       (item: any) => item.DrawOrder === drawOrder
     );
-    console.log("Available drawOrderItems:", allDrawItems);
-    console.log("Looking for:", firstDate, secondDate);
+
     const firstDateItems = allDrawItems.filter((item: any) =>
       datesMatch(item.DateOfWinningCombination, firstDate)
     );
@@ -60,44 +59,42 @@ export const processChart2Data = (
     );
 
     const firstDateTumbok = firstDateItems.reduce(
-      (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
       0
     );
     const secondDateTumbok = secondDateItems.reduce(
-      (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
+      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
       0
     );
 
     const firstDateSahod = firstDateItems.reduce(
-      (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
       0
     );
     const secondDateSahod = secondDateItems.reduce(
-      (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
+      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
       0
     );
 
     const firstDateRamble = firstDateItems.reduce(
-      (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
+      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
       0
     );
     const secondDateRamble = secondDateItems.reduce(
-      (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
+      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
       0
     );
 
     const firstDateCasas = firstDateItems.reduce(
-      (sum: number, item: any) =>
-        sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
+      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
       0
     );
     const secondDateCasas = secondDateItems.reduce(
-      (sum: number, item: any) =>
-        sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
+      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
       0
     );
 
-    return {
+    const result = {
       drawOrder,
       firstDateTumbok,
       secondDateTumbok,
@@ -108,6 +105,8 @@ export const processChart2Data = (
       firstDateCasas,
       secondDateCasas,
     };
+
+    return result;
   });
 };
 
@@ -219,41 +218,55 @@ export const processChart5Data = (
       datesMatch(item.DateOfWinningCombination, secondDate)
     );
 
-    return {
+    const firstDateTumbok = firstDateItems.reduce(
+      (sum: number, item: any) => sum + (item.TotalTumbokWinners || 0),
+      0
+    );
+    const secondDateTumbok = secondDateItems.reduce(
+      (sum: number, item: any) => sum + (item.TotalTumbokWinners || 0),
+      0
+    );
+
+    const firstDateSahod = firstDateItems.reduce(
+      (sum: number, item: any) => sum + (item.TotalSahodWinners || 0),
+      0
+    );
+    const secondDateSahod = secondDateItems.reduce(
+      (sum: number, item: any) => sum + (item.TotalSahodWinners || 0),
+      0
+    );
+
+    const firstDateRamble = firstDateItems.reduce(
+      (sum: number, item: any) => sum + (item.TotalRambleWinners || 0),
+      0
+    );
+    const secondDateRamble = secondDateItems.reduce(
+      (sum: number, item: any) => sum + (item.TotalRambleWinners || 0),
+      0
+    );
+
+    const firstDateCasas = firstDateItems.reduce(
+      (sum: number, item: any) => sum + (item.TotalCasasWinners || 0),
+      0
+    );
+    const secondDateCasas = secondDateItems.reduce(
+      (sum: number, item: any) => sum + (item.TotalCasasWinners || 0),
+      0
+    );
+
+    const result = {
       drawOrder,
-      firstDateTumbok: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
-        0
-      ),
-      secondDateTumbok: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Tumbok || 0),
-        0
-      ),
-      firstDateSahod: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
-        0
-      ),
-      secondDateSahod: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Sahod || 0),
-        0
-      ),
-      firstDateRamble: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
-        0
-      ),
-      secondDateRamble: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.BetTypes?.Ramble || 0),
-        0
-      ),
-      firstDateCasas: firstDateItems.reduce(
-        (sum: number, item: any) => sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
-        0
-      ),
-      secondDateCasas: secondDateItems.reduce(
-        (sum: number, item: any) => sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
-        0
-      ),
+      firstDateTumbok,
+      secondDateTumbok,
+      firstDateSahod,
+      secondDateSahod,
+      firstDateRamble,
+      secondDateRamble,
+      firstDateCasas,
+      secondDateCasas,
     };
+
+    return result;
   });
 };
 
@@ -331,43 +344,36 @@ export const processDurationChart2Data = (payload: any) => {
     return {
       drawOrder,
       firstRangeTumbok: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Tumbok || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
         0
       ),
       secondRangeTumbok: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Tumbok || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
         0
       ),
       firstRangeSahod: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Sahod || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0) / 10000),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Sahod || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0) / 10000),
         0
       ),
       firstRangeRamble: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Ramble || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0) / 10000),
         0
       ),
       secondRangeRamble: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Ramble || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0) / 10000),
         0
       ),
+      
       firstRangeCasas: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
         0
       ),
       secondRangeCasas: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
         0
       ),
     };
@@ -422,43 +428,36 @@ export const processDurationChart5Data = (payload: any) => {
     return {
       drawOrder,
       firstRangeTumbok: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Tumbok || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalTumbokWinners || 0),
         0
       ),
       secondRangeTumbok: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Tumbok || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalTumbokWinners || 0),
         0
       ),
       firstRangeSahod: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Sahod || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalSahodWinners || 0),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Sahod || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalSahodWinners || 0),
         0
       ),
       firstRangeRamble: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Ramble || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalRambleWinners || 0),
         0
       ),
       secondRangeRamble: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.BetTypes?.Ramble || 0),
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalRambleWinners || 0),
         0
       ),
+      
       firstRangeCasas: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
+        (sum: number, item: any) => sum + (item.TotalCasasWinners || 0),
         0
       ),
       secondRangeCasas: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) =>
-          sum + (item.TotalSaisCasas || 0) + (item.TotalTresCasas || 0),
+        (sum: number, item: any) => sum + (item.TotalCasasWinners || 0),
         0
       ),
     };
