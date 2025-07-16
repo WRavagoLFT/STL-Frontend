@@ -57,7 +57,7 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
             secondStart: formatDate(secondDurationFrom),
             secondEnd: formatDate(secondDurationTo),
             ...gameCategoryParam,
-          }
+          } 
         );
 
         if (resp?.data?.DrawOrder) {

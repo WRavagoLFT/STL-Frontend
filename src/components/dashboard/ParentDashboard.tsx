@@ -38,7 +38,7 @@ export const ParentDashboard = () => {
 
         const result: ApiResponse<WebDashboard> = await fetchWebDashboard({from: date, to: date});
 
-        console.log(result)
+        //console.log(result)
         if(!result.success) {
           console.error("Failed to fetch dashboard data:", result.message);
           setLoading(false);

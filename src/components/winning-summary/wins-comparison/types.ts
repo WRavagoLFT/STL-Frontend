@@ -15,6 +15,7 @@ export interface chartOne_Specific {
   TotalWinners: number;
   TotalPayoutAmount: number;
   //BetTypes: number;
+  DateOfWinningCombination: string;
 }
 
 export interface chartOne_Range {
@@ -48,6 +49,7 @@ export interface chartTwoFive_Range {
   BetTypes: { Tumbok: number; Sahod: number; Ramble: number };
   TotalWinners: number;
   TotalPayoutAmount: number;
+  DateOfWinningCombination: string;
 }
 
 export interface chartThreeSix_Range {
@@ -64,6 +66,7 @@ export interface chartThreeSix_Range {
   TotalWinners: number;
   TotalPayoutAmount: number;
   BetTypes: number;
+  DateOfWinningCombination: string;
 }
 
 export type Chart1Data = {

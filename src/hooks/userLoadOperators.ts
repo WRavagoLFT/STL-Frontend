@@ -11,7 +11,7 @@ export const fetchOperatorsData = async () => {
   } catch (error) {
     console.error("Error fetching operators:", error);
   }
-};
+};``
 
 export const fetchFormOptionsData = async () => {
   try {

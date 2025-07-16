@@ -6,23 +6,29 @@ export const processChart1Data = (
   payload: SpecificDatePayload,
   firstDate: string,
   secondDate: string,
-  //_datesMatch: (dateString1: string, dateString2: string) => boolean // not used
+  _datesMatch: (dateString1: string, dateString2: string) => boolean
 ) => {
   const drawItems = Array.isArray(payload.DrawOrder[0])
     ? payload.DrawOrder.flat()
     : payload.DrawOrder;
-
+    
   return drawOrders.map((drawOrder) => {
     const drawOrderItems = drawItems.filter(
       (item: any) => item.DrawOrder === drawOrder
     );
 
-    const [firstItem, secondItem] = drawOrderItems;
+    const firstItem = drawOrderItems.find((item) =>
+      _datesMatch(item.DateOfWinningCombination, firstDate)
+    );
 
-    const firstDateWinners = firstItem?.TotalWinners || 0;
-    const secondDateWinners = secondItem?.TotalWinners || 0;
-    const firstDateWinnings = firstItem?.TotalPayoutAmount || 0;
-    const secondDateWinnings = secondItem?.TotalPayoutAmount || 0;
+    const secondItem = drawOrderItems.find((item) =>
+      _datesMatch(item.DateOfWinningCombination, secondDate)
+    );
+
+    const firstDateWinners = firstItem?.TotalWinners ?? 0;
+    const secondDateWinners = secondItem?.TotalPayoutAmount ?? 0;
+    const firstDateWinnings = firstItem?.TotalWinners ?? 0;
+    const secondDateWinnings = secondItem?.TotalPayoutAmount ?? 0;
 
     return {
       drawOrder,
@@ -44,7 +50,8 @@ export const processChart2Data = (
     const allDrawItems = payload.DrawOrder.filter(
       (item: any) => item.DrawOrder === drawOrder
     );
-
+    console.log("Available drawOrderItems:", allDrawItems);
+    console.log("Looking for:", firstDate, secondDate);
     const firstDateItems = allDrawItems.filter((item: any) =>
       datesMatch(item.DateOfWinningCombination, firstDate)
     );
@@ -121,17 +128,20 @@ export const processChart3Data = (
           item.DrawOrder === drawOrder && item.GameCategory === category
       );
 
-      const firstItem = allItems[0];
-      const secondItem = allItems[1];
+      const firstItem = allItems.find((item) =>
+        _datesMatch(item.DateOfWinningCombination, firstDate)
+      );
+      const secondItem = allItems.find((item) =>
+        _datesMatch(item.DateOfWinningCombination, secondDate)
+      );
 
       const keyPrefix = category.replace(/\s+/g, "");
 
-      const firstValue = (firstItem?.TotalPayoutAmount || 0) / 100000;
-      const secondValue = (secondItem?.TotalPayoutAmount || 0) / 100000;
+      const firstValue = firstItem?.TotalPayoutAmount ?? 0;
+      const secondValue = secondItem?.TotalPayoutAmount ?? 0;
 
       result[`firstDate${keyPrefix}`] = firstValue;
       result[`secondDate${keyPrefix}`] = secondValue;
-      
     });
 
     return result;
@@ -253,6 +263,7 @@ export const processSpecificDatePayload = (
   firstDate: string,
   secondDate: string,
   datesMatch: (dateString1: string, dateString2: string) => boolean
+  //datesMatch
 ) => {
   if (!payload || !payload.DrawOrder) {
     console.warn("Invalid payload structure", payload, );
@@ -261,7 +272,7 @@ export const processSpecificDatePayload = (
 
   switch (urlParam) {
     case "1":
-      return processChart1Data(payload, firstDate, secondDate);
+      return processChart1Data(payload, firstDate, secondDate, datesMatch);
     case "2":
       return processChart2Data(payload, firstDate, secondDate, datesMatch);
     case "3":
@@ -366,25 +377,31 @@ export const processDurationChart2Data = (payload: any) => {
 export const processDurationChart3Data = (payload: any) => {
   const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
+  // Use safe fallback arrays to avoid TypeError
+  const firstRange = payload?.DrawOrder?.FirstRange ?? [];
+  const secondRange = payload?.DrawOrder?.SecondRange ?? [];
+
   return drawOrders.map((drawOrder) => {
     const result: any = { drawOrder };
 
     gameCategories.forEach((category) => {
-      const firstRangeItems = payload.DrawOrder.FirstRange.filter(
+      const firstRangeItems = firstRange.filter(
         (item: chartThreeSix_Range) =>
           item.DrawOrder === drawOrder && item.GameCategory === category
       );
-      const secondRangeItems = payload.DrawOrder.SecondRange.filter(
+
+      const secondRangeItems = secondRange.filter(
         (item: chartThreeSix_Range) =>
           item.DrawOrder === drawOrder && item.GameCategory === category
       );
 
       result[`firstRange${category.replace(/\s+/g, "")}`] = firstRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + item.TotalBetAmount,
+        (sum: number, item: chartThreeSix_Range) => sum + (item.TotalPayoutAmount ?? 0),
         0
       );
+
       result[`secondRange${category.replace(/\s+/g, "")}`] = secondRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + item.TotalBetAmount,
+        (sum: number, item: chartThreeSix_Range) => sum + (item.TotalPayoutAmount ?? 0),
         0
       );
     });
@@ -479,13 +496,8 @@ export const processDurationChart6Data = (payload: any) => {
 };
 
 export const processDurationPayload = (urlParam: string, payload: any) => {
-  if (
-    !payload ||
-    !payload.DrawOrder ||
-    !payload.DrawOrder.FirstRange ||
-    !payload.DrawOrder.SecondRange
-  ) {
-    console.warn("Invalid duration payload structure", payload);
+  if (!payload || !payload.DrawOrder) {
+    console.warn("Invalid payload structure", payload, );
     return [];
   }
 
