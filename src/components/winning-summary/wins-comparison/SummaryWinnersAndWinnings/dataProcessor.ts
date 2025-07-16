@@ -481,11 +481,11 @@ export const processDurationChart6Data = (payload: any) => {
       );
 
       result[`firstRange${category.replace(/\s+/g, "")}`] = firstRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + item.TotalBettors,
+        (sum: number, item: chartThreeSix_Range) => sum + item.TotalWinners,
         0
       );
       result[`secondRange${category.replace(/\s+/g, "")}`] = secondRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + item.TotalBettors,
+        (sum: number, item: chartThreeSix_Range) => sum + item.TotalWinners,
         0
       );
     });

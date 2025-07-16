@@ -264,32 +264,51 @@ export const processDurationChart1Data = (payload: { Region: RegionRangeData[] }
   });
 };
 
-
 export const processDurationChart2Data = (payload: RangePayload) => {
-  return philippineRegions.map((region) => {
-    const firstRangeItems = payload.Region.FirstRange.filter(
-      (item) => item.Region === region || item.Region === `Region ${region}`
-    );
-    const secondRangeItems = payload.Region.SecondRange.filter(
-      (item) => item.Region === region || item.Region === `Region ${region}`
-    );
+  return philippineRegions.map((regionName) => {
+    const regionBlock = payload.Region.find(
+      (r: any) =>
+        r.Region === regionName ||
+        r.RegionName === regionName ||
+        r.Region === `Region ${regionName}` ||
+        r.RegionName === `Region ${regionName}`
+    ) as { FirstRange?: any[]; SecondRange?: any[] };
+
+    const firstRangeItems = regionBlock?.FirstRange ?? [];
+    const secondRangeItems = regionBlock?.SecondRange ?? [];
 
     return {
-      region,
+      region: regionName,
       firstRangeTumbok: firstRangeItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
         0
       ),
       secondRangeTumbok: secondRangeItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
         0
       ),
       firstRangeSahod: firstRangeItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Sahod || 0),
+        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+        0
+      ),
+      firstRangeRamble: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        0
+      ),
+      secondRangeRamble: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        0
+      ),
+      firstRangeCasas: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+        0
+      ),
+      secondRangeCasas: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
         0
       ),
     };
@@ -299,25 +318,40 @@ export const processDurationChart2Data = (payload: RangePayload) => {
 export const processDurationChart3Data = (payload: RangePayload) => {
   const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-  return philippineRegions.map((region) => {
-    const result: any = { region };
+  return philippineRegions.map((regionName) => {
+    const result: any = { region: regionName };
+
+    // Find the region block from the payload
+    const regionBlock = payload.Region.find(
+      (r: any) =>
+        r.Region === regionName ||
+        r.RegionName === regionName ||
+        r.Region === `Region ${regionName}` ||
+        r.RegionName === `Region ${regionName}`
+    ) as {
+      FirstRange?: any[];
+      SecondRange?: any[];
+    };
+
+    const firstRange = regionBlock?.FirstRange ?? [];
+    const secondRange = regionBlock?.SecondRange ?? [];
 
     gameCategories.forEach((category) => {
-      const firstRangeItems = payload.Region.FirstRange.filter(
-        (item) =>
-          (item.Region === region || item.Region === `Region ${region}`) &&
-          item.GameCategory === category
+      const firstRangeItems = firstRange.filter(
+        (item: any) => item.GameCategory === category
       );
-      const secondRangeItems = payload.Region.SecondRange.filter(
-        (item) =>
-          (item.Region === region || item.Region === `Region ${region}`) &&
-          item.GameCategory === category
+      const secondRangeItems = secondRange.filter(
+        (item: any) => item.GameCategory === category
       );
 
-      result[`firstRange${category.replace(/\s+/g, "")}`] =
-        firstRangeItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0);
-      result[`secondRange${category.replace(/\s+/g, "")}`] =
-        secondRangeItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0);
+      result[`firstRange${category.replace(/\s+/g, "")}`] = firstRangeItems.reduce(
+        (sum: number, item: any) => sum + (item.TotalPayoutAmount || 0),
+        0
+      );
+      result[`secondRange${category.replace(/\s+/g, "")}`] = secondRangeItems.reduce(
+        (sum: number, item: any) => sum + (item.TotalPayoutAmount || 0),
+        0
+      );
     });
 
     return result;
@@ -325,16 +359,32 @@ export const processDurationChart3Data = (payload: RangePayload) => {
 };
 
 export const processDurationChart5Data = (payload: RangePayload) => {
-  return philippineRegions.map((region) => {
-    const firstRangeItems = payload.Region.FirstRange.filter(
-      (item) => item.Region === region || item.Region === `Region ${region}`
-    );
-    const secondRangeItems = payload.Region.SecondRange.filter(
-      (item) => item.Region === region || item.Region === `Region ${region}`
-    );
+  return philippineRegions.map((regionName) => {
+    const regionData = payload.Region.find((r: any) =>
+      r.Region === regionName ||
+      r.RegionName === regionName ||
+      r.Region === `Region ${regionName}` ||
+      r.RegionName === `Region ${regionName}`
+    ) as {
+      FirstRange?: {
+        TotalTumbokWinners?: number;
+        TotalSahodWinners?: number;
+        TotalRambleWinners?: number;
+        TotalCasasWinners?: number;
+      }[];
+      SecondRange?: {
+        TotalTumbokWinners?: number;
+        TotalSahodWinners?: number;
+        TotalRambleWinners?: number;
+        TotalCasasWinners?: number;
+      }[];
+    } | undefined;
+
+    const firstRangeItems = regionData?.FirstRange ?? [];
+    const secondRangeItems = regionData?.SecondRange ?? [];
 
     return {
-      region,
+      region: regionName,
       firstRangeTumbok: firstRangeItems.reduce(
         (sum, item) => sum + (item.TotalTumbokWinners || 0),
         0
@@ -349,6 +399,22 @@ export const processDurationChart5Data = (payload: RangePayload) => {
       ),
       secondRangeSahod: secondRangeItems.reduce(
         (sum, item) => sum + (item.TotalSahodWinners || 0),
+        0
+      ),
+      firstRangeRamble: firstRangeItems.reduce(
+        (sum, item) => sum + (item.TotalRambleWinners || 0),
+        0
+      ),
+      secondRangeRamble: secondRangeItems.reduce(
+        (sum, item) => sum + (item.TotalRambleWinners || 0),
+        0
+      ),
+      firstRangeCasas: firstRangeItems.reduce(
+        (sum, item) => sum + (item.TotalCasasWinners || 0),
+        0
+      ),
+      secondRangeCasas: secondRangeItems.reduce(
+        (sum, item) => sum + (item.TotalCasasWinners || 0),
         0
       ),
     };
@@ -384,22 +450,13 @@ export const processDurationChart6Data = (payload: RangePayload) => {
 };
 
 export const processDurationPayload = (urlParam: string, payload: any) => {
-  if (!payload) {
-    console.warn("Missing payload object", payload);
+  if (!payload || !payload.Region) {
+    console.warn("Missing payload or Region", payload);
     return [];
   }
 
   if (!Array.isArray(payload.Region)) {
     console.warn("Missing or invalid 'Region' property in payload", payload);
-    return [];
-  }
-
-  const hasMissingRange = payload.Region.some((region: { FirstRange: any; SecondRange: any; }) => 
-    !Array.isArray(region.FirstRange) || !Array.isArray(region.SecondRange)
-  );
-
-  if (hasMissingRange) {
-    console.warn("Some regions are missing 'FirstRange' or 'SecondRange'", payload.Region);
     return [];
   }
 

@@ -128,7 +128,7 @@ export const generateSeries = (
       );
     }
 
-    if (gameCategoryId === 3 || gameCategoryId === 4 || gameCategoryId == 0) {
+    if (gameCategoryId === 3 || gameCategoryId === 4) {
       // Add Ramble
       series.push(
         {
