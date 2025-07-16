@@ -65,7 +65,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
   ];
 
   const fetchData = useCallback(async () => {
-    console.log("🌀 Fetching chart data...");
+    console.log("Fetching chart data...");
     setLoading(true);
     try {
       const gameCategoryParam = getGameCategoryParam();
