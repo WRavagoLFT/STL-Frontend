@@ -1,5 +1,5 @@
 import React from "react";
-import { NetIncomePageProps } from "~/types/types";
+import { NetIncomePageProps } from "@/types/types";
 
 const NetAACIncomePage: React.FC<NetIncomePageProps> = ({
   netAmount,

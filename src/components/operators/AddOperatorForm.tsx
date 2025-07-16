@@ -7,11 +7,11 @@ import Select from "react-select";
 import { FormikProps, useFormik } from "formik";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
-import { operatorSchema } from "~/schemas/operatorSchema";
+import { operatorSchema } from "@/schemas/operatorSchema";
 import Swal from "sweetalert2";
-import { generateValidPassword } from "~/utils/passwordgenerate";
+import { generateValidPassword } from "@/utils/passwordgenerate";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { AddOperatorPayload } from "~/lib/api/operators/operators.service";
+import { AddOperatorPayload } from "@/lib/api/operators/operators.service";
 
 interface AddOperatorFormProps {
   title?: string;

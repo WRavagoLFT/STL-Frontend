@@ -1,13 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { ParentBettingSummary } from "./ParentBettingSummary";
+import BettingSummarySkeleton from "./BettingSummarySkeleton";
 import { fetchGameCategories } from "@/lib/api/gamecategories";
-import { AccessGuard } from "@/components/auth/AccessGuard";
-import { ParentWinningSummaryPage } from "@/components/winning-summary/ParentWinningSummary";
-import WinningSummarySkeleton from "@/components/winning-summary/WinningSummarySkeleton";
 
-// Normalize slug: "STL Swer 2" -> "stlswer2"
 const normalizeSlug = (text: string) =>
   text
     .replace(/Swer\s*2/gi, "Swer2")
@@ -18,16 +16,8 @@ const normalizeSlug = (text: string) =>
     .replace(/-/g, "")
     .replace(/[^\w]/g, "");
 
-interface PageProps {
-  params: {
-    mainSlug: string;
-  };
-}
-
-export default function WinningSummarySlugPage() {
+export default function ClientBettingSummary({ slug }: { slug: string }) {
   const router = useRouter();
-  const params = useParams();
-  const mainSlug = params?.mainSlug as string;
 
   const [category, setCategory] = useState<{
     GameCategoryId: number;
@@ -39,13 +29,13 @@ export default function WinningSummarySlugPage() {
   const [invalid, setInvalid] = useState(false);
 
   const fetchCategory = useCallback(async () => {
-    if (!mainSlug) return;
+    if (!slug) return;
 
     setLoading(true);
     const result = await fetchGameCategories();
 
     if (result.success && Array.isArray(result.data)) {
-      const normalizedSlug = normalizeSlug(mainSlug);
+      const normalizedSlug = normalizeSlug(slug);
 
       const matched = result.data.find((cat: any) => {
         const categorySlug = normalizeSlug(cat.GameCategory);
@@ -54,13 +44,13 @@ export default function WinningSummarySlugPage() {
 
       if (matched) {
         setCategory(matched);
-      } else if (mainSlug !== "dashboard") {
+      } else if (slug !== "dashboard") {
         setInvalid(true);
       }
     }
 
     setLoading(false);
-  }, [mainSlug]);
+  }, [slug]);
 
   useEffect(() => {
     fetchCategory();
@@ -73,17 +63,15 @@ export default function WinningSummarySlugPage() {
   }, [loading, invalid, router]);
 
   if (loading) {
-    return <WinningSummarySkeleton />;
+    return <BettingSummarySkeleton />;
   }
 
   if (invalid) return null;
 
   return (
-    <AccessGuard allowedUserTypes={[3, 4, 6]}>
-      <ParentWinningSummaryPage
-        gameCategoryId={category?.GameCategoryId || 0}
-        slug={mainSlug ?? ""}
-      />
-    </AccessGuard>
+    <ParentBettingSummary
+      gameCategoryId={category?.GameCategoryId || 0}
+      slug={slug}
+    />
   );
 }

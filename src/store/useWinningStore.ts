@@ -1,6 +1,5 @@
 import { create } from "zustand";
-import { fetchHistoricalRegion } from "~/lib/api/transactions";
-//import getTransactionsData from '~/utils/api/transactions/get.TransactionsData.service';
+import { fetchHistoricalRegion } from "@/lib/api/transactions";
 
 const getTodayDate = () => new Date().toISOString().slice(0, 10);
 const getYesterdayDate = () => {
@@ -71,7 +70,7 @@ export const useWinningStore = create<WinningStore>((set) => ({
   activeGameType: "",
   categoryFilter: "Total Winnings and Winners",
   dateFilter: "Specific Date",
-  firstDateSpecific: getTodayDate(),
+  firstDateSpecific: getYesterdayDate(),
   secondDateSpecific: getTodayDate(),
   firstDateDuration: null,
   secondDateDuration: null,

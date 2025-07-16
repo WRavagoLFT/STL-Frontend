@@ -3,17 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
-import TableWinningActivityToday from "~/components/winning-summary/WinningActivityTodayTable";
-import ChartWinnersvsWinningsSummary from "~/components/winning-summary/WinnersvsWinningsChart";
-import TableWinningSummary from "~/components/winning-summary/WinningSummaryTable";
-import ChartWinnersBetTypeSummary from "~/components/winning-summary/WinnerCountBetTypeChart";
-import WinningSummarySkeleton from "~/components/winning-summary/WinningSummarySkeleton";
-import { buttonStyles } from "~/styles/theme";
-import { useAuthStore } from "~/store/useAuthStore";
-import ChartWinnersSummary from "~/components/winning-summary/WinnerCountChart";
+import TableWinningActivityToday from "@/components/winning-summary/WinningActivityTodayTable";
+import ChartWinnersvsWinningsSummary from "@/components/winning-summary/WinnersvsWinningsChart";
+import TableWinningSummary from "@/components/winning-summary/WinningSummaryTable";
+import ChartWinnersBetTypeSummary from "@/components/winning-summary/WinnerCountBetTypeChart";
+import WinningSummarySkeleton from "@/components/winning-summary/WinningSummarySkeleton";
+import { buttonStyles } from "@/styles/theme";
+import { useAuthStore } from "@/store/useAuthStore";
+import ChartWinnersSummary from "@/components/winning-summary/WinnerCountChart";
 import Card from "../ui/dashboardcards/Cards";
-import { fetchHistoricalSummary } from "~/lib/api/transactions";
-import { fetchWinners } from "~/lib/api/winners";
+import { fetchHistoricalSummary } from "@/lib/api/transactions";
+import { fetchWinners } from "@/lib/api/winners";
 
 const GAME_TITLES = [
   "STL",

@@ -1,8 +1,8 @@
 import React from "react";
 import ModalWrapper from "../ui/modals/ModalWrapper";
 import UpdateUserForm from "./UpdateUserForm";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
-import { UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
+import { UpdateUserPayload, UsersItem } from "@/lib/api/users/users.service";
 
 type UpdateUserModalProps = {
   open?: boolean;

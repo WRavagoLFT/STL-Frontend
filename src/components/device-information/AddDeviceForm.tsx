@@ -7,9 +7,9 @@ import { toFormikValidationSchema } from "zod-formik-adapter";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import Swal from "sweetalert2";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
-import { addDeviceSchema } from "~/schemas/deviceSchema";
 import { getUsageNotes } from "./ParentDeviceView";
-import { AddDevicePayload } from "~/lib/api/device/device.service";
+import { AddDevicePayload } from "@/lib/api/device/device.service";
+import { addDeviceSchema } from "@/schemas/deviceSchema";
 
 interface AddDeviceFormProps {
   title?: string;
@@ -43,7 +43,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const openConfirmModal = () => setIsConfirmModalOpen(true);
   const closeConfirmModal = () => setIsConfirmModalOpen(false);
-  
+
   //console.log('USER ID FROM THE KABO/KUBRADOR PAGE', userid);
 
   const handleModalClose = () => {
@@ -85,12 +85,13 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
           confirmButtonColor: "#EF4444",
           cancelButtonColor: "#3B82F6",
           confirmButtonText: '<i class="fa fa-ban"></i> Yes, I did',
-          cancelButtonText: 'No, let me check',
+          cancelButtonText: "No, let me check",
           customClass: {
-            popup: 'bg-[#FFFFFF] text-black rounded-md',
-            title: 'text-lg font-semibold',
-            confirmButton: 'bg-[#0038A8] rounded-md text-white text-base hover:bg-blue-700 px-8 py-1',
-            cancelButton: 'bg-transparent px-4 text-base',
+            popup: "bg-[#FFFFFF] text-black rounded-md",
+            title: "text-lg font-semibold",
+            confirmButton:
+              "bg-[#0038A8] rounded-md text-white text-base hover:bg-blue-700 px-8 py-1",
+            cancelButton: "bg-transparent px-4 text-base",
           },
           buttonsStyling: false,
         });
@@ -104,7 +105,8 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
                 acc[key] = value;
               }
               return acc;
-            }, {} as { [key: string]: string | number | string[] }
+            },
+            {} as { [key: string]: string | number | string[] }
           );
 
           cleanedData.assignedUser = userid || 0;
@@ -117,10 +119,12 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
           console.log("User canceled confirmation dialog. Submission aborted.");
         }
       } catch (error) {
-        console.error("Unexpected error during submission confirmation flow:", error);
+        console.error(
+          "Unexpected error during submission confirmation flow:",
+          error
+        );
       }
     },
-
   });
 
   const getError = (field: string) =>
@@ -184,11 +188,11 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
             <CustomSelect
               name="usageNotes"
               options={usageNotesOptions}
-                 value={
-                   usageNotesOptions.find(
-                     (opt) => opt.value === formik.values.usageNotes?.toString()
-                   ) || null
-                 }
+              value={
+                usageNotesOptions.find(
+                  (opt) => opt.value === formik.values.usageNotes?.toString()
+                ) || null
+              }
               onChange={(e) => {
                 formik.setFieldValue("usageNotes", e.target.value);
               }}
@@ -212,9 +216,7 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
               disabled
               {...formik.getFieldProps("lastknownGPS")}
               error={
-                !!(
-                  formik.touched.lastknownGPS && formik.errors.lastknownGPS
-                )
+                !!(formik.touched.lastknownGPS && formik.errors.lastknownGPS)
               }
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
@@ -235,7 +237,8 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
               {...formik.getFieldProps("lastSyncTimestamp")}
               error={
                 !!(
-                  formik.touched.lastSyncTimestamp && formik.errors.lastSyncTimestamp
+                  formik.touched.lastSyncTimestamp &&
+                  formik.errors.lastSyncTimestamp
                 )
               }
             />
@@ -245,7 +248,10 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
           </div>
 
           <div>
-            <label htmlFor="unauthorizedLocationAlerts" className="block text-sm">
+            <label
+              htmlFor="unauthorizedLocationAlerts"
+              className="block text-sm"
+            >
               Unauthorized Location Alerts
             </label>
             <Input
@@ -257,7 +263,8 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
               {...formik.getFieldProps("unauthorizedLocationAlerts")}
               error={
                 !!(
-                  formik.touched.unauthorizedLocationAlerts && formik.errors.unauthorizedLocationAlerts
+                  formik.touched.unauthorizedLocationAlerts &&
+                  formik.errors.unauthorizedLocationAlerts
                 )
               }
             />
@@ -352,7 +359,12 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
               className="mt-1"
               disabled
               {...formik.getFieldProps("lastMaintenance")}
-              error={!!(formik.touched.lastMaintenance && formik.errors.lastMaintenance)}
+              error={
+                !!(
+                  formik.touched.lastMaintenance &&
+                  formik.errors.lastMaintenance
+                )
+              }
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("lastMaintenance") || "\u00A0"}
@@ -370,7 +382,12 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
               className="mt-1"
               disabled
               {...formik.getFieldProps("replacementHistory")}
-              error={!!(formik.touched.replacementHistory && formik.errors.replacementHistory)}
+              error={
+                !!(
+                  formik.touched.replacementHistory &&
+                  formik.errors.replacementHistory
+                )
+              }
             />
             <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
               {getError("replacementHistory") || "\u00A0"}
@@ -393,7 +410,10 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
             disabled
             {...formik.getFieldProps("applicationVersion")}
             error={
-              !!(formik.touched.applicationVersion && formik.errors.applicationVersion)
+              !!(
+                formik.touched.applicationVersion &&
+                formik.errors.applicationVersion
+              )
             }
           />
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
@@ -475,9 +495,9 @@ const AddDeviceForm: React.FC<AddDeviceFormProps> = ({
           mode="add"
           onConfirm={async () => {
             try {
-              await onSubmit(formData as unknown as AddDevicePayload); // submit from the parent component handled after password verification
-              closeConfirmModal(); // close confirm modal
-              if (onClose) onClose(); // optionally close the parent modal
+              await onSubmit(formData as unknown as AddDevicePayload);
+              closeConfirmModal();
+              if (onClose) onClose();
             } catch (err) {
               console.error("Error during onSubmit:", err);
             }

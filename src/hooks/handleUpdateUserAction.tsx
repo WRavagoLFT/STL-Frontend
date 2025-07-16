@@ -1,5 +1,5 @@
 import Swal from "sweetalert2";
-import { updateUser, UpdateUserPayload, UsersItem } from "~/lib/api/users/users.service";
+import { updateUser, UpdateUserPayload, UsersItem } from "@/lib/api/users/users.service";
 
 export const handleUpdateUser = async (
   data: UpdateUserPayload,

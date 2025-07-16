@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { fetchWinners } from "~/lib/api/winners";
+import { fetchWinners } from "@/lib/api/winners";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
-import { TransactionData } from "~/types/types";
-import { useAuthStore } from "~/store/useAuthStore";
+import { TransactionData } from "@/types/types";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const CustomLegend = () => (
   <div className="flex flex-row space-x-5 justify-start mt-1 mr-4">

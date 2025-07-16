@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
-import { useAuthStore } from "~/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const CustomLegend = () => (
   <div className="flex flex-row space-x-5 justify-start mt-1 mr-4">

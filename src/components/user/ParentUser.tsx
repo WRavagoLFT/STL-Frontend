@@ -1,21 +1,21 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
-import { useAuthStore } from "~/store/useAuthStore";
-import useUserRoleStore from "~/store/useUserStore";
-import { handleUpdateUser } from "~/hooks/handleUpdateUserAction";
-import { loadUsers } from "~/hooks/useLoadUsers";
-import DetailedTable from "~/components/ui/tables/DetailedTable";
-import AddUserModal from "~/components/user/AddUser";
-import UpdateUserModal from "~/components/user/UpdateUser";
-import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
-import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
-import { userTableColumns } from "~/config/userTableColumns";
-import { userEditColumns } from "~/config/userEditLogTableColumns";
+import { useAuthStore } from "@/store/useAuthStore";
+import useUserRoleStore from "@/store/useUserStore";
+import { handleUpdateUser } from "@/hooks/handleUpdateUserAction";
+import { loadUsers } from "@/hooks/useLoadUsers";
+import DetailedTable from "@/components/ui/tables/DetailedTable";
+import AddUserModal from "@/components/user/AddUser";
+import UpdateUserModal from "@/components/user/UpdateUser";
+import EditModalPage from "@/components/ui/modals/EditLogModalWrapper";
+import { UsersSkeletonPage } from "@/components/user/UsersSkeleton";
+import { userTableColumns } from "@/config/userTableColumns";
+import { userEditColumns } from "@/config/userEditLogTableColumns";
 import Swal from "sweetalert2";
-import { addUsers, AddUserPayload, suspendUser, UsersItem, editLogUser, UpdateUserPayload } from "~/lib/api/users/users.service";
-const ChartsDataPage = React.lazy(() => import("~/components/ui/charts/UserChartsData"));
-const CardsPage = React.lazy(() => import("~/components/user/CardsData"));
+import { addUsers, AddUserPayload, suspendUser, UsersItem, editLogUser, UpdateUserPayload } from "@/lib/api/users/users.service";
+const ChartsDataPage = React.lazy(() => import("@/components/ui/charts/UserChartsData"));
+const CardsPage = React.lazy(() => import("@/components/user/CardsData"));
 
 interface UsersPageProps {
   roleConfig: {

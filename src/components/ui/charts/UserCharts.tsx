@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { ChartCardProps } from "~/types/interfaces";
+import { ChartCardProps } from "@/types/interfaces";
 import GenericCSVExportButton from "../buttons/CSVExportButtonDashboard";
 
 const getLegendItems = (pageType: string) => {

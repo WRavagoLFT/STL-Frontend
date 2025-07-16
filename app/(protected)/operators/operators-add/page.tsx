@@ -1,5 +1,5 @@
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import ParentAddOperator from "~/components/operators/ParentAddOperator";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import ParentAddOperator from "@/components/operators/ParentAddOperator";
 
 export default function Page() {
   return (

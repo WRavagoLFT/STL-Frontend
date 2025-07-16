@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { fetchGameCategories } from "~/lib/api/gamecategories";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import WinningComparisonPage from "~/components/winning-summary/ParentWinningComparison";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import { fetchGameCategories } from "@/lib/api/gamecategories";
+import WinningComparisonPage from "@/components/winning-summary/ParentWinningComparison"
+import WinningSummarySkeleton from "@/components/winning-summary/WinningSummarySkeleton";
 
 const slugify = (text: string) =>
   text
@@ -69,7 +70,7 @@ export default function WinningComparisonSlugPageClient() {
   }, [loading, invalid]);
 
   if (loading)
-    return <div className="p-4 text-center text-gray-600">Loading...</div>;
+    return <WinningSummarySkeleton />;
   if (invalid) return null;
 
   return (

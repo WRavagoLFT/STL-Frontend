@@ -7,36 +7,36 @@ import React, {
   useState,
   Suspense,
 } from "react";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import PCSOTaxesPage from "~/components/retail-receipts/PCSOTaxes";
-import { useRetailReceiptProcessor } from "~/components/retail-receipts/useRetailReceiptProcessor";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import PCSOTaxesPage from "@/components/retail-receipts/PCSOTaxes";
+import { useRetailReceiptProcessor } from "@/components/retail-receipts/useRetailReceiptProcessor";
 import {
   fetchRetailReceiptsMetrics,
   fetchRetailReceiptsData,
-} from "~/lib/api/transactions";
+} from "@/lib/api/transactions";
 import Select, { ActionMeta, SingleValue } from "react-select";
 
-import RetailReceiptSkeleton from "~/components/retail-receipts/RetailReceiptSkeleton";
-import { ExportRetailDataToPDF } from "~/components/retail-receipts/ExportRetailDataToPdf";
-import ExportRetailDataToExcel from "~/components/retail-receipts/ExportReceiptsCSV";
+import RetailReceiptSkeleton from "@/components/retail-receipts/RetailReceiptSkeleton";
+import { ExportRetailDataToPDF } from "@/components/retail-receipts/ExportRetailDataToPdf";
+import ExportRetailDataToExcel from "@/components/retail-receipts/ExportReceiptsCSV";
 
 const ReceiptCardsPage = React.lazy(
-  () => import("~/components/retail-receipts/ReceiptsCardPage")
+  () => import("@/components/retail-receipts/ReceiptsCardPage")
 );
 const GrossAACSharePage = React.lazy(
-  () => import("~/components/retail-receipts/GrossAACShare")
+  () => import("@/components/retail-receipts/GrossAACShare")
 );
 const GrossPSCOSharePage = React.lazy(
-  () => import("~/components/retail-receipts/GrossPSCOShare")
+  () => import("@/components/retail-receipts/GrossPSCOShare")
 );
 const AACTaxesPage = React.lazy(
-  () => import("~/components/retail-receipts/ACCSTaxes")
+  () => import("@/components/retail-receipts/ACCSTaxes")
 );
 const NetAACIncomePage = React.lazy(
-  () => import("~/components/retail-receipts/NetAACIncome")
+  () => import("@/components/retail-receipts/NetAACIncome")
 );
 const NetPSCOIncomePage = React.lazy(
-  () => import("~/components/retail-receipts/NetPSCOIncome")
+  () => import("@/components/retail-receipts/NetPSCOIncome")
 );
 
 export type OptionType = {

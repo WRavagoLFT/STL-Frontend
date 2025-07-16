@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
-import { fetchHistoricalSummary } from "~/lib/api/transactions";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
-import { useAuthStore } from "~/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { fetchHistoricalSummary } from "@/lib/api/transactions";
 
 const getBetTypeSeries = (gameCategoryId?: number) => {
   switch (gameCategoryId) {

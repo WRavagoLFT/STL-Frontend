@@ -1,7 +1,7 @@
 // store/dashboardStore.ts
 import { create } from "zustand";
 import dayjs from "dayjs";
-import { ChartBarItem } from "~/types/interfaces";
+import { ChartBarItem } from "@/types/interfaces";
 
 export interface DashboardData {
   LastLogin?: string;

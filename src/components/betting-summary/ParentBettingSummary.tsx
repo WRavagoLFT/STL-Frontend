@@ -2,18 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import { Button } from "@mui/material";
-import TableBettingActivityToday from "~/components/betting-summary/BettingActivityTodayTable";
-import ChartBettorsvsBetsPlacedSummary from "~/components/betting-summary/BettorsvsBetsPlacedChart";
-import ChartBettorsSummary from "~/components/betting-summary/BettorCountChart";
-import TableBettingSummary from "~/components/betting-summary/BettingSummaryTable";
-import ChartBettorsBetTypeSummary from "~/components/betting-summary/BettorCountByBetType";
-import BettingSummarySkeleton from "~/components/betting-summary/BettingSummarySkeleton";
-import { buttonStyles } from "~/styles/theme";
-import { useAuthStore } from "~/store/useAuthStore";
 import { useRouter } from "next/navigation";
 import Card from "../ui/dashboardcards/Cards";
-import { fetchHistoricalSummary } from "~/lib/api/transactions";
-import { fetchWinners } from "~/lib/api/winners";
+import { useAuthStore } from "@/store/useAuthStore";
+import { fetchHistoricalSummary } from "@/lib/api/transactions";
+import { fetchWinners } from "@/lib/api/winners";
+import ChartBettorsvsBetsPlacedSummary from "./BettorsvsBetsPlacedChart";
+import ChartBettorsBetTypeSummary from "./BettorCountByBetType";
+import ChartBettorsSummary from "./BettorCountChart";
+import { buttonStyles } from "@/styles/theme";
+import BettingSummarySkeleton from "./BettingSummarySkeleton";
+import TableBettingActivityToday from "./BettingActivityTodayTable";
+import TableBettingSummary from "./BettingSummaryTable";
 
 const GAME_TITLES = ["STL", "STL Pares", "STL Swer 2", "STL Swer 3", "STL Swer 4"];
 

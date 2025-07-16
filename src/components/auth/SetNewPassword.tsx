@@ -3,11 +3,10 @@
 import React, { useState, useEffect } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoginSectionData } from "../../data/LoginSectionData";
-import { useRouter } from "next/router";
 import Swal from "sweetalert2";
 import { useAuthStore } from "../../store/useForgetAuthStore";
-import { updateForgottenPassword } from "~/lib/api/auth";
 import ActivityIndicator from "./ActivityIndicator";
+import { updateForgottenPassword } from "@/lib/api/auth/auth.service";
 
 const SetNewPassword = () => {
   const [credentials, setCredentials] = useState({

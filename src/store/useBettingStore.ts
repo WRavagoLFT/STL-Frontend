@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { fetchHistoricalRegion } from "~/lib/api/transactions";
+import { fetchHistoricalRegion } from "@/lib/api/transactions";
 
 const getTodayDate = () => new Date().toISOString().slice(0, 10);
 const getYesterdayDate = () => {

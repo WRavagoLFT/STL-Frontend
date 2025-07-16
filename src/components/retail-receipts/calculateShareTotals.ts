@@ -1,4 +1,4 @@
-import { Share } from "~/types/types";
+import { Share } from "@/types/types";
 
 export function processShares(
   data: any,

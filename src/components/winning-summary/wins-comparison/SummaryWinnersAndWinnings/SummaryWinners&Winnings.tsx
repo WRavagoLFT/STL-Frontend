@@ -7,9 +7,12 @@ import { WinnersandWinningsSummaryProps } from "../types";
 import {
   fetchCompareHistoricalWinnersDate,
   fetchCompareHistoricalWinnersRange,
-} from "~/lib/api/winners";
+} from "@/lib/api/winners";
 import { formatDate, getGameCategoryParam } from "../utils";
-import { processSpecificDatePayload, processDurationPayload } from "./dataProcessor";
+import {
+  processSpecificDatePayload,
+  processDurationPayload,
+} from "./dataProcessor";
 import { generateSeries } from "./seriesGenerator";
 import { CustomLegend } from "../CustomLegend";
 import { drawOrders, chartMap } from "../constant";
@@ -22,17 +25,51 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
   secondDateSpecific,
   firstDateDuration,
   secondDateDuration,
+  secondDurationFrom,
+  secondDurationTo,
 }) => {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
 
-  const urlParam = chartMap[categoryFilter];
+  const urlParam = chartMap[categoryFilter]; // now checked.
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const gameCategoryParam = getGameCategoryParam();
+      const gameCategoryParam = getGameCategoryParam(gameCategoryId);
+
+      console.log("DATE FILTER:", dateFilter);
+
+      // DATE DURATION HAS PRIORITY
       if (
+        dateFilter === "Date Duration" &&
+        firstDateDuration &&
+        secondDateDuration &&
+        secondDurationFrom &&
+        secondDurationTo
+      ) {
+        const resp = await fetchCompareHistoricalWinnersRange(
+          "/winners/compareHistoricalWinnersRange/chartType/",
+          urlParam,
+          {
+            firstStart: formatDate(firstDateDuration),
+            firstEnd: formatDate(secondDateDuration),
+            secondStart: formatDate(secondDurationFrom),
+            secondEnd: formatDate(secondDurationTo),
+            ...gameCategoryParam,
+          } 
+        );
+
+        if (resp?.data?.DrawOrder) {
+          const processed = processDurationPayload(urlParam, resp.data);
+          setChartData(processed);
+        } else {
+          console.warn("Unexpected payload (Date Duration):", resp);
+          setChartData([]);
+        }
+
+      // FALLBACK TO SPECIFIC DATE
+      } else if (
         dateFilter === "Specific Date" &&
         firstDateSpecific &&
         secondDateSpecific
@@ -46,52 +83,29 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
             ...gameCategoryParam,
           }
         );
+
         if (resp?.data?.DrawOrder) {
-          const processedData = processSpecificDatePayload(
+          const processed = processSpecificDatePayload(
             urlParam,
             resp.data,
             firstDateSpecific,
             secondDateSpecific,
-            (dateString1: string, dateString2: string) =>
-              formatDate(dateString1) === formatDate(dateString2)
+              (dateString1: string, dateString2: string) =>
+            formatDate(dateString1) === formatDate(dateString2)
           );
-          setChartData(processedData);
+          setChartData(processed);
         } else {
           console.warn("Unexpected payload (Specific Date):", resp);
           setChartData([]);
         }
-      } else if (
-        dateFilter === "Date Duration" &&
-        firstDateSpecific &&
-        secondDateSpecific &&
-        firstDateDuration &&
-        secondDateDuration
-      ) {
-        const resp = await fetchCompareHistoricalWinnersRange(
-          "/winners/compareHistoricalWinnersRange/chartType/",
-          urlParam,
-          {
-            firstStart: formatDate(firstDateSpecific),
-            firstEnd: formatDate(firstDateDuration),
-            secondStart: formatDate(secondDateSpecific),
-            secondEnd: formatDate(secondDateDuration),
-            ...gameCategoryParam,
-          }
-        );
 
-        if (resp?.data?.DrawOrder) {
-          const processedData = processDurationPayload(urlParam, resp.data);
-          setChartData(processedData);
-        } else {
-          console.warn("Unexpected payload (Date Duration):", resp);
-          setChartData([]);
-        }
+      // INVALID OR INCOMPLETE STATE
       } else {
         console.log("No valid condition met for data fetching.");
         setChartData([]);
       }
     } catch (err) {
-      console.error("Error fetching data:", err);
+      console.error("Error fetching chart data:", err);
       setChartData([]);
     } finally {
       setLoading(false);
@@ -102,6 +116,8 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
     secondDateSpecific,
     firstDateDuration,
     secondDateDuration,
+    secondDurationFrom,
+    secondDurationTo,
     urlParam,
     gameCategoryId,
   ]);
@@ -111,7 +127,7 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
   }, [fetchData]);
 
   return (
-    <div className="bg-transparent p-4 rounded-lg pb-8 w-full h-[511px] border border-[#7266C9]">
+    <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
       <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
         {`Summary of ${categoryFilter}`}
       </p>
@@ -123,42 +139,55 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
         secondDateSpecific={secondDateSpecific}
         firstDateDuration={firstDateDuration}
         secondDateDuration={secondDateDuration}
+        secondDurationFrom={null}
+        secondDurationTo={null}
       />
 
-      <div className="h-full flex flex-col flex-grow bg-transparent">
+      <div className="h-full w-full mt-4">
         {loading ? (
-          <div className="flex justify-center items-center h-screen">
+          <div className="flex justify-center items-center h-full">
             <CircularProgress />
           </div>
         ) : (
-          <BarChart
-            height={350}
-            grid={{ vertical: true }}
-            layout="horizontal"
-            margin={{ left: 90, right: 20, top: 20, bottom: 40 }}
-            series={generateSeries(
-              chartData,
-              urlParam,
-              dateFilter,
-              firstDateSpecific,
-              secondDateSpecific,
-              firstDateDuration,
-              secondDateDuration
-            )}
-            yAxis={[
-              {
-                scaleType: "band",
-                data: drawOrders.map((order) => `${order === 1 ? 'First' : order === 2 ? 'Second' : 'Third'} Draw`),
-              },
-            ]}
-            xAxis={[
-              {
-                label: "Amount (in 100,000 units)",
-                min: 0,
-              },
-            ]}
-            slotProps={{ legend: { hidden: true } }}
-          />
+          <div className="min-w-[1000px] md:min-w-[600px]">
+            <BarChart
+              height={350}
+              grid={{ vertical: true }}
+              layout="horizontal"
+              margin={{ left: 90, right: 20, top: 20, bottom: 20 }}
+              series={generateSeries(
+                chartData,
+                urlParam,
+                dateFilter,
+                firstDateSpecific,
+                secondDateSpecific,
+                firstDateDuration,
+                secondDateDuration
+              )}
+              yAxis={[
+                {
+                  scaleType: "band",
+                  data: drawOrders.map(
+                    (order) =>
+                      `${order === 1 ? "First" : order === 2 ? "Second" : "Third"} Draw`
+                  ),
+                },
+              ]}
+              xAxis={[
+                {
+                  label: "Total (x 100,000)",
+                  scaleType: "linear",
+                  min: 0,
+                  max: 1000,
+                  tickInterval: 50,
+                  valueFormatter: (value: number) => value.toString(),
+                  tickSize: 2,
+                  tickLabelProps: { style: { fontSize: "12px" } },
+                } as any,
+              ]}
+              slotProps={{ legend: { hidden: true } }}
+            />
+          </div>
         )}
       </div>
     </div>

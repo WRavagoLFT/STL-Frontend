@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
-import {
-  fetchHistoricalRegion,
-  fetchHistoricalSummary,
-} from "~/lib/api/transactions";
-import { historicalSummaryByRegionCategory } from "~/utils/transforms";
+
 import { FaDiceSix } from "react-icons/fa";
+import { fetchHistoricalRegion, fetchHistoricalSummary } from "@/lib/api/transactions";
+import { historicalSummaryByRegionCategory } from "@/utils/transforms";
 
 interface RegionData {
   Region: string;

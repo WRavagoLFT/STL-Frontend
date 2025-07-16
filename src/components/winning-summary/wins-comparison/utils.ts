@@ -14,6 +14,10 @@ export const getGameCategoryParam = (gameCategoryId?: number) => {
   return {};
 };
 
+// export const datesMatch = (dateString1: string, dateString2: string): boolean => {
+//   return formatDate(dateString1) === formatDate(dateString2);
+// };
+
 export const datesMatch = (dateString1: string, dateString2: string): boolean => {
   return formatDate(dateString1) === formatDate(dateString2);
 };

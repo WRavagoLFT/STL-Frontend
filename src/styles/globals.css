@@ -25,11 +25,6 @@ html, body {
   color: #CE1126 !important;
 }
 
-/* input {
-  background-color: transparent !important;
-  color: inherit;
-} */
-
 .custom-select__control {
   font-size: 0.875rem;
   padding: 2px;

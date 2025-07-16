@@ -1,24 +1,24 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import OperatorViewPage from "~/components/operators/UpdateOperatorForm";
-import RetailReceiptOperatorsPage from "~/components/operators/RetailReceipts";
-import BackIconButton from "~/components/ui/icons/BackButton";
+import OperatorViewPage from "@/components/operators/UpdateOperatorForm";
+import RetailReceiptOperatorsPage from "@/components/operators/RetailReceipts";
+import BackIconButton from "@/components/ui/icons/BackButton";
 import router, { useRouter } from "next/navigation";
-import EditModalPage from "~/components/ui/modals/EditLogModalWrapper";
-import { operatorEditColumns } from "~/config/operatorEditLogTableColumns";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import { fetchFormOptionsData } from "~/hooks/userLoadOperators";
+import EditModalPage from "@/components/ui/modals/EditLogModalWrapper";
+import { operatorEditColumns } from "@/config/operatorEditLogTableColumns";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import { fetchFormOptionsData } from "@/hooks/userLoadOperators";
 import Swal from "sweetalert2";
-import { useOperatorFormStore } from "~/store/useOperatorFormStore";
+import { useOperatorFormStore } from "@/store/useOperatorFormStore";
 import {
   OperatorsItem,
   updateOperator,
   UpdateOperatorPayload,
   editLogOperator,
-} from "~/lib/api/operators/operators.service";
+} from "@/lib/api/operators/operators.service";
 
-export interface OperatorViewPageProps {
+interface OperatorViewPageProps {
   slug: string;
   operator: OperatorsItem;
 }

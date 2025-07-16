@@ -1,18 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
-import { Branch } from "~/types/types";
+import { Branch } from "@/types/types";
 import Input from "../ui/inputs/TextInputs";
 import CustomSelect, { OptionType } from "../ui/inputs/SelectInputs";
 import { useFormik } from "formik";
-import { userSchema } from "~/schemas/userSchema";
+import { userSchema } from "@/schemas/userSchema";
 import ConfirmUserActionModalPage from "../ui/modals/ConfirmUserActionModal";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { generateValidPassword } from "~/utils/passwordgenerate";
+import { generateValidPassword } from "@/utils/passwordgenerate";
 import Swal from "sweetalert2";
-import { toFormikValidationSchema } from "~/utils/formikHelpers";
-import { AddUserPayload, UsersItem } from "~/lib/api/users/users.service";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
+import { toFormikValidationSchema } from "@/utils/formikHelpers";
+import { AddUserPayload, UsersItem } from "@/lib/api/users/users.service";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
 
 interface AddUserFormProps {
   title?: string;

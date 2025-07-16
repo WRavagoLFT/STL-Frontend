@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuthStore } from "~/store/useAuthStore";
-import { getCurrentUser } from "~/lib/api/auth";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter, usePathname } from "next/navigation";
-import axiosInstance from "~/lib/api/axiosInstance";
-import { UsersItem } from "~/lib/api/users/users.service";
+import axiosInstance from "@/lib/api/axiosInstance";
+import { UsersItem } from "@/lib/api/users/users.service";
+import { getCurrentUser } from "@/lib/api/auth/auth.service";
 
 export function useAuth() {
   const router = useRouter();

@@ -1,7 +1,7 @@
 import React from "react";
 import ModalWrapper from "../ui/modals/ModalWrapper";
-import { GameCombination } from "~/types/types";
 import AddGameCombinationForm from "./AddGameCombinationForm";
+import { GameCombination } from "@/types/types";
 
 type AddGameCombinationModalProps = {
   open: boolean;

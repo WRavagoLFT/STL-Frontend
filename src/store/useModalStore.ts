@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
-import { UsersItem } from "~/lib/api/users/users.service";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
+import { UsersItem } from "@/lib/api/users/users.service";
 
 type ModalType = "create" | "view" | "editlog" | "page" | null;
 

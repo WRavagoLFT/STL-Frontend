@@ -1,5 +1,5 @@
-import axiosInstance from "./axiosInstance";
-import { UsersItem } from "./users/users.service";
+import axiosInstance from "../axiosInstance";
+import { UsersItem } from "../users/users.service";
 
 // Utility to prevent accidental absolute URL usage
 const validateRelativeUrl = (url: string) => {

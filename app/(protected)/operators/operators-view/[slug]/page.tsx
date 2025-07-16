@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { fetchOperatorById } from "~/services/userService";
-import OperatorsView from "~/components/operators/OperatorsView";
-import { AccessGuard } from "~/components/auth/AccessGuard";
+import { fetchOperatorById } from "@/services/userService";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import OperatorsView from "@/components/operators/OperatorsView";
 
 export default function OperatorSlugClientPage() {
   const { slug } = useParams();

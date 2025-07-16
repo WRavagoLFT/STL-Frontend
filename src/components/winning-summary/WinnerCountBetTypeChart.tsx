@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
-import { fetchWinners } from "~/lib/api/winners";
-import { useAuthStore } from "~/store/useAuthStore";
+import { fetchWinners } from "@/lib/api/winners";
+import { useAuthStore } from "@/store/useAuthStore";
 
 // Define bet type series per GameCategory
 const getBetTypeSeries = (gameCategoryId?: number) => {

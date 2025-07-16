@@ -1,5 +1,7 @@
 "use client";
 
+import { devicesTableColumns } from "@/config/devicesTableColumns";
+import { DeviceItem, fetchDevices } from "@/lib/api/device/device.service";
 import router, { useRouter } from "next/navigation";
 import React, {
   useState,
@@ -8,11 +10,10 @@ import React, {
   useMemo,
   Suspense,
 } from "react";
-import Card from "~/components/ui/dashboardcards/Cards";
-import DetailedTable from "~/components/ui/tables/DetailedTable";
-import { UsersSkeletonPage } from "~/components/user/UsersSkeleton";
-import { devicesTableColumns } from "~/config/devicesTableColumns";
-import { DeviceItem, fetchDevices } from "~/lib/api/device/device.service";
+import { UsersSkeletonPage } from "../user/UsersSkeleton";
+import Card from "../ui/dashboardcards/Cards";
+import DetailedTable from "../ui/tables/DetailedTable";
+
 
 export interface DeviceInfoSummary {
   TotalDevices: number;

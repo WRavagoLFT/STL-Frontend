@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import UsersViewPage from "~/components/user/UsersViewPage";
-import { fetchUserById, UsersItem } from "~/lib/api/users/users.service";
+import { fetchUserById, UsersItem } from "@/lib/api/users/users.service";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import UsersViewPage from "@/components/user/UsersViewPage";
 
 const UserSlugPage = () => {
   const params = useParams();

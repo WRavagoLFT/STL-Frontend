@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { fetchGameCategories } from "~/lib/api/gamecategories";
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import ParentComparisonBetting from "~/components/betting-summary/ParentBettingComparison";
+import { fetchGameCategories } from "@/lib/api/gamecategories";
+import BettingSummarySkeleton from "@/components/betting-summary/BettingSummarySkeleton";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import ParentComparisonBetting from "@/components/betting-summary/ParentBettingComparison";
 
 const slugify = (text: string) =>
   text
@@ -62,7 +63,7 @@ export default function BettingComparisonSlugPageClient() {
     }
   }, [loading, invalid]);
 
-  if (loading) return <div className="p-4 text-center">Loading...</div>;
+  if (loading) return <BettingSummarySkeleton />;
   if (invalid) return null;
 
   return (

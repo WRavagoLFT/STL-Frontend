@@ -1,5 +1,5 @@
 import React from "react";
-import { CardProps } from "~/types/interfaces"; 
+import { CardProps } from "@/types/interfaces"; 
 
 export const Card = <T extends React.ReactNode>({ label, value, color, style }: CardProps<T>) => {
   return (

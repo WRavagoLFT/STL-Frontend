@@ -1,10 +1,10 @@
 "use client";
 
+import { useAuthStore } from "@/store/useAuthStore";
+import { useSideBarStore } from "@/store/useSideBarStore";
+import { useAuth } from "@/utils/useAuth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useAuthStore } from "~/store/useAuthStore";
-import { useAuth } from "~/utils/useAuth";
-import { useSideBarStore } from "~/store/useSideBarStore";
 
 interface AccessGuardProps {
   allowedUserTypes: number[];

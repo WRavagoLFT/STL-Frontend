@@ -1,5 +1,5 @@
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import { ParentRetailReceipt } from "~/components/retail-receipts/ParentRetailReceipts";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import { ParentRetailReceipt } from "@/components/retail-receipts/ParentRetailReceipts";
 
 export default function Page() {
   return (

@@ -11,12 +11,12 @@ import {
 } from "react-icons/fa";
 import { SortableTableCell } from "../../../utils/sortPaginationSearch";
 import { DetailedTableProps } from "../../../types/interfaces";
-import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
+import { Transactions } from "@/components/betting-summary/BettingSummaryTable";
 import CSVExportButtonTable from "../buttons/CSVExportButtonTable";
 import {
   filterDataEditLog,
   sortDataEditLog,
-} from "~/utils/sortPaginationSearch";
+} from "@/utils/sortPaginationSearch";
 
 const EditLogsTablePage = <T extends Transactions>({
   data,

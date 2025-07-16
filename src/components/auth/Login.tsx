@@ -6,7 +6,7 @@ import { LoginSectionData } from "../../data/LoginSectionData";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import ActivityIndicator from "./ActivityIndicator";
-import { loginUser } from "~/lib/api/login";
+import { loginUser } from "@/lib/api/login";
 
 const loginSchema = z.object({
   email: z

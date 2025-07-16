@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { FaDiceSix } from "react-icons/fa";
-import { fetchWinners } from "~/lib/api/winners";
+import { fetchWinners } from "@/lib/api/winners";
 import { CircularProgress } from "@mui/material";
 
 interface RegionData {

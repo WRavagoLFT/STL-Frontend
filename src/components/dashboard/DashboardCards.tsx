@@ -27,13 +27,13 @@ const DashboardCardsPage = ({
   });
 
   useEffect(() => {
-    console.log("Setting Dashboard Data:", {
-      totalBettors,
-      totalWinners,
-      totalBetsPlaced,
-      totalPayout,
-      totalRevenue,
-    });
+    // console.log("Setting Dashboard Data:", {
+    //   totalBettors,
+    //   totalWinners,
+    //   totalBetsPlaced,
+    //   totalPayout,
+    //   totalRevenue,
+    // });
     setDashboardData({
       totalBettors: totalBettors,
       totalWinners: totalWinners,

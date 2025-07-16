@@ -1,8 +1,8 @@
 import dayjs from "dayjs";
-import { Column } from "~/types/interfaces";
+import { Column } from "@/types/interfaces";
 import Button from "@mui/material/Button";
-import { getUserStatus } from "~/hooks/dashboarddata";
-import { DeviceItem } from "~/lib/api/device/device.service";
+import { getUserStatus } from "@/hooks/dashboarddata";
+import { DeviceItem } from "@/lib/api/device/device.service";
 
 export const devicesTableColumns = (): Column<DeviceItem>[] => [
   {

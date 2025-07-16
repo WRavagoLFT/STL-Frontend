@@ -3,8 +3,8 @@
 // It takes in props for the dashboard data, role label, text label, and card data
 
 import React from "react";
-import { CardsPageProps } from "~/types/interfaces";
-import { getUserStatus } from "~/hooks/dashboarddata";
+import { CardsPageProps } from "@/types/interfaces";
+import { getUserStatus } from "@/hooks/dashboarddata";
 import dayjs from "dayjs";
 import Card from "../ui/dashboardcards/Cards";
 

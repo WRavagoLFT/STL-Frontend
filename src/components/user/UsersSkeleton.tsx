@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuthStore } from "~/store/useAuthStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface SkeletonCardProps {
   height?: string | number;

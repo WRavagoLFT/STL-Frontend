@@ -12,6 +12,10 @@ export interface chartOne_Specific {
   TotalTumbok: number;
   TotalSahod: number;
   TotalRamble: number;
+  TotalWinners: number;
+  TotalPayoutAmount: number;
+  //BetTypes: number;
+  DateOfWinningCombination: string;
 }
 
 export interface chartOne_Range {
@@ -21,10 +25,12 @@ export interface chartOne_Range {
   TotalBets: number;
   TotalBetAmount: number;
   TotalBettors: number;
-  TotalTumbok: number;
-  TotalSahod: number;
+  TotalTumbok?: number;
+  TotalSahod?: number;
   TotalRamble: number;
   DateRange: { start: string; end: string };
+  TotalWinners: number;
+  TotalPayoutAmount: number;
 }
 
 export interface chartTwoFive_Range {
@@ -41,6 +47,9 @@ export interface chartTwoFive_Range {
   TotalRamble: number;
   DateRange: { start: string; end: string };
   BetTypes: { Tumbok: number; Sahod: number; Ramble: number };
+  TotalWinners: number;
+  TotalPayoutAmount: number;
+  DateOfWinningCombination: string;
 }
 
 export interface chartThreeSix_Range {
@@ -54,6 +63,10 @@ export interface chartThreeSix_Range {
   TotalSahod: number;
   TotalRamble: number;
   DateRange: { start: string; end: string };
+  TotalWinners: number;
+  TotalPayoutAmount: number;
+  BetTypes: number;
+  DateOfWinningCombination: string;
 }
 
 export type Chart1Data = {
@@ -153,6 +166,7 @@ export interface RegionRangeData {
 
 export interface RangePayload {
   Region: {
+    find(arg0: (item: { RegionName: string; }) => boolean): unknown;
     FirstRange: RegionRangeData[];
     SecondRange: RegionRangeData[];
   };

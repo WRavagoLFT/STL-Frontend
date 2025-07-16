@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { fetchTransactions } from "~/lib/api/transactions";
-import { bettingTableColumns } from "~/config/bettingTableColumns";
 import ReadOnlyTablePage from "../ui/tables/ReadOnlyTable";
-import useDetailTableStore from "~/store/useTableStore";
+import { bettingTableColumns } from "@/config/bettingTableColumns";
+import useDetailTableStore from "@/store/useTableStore";
+import { fetchTransactions } from "@/lib/api/transactions";
 
 export interface Transactions {
   transactionNumber: string;

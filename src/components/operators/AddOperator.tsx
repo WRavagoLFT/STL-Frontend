@@ -1,6 +1,6 @@
 import React from "react";
 import AddOperatorForm from "./AddOperatorForm";
-import { AddOperatorPayload } from "~/lib/api/operators/operators.service";
+import { AddOperatorPayload } from "@/lib/api/operators/operators.service";
 
 type AddOperatorPageProps = {
   onClose?: () => void;

@@ -1,5 +1,5 @@
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import { ParentDevicePage } from "~/components/device-information/ParentDevice";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import { ParentDevicePage } from "@/components/device-information/ParentDevice";
 
 export default function Page() {
   return (

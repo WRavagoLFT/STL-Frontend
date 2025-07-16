@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
 const MonthSummaryPage = React.lazy(
-  () => import("~/components/draw-summary/MonthSummary")
+  () => import("@/components/draw-summary/MonthSummary")
 );
 
 const FirstSummaryPage = React.lazy(
-  () => import("~/components/draw-summary/FirstSummary")
+  () => import("@/components/draw-summary/FirstSummary")
 );
 
 const DrawListSummaryPage = (data: {

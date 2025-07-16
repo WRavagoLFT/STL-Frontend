@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { OperatorsItem } from '~/lib/api/operators/operators.service';
+import { OperatorsItem } from '@/lib/api/operators/operators.service';
 
 interface SortConfig<T> {
   key: string;

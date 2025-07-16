@@ -1,4 +1,4 @@
-import { DeviceItem, fetchDeviceById } from "~/lib/api/device/device.service";
+import { DeviceItem, fetchDeviceById } from "@/lib/api/device/device.service";
 
 export const fetchAndSetDevice = async (
   slug: string,

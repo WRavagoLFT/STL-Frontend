@@ -1,8 +1,8 @@
 import { z, ZodSchema } from "zod";
 import { Share } from "./types";
-import { userSchema } from "~/schemas/userSchema";
+import { userSchema } from "@/schemas/userSchema";
 import { MultiValue } from "react-select";
-import { OperatorsItem } from "~/lib/api/operators/operators.service";
+import { OperatorsItem } from "@/lib/api/operators/operators.service";
 
 export interface ApiResponse<T> {
   success: boolean;

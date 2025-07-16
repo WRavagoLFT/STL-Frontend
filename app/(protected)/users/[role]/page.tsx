@@ -1,7 +1,7 @@
 "use client";
 
-import { AccessGuard } from "~/components/auth/AccessGuard";
-import UsersPage from "~/components/user/ParentUser";
+import { AccessGuard } from "@/components/auth/AccessGuard";
+import UsersPage from "@/components/user/ParentUser";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 

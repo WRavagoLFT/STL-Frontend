@@ -1,9 +1,9 @@
 import React from "react";
 import dayjs from "dayjs";
 import Button from "@mui/material/Button";
-import { getUserStatus } from "~/hooks/dashboarddata";
-import { Column } from "~/types/interfaces";
-import { UsersItem } from "~/lib/api/users/users.service";
+import { getUserStatus } from "@/hooks/dashboarddata";
+import { Column } from "@/types/interfaces";
+import { UsersItem } from "@/lib/api/users/users.service";
 
 export const userTableColumns = (roleId: number): Column<UsersItem>[] => {
   const columns: Column<UsersItem>[] = [

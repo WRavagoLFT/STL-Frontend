@@ -1,5 +1,5 @@
-import { GameCombination } from '~/types/types';
-import axios, { AxiosError } from 'axios'; // Import AxiosError for better typing
+import { GameCombination } from '@/types/types';
+import axios, { AxiosError } from 'axios';
 import axiosInstance from './axiosInstance';
 
 const validateRelativeUrl = (url: string) => {

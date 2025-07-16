@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import Button from "@mui/material/Button";
-import { Column } from "~/types/interfaces";
-import { Transactions } from "~/components/betting-summary/BettingSummaryTable";
+import { Column } from "@/types/interfaces";
+import { Transactions } from "@/components/betting-summary/BettingSummaryTable";
 
 export const winningTableColumns = (): Column<Transactions>[] => [
   {

@@ -2,16 +2,15 @@
 
 import React, { useMemo, useState } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import BackIconButton from "~/components/ui/icons/BackButton";
-import { useRouter } from "next/navigation";
-import { categoryType, useWinningStore } from "~/store/useWinningStore";
-import ChartWinnersandWinningsSummary from "~/components/winning-summary/wins-comparison/SummaryWinnersAndWinnings/SummaryWinners&Winnings";
-import ChartWinnersandWinningsRegionalSummary from "~/components/winning-summary/wins-comparison/RegionalSummaryWinnersAndWinnings/RegionalSummaryWinners&Winnings";
-import ChartTopRegionByWinsandWinners from "~/components/winning-summary/wins-comparison/TopRegionWinning";
-import { AccessGuard } from "~/components/auth/AccessGuard";
 import dayjs from "dayjs";
 import Swal from "sweetalert2";
-
+import { categoryType, useWinningStore } from "@/store/useWinningStore";
+import { useRouter } from "next/navigation";
+import { AccessGuard } from "../auth/AccessGuard";
+import BackIconButton from "../ui/icons/BackButton";
+import ChartTopRegionByWinsandWinners from "./wins-comparison/TopRegionWinning";
+import ChartWinnersandWinningsSummary from "@/components/winning-summary/wins-comparison/SummaryWinnersAndWinnings/SummaryWinners&Winnings"
+import ChartWinnersandWinningsRegionalSummary from "@/components/winning-summary/wins-comparison/RegionalSummaryWinnersAndWinnings/RegionalSummaryWinners&Winnings"
 type dateType = "Specific Date" | "Date Duration";
 
 const ParentWinningComparison = ({
@@ -146,7 +145,6 @@ const ParentWinningComparison = ({
           </h1>
         </div>
         <div className="mt-8 space-y-4">
-          {/* First Row: Filters */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
               <label
@@ -196,8 +194,6 @@ const ParentWinningComparison = ({
               />
             </div>
           </div>
-
-          {/* Specific Date Inputs */}
           {dateFilter === "Specific Date" && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col">
@@ -237,8 +233,6 @@ const ParentWinningComparison = ({
               </div>
             </div>
           )}
-
-          {/* Date Duration Inputs */}
           {dateFilter === "Date Duration" && (
             <div className="grid grid-cols-12 gap-4">
               <div className="col-span-12 md:col-span-3 flex flex-col">

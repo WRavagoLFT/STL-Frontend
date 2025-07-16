@@ -1,4 +1,4 @@
-import { RegionSpecificData, RegionRangeData, RangePayload } from "../types";
+import { RegionSpecificData, RangePayload } from "../types";
 import { philippineRegions } from "../constant";
 
 export const processChart1Data = (
@@ -199,7 +199,7 @@ export const processSpecificDatePayload = (
   datesMatch: (dateString1: string, dateString2: string) => boolean
 ) => {
   if (!payload || !payload.Region) {
-    console.warn("Invalid payload structure", payload);
+    //console.warn("Invalid payload structure", payload);
     return [];
   }
 
@@ -215,41 +215,45 @@ export const processSpecificDatePayload = (
     case "6":
       return processChart6Data(payload, firstDate, secondDate, datesMatch);
     default:
-      console.warn("Unknown urlParam:", urlParam);
+      //console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };
 
-export const processDurationChart1Data = (payload: RangePayload) => {
-  return philippineRegions.map((region) => {
-    const firstRangeItems = payload.Region.FirstRange.filter(
-      (item) => item.Region === region || item.Region === `Region ${region}`
-    );
-    const secondRangeItems = payload.Region.SecondRange.filter(
-      (item) => item.Region === region || item.Region === `Region ${region}`
-    );
+interface RegionRangeData {
+  RegionName: string;
+  FirstRange: { TotalWinners?: number; TotalPayoutAmount?: number }[];
+  SecondRange: { TotalWinners?: number; TotalPayoutAmount?: number }[];
+}
+export const processDurationChart1Data = (payload: { Region: RegionRangeData[] }) => {
+  return payload.Region.map((regionData) => {
+    const region = regionData.RegionName || "Unknown Region";
+
+    const firstRangeItems = regionData.FirstRange || [];
+    const secondRangeItems = regionData.SecondRange || [];
 
     return {
       region,
       firstRangeWinners: firstRangeItems.reduce(
-        (sum, item) => sum + item.TotalWinners,
+        (sum, item) => sum + (item.TotalWinners || 0),
         0
       ),
       secondRangeWinners: secondRangeItems.reduce(
-        (sum, item) => sum + item.TotalWinners,
+        (sum, item) => sum + (item.TotalWinners || 0),
         0
       ),
       firstRangeWinnings: firstRangeItems.reduce(
-        (sum, item) => sum + item.TotalPayoutAmount,
+        (sum, item) => sum + (item.TotalPayoutAmount || 0),
         0
       ),
       secondRangeWinnings: secondRangeItems.reduce(
-        (sum, item) => sum + item.TotalPayoutAmount,
+        (sum, item) => sum + (item.TotalPayoutAmount || 0),
         0
       ),
     };
   });
 };
+
 
 export const processDurationChart2Data = (payload: RangePayload) => {
   return philippineRegions.map((region) => {
@@ -370,13 +374,22 @@ export const processDurationChart6Data = (payload: RangePayload) => {
 };
 
 export const processDurationPayload = (urlParam: string, payload: any) => {
-  if (
-    !payload ||
-    !payload.Region ||
-    !payload.Region.FirstRange ||
-    !payload.Region.SecondRange
-  ) {
-    console.warn("Invalid duration payload structure", payload);
+  if (!payload) {
+    console.warn("Missing payload object", payload);
+    return [];
+  }
+
+  if (!Array.isArray(payload.Region)) {
+    console.warn("Missing or invalid 'Region' property in payload", payload);
+    return [];
+  }
+
+  const hasMissingRange = payload.Region.some((region: { FirstRange: any; SecondRange: any; }) => 
+    !Array.isArray(region.FirstRange) || !Array.isArray(region.SecondRange)
+  );
+
+  if (hasMissingRange) {
+    console.warn("Some regions are missing 'FirstRange' or 'SecondRange'", payload.Region);
     return [];
   }
 
@@ -392,7 +405,7 @@ export const processDurationPayload = (urlParam: string, payload: any) => {
     case "6":
       return processDurationChart6Data(payload);
     default:
-      console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };
+

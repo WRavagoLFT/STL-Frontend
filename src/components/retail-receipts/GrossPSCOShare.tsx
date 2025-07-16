@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ShareBreakdownPageProps } from "~/types/interfaces";
+import { ShareBreakdownPageProps } from "@/types/interfaces";
 
 const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
   totalPercentage,
