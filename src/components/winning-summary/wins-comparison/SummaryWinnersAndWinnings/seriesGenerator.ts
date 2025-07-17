@@ -47,7 +47,7 @@ export const generateSeries = (
         color: "#A06FE6",
       },
     ];
-  } else if (urlParam === "2" || urlParam === "5") {
+  } else if (urlParam === "2" || urlParam === "6") {
     return [
       {
         data: chartData.map((item: any) =>
@@ -92,7 +92,7 @@ export const generateSeries = (
         color: "#EAA9FA",
       },
     ];
-    } else if (urlParam === "3" || urlParam === "6") {
+    } else if (urlParam === "3") {
     const gameCategories = ["STLPares", "STLSwer2", "STLSwer3", "STLSwer4"];
     return gameCategories.flatMap((category) => [
       {

@@ -148,60 +148,7 @@ export const processChart3Data = (
 };
 
 export const processChart6Data = (
-  payload: SpecificDatePayload,
-  firstDate: string,
-  secondDate: string,
-  datesMatch: (dateString1: string, dateString2: string) => boolean
-) => {
-  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
-
-  console.log("Raw DrawOrder payload:", payload.DrawOrder);
-  console.log("Comparing dates:", firstDate, "vs", secondDate);
-
-  return drawOrders.map((drawOrder) => {
-    const result: any = { drawOrder };
-
-    console.log(`\n Processing DrawOrder: ${drawOrder}`);
-
-    gameCategories.forEach((category) => {
-      const allItems = payload.DrawOrder.filter(
-        (item: any) =>
-          item.DrawOrder === drawOrder && item.GameCategory === category
-      );
-
-      const firstDateItems = allItems.filter((item: any) =>
-        datesMatch(item.DateOfWinningCombination, firstDate)
-      );
-      const secondDateItems = allItems.filter((item: any) =>
-        datesMatch(item.DateOfWinningCombination, secondDate)
-      );
-
-      const firstTotal = firstDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalWinnners,
-        0
-      );
-      const secondTotal = secondDateItems.reduce(
-        (sum: number, item: any) => sum + item.TotalWinnners,
-        0
-      );
-
-      result[`firstDate${category.replace(/\s+/g, "")}`] = firstTotal;
-      result[`secondDate${category.replace(/\s+/g, "")}`] = secondTotal;
-
-      console.log(`Category: ${category}`);
-      console.log(`FirstDate Items (${firstDate}):`, firstDateItems);
-      console.log(`Total Bettors (FirstDate):`, firstTotal);
-      console.log(`SecondDate Items (${secondDate}):`, secondDateItems);
-      console.log(`Total Bettors (SecondDate):`, secondTotal);
-    });
-
-    console.log("Final Result for drawOrder:", result);
-    return result;
-  });
-};
-
-export const processChart5Data = (
-  payload: SpecificDatePayload,
+payload: SpecificDatePayload,
   firstDate: string,
   secondDate: string,
   datesMatch: (dateString1: string, dateString2: string) => boolean
@@ -268,6 +215,60 @@ export const processChart5Data = (
 
     return result;
   });
+};
+
+export const processChart5Data = (
+  payload: SpecificDatePayload,
+  firstDate: string,
+  secondDate: string,
+  datesMatch: (dateString1: string, dateString2: string) => boolean
+) => {
+  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
+
+  console.log("Raw DrawOrder payload:", payload.DrawOrder);
+  console.log("Comparing dates:", firstDate, "vs", secondDate);
+
+  return drawOrders.map((drawOrder) => {
+    const result: any = { drawOrder };
+
+    console.log(`\n Processing DrawOrder: ${drawOrder}`);
+
+    gameCategories.forEach((category) => {
+      const allItems = payload.DrawOrder.filter(
+        (item: any) =>
+          item.DrawOrder === drawOrder && item.GameCategory === category
+      );
+
+      const firstDateItems = allItems.filter((item: any) =>
+        datesMatch(item.DateOfWinningCombination, firstDate)
+      );
+      const secondDateItems = allItems.filter((item: any) =>
+        datesMatch(item.DateOfWinningCombination, secondDate)
+      );
+
+      const firstTotal = firstDateItems.reduce(
+        (sum: number, item: any) => sum + item.TotalWinnners,
+        0
+      );
+      const secondTotal = secondDateItems.reduce(
+        (sum: number, item: any) => sum + item.TotalWinnners,
+        0
+      );
+
+      result[`firstDate${category.replace(/\s+/g, "")}`] = firstTotal;
+      result[`secondDate${category.replace(/\s+/g, "")}`] = secondTotal;
+
+      console.log(`Category: ${category}`);
+      console.log(`FirstDate Items (${firstDate}):`, firstDateItems);
+      console.log(`Total Bettors (FirstDate):`, firstTotal);
+      console.log(`SecondDate Items (${secondDate}):`, secondDateItems);
+      console.log(`Total Bettors (SecondDate):`, secondTotal);
+    });
+
+    console.log("Final Result for drawOrder:", result);
+    return result;
+  });
+
 };
 
 export const processSpecificDatePayload = (
@@ -464,33 +465,52 @@ export const processDurationChart5Data = (payload: any) => {
   });
 };
 
+// WINNERS BY BET TYPE = 6
 export const processDurationChart6Data = (payload: any) => {
-  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
-
   return drawOrders.map((drawOrder) => {
-    const result: any = { drawOrder };
+    const firstRangeItems = payload.DrawOrder.FirstRange.filter(
+      (item: chartTwoFive_Range) => item.DrawOrder === drawOrder
+    );
+    const secondRangeItems = payload.DrawOrder.SecondRange.filter(
+      (item: chartTwoFive_Range) => item.DrawOrder === drawOrder
+    );
 
-    gameCategories.forEach((category) => {
-      const firstRangeItems = payload.DrawOrder.FirstRange.filter(
-        (item: chartThreeSix_Range) =>
-          item.DrawOrder === drawOrder && item.GameCategory === category
-      );
-      const secondRangeItems = payload.DrawOrder.SecondRange.filter(
-        (item: chartThreeSix_Range) =>
-          item.DrawOrder === drawOrder && item.GameCategory === category
-      );
-
-      result[`firstRange${category.replace(/\s+/g, "")}`] = firstRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + item.TotalWinners,
+    return {
+      drawOrder,
+      firstRangeTumbok: firstRangeItems.reduce(
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalTumbokWinners || 0),
         0
-      );
-      result[`secondRange${category.replace(/\s+/g, "")}`] = secondRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + item.TotalWinners,
+      ),
+      secondRangeTumbok: secondRangeItems.reduce(
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalTumbokWinners || 0),
         0
-      );
-    });
-
-    return result;
+      ),
+      firstRangeSahod: firstRangeItems.reduce(
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalSahodWinners || 0),
+        0
+      ),
+      secondRangeSahod: secondRangeItems.reduce(
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalSahodWinners || 0),
+        0
+      ),
+      firstRangeRamble: firstRangeItems.reduce(
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalRambleWinners || 0),
+        0
+      ),
+      secondRangeRamble: secondRangeItems.reduce(
+        (sum: number, item: chartTwoFive_Range) => sum + (item.TotalRambleWinners || 0),
+        0
+      ),
+      
+      firstRangeCasas: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + (item.TotalCasasWinners || 0),
+        0
+      ),
+      secondRangeCasas: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + (item.TotalCasasWinners || 0),
+        0
+      ),
+    };
   });
 };
 
@@ -499,7 +519,6 @@ export const processDurationPayload = (urlParam: string, payload: any) => {
     console.warn("Invalid payload structure", payload, );
     return [];
   }
-
   switch (urlParam) {
     case "1":
       return processDurationChart1Data(payload);
@@ -512,7 +531,7 @@ export const processDurationPayload = (urlParam: string, payload: any) => {
     case "6":
       return processDurationChart6Data(payload);
     default:
-      //console.warn("Unknown urlParam:", urlParam);
+      console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };

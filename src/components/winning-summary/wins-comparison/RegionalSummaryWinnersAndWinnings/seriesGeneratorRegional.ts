@@ -67,7 +67,7 @@ export const generateSeries = (
           `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeWinnings' : 'secondDateWinnings'] || 0)).toLocaleString()}`,
       },
     ];
-  } else if (urlParam === "2" || urlParam === "5") {
+  } else if (urlParam === "2" || urlParam === "6") {
     const typedChartData = chartData as Chart25Data[];
     if (!typedChartData.length || typedChartData.some((item) => !item)) {
       console.warn("Invalid Chart25Data:", typedChartData);
@@ -149,7 +149,7 @@ export const generateSeries = (
     }
 
     return series;
-  } else if (urlParam === "3" || urlParam === "6") {
+  } else if (urlParam === "3") {
     const typedChartData = chartData as Chart36Data[];
     if (!typedChartData.length || typedChartData.some((item) => !item)) {
       console.warn("Invalid Chart36Data:", typedChartData);

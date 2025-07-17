@@ -38,6 +38,7 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const urlParam = chartMap[categoryFilter];
+  console.log('CATEG FILTER: ', categoryFilter);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -65,6 +66,8 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
             ...gameCategoryParam,
           }
         );
+
+        console.log(urlParam);
 
         console.log(firstDateDuration, secondDateDuration, secondDurationFrom, secondDurationTo )
 

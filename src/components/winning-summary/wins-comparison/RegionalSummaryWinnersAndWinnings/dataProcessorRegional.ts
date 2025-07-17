@@ -126,7 +126,7 @@ export const processChart3Data = (
   });
 };
 
-export const processChart5Data = (
+export const processChart6Data = (
   payload: { Region: Array<RegionSpecificData[]> },
   firstDate: string,
   secondDate: string,
@@ -147,11 +147,11 @@ export const processChart5Data = (
     return {
       region,
       firstDateTumbok: firstDateItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+        (sum, item) => sum + (item.TotalTumbokPayouts|| 0),
         0
       ),
       secondDateTumbok: secondDateItems.reduce(
-        (sum, item) => sum + (item.BetTypes?.Tumbok || 0),
+        (sum, item) => sum + (item.TotalTumbokPayouts || 0),
         0
       ),
       firstDateSahod: firstDateItems.reduce(
@@ -163,41 +163,6 @@ export const processChart5Data = (
         0
       ),
     };
-  });
-};
-
-export const processChart6Data = (
-  payload: { Region: Array<RegionSpecificData[]> },
-  firstDate: string,
-  secondDate: string,
-  datesMatch: (dateString1: string, dateString2: string) => boolean
-) => {
-  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
-
-  return philippineRegions.map((region) => {
-    const result: any = { region };
-
-    gameCategories.forEach((category) => {
-      const allItems = payload.Region.flat().filter(
-        (item) =>
-          (item.Region === region || item.Region === `Region ${region}`) &&
-          item.GameCategory === category
-      );
-
-      const firstDateItems = allItems.filter((item) =>
-        datesMatch(item.DateOfWinningCombination, firstDate)
-      );
-      const secondDateItems = allItems.filter((item) =>
-        datesMatch(item.DateOfWinningCombination, secondDate)
-      );
-
-      result[`firstDate${category.replace(/\s+/g, "")}`] =
-        firstDateItems.reduce((sum, item) => sum + item.TotalTumbokWinners, 0);
-      result[`secondDate${category.replace(/\s+/g, "")}`] =
-        secondDateItems.reduce((sum, item) => sum + item.TotalSahodWinners, 0);
-    });
-
-    return result;
   });
 };
 
@@ -221,7 +186,7 @@ export const processSpecificDatePayload = (
     case "3":
       return processChart3Data(payload, firstDate, secondDate, datesMatch);
     case "5":
-      return processChart5Data(payload, firstDate, secondDate, datesMatch);
+      return processChart6Data(payload, firstDate, secondDate, datesMatch); // MALI ITO
     case "6":
       return processChart6Data(payload, firstDate, secondDate, datesMatch);
     default:
