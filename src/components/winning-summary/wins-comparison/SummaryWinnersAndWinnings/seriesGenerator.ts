@@ -11,14 +11,7 @@ export const getCategoryColor = (category: string, isFirstDate: boolean) => {
 };
 
 export const generateSeries = (
-  chartData: any[],
-  urlParam: string,
-  dateFilter: string,
-  firstDateSpecific: string | null,
-  secondDateSpecific: string | null,
-  firstDateDuration: string | null,
-  secondDateDuration: string | null
-) => {
+chartData: any[], urlParam: string, dateFilter: string, firstDateSpecific: string | null, secondDateSpecific: string | null, firstDateDuration: string | null, secondDateDuration: string | null, secondDurationFrom?: string | null, secondDurationTo?: string | null, p0?: number | null) => {
   const isDuration = dateFilter === "Date Duration";
 
   const firstLabel = formatDate(firstDateSpecific);

@@ -150,7 +150,7 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
     "Total Bettors by Bet Type": "5",
     "Total Bettors by Game Type": "6",
     "Top Betting Region by Total Bets": "4",
-    "Top Betting Region by Total Bettors": "4",
+    "Top Betting Region by Total Bettors": "5",
   };
 
   const urlParam = chartMap[categoryFilter];

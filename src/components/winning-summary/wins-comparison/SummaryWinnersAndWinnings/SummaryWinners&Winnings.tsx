@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { WinnersandWinningsSummaryProps } from "../types";
@@ -16,6 +16,8 @@ import {
 import { generateSeries } from "./seriesGenerator";
 import { CustomLegend } from "../CustomLegend";
 import { drawOrders, chartMap } from "../constant";
+import GenericCSVExportButton from "@/components/ui/buttons/CSVExportButtonDashboard";
+import { useAuthStore } from "@/store/useAuthStore";
 
 const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
   gameCategoryId,
@@ -30,6 +32,7 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
+  const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const urlParam = chartMap[categoryFilter];
 
@@ -57,7 +60,7 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
             secondStart: formatDate(secondDurationFrom),
             secondEnd: formatDate(secondDurationTo),
             ...gameCategoryParam,
-          } 
+          }
         );
 
         if (resp?.data?.DrawOrder) {
@@ -68,7 +71,7 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
           setChartData([]);
         }
 
-      // FALLBACK TO SPECIFIC DATE
+        // FALLBACK TO SPECIFIC DATE
       } else if (
         dateFilter === "Specific Date" &&
         firstDateSpecific &&
@@ -83,17 +86,14 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
             ...gameCategoryParam,
           }
         );
-
-        console.log('ULR PARAM: ', urlParam);
-
         if (resp?.data?.DrawOrder) {
           const processed = processSpecificDatePayload(
             urlParam,
             resp.data,
             firstDateSpecific,
             secondDateSpecific,
-              (dateString1: string, dateString2: string) =>
-            formatDate(dateString1) === formatDate(dateString2)
+            (dateString1: string, dateString2: string) =>
+              formatDate(dateString1) === formatDate(dateString2)
           );
           setChartData(processed);
         } else {
@@ -101,7 +101,7 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
           setChartData([]);
         }
 
-      // INVALID OR INCOMPLETE STATE
+        // INVALID OR INCOMPLETE STATE
       } else {
         console.log("No valid condition met for data fetching.");
         setChartData([]);
@@ -128,22 +128,82 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
     fetchData();
   }, [fetchData]);
 
+  const chartSeries = useMemo(() => {
+    return generateSeries(
+      chartData,
+      urlParam,
+      dateFilter,
+      firstDateSpecific,
+      secondDateSpecific,
+      firstDateDuration,
+      secondDateDuration,
+      secondDurationFrom,
+      secondDurationTo,
+      gameCategoryId ?? null
+    );
+  }, [
+    chartData,
+    urlParam,
+    dateFilter,
+    firstDateSpecific,
+    secondDateSpecific,
+    firstDateDuration,
+    secondDateDuration,
+    secondDurationFrom,
+    secondDurationTo,
+    gameCategoryId,
+  ]);
+
+  const formatWithCommas = (num: number): string =>
+    new Intl.NumberFormat("en-US").format(num);
+
+  const getCSVHeaders = () => [
+    "Draw Order",
+    ...chartSeries.map((s) => s.label || ""),
+  ];
+
+  const getRowData = (label: string) => {
+    const index = ["First Draw", "Second Draw", "Third Draw"].indexOf(label);
+    return [
+      label,
+      ...chartSeries.map((s) =>
+        formatWithCommas(Number(s.data?.[index] || 0) * 100000)
+      ),
+    ];
+  };
+
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
-      <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
-        {`Summary of ${categoryFilter}`}
-      </p>
-      <CustomLegend
-        gameCategoryId={gameCategoryId}
-        categoryFilter={categoryFilter}
-        dateFilter={dateFilter}
-        firstDateSpecific={firstDateSpecific}
-        secondDateSpecific={secondDateSpecific}
-        firstDateDuration={firstDateDuration}
-        secondDateDuration={secondDateDuration}
-        secondDurationFrom={null}
-        secondDurationTo={null}
-      />
+      <div className="w-full mb-2 flex flex-col xl:flex-row xl:items-center xl:justify-between">
+        <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
+          {`Summary of ${categoryFilter}`}
+        </p>
+        <CustomLegend
+          gameCategoryId={gameCategoryId}
+          categoryFilter={categoryFilter}
+          dateFilter={dateFilter}
+          firstDateSpecific={firstDateSpecific}
+          secondDateSpecific={secondDateSpecific}
+          firstDateDuration={firstDateDuration}
+          secondDateDuration={secondDateDuration}
+          secondDurationFrom={null}
+          secondDurationTo={null}
+        />
+
+        {currentUserType !== 3 && (
+          <div className="mt-2 md:mt-4 xl:mt-0">
+            <GenericCSVExportButton
+              data={["First Draw", "Second Draw", "Third Draw"]}
+              headers={getCSVHeaders()}
+              title={`Summary of ${categoryFilter}`}
+              filename={`${categoryFilter.replace(/\s+/g, "_")}_${new Date()
+                .toISOString()
+                .slice(0, 10)}`}
+              getRowData={getRowData}
+            />
+          </div>
+        )}
+      </div>
 
       <div className="h-full w-full mt-4">
         {loading ? (

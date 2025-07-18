@@ -361,8 +361,6 @@ const ChartTopRegionByWinsandWinners: React.FC<
                 data: convertToRankArray(
                   chartData.map((item) => item.firstValue)
                 ),
-                // can i stll display the data which is not converted? : data: chartData.map((item) => item.firstValue),
-                // though, the converted one is correct.
                 label:
                   dateFilter === "Specific Date"
                     ? `Ranking\n${firstDateSpecific}`
