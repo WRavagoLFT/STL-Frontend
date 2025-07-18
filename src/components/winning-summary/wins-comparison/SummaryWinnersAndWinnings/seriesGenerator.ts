@@ -11,7 +11,17 @@ export const getCategoryColor = (category: string, isFirstDate: boolean) => {
 };
 
 export const generateSeries = (
-chartData: any[], urlParam: string, dateFilter: string, firstDateSpecific: string | null, secondDateSpecific: string | null, firstDateDuration: string | null, secondDateDuration: string | null, secondDurationFrom?: string | null, secondDurationTo?: string | null, p0?: number | null) => {
+  chartData: any[],
+  urlParam: string,
+  dateFilter: string,
+  firstDateSpecific: string | null,
+  secondDateSpecific: string | null,
+  firstDateDuration: string | null,
+  secondDateDuration: string | null,
+  secondDurationFrom?: string | null,
+  secondDurationTo?: string | null,
+  p0?: number | null
+) => {
   const isDuration = dateFilter === "Date Duration";
 
   const firstLabel = formatDate(firstDateSpecific);
@@ -20,91 +30,164 @@ chartData: any[], urlParam: string, dateFilter: string, firstDateSpecific: strin
   if (urlParam === "1") {
     return [
       {
-        data: chartData.map((item) => (item.firstDateWinners || 0 / 100000)),
+        data: chartData.map((item) => (item.firstDateWinners || 0) / 100000),
         label: `Winners ${firstLabel}`,
         color: "#E5C7FF",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.firstDateWinners || 0
+          ).toLocaleString()}`,
       },
       {
-        data: chartData.map((item) => (item.secondDateWinners || 0 / 100000)),
+        data: chartData.map((item) => (item.secondDateWinners || 0) / 100000),
         label: `Winners ${secondLabel}`,
         color: "#D2A7FF",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.secondDateWinners || 0
+          ).toLocaleString()}`,
       },
       {
-        data: chartData.map((item) => (item.firstDateWinnings || 0 / 100000)),
+        data: chartData.map((item) => (item.firstDateWinnings || 0) / 100000),
         label: `Winnings ${firstLabel}`,
         color: "#BB86FC",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.firstDateWinnings || 0
+          ).toLocaleString()}`,
       },
       {
         data: chartData.map((item) => (item.secondDateWinnings || 0) / 100000),
         label: `Winnings ${secondLabel}`,
         color: "#A06FE6",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.secondDateWinnings || 0
+          ).toLocaleString()}`,
       },
     ];
   } else if (urlParam === "2" || urlParam === "6") {
     return [
       {
-        data: chartData.map((item: any) =>
-          (isDuration ? item.firstRangeTumbok : item.firstDateTumbok)
+        data: chartData.map(
+          (item: any) =>
+            (isDuration ? item.firstRangeTumbok : item.firstDateTumbok) / 100000
         ),
         label: `Tumbok ${firstLabel}`,
         color: "#E5C7FF",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.[
+              isDuration ? "firstRangeTumbok" : "firstDateTumbok"
+            ] || 0
+          ).toLocaleString()}`,
       },
       {
-        data: chartData.map((item: any) =>
-          (isDuration ? item.secondRangeTumbok : item.secondDateTumbok)
+        data: chartData.map(
+          (item: any) =>
+            (isDuration ? item.secondRangeTumbok : item.secondDateTumbok) /
+            100000
         ),
         label: `Tumbok ${secondLabel}`,
         color: "#D2A7FF",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.[
+              isDuration ? "secondRangeTumbok" : "secondDateTumbok"
+            ] || 0
+          ).toLocaleString()}`,
       },
       {
-        data: chartData.map((item: any) =>
-          (isDuration ? item.firstRangeSahod : item.firstDateSahod)
+        data: chartData.map(
+          (item: any) =>
+            (isDuration ? item.firstRangeSahod : item.firstDateSahod) / 100000
         ),
         label: `Sahod ${firstLabel}`,
         color: "#BB86FC",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.[
+              isDuration ? "firstRangeSahod" : "firstDateSahod"
+            ] || 0
+          ).toLocaleString()}`,
       },
       {
-        data: chartData.map((item: any) =>
-          (isDuration ? item.secondRangeSahod : item.secondDateSahod)
+        data: chartData.map(
+          (item: any) =>
+            (isDuration ? item.secondRangeSahod : item.secondDateSahod) / 100000
         ),
         label: `Sahod ${secondLabel}`,
         color: "#A06FE6",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.[
+              isDuration ? "secondRangeSahod" : "secondDateSahod"
+            ] || 0
+          ).toLocaleString()}`,
       },
       {
-        data: chartData.map((item: any) =>
-          isDuration ? item.firstRangeCasas : item.firstDateCasas
+        data: chartData.map(
+          (item: any) =>
+            (isDuration ? item.firstRangeCasas : item.firstDateCasas) / 100000
         ),
         label: `Casas ${firstLabel}`,
         color: "#F6C3FF",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.[
+              isDuration ? "firstRangeCasas" : "firstDateCasas"
+            ] || 0
+          ).toLocaleString()}`,
       },
       {
-        data: chartData.map((item: any) =>
-          isDuration ? item.secondRangeCasas : item.secondDateCasas
+        data: chartData.map(
+          (item: any) =>
+            (isDuration ? item.secondRangeCasas : item.secondDateCasas) / 100000
         ),
         label: `Casas ${secondLabel}`,
         color: "#EAA9FA",
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.[
+              isDuration ? "secondRangeCasas" : "secondDateCasas"
+            ] || 0
+          ).toLocaleString()}`,
       },
     ];
-    } else if (urlParam === "3" || urlParam === "7") {
+  } else if (urlParam === "3" || urlParam === "7") {
     const gameCategories = ["STLPares", "STLSwer2", "STLSwer3", "STLSwer4"];
     return gameCategories.flatMap((category) => [
       {
-        data: chartData.map((item: any) =>
-          (isDuration
-            ? item[`firstRange${category}`]
-            : item[`firstDate${category}`])
+        data: chartData.map(
+          (item: any) =>
+            (isDuration
+              ? item[`firstRange${category}`]
+              : item[`firstDate${category}`]) / 100000
         ),
         label: `${category.replace("STL", "STL ")} ${firstLabel}`,
         color: getCategoryColor(category, true),
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.[
+              isDuration ? `firstRange${category}` : `firstDate${category}`
+            ] || 0
+          ).toLocaleString()}`,
       },
       {
-        data: chartData.map((item: any) =>
-          (isDuration
-            ? item[`secondRange${category}`]
-            : item[`secondDate${category}`])
+        data: chartData.map(
+          (item: any) =>
+            (isDuration
+              ? item[`secondRange${category}`]
+              : item[`secondDate${category}`]) / 100000
         ),
         label: `${category.replace("STL", "STL ")} ${secondLabel}`,
         color: getCategoryColor(category, false),
+        valueFormatter: (_value: number | null, context: any) =>
+          `${(
+            chartData[context.dataIndex]?.[
+              isDuration ? `secondRange${category}` : `secondDate${category}`
+            ] || 0
+          ).toLocaleString()}`,
       },
     ]);
   }

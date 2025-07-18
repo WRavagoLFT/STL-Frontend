@@ -175,20 +175,23 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
       <div className="w-full mb-2 flex flex-col xl:flex-row xl:items-center xl:justify-between">
+         <div className="flex flex-col leading-none">
+        
         <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
           {`Summary of ${categoryFilter}`}
         </p>
-        <CustomLegend
-          gameCategoryId={gameCategoryId}
-          categoryFilter={categoryFilter}
-          dateFilter={dateFilter}
-          firstDateSpecific={firstDateSpecific}
-          secondDateSpecific={secondDateSpecific}
-          firstDateDuration={firstDateDuration}
-          secondDateDuration={secondDateDuration}
-          secondDurationFrom={null}
-          secondDurationTo={null}
-        />
+          <CustomLegend
+            gameCategoryId={gameCategoryId}
+            categoryFilter={categoryFilter}
+            dateFilter={dateFilter}
+            firstDateSpecific={firstDateSpecific}
+            secondDateSpecific={secondDateSpecific}
+            firstDateDuration={firstDateDuration}
+            secondDateDuration={secondDateDuration}
+            secondDurationFrom={null}
+            secondDurationTo={null}
+          />
+        </div>
 
         {currentUserType !== 3 && (
           <div className="mt-2 md:mt-4 xl:mt-0">

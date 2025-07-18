@@ -26,8 +26,8 @@ export const processChart1Data = (
     );
 
     const firstDateWinners = firstItem?.TotalWinners ?? 0;
-    const secondDateWinners = secondItem?.TotalPayoutAmount ?? 0;
-    const firstDateWinnings = firstItem?.TotalWinners ?? 0;
+    const secondDateWinners = secondItem?.TotalWinners ?? 0;
+    const firstDateWinnings = firstItem?.TotalPayoutAmount ?? 0;
     const secondDateWinnings = secondItem?.TotalPayoutAmount ?? 0;
 
     return {
@@ -59,38 +59,38 @@ export const processChart2Data = (
     );
 
     const firstDateTumbok = firstDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0)),
       0
     );
     const secondDateTumbok = secondDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0)),
       0
     );
 
     const firstDateSahod = firstDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0)),
       0
     );
     const secondDateSahod = secondDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0)),
       0
     );
 
     const firstDateRamble = firstDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0)),
       0
     );
     const secondDateRamble = secondDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0)),
       0
     );
 
     const firstDateCasas = firstDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
       0
     );
     const secondDateCasas = secondDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
       0
     );
 
@@ -136,8 +136,8 @@ export const processChart3Data = (
 
       const keyPrefix = category.replace(/\s+/g, "");
 
-      const firstValue = (firstItem?.TotalPayoutAmount ?? 0) / 10000;
-      const secondValue = (secondItem?.TotalPayoutAmount ?? 0) / 10000;
+      const firstValue = (firstItem?.TotalPayoutAmount ?? 0);
+      const secondValue = (secondItem?.TotalPayoutAmount ?? 0);
 
       result[`firstDate${keyPrefix}`] = firstValue;
       result[`secondDate${keyPrefix}`] = secondValue;
@@ -395,36 +395,36 @@ export const processDurationChart2Data = (payload: any) => {
     return {
       drawOrder,
       firstRangeTumbok: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0)),
         0
       ),
       secondRangeTumbok: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0)),
         0
       ),
       firstRangeSahod: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0)),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0)),
         0
       ),
       firstRangeRamble: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0)),
         0
       ),
       secondRangeRamble: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0)),
         0
       ),
       
       firstRangeCasas: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
         0
       ),
       secondRangeCasas: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
         0
       ),
     };
@@ -453,12 +453,12 @@ export const processDurationChart3Data = (payload: any) => {
       );
 
       result[`firstRange${category.replace(/\s+/g, "")}`] = firstRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + ((item.TotalPayoutAmount ?? 0) / 10000),
+        (sum: number, item: chartThreeSix_Range) => sum + ((item.TotalPayoutAmount ?? 0)),
         0
       );
 
       result[`secondRange${category.replace(/\s+/g, "")}`] = secondRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + ((item.TotalPayoutAmount ?? 0) / 10000),
+        (sum: number, item: chartThreeSix_Range) => sum + ((item.TotalPayoutAmount ?? 0)),
         0
       );
     });

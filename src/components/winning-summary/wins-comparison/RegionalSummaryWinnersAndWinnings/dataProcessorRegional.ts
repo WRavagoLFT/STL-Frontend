@@ -117,10 +117,10 @@ export const processChart3Data = (
       );
 
       result[`firstDate${category.replace(/\s+/g, "")}`] =
-        firstDateItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0) / 10000;
+        firstDateItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0);
 
       result[`secondDate${category.replace(/\s+/g, "")}`] =
-        secondDateItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0) / 10000;
+        secondDateItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0);
     });
 
     return result;
@@ -286,35 +286,35 @@ export const processDurationChart2Data = (payload: RangePayload) => {
     return {
       region: regionName,
       firstRangeTumbok: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0)),
         0
       ),
       secondRangeTumbok: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0)),
         0
       ),
       firstRangeSahod: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0)),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0)),
         0
       ),
       firstRangeRamble: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0)),
         0
       ),
       secondRangeRamble: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0)),
         0
       ),
       firstRangeCasas: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
         0
       ),
       secondRangeCasas: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
         0
       ),
     };
@@ -351,11 +351,11 @@ export const processDurationChart3Data = (payload: RangePayload) => {
       );
 
       result[`firstRange${category.replace(/\s+/g, "")}`] = firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalPayoutAmount || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalPayoutAmount || 0)),
         0
       );
       result[`secondRange${category.replace(/\s+/g, "")}`] = secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalPayoutAmount || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalPayoutAmount || 0)),
         0
       );
     });
