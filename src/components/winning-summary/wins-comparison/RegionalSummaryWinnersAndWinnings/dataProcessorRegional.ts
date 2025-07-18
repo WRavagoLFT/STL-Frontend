@@ -428,28 +428,57 @@ export const processDurationChart5Data = (payload: RangePayload) => {
 };
 
 export const processDurationChart6Data = (payload: RangePayload) => {
-  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
+  return philippineRegions.map((regionName) => {
+    const regionBlock = payload?.Region?.find(
+      (r: any) =>
+        r.Region === regionName ||
+        r.RegionName === regionName ||
+        r.Region === `Region ${regionName}` ||
+        r.RegionName === `Region ${regionName}`
+    ) as { FirstRange?: any[]; SecondRange?: any[] };
 
-  return philippineRegions.map((region) => {
-    const result: any = { region };
+    if (!regionBlock) {
+      console.warn(`No region block found for "${regionName}"`);
+    }
 
-    gameCategories.forEach((category) => {
-      const firstRangeItems = payload.Region.FirstRange.filter(
-        (item) =>
-          (item.Region === region || item.Region === `Region ${region}`) &&
-          item.GameCategory === category
-      );
-      const secondRangeItems = payload.Region.SecondRange.filter(
-        (item) =>
-          (item.Region === region || item.Region === `Region ${region}`) &&
-          item.GameCategory === category
-      );
+    const firstRangeItems = regionBlock?.FirstRange ?? [];
+    const secondRangeItems = regionBlock?.SecondRange ?? [];
 
-      result[`firstRange${category.replace(/\s+/g, "")}`] =
-        firstRangeItems.reduce((sum, item) => sum + item.TotalWinners, 0);
-      result[`secondRange${category.replace(/\s+/g, "")}`] =
-        secondRangeItems.reduce((sum, item) => sum + item.TotalWinners, 0);
-    });
+    const result = {
+      region: regionName,
+      firstRangeTumbok: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalTumbokWinners || 0)),
+        0
+      ),
+      secondRangeTumbok: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalTumbokWinners || 0)),
+        0
+      ),
+      firstRangeSahod: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalSahodWinners || 0)),
+        0
+      ),
+      secondRangeSahod: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalSahodWinners || 0)),
+        0
+      ),
+      firstRangeRamble: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalRambleWinners || 0)),
+        0
+      ),
+      secondRangeRamble: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalRambleWinners || 0)),
+        0
+      ),
+      firstRangeCasas: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalCasasWinners || 0)),
+        0
+      ),
+      secondRangeCasas: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalCasasWinners || 0)),
+        0
+      ),
+    };
 
     return result;
   });

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { WinnersandWinningsSummaryProps } from "../types";
@@ -36,6 +36,7 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
+  const hasFetchedRef = useRef(false);
 
   const urlParam = chartMap[categoryFilter];
   console.log('CATEG FILTER: ', categoryFilter);
@@ -138,6 +139,13 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // useEffect(() => {
+  //    if (!hasFetchedRef.current) {
+  //      fetchData();
+  //      hasFetchedRef.current = true;
+  //    }
+  //  }, [fetchData]);
 
   const formatWithCommas = (num: number): string => {
     return new Intl.NumberFormat("en-US").format(num);
