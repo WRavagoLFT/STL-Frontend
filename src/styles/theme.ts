@@ -30,14 +30,4 @@ const lightTheme = createTheme({
   },
 });
 
-export const buttonStyles = {
-  paddingX: 3.9,
-  paddingY: 0.9,
-  textTransform: "none",
-  fontSize: 12,
-  borderRadius: "8px",
-  fontWeight: 1,
-  color: 'white'
-};
-
 export default lightTheme;
