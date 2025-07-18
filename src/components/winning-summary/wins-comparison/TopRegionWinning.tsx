@@ -58,6 +58,18 @@ const formatDate = (date: string | null): string => {
   return `${year}-${month}-${day}`;
 };
 
+const convertToRankArray = (values: number[]): number[] => {
+  // Create a sorted array of unique non-zero values
+  const sortedUnique = Array.from(new Set(values.filter((v) => v > 0))).sort(
+    (a, b) => b - a
+  );
+
+  return values.map((val) => {
+    if (!val) return 0;
+    return sortedUnique.indexOf(val) + 1;
+  });
+};
+
 const apiRegionLabel = (r: string) =>
   ["NCR", "CAR", "BARMM"].includes(r) ? r : `Region ${r}`;
 
@@ -339,15 +351,18 @@ const ChartTopRegionByWinsandWinners: React.FC<
             ]}
             yAxis={[
               {
-                label: "Amount (in 100,000 units)",
+                label: "Rank",
                 min: 0,
-                //max: 18,
-                max: Math.ceil(maxY * 1.1),
+                max: 18,
               },
             ]}
             series={[
               {
-                data: chartData.map((item) => item.firstValue),
+                data: convertToRankArray(
+                  chartData.map((item) => item.firstValue)
+                ),
+                // can i stll display the data which is not converted? : data: chartData.map((item) => item.firstValue),
+                // though, the converted one is correct.
                 label:
                   dateFilter === "Specific Date"
                     ? `Ranking\n${firstDateSpecific}`
@@ -356,7 +371,9 @@ const ChartTopRegionByWinsandWinners: React.FC<
                 curve: "linear",
               },
               {
-                data: chartData.map((item) => item.secondValue),
+                data: convertToRankArray(
+                  chartData.map((item) => item.secondValue)
+                ),
                 label:
                   dateFilter === "Specific Date"
                     ? `Ranking\n${secondDateSpecific}`
