@@ -102,7 +102,9 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
   );
 };
 
-const ChartTopRegionByWinsandWinners: React.FC<WinnersandWinningsSummaryProps> = ({
+const ChartTopRegionByWinsandWinners: React.FC<
+  WinnersandWinningsSummaryProps
+> = ({
   categoryFilter,
   dateFilter,
   firstDateSpecific,
@@ -115,8 +117,23 @@ const ChartTopRegionByWinsandWinners: React.FC<WinnersandWinningsSummaryProps> =
   const [chartData, setChartData] = useState<ChartData[]>([]);
 
   const philippineRegions = [
-    "NCR", "CAR", "I", "II", "III", "IV-A", "IV-B", "V",
-    "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "BARMM",
+    "NCR",
+    "CAR",
+    "I",
+    "II",
+    "III",
+    "IV-A",
+    "IV-B",
+    "V",
+    "VI",
+    "VII",
+    "VIII",
+    "IX",
+    "X",
+    "XI",
+    "XII",
+    "XIII",
+    "BARMM",
   ];
 
   const aggregateField: RegionField = categoryFilter.includes("Winnings")
@@ -146,10 +163,18 @@ const ChartTopRegionByWinsandWinners: React.FC<WinnersandWinningsSummaryProps> =
     FirstDate: DateSpecific[];
     SecondDate: DateSpecific[];
   }) => {
+    const normalize = (r: string) => r.toLowerCase().replace(/[\s\-]/g, "");
+
     const data: ChartData[] = philippineRegions.map((region) => {
       const apiLabel = apiRegionLabel(region);
-      const firstItem = payload.FirstDate.find((r) => r.Region === apiLabel);
-      const secondItem = payload.SecondDate.find((r) => r.Region === apiLabel);
+
+      const firstItem = payload.FirstDate.find(
+        (r) => normalize(r.Region) === normalize(apiLabel)
+      );
+
+      const secondItem = payload.SecondDate.find(
+        (r) => normalize(r.Region) === normalize(apiLabel)
+      );
 
       return {
         region,
@@ -158,6 +183,7 @@ const ChartTopRegionByWinsandWinners: React.FC<WinnersandWinningsSummaryProps> =
       };
     });
 
+    console.table(data);
     setChartData(data);
   };
 
@@ -176,11 +202,15 @@ const ChartTopRegionByWinsandWinners: React.FC<WinnersandWinningsSummaryProps> =
       const normalizedRegionName = region.toLowerCase().replace(/\s+/g, "");
 
       const firstItem = FirstRange.find((r) =>
-        r.Region.toLowerCase().replace(/\s+/g, "").includes(normalizedRegionName)
+        r.Region.toLowerCase()
+          .replace(/\s+/g, "")
+          .includes(normalizedRegionName)
       );
 
       const secondItem = SecondRange.find((r) =>
-        r.Region.toLowerCase().replace(/\s+/g, "").includes(normalizedRegionName)
+        r.Region.toLowerCase()
+          .replace(/\s+/g, "")
+          .includes(normalizedRegionName)
       );
 
       return {
@@ -200,10 +230,14 @@ const ChartTopRegionByWinsandWinners: React.FC<WinnersandWinningsSummaryProps> =
       console.log("DATE FILTER:", dateFilter);
 
       const isValidDateDuration =
-        dateFilter === "Date Duration" && firstDateDuration && secondDateDuration;
+        dateFilter === "Date Duration" &&
+        firstDateDuration &&
+        secondDateDuration;
 
       const isValidSpecificDate =
-        dateFilter === "Specific Date" && firstDateSpecific && secondDateSpecific;
+        dateFilter === "Specific Date" &&
+        firstDateSpecific &&
+        secondDateSpecific;
 
       if (isValidDateDuration) {
         const payload = {
@@ -266,7 +300,9 @@ const ChartTopRegionByWinsandWinners: React.FC<WinnersandWinningsSummaryProps> =
   useEffect(() => {
     fetchData();
   }, [fetchData]);
-
+  const maxY = Math.max(
+    ...chartData.map((item) => Math.max(item.firstValue, item.secondValue))
+  );
   return (
     <div className="bg-[#F8F0E3] p-4 rounded-lg pb-8 w-full h-[685px] border border-[#0038A8]">
       <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
@@ -305,7 +341,8 @@ const ChartTopRegionByWinsandWinners: React.FC<WinnersandWinningsSummaryProps> =
               {
                 label: "Amount (in 100,000 units)",
                 min: 0,
-                max: 18,
+                //max: 18,
+                max: Math.ceil(maxY * 1.1),
               },
             ]}
             series={[
