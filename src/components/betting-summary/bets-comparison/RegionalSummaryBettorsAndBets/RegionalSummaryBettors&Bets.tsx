@@ -65,15 +65,23 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
   ];
 
   const fetchData = useCallback(async () => {
+    console.log("Fetching chart data...");
     setLoading(true);
     try {
       const gameCategoryParam = getGameCategoryParam();
+      console.log("Game Category Param:", gameCategoryParam);
+      console.log("URL Param:", urlParam);
+      console.log("Date Filter:", dateFilter);
 
       if (
         dateFilter === "Specific Date" &&
         firstDateSpecific &&
         secondDateSpecific
       ) {
+        console.log("Fetching Specific Date data...");
+        console.log("First Date:", firstDateSpecific);
+        console.log("Second Date:", secondDateSpecific);
+
         const resp = await fetchCompareHistoricalDate(
           "/transactions/compareHistoricalDate/chartType/",
           urlParam,
@@ -84,6 +92,8 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
           }
         );
 
+        console.log("Response (Specific Date):", resp);
+
         if (resp?.data?.Region) {
           const processedData = processSpecificDatePayload(
             urlParam,
@@ -91,11 +101,13 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
             firstDateSpecific,
             secondDateSpecific
           );
+          console.log("Processed Specific Date Data:", processedData);
           setChartData(processedData);
         } else {
           console.warn("Unexpected payload (Specific Date):", resp);
           setChartData([]);
         }
+
       } else if (
         dateFilter === "Date Duration" &&
         firstDateDuration &&
@@ -103,6 +115,10 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
         secondDurationFrom &&
         secondDurationTo
       ) {
+        console.log("Fetching Date Duration data...");
+        console.log("First Duration:", firstDateDuration, secondDateDuration);
+        console.log("Second Duration:", secondDurationFrom, secondDurationTo);
+
         const resp = await fetchCompareHistoricalRange(
           "/transactions/compareHistoricalRange/chartType/",
           urlParam,
@@ -115,15 +131,19 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
           }
         );
 
+        console.log("Response (Date Duration):", resp);
+
         if (resp?.data?.Region) {
           const processedData = processDurationPayload(urlParam, resp.data);
+          console.log("Processed Duration Data:", processedData);
           setChartData(processedData);
         } else {
           console.warn("Unexpected payload (Date Duration):", resp);
           setChartData([]);
         }
+
       } else {
-        console.log("No valid condition met for data fetching.");
+        console.warn("No valid condition met for data fetching.");
         setChartData([]);
       }
     } catch (err) {
@@ -131,6 +151,7 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
       setChartData([]);
     } finally {
       setLoading(false);
+      console.log("Fetch complete");
     }
   }, [
     dateFilter,
@@ -144,11 +165,15 @@ const ChartBettorsAndBetsRegionalSummary: React.FC<
     gameCategoryId,
   ]);
 
+  // useEffect(() => {
+  //   if (!hasFetchedRef.current) {
+  //     fetchData();
+  //     hasFetchedRef.current = true;
+  //   }
+  // }, [fetchData]);
+  
   useEffect(() => {
-    if (!hasFetchedRef.current) {
-      fetchData();
-      hasFetchedRef.current = true;
-    }
+    fetchData();
   }, [fetchData]);
 
   const formatWithCommas = (num: number): string => {

@@ -47,38 +47,52 @@ export const generateSeries = (
         color: "#A06FE6",
       },
     ];
-  } else if (urlParam === "2" || urlParam === "5") {
+  } else if (urlParam === "2" || urlParam === "6") {
     return [
       {
         data: chartData.map((item: any) =>
-          isDuration ? item.firstRangeTumbok : item.firstDateTumbok
+          (isDuration ? item.firstRangeTumbok : item.firstDateTumbok)
         ),
         label: `Tumbok ${firstLabel}`,
         color: "#E5C7FF",
       },
       {
         data: chartData.map((item: any) =>
-          isDuration ? item.secondRangeTumbok : item.secondDateTumbok
+          (isDuration ? item.secondRangeTumbok : item.secondDateTumbok)
         ),
         label: `Tumbok ${secondLabel}`,
         color: "#D2A7FF",
       },
       {
         data: chartData.map((item: any) =>
-          isDuration ? item.firstRangeSahod : item.firstDateSahod
+          (isDuration ? item.firstRangeSahod : item.firstDateSahod)
         ),
         label: `Sahod ${firstLabel}`,
         color: "#BB86FC",
       },
       {
         data: chartData.map((item: any) =>
-          isDuration ? item.secondRangeSahod : item.secondDateSahod
+          (isDuration ? item.secondRangeSahod : item.secondDateSahod)
         ),
         label: `Sahod ${secondLabel}`,
         color: "#A06FE6",
       },
+      {
+        data: chartData.map((item: any) =>
+          isDuration ? item.firstRangeCasas : item.firstDateCasas
+        ),
+        label: `Casas ${firstLabel}`,
+        color: "#F6C3FF",
+      },
+      {
+        data: chartData.map((item: any) =>
+          isDuration ? item.secondRangeCasas : item.secondDateCasas
+        ),
+        label: `Casas ${secondLabel}`,
+        color: "#EAA9FA",
+      },
     ];
-    } else if (urlParam === "3" || urlParam === "6") {
+    } else if (urlParam === "3") {
     const gameCategories = ["STLPares", "STLSwer2", "STLSwer3", "STLSwer4"];
     return gameCategories.flatMap((category) => [
       {

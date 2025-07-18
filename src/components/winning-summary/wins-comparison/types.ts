@@ -34,6 +34,12 @@ export interface chartOne_Range {
 }
 
 export interface chartTwoFive_Range {
+  TotalRambleWinners: number;
+  TotalSahodWinners: number;
+  TotalTumbokWinners: number;
+  TotalRamblePayouts: number;
+  TotalSahodPayouts: number;
+  TotalTumbokPayouts: number;
   TotalSaisCasas: number;
   TotalTresCasas: number;
   DrawOrder: number;
@@ -143,6 +149,8 @@ export interface RegionSpecificData {
 }
 
 export interface RegionRangeData {
+  TotalCasasWinners: number;
+  TotalCasasPayouts: number;
   RegionName: string;
   DateOfWinningCombination: string;
   DrawOrder?: null;
@@ -166,7 +174,9 @@ export interface RegionRangeData {
 
 export interface RangePayload {
   Region: {
-    find(arg0: (item: { RegionName: string; }) => boolean): unknown;
+    find(arg0: (item: {
+      Region: string; RegionName: string; 
+}) => boolean): unknown;
     FirstRange: RegionRangeData[];
     SecondRange: RegionRangeData[];
   };

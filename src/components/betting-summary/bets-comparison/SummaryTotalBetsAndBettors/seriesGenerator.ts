@@ -93,7 +93,7 @@ export const generateSeries = (
       },
     );
 
-    if (gameCategoryId === 1 || gameCategoryId === 2) {
+    if (gameCategoryId === 1 || gameCategoryId === 2 || gameCategoryId === 0) {
       series.push(
         {
           data: typedChartData.map((item) => ((isDuration ? item.firstRangeSahod : item.firstDateSahod) || 0) / 100000),
@@ -130,7 +130,7 @@ export const generateSeries = (
       );
     }
 
-    if (gameCategoryId === 3 || gameCategoryId === 4) {
+    if (gameCategoryId === 3 || gameCategoryId === 4 || gameCategoryId === 0) {
       series.push(
         {
           data: typedChartData.map((item) => ((isDuration ? item.firstRangeRamble : item.firstDateRamble) || 0) / 100000),

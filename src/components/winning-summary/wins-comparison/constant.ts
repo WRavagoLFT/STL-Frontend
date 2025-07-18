@@ -21,13 +21,23 @@ export const philippineRegions = [
 export const drawOrders = [1, 2, 3];
 
 export const chartMap: Record<string, string> = {
-  "Total Winnings and Winners": "1",
-  "Total Winnings by Bet Type": "2",
-  "Total Winnings by Game Type": "3",
-  "Total Winners by Bet Type": "5",
-  "Total Winners by Game Type": "6",
+  "Total Winnings and Winners": "1", // TOTAL_WINNERS_WINNINGS = 1
+  "Total Winnings by Bet Type": "2", // WINNINGS_BY_BET_TYPE = 2
+  "Total Winnings by Game Type": "3", // WINNINGS BY GAME TYPE = 3
+  "Total Winners by Bet Type": "6", // WINNERS BY BET TYPE = 6
+  "Total Winners by Game Type": "7", // WINNERS BY GAME TYPE = 3
   "Top Winning Region by Total Winning": "4",
-  "Top Winning Region by Total Winners": "4",
+  "Top Winning Region by Total Winners": "5",
 };
+
+// export const chartMap: Record<string, string> = {
+//   "Total Winnings and Winners": "1",
+//   "Total Winnings by Bet Type": "2",
+//   "Total Winnings by Game Type": "3",
+//   "Total Winners by Bet Type": "5",
+//   "Total Winners by Game Type": "6",
+//   "Top Winning Region by Total Winning": "4",
+//   "Top Winning Region by Total Winners": "4",
+// };
 
 export const GAME_CATEGORIES = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];

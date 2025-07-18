@@ -31,7 +31,7 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
   const [loading, setLoading] = useState(false);
   const [chartData, setChartData] = useState<any[]>([]);
 
-  const urlParam = chartMap[categoryFilter]; // now checked.
+  const urlParam = chartMap[categoryFilter];
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -83,6 +83,8 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
             ...gameCategoryParam,
           }
         );
+
+        console.log('ULR PARAM: ', urlParam);
 
         if (resp?.data?.DrawOrder) {
           const processed = processSpecificDatePayload(
