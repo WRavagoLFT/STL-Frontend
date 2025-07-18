@@ -76,10 +76,10 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
     setShowEditButton(false);
   };
 
-  //console.log("hihihh", areaofoperations);
+  //console.log("AREA OF OPERATIONS: ", areaofoperations);
   //console.log("SELECTED USERRR:", selectedUser);
-  console.log("initialUserData:", initialUserOperatorData);
-  console.log("provinces:", provinces);
+  //console.log("initialUserData:", initialUserOperatorData);
+  //console.log("provinces:", provinces);
 
   const gameTypeOptions: GameTypeOption[] = useMemo(() => {
     return (
@@ -567,7 +567,10 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
                         ? "#EF4444 !important"
                         : "#0038A8 !important",
                     fontSize: "0.875rem",
-                    padding: "2px",
+                    //padding: "2px",
+                    minHeight: "35px",
+                    height: "32px",
+                    borderRadius: "9px",
                     color: isDisabled ? "#6B7280" : "inherit",
                     backgroundColor: "transparent",
                     cursor: isDisabled ? "not-allowed" : "default",
@@ -633,7 +636,10 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
                         ? "#EF4444 !important"
                         : "#0038A8 !important",
                     fontSize: "0.875rem",
-                    padding: "2px",
+                    //padding: "2px",
+                    minHeight: "35px",
+                    height: "32px",
+                    borderRadius: "9px",
                     color: isDisabled ? "#6B7280" : "inherit",
                     backgroundColor: "transparent",
                     cursor: isDisabled ? "not-allowed" : "default",
@@ -687,7 +693,8 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
               menuPortalTarget={
                 typeof window !== "undefined" ? document.body : null
               }
-              isDisabled={isDisabled}
+              //isDisabled={isDisabled}
+              isDisabled
               styles={{
                 control: (provided, state) => {
                   const isDisabled = state.isDisabled;
@@ -701,7 +708,10 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
                         ? "#EF4444 !important"
                         : "#0038A8 !important",
                     fontSize: "0.875rem",
-                    padding: "2px",
+                    //padding: "2px",
+                    minHeight: "35px",
+                    height: "32px",
+                    borderRadius: "9px",
                     color: isDisabled ? "#6B7280" : "inherit",
                     backgroundColor: "transparent",
                     cursor: isDisabled ? "not-allowed" : "default",
@@ -770,7 +780,10 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
                         ? "#EF4444 !important"
                         : "#0038A8 !important",
                     fontSize: "0.875rem",
-                    padding: "2px",
+                    //padding: "2px",
+                    minHeight: "35px",
+                    height: "32px",
+                    borderRadius: "9px",
                     color: isDisabled ? "#6B7280" : "inherit",
                     backgroundColor: "transparent",
                     cursor: isDisabled ? "not-allowed" : "default",
