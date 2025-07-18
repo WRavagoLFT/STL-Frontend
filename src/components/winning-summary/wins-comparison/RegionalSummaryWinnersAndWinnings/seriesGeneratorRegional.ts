@@ -149,7 +149,7 @@ export const generateSeries = (
     }
 
     return series;
-  } else if (urlParam === "3") {
+  } else if (urlParam === "3" || urlParam === "7") {
     const typedChartData = chartData as Chart36Data[];
     if (!typedChartData.length || typedChartData.some((item) => !item)) {
       console.warn("Invalid Chart36Data:", typedChartData);
@@ -163,14 +163,14 @@ export const generateSeries = (
 
       return [
         {
-          data: typedChartData.map((item) => ((item[`${keyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0) / 100000),
+          data: typedChartData.map((item) => ((item[`${keyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0)),
           label: `${category.replace("STL", "STL ")} ${firstLabel}`,
           color: getCategoryColor(category.replace(/\s+/g, ""), true),
           valueFormatter: (_value: number | null, context: any) =>
             `${((typedChartData[context.dataIndex]?.[`${keyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0).toLocaleString()}`,
         },
         {
-          data: typedChartData.map((item) => ((item[`${secondKeyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0) / 100000),
+          data: typedChartData.map((item) => ((item[`${secondKeyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0)),
           label: `${category.replace("STL", "STL ")} ${secondLabel}`,
           color: getCategoryColor(category.replace(/\s+/g, ""), false),
           valueFormatter: (_value: number | null, context: any) =>

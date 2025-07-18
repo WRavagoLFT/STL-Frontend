@@ -27,12 +27,12 @@ export const generateSeries = (
   if (urlParam === "1") {
     return [
       {
-        data: chartData.map((item) => (item.firstDateWinners || 0)),
+        data: chartData.map((item) => (item.firstDateWinners || 0 / 100000)),
         label: `Winners ${firstLabel}`,
         color: "#E5C7FF",
       },
       {
-        data: chartData.map((item) => (item.secondDateWinners || 0)),
+        data: chartData.map((item) => (item.secondDateWinners || 0 / 100000)),
         label: `Winners ${secondLabel}`,
         color: "#D2A7FF",
       },
@@ -92,14 +92,14 @@ export const generateSeries = (
         color: "#EAA9FA",
       },
     ];
-    } else if (urlParam === "3") {
+    } else if (urlParam === "3" || urlParam === "7") {
     const gameCategories = ["STLPares", "STLSwer2", "STLSwer3", "STLSwer4"];
     return gameCategories.flatMap((category) => [
       {
         data: chartData.map((item: any) =>
           (isDuration
             ? item[`firstRange${category}`]
-            : item[`firstDate${category}`]) / 10000
+            : item[`firstDate${category}`])
         ),
         label: `${category.replace("STL", "STL ")} ${firstLabel}`,
         color: getCategoryColor(category, true),
@@ -108,7 +108,7 @@ export const generateSeries = (
         data: chartData.map((item: any) =>
           (isDuration
             ? item[`secondRange${category}`]
-            : item[`secondDate${category}`]) / 10000
+            : item[`secondDate${category}`])
         ),
         label: `${category.replace("STL", "STL ")} ${secondLabel}`,
         color: getCategoryColor(category, false),
