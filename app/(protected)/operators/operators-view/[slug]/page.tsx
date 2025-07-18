@@ -18,7 +18,7 @@ export default function OperatorSlugClientPage() {
     fetchOperatorById(id).then(setOperator);
   }, [slug]);
 
-  if (!operator) return <div>Loading or no operator...</div>;
+  if (!operator) return <div>Loading...</div>;
 
   return (
     <AccessGuard allowedUserTypes={[6]}>

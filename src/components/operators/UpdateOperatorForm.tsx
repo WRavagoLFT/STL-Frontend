@@ -79,7 +79,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
   //console.log("hihihh", areaofoperations);
   //console.log("SELECTED USERRR:", selectedUser);
   console.log("initialUserData:", initialUserOperatorData);
-  //console.log("provinces:", provinces);
+  console.log("provinces:", provinces);
 
   const gameTypeOptions: GameTypeOption[] = useMemo(() => {
     return (
@@ -166,25 +166,26 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
     if (initialUserOperatorData && initialUserOperatorData.data) {
       const operatorData = initialUserOperatorData.data;
 
-      const mappedGameTypes = operatorData.GameTypes?.map(
-        (gt: { GameCategory: any; GameCategoryId: any }) => ({
-          label: gt.GameCategory,
-          value: gt.GameCategoryId,
-        })
-      ) || [];
+      const mappedGameTypes = operatorData.GameTypes?.map((gt: { GameCategory: any; GameCategoryId: any; }) => ({
+        label: gt.GameCategory,
+        value: gt.GameCategoryId,
+      })) || [];
 
-      const mappedCities = operatorData.Cities?.map(
-        (pv: { CityId: any; CityName: any }) => ({
-          label: pv.CityName,
-          value: pv.CityId,
-        })
-      ) || [];
+      const mappedCities = operatorData.Cities?.map((ct: { CityName: any; CityId: any; }) => ({
+        label: ct.CityName,
+        value: ct.CityId,
+      })) || [];
+
+      const mappedProvinces = operatorData.Province?.map((prov: { ProvinceName: any; ProvinceId: any; }) => ({
+        label: prov.ProvinceName,
+        value: prov.ProvinceId,
+      })) || [];
 
       setSelectedGameTypes(mappedGameTypes);
 
       if (operatorData.AreaOfOperationsOptionsId && areaOfOperationsOptions) {
         const matchedOption = areaOfOperationsOptions.find(
-          (opt: any) => opt.value === operatorData.AreaOfOperationsOptionsId
+          (opt) => opt.value === operatorData.AreaOfOperationsOptionsId
         );
         if (matchedOption) {
           setselectedAreaOfOperations(matchedOption);
@@ -192,6 +193,11 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
       }
 
       const formattedData = mapSelectedOperatorToFormData(initialUserOperatorData);
+
+      if (mappedProvinces.length > 0) {
+        formattedData.provinces = mappedProvinces;
+      }
+
       setFormData(formattedData);
     } else {
       setFormData({});
@@ -215,6 +221,7 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
     initialValues: {
       ...mapSelectedOperatorToFormData(initialUserOperatorData),
       remarks: '',
+      provinces: formData?.provinces || [],
     },
     validate,
     onSubmit: async (values) => {
@@ -286,6 +293,8 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
   const areaOfOperationsError = getError("areaOfOperations");
   const provincesError = getError("provinces");
   const statusError = getError("status");
+  console.log("Formik Provinces:", formik.values.provinces);
+  console.log("Raw Province Data:", initialUserOperatorData.Province);
 
   return (
     <form onSubmit={formik.handleSubmit}>

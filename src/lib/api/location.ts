@@ -39,15 +39,33 @@ export const fetchProvinces = async (filters?: { regionId: number }) => {
 };
 
 // Cities
-export const fetchCities = async () => {
-  try {
-    const url = validateRelativeUrl("/location/getCities");
-    const response = await axiosInstance.get(url);
-    return { success: true, message: "Cities fetched", data: response.data?.data || [] };
-  } catch (error) {
-    return handleError("fetchCities", error);
-  }
-};
+// export const fetchCities = async () => {
+//   try {
+//     const url = validateRelativeUrl("/location/getCities");
+//     const response = await axiosInstance.get(url);
+//     return { success: true, message: "Cities fetched", data: response.data?.data || [] };
+//   } catch (error) {
+//     return handleError("fetchCities", error);
+//   }
+// };
+
+export const fetchCities = async(filters?: { availableOnly?: boolean }) => {
+    try {
+        const url = validateRelativeUrl("/location/getCities");
+        const params: Record<string, any> = {};
+
+        //if (filters?.provinceId) params.provinceId = filters.provinceId;
+        if (filters?.availableOnly !== undefined) params.availableOnly = filters.availableOnly;
+
+        const response = await axiosInstance.get(url, { params });
+
+        return response.data;
+    }
+    catch (error) {
+        console.error("Error fetching cities:", (error as Error).message);
+        return { success: false, message: (error as Error).message, data: [] };
+    }
+}
 
 // PCSO Branches
 export const fetchPCSOBranch = async () => {
