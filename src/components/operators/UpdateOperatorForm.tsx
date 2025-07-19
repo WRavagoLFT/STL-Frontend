@@ -617,7 +617,8 @@ const OperatorViewPage: React.FC<OperatorUpdatePageProps> = ({
                   (opt) => opt.value === formik.values.areaOfOperations
                 ) || null
               }
-              isDisabled={isDisabled}
+              //isDisabled={isDisabled}
+              isDisabled
               onChange={(selected) =>
                 formik.setFieldValue("areaOfOperations", selected?.value)
               }

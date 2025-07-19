@@ -165,13 +165,24 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
             options={filterOptions}
             classNamePrefix="react-select"
             styles={{
-              control: (provided, state) => ({
-                ...provided,
-                borderRadius: "0.5rem",
-                color: "#2F2F2F",
-                padding: "0.25rem",
-                boxShadow: state.isFocused ? "none" : provided.boxShadow,
-              }),
+                control: (provided, state) => {
+                  const isDisabled = state.isDisabled;
+                  return {
+                    ...provided,
+                    fontSize: "0.875rem",
+                    //padding: "2px",
+                    minHeight: "35px",
+                    height: "32px",
+                    borderRadius: "9px",
+                    borderColor: "#0038A8",
+                    color: isDisabled ? "#6B7280" : "inherit",
+                    backgroundColor: "transparent",
+                    boxShadow: "none",
+                    '&:hover': {
+                      borderColor: "#0038A8",
+                    },
+                  };
+                },
               menu: (provided) => ({
                 ...provided,
                 zIndex: 10,
