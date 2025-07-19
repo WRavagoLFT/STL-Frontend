@@ -91,10 +91,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
 
   const provinceOptions = filteredProvinces;
   const cityOptions = filteredCities;
-  const availableExcludedCities = filteredCities;
-  //const selectedCities = Array.isArray(formData.cities) ? formData.cities : [];
+  //const availableExcludedCities = filteredCities;
+  const selectedCities = Array.isArray(formData.cities) ? formData.cities : [];
   //const availableExcludedCities = Array.isArray(formData.cities) ? formData.cities : [];
-  //const availableExcludedCities = cityOptions.filter((opt) => !selectedCities.includes(opt.value));
+  const availableExcludedCities = cityOptions.filter((opt) => !selectedCities.includes(opt.value));
 
   const handleSelectChange = (e: {
     target: { name: string; value: string };
@@ -505,7 +505,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                       ? "#EF4444 !important"
                       : "#0038A8 !important",
                   fontSize: "0.875rem",
-                  padding: "2px",
+                  // padding: "2px",
+                  minHeight: "35px",
+                  height: "32px",
+                  borderRadius: "9px",
                   color: isDisabled ? "#6B7280" : "inherit",
                   backgroundColor: "transparent",
                   cursor: isDisabled ? "not-allowed" : "default",
@@ -595,7 +598,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                         ? "#EF4444 !important"
                         : "#0038A8 !important",
                     fontSize: "0.875rem",
-                    padding: "2px",
+                    //padding: "2px",
+                    minHeight: "35px",
+                    height: "32px",
+                    borderRadius: "9px",
                     color: isDisabled ? "#6B7280" : "inherit",
                     backgroundColor: "transparent",
                     cursor: isDisabled ? "not-allowed" : "default",
@@ -659,7 +665,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                         ? "#EF4444 !important"
                         : "#0038A8 !important",
                     fontSize: "0.875rem",
-                    padding: "2px",
+                    //padding: "2px",
+                    minHeight: "35px",
+                    height: "32px",
+                    borderRadius: "9px",
                     color: isDisabled ? "#6B7280" : "inherit",
                     backgroundColor: "transparent",
                     cursor: isDisabled ? "not-allowed" : "default",
@@ -726,7 +735,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                           ? "#EF4444 !important"
                           : "#0038A8 !important",
                       fontSize: "0.875rem",
-                      padding: "2px",
+                      //padding: "2px",
+                      minHeight: "35px",
+                      height: "32px",
+                      borderRadius: "9px",
                       color: isDisabled ? "#6B7280" : "inherit",
                       backgroundColor: "transparent",
                       cursor: isDisabled ? "not-allowed" : "default",
@@ -793,7 +805,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                         ? "#EF4444 !important"
                         : "#0038A8 !important",
                     fontSize: "0.875rem",
-                    padding: "2px",
+                    //padding: "2px",
+                    minHeight: "35px",
+                    height: "32px",
+                    borderRadius: "9px",
                     color: isDisabled ? "#6B7280" : "inherit",
                     backgroundColor: "transparent",
                     cursor: isDisabled ? "not-allowed" : "default",

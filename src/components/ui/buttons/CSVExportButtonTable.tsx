@@ -1,6 +1,5 @@
 import React from "react";
 import { Button } from "@mui/material";
-import { buttonStyles } from "@/styles/theme";
 import { CSVExportButtonProps } from "@/types/interfaces";
 import { getRoleName, getUserStatus } from "@/hooks/dashboarddata";
 import dayjs from "dayjs";
@@ -108,9 +107,12 @@ const CSVExportButtonTable: React.FC<CSVExportButtonProps> = ({
   };
 
   return (
-    <Button sx={buttonStyles} variant="contained" onClick={downloadExcel}>
+    <button
+      onClick={downloadExcel}
+      className="bg-[#0038A8] hover:bg-blue-700 text-white rounded-lg px-6 py-2 text-[0.8rem]"
+    >
       Export as Excel
-    </Button>
+    </button>
   );
 };
 

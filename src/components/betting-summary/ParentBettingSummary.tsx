@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Button } from "@mui/material";
 import { useRouter } from "next/navigation";
 import Card from "../ui/dashboardcards/Cards";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -10,12 +9,17 @@ import { fetchWinners } from "@/lib/api/winners";
 import ChartBettorsvsBetsPlacedSummary from "./BettorsvsBetsPlacedChart";
 import ChartBettorsBetTypeSummary from "./BettorCountByBetType";
 import ChartBettorsSummary from "./BettorCountChart";
-import { buttonStyles } from "@/styles/theme";
 import BettingSummarySkeleton from "./BettingSummarySkeleton";
 import TableBettingActivityToday from "./BettingActivityTodayTable";
 import TableBettingSummary from "./BettingSummaryTable";
 
-const GAME_TITLES = ["STL", "STL Pares", "STL Swer 2", "STL Swer 3", "STL Swer 4"];
+const GAME_TITLES = [
+  "STL",
+  "STL Pares",
+  "STL Swer 2",
+  "STL Swer 3",
+  "STL Swer 4",
+];
 
 interface DashboardCardsData {
   totalBettors: number;
@@ -98,10 +102,9 @@ export const ParentBettingSummary = ({
               (item: { DateOfTransaction?: string }) => {
                 if (typeof item.DateOfTransaction !== "string") return false;
 
-                const localDate = new Date(item.DateOfTransaction).toLocaleDateString(
-                  "en-CA",
-                  { timeZone: "Asia/Manila" }
-                );
+                const localDate = new Date(
+                  item.DateOfTransaction
+                ).toLocaleDateString("en-CA", { timeZone: "Asia/Manila" });
 
                 return localDate === today;
               }
@@ -133,7 +136,9 @@ export const ParentBettingSummary = ({
   const handleViewComparisonClick = () => {
     const comparisonSlug = slugify(title);
     const mainSlug = slug || "dashboard";
-    router.push(`/betting-summary/${mainSlug}/betting-comparisons/${comparisonSlug}`);
+    router.push(
+      `/betting-summary/${mainSlug}/betting-comparisons/${comparisonSlug}`
+    );
   };
 
   const cardItems = [
@@ -166,14 +171,12 @@ export const ParentBettingSummary = ({
 
   const ComparisonButton = (
     <div className="w-full xl:w-auto xl:self-end xl:ml-auto my-3 flex">
-      <Button
-        fullWidth
-        variant="contained"
-        sx={buttonStyles}
+      <button
         onClick={handleViewComparisonClick}
+        className="bg-[#0038A8] hover:bg-blue-700 text-white rounded-lg px-6 py-2 text-[0.8rem]"
       >
         View Comparison
-      </Button>
+      </button>
     </div>
   );
 
@@ -185,11 +188,7 @@ export const ParentBettingSummary = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 w-full">
         {cardItems.map((item, index) => (
-          <Card
-            key={index}
-            label={item.label}
-            value={item.value}
-          />
+          <Card key={index} label={item.label} value={item.value} />
         ))}
       </div>
 
@@ -206,11 +205,13 @@ export const ParentBettingSummary = ({
                 {ComparisonButton}
               </div>
             </div>
-          ) : (userTypeId === 3 || userTypeId === 4) && (
-            <div className="w-full flex flex-col space-y-5">
-              {ChartSection}
-              {ComparisonButton}
-            </div>
+          ) : (
+            (userTypeId === 3 || userTypeId === 4) && (
+              <div className="w-full flex flex-col space-y-5">
+                {ChartSection}
+                {ComparisonButton}
+              </div>
+            )
           )}
 
           <TableBettingSummary gameCategoryId={gameCategoryId} />

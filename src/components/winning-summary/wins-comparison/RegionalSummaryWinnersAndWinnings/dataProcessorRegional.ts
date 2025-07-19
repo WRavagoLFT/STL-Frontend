@@ -117,9 +117,10 @@ export const processChart3Data = (
       );
 
       result[`firstDate${category.replace(/\s+/g, "")}`] =
-        firstDateItems.reduce((sum, item) => sum + item.TotalTumbokPayouts, 0);
+        firstDateItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0);
+
       result[`secondDate${category.replace(/\s+/g, "")}`] =
-        secondDateItems.reduce((sum, item) => sum + item.TotalSahodPayouts, 0);
+        secondDateItems.reduce((sum, item) => sum + item.TotalPayoutAmount, 0);
     });
 
     return result;
@@ -166,6 +167,43 @@ export const processChart6Data = (
   });
 };
 
+export const processChart7Data = (
+  payload: { Region: RegionSpecificData[][] },
+  firstDate: string,
+  secondDate: string,
+  datesMatch: (dateString1: string, dateString2: string) => boolean
+) => {
+  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
+
+  return philippineRegions.map((region, idx) => {
+    const result: any = { region };
+
+    const rawRegionData = payload.Region[idx] || [];
+
+    const firstRange = rawRegionData.filter(item => datesMatch(item.DateOfWinningCombination, firstDate));
+    const secondRange = rawRegionData.filter(item => datesMatch(item.DateOfWinningCombination, secondDate));
+
+    gameCategories.forEach((category) => {
+      const firstDateItems = firstRange.filter(item => item.GameCategory === category);
+      const secondDateItems = secondRange.filter(item => item.GameCategory === category);
+
+      const firstTotal = firstDateItems.reduce(
+        (sum, item) => sum + (Number(item.TotalWinners) || 0),
+        0
+      );
+      const secondTotal = secondDateItems.reduce(
+        (sum, item) => sum + (Number(item.TotalWinners) || 0),
+        0
+      );
+
+      result[`firstDate${category.replace(/\s+/g, "")}`] = firstTotal;
+      result[`secondDate${category.replace(/\s+/g, "")}`] = secondTotal;
+    });
+
+    return result;
+  });
+};
+
 export const processSpecificDatePayload = (
   urlParam: string,
   payload: any,
@@ -174,7 +212,7 @@ export const processSpecificDatePayload = (
   datesMatch: (dateString1: string, dateString2: string) => boolean
 ) => {
   if (!payload || !payload.Region) {
-    //console.warn("Invalid payload structure", payload);
+    console.warn("Invalid payload structure", payload);
     return [];
   }
 
@@ -189,8 +227,10 @@ export const processSpecificDatePayload = (
       return processChart6Data(payload, firstDate, secondDate, datesMatch); // MALI ITO
     case "6":
       return processChart6Data(payload, firstDate, secondDate, datesMatch);
+    case "7":
+      return processChart7Data(payload, firstDate, secondDate, datesMatch);
     default:
-      //console.warn("Unknown urlParam:", urlParam);
+      console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };
@@ -200,6 +240,7 @@ interface RegionRangeData {
   FirstRange: { TotalWinners?: number; TotalPayoutAmount?: number }[];
   SecondRange: { TotalWinners?: number; TotalPayoutAmount?: number }[];
 }
+
 export const processDurationChart1Data = (payload: { Region: RegionRangeData[] }) => {
   return payload.Region.map((regionData) => {
     const region = regionData.RegionName || "Unknown Region";
@@ -245,35 +286,35 @@ export const processDurationChart2Data = (payload: RangePayload) => {
     return {
       region: regionName,
       firstRangeTumbok: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0)),
         0
       ),
       secondRangeTumbok: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0)),
         0
       ),
       firstRangeSahod: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0)),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0)),
         0
       ),
       firstRangeRamble: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0)),
         0
       ),
       secondRangeRamble: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0)),
         0
       ),
       firstRangeCasas: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
         0
       ),
       secondRangeCasas: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
         0
       ),
     };
@@ -310,11 +351,11 @@ export const processDurationChart3Data = (payload: RangePayload) => {
       );
 
       result[`firstRange${category.replace(/\s+/g, "")}`] = firstRangeItems.reduce(
-        (sum: number, item: any) => sum + (item.TotalPayoutAmount || 0),
+        (sum: number, item: any) => sum + ((item.TotalPayoutAmount || 0)),
         0
       );
       result[`secondRange${category.replace(/\s+/g, "")}`] = secondRangeItems.reduce(
-        (sum: number, item: any) => sum + (item.TotalPayoutAmount || 0),
+        (sum: number, item: any) => sum + ((item.TotalPayoutAmount || 0)),
         0
       );
     });
@@ -387,27 +428,99 @@ export const processDurationChart5Data = (payload: RangePayload) => {
 };
 
 export const processDurationChart6Data = (payload: RangePayload) => {
+  return philippineRegions.map((regionName) => {
+    const regionBlock = payload?.Region?.find(
+      (r: any) =>
+        r.Region === regionName ||
+        r.RegionName === regionName ||
+        r.Region === `Region ${regionName}` ||
+        r.RegionName === `Region ${regionName}`
+    ) as { FirstRange?: any[]; SecondRange?: any[] };
+
+    if (!regionBlock) {
+      console.warn(`No region block found for "${regionName}"`);
+    }
+
+    const firstRangeItems = regionBlock?.FirstRange ?? [];
+    const secondRangeItems = regionBlock?.SecondRange ?? [];
+
+    const result = {
+      region: regionName,
+      firstRangeTumbok: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalTumbokWinners || 0)),
+        0
+      ),
+      secondRangeTumbok: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalTumbokWinners || 0)),
+        0
+      ),
+      firstRangeSahod: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalSahodWinners || 0)),
+        0
+      ),
+      secondRangeSahod: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalSahodWinners || 0)),
+        0
+      ),
+      firstRangeRamble: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalRambleWinners || 0)),
+        0
+      ),
+      secondRangeRamble: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalRambleWinners || 0)),
+        0
+      ),
+      firstRangeCasas: firstRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalCasasWinners || 0)),
+        0
+      ),
+      secondRangeCasas: secondRangeItems.reduce(
+        (sum: number, item: any) => sum + ((item.TotalCasasWinners || 0)),
+        0
+      ),
+    };
+
+    return result;
+  });
+};
+
+export const processDurationChart7Data = (payload: RangePayload) => {
   const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
 
-  return philippineRegions.map((region) => {
-    const result: any = { region };
+  return philippineRegions.map((regionName) => {
+    const result: any = { region: regionName };
+
+    // Find the region block from the payload
+    const regionBlock = payload.Region.find(
+      (r: any) =>
+        r.Region === regionName ||
+        r.RegionName === regionName ||
+        r.Region === `Region ${regionName}` ||
+        r.RegionName === `Region ${regionName}`
+    ) as {
+      FirstRange?: any[];
+      SecondRange?: any[];
+    };
+
+    const firstRange = regionBlock?.FirstRange ?? [];
+    const secondRange = regionBlock?.SecondRange ?? [];
 
     gameCategories.forEach((category) => {
-      const firstRangeItems = payload.Region.FirstRange.filter(
-        (item) =>
-          (item.Region === region || item.Region === `Region ${region}`) &&
-          item.GameCategory === category
+      const firstRangeItems = firstRange.filter(
+        (item: any) => item.GameCategory === category
       );
-      const secondRangeItems = payload.Region.SecondRange.filter(
-        (item) =>
-          (item.Region === region || item.Region === `Region ${region}`) &&
-          item.GameCategory === category
+      const secondRangeItems = secondRange.filter(
+        (item: any) => item.GameCategory === category
       );
 
-      result[`firstRange${category.replace(/\s+/g, "")}`] =
-        firstRangeItems.reduce((sum, item) => sum + item.TotalWinners, 0);
-      result[`secondRange${category.replace(/\s+/g, "")}`] =
-        secondRangeItems.reduce((sum, item) => sum + item.TotalWinners, 0);
+      result[`firstRange${category.replace(/\s+/g, "")}`] = firstRangeItems.reduce(
+        (sum: number, item: any) => sum + (item.TotalWinners || 0),
+        0
+      );
+      result[`secondRange${category.replace(/\s+/g, "")}`] = secondRangeItems.reduce(
+        (sum: number, item: any) => sum + (item.TotalWinners || 0),
+        0
+      );
     });
 
     return result;
@@ -436,6 +549,8 @@ export const processDurationPayload = (urlParam: string, payload: any) => {
       return processDurationChart5Data(payload);
     case "6":
       return processDurationChart6Data(payload);
+    case "7":
+      return processDurationChart7Data(payload);
     default:
       return [];
   }

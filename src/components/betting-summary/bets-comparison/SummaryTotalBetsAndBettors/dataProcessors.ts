@@ -52,6 +52,28 @@ export const processChart2Data = (payload: any, firstDate: string, secondDate: s
   });
 };
 
+export const processChart5Data = (payload: any, firstDate: string, secondDate: string): ChartData[] => {
+  const drawOrders = [1, 2, 3];
+
+  return drawOrders.map((drawOrder) => {
+    const items = payload.DrawOrder.filter((item: any) => item.DrawOrder === drawOrder);
+    const first = items.filter((item: { TransactionDate: string; }) => datesMatch(item.TransactionDate, firstDate));
+    const second = items.filter((item: { TransactionDate: string; }) => datesMatch(item.TransactionDate, secondDate));
+
+    return {
+      drawOrder,
+      firstDateTumbok: first.reduce((sum: any, item: { TotalBettors: { Tumbok: any; }; }) => sum + (item.TotalBettors || 0), 0),
+      secondDateTumbok: second.reduce((sum: any, item: { TotalBettors: { Tumbok: any; }; }) => sum + (item.TotalBettors || 0), 0),
+      firstDateSahod: first.reduce((sum: any, item: { TotalBettors: { Sahod: any; }; }) => sum + (item.TotalBettors || 0), 0),
+      secondDateSahod: second.reduce((sum: any, item: { TotalBettors: { Sahod: any; }; }) => sum + (item.TotalBettors || 0), 0),
+      firstDateRamble: first.reduce((sum: any, item: { TotalBettors: { Ramble: any; }; }) => sum + (item.TotalBettors || 0), 0),
+      secondDateRamble: second.reduce((sum: any, item: { TotalBettors: { Ramble: any; }; }) => sum + (item.TotalBettors || 0), 0),
+      firstDateCasas: first.reduce((sum: number, item: any) => sum + sumCasas(item), 0),
+      secondDateCasas: second.reduce((sum: number, item: any) => sum + sumCasas(item), 0),
+    };
+  });
+};
+
 const processGameCategoryChartData = (
   payload: any,
   firstDate: string,
@@ -82,7 +104,6 @@ export const processChart3Data = (payload: any, firstDate: string, secondDate: s
 export const processChart6Data = (payload: any, firstDate: string, secondDate: string): ChartData[] =>
   processGameCategoryChartData(payload, firstDate, secondDate, "TotalBettors");
 
-export const processChart5Data = processChart2Data;
 
 export const processSpecificDatePayload = (
   urlParam: string,
@@ -136,7 +157,24 @@ export const processDurationChart2Data = (payload: any): ChartData[] => {
   });
 };
 
-export const processDurationChart5Data = processDurationChart2Data;
+export const processDurationChart5Data = (payload: any): ChartData[] => {
+  return [1, 2, 3].map((drawOrder) => {
+    const first = filterRangeItems(payload, drawOrder, "FirstRange");
+    const second = filterRangeItems(payload, drawOrder, "SecondRange");
+
+    return {
+      drawOrder,
+      firstRangeTumbok: first.reduce((sum: any, item: any) => sum + (item.TotalBettors || 0), 0),
+      secondRangeTumbok: second.reduce((sum: any, item: any) => sum + (item.TotalBettors || 0), 0),
+      firstRangeSahod: first.reduce((sum: any, item: any) => sum + (item.TotalBettors || 0), 0),
+      secondRangeSahod: second.reduce((sum: any, item: any) => sum + (item.TotalBettors || 0), 0),
+      firstRangeCasas: first.reduce((sum: number, item: any) => sum + sumCasas(item), 0),
+      secondRangeCasas: second.reduce((sum: number, item: any) => sum + sumCasas(item), 0),
+    };
+  });
+};
+
+// export const processDurationChart5Data = processDurationChart2Data;
 
 const processDurationGameCategoryChartData = (
   payload: any,

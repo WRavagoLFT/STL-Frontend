@@ -26,8 +26,8 @@ export const processChart1Data = (
     );
 
     const firstDateWinners = firstItem?.TotalWinners ?? 0;
-    const secondDateWinners = secondItem?.TotalPayoutAmount ?? 0;
-    const firstDateWinnings = firstItem?.TotalWinners ?? 0;
+    const secondDateWinners = secondItem?.TotalWinners ?? 0;
+    const firstDateWinnings = firstItem?.TotalPayoutAmount ?? 0;
     const secondDateWinnings = secondItem?.TotalPayoutAmount ?? 0;
 
     return {
@@ -59,38 +59,38 @@ export const processChart2Data = (
     );
 
     const firstDateTumbok = firstDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0)),
       0
     );
     const secondDateTumbok = secondDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalTumbokPayouts || 0)),
       0
     );
 
     const firstDateSahod = firstDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0)),
       0
     );
     const secondDateSahod = secondDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalSahodPayouts || 0)),
       0
     );
 
     const firstDateRamble = firstDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0)),
       0
     );
     const secondDateRamble = secondDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalRamblePayouts || 0)),
       0
     );
 
     const firstDateCasas = firstDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
       0
     );
     const secondDateCasas = secondDateItems.reduce(
-      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+      (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
       0
     );
 
@@ -136,8 +136,8 @@ export const processChart3Data = (
 
       const keyPrefix = category.replace(/\s+/g, "");
 
-      const firstValue = firstItem?.TotalPayoutAmount ?? 0;
-      const secondValue = secondItem?.TotalPayoutAmount ?? 0;
+      const firstValue = (firstItem?.TotalPayoutAmount ?? 0);
+      const secondValue = (secondItem?.TotalPayoutAmount ?? 0);
 
       result[`firstDate${keyPrefix}`] = firstValue;
       result[`secondDate${keyPrefix}`] = secondValue;
@@ -271,6 +271,54 @@ export const processChart5Data = (
 
 };
 
+export const processChart7Data = (
+  payload: SpecificDatePayload,
+  firstDate: string,
+  secondDate: string,
+  datesMatch: (dateString1: string, dateString2: string) => boolean
+) => {
+  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
+
+  // Get all unique draw orders
+  const uniqueDrawOrders = [
+    ...new Set(payload.DrawOrder.map((item: any) => item.DrawOrder)),
+  ];
+
+  return uniqueDrawOrders.map((drawOrder) => {
+    const result: any = { drawOrder };
+
+    console.log(`\nProcessing DrawOrder: ${drawOrder}`);
+
+    gameCategories.forEach((category) => {
+      const allItems = payload.DrawOrder.filter(
+        (item: any) =>
+          item.DrawOrder === drawOrder && item.GameCategory === category
+      );
+
+      const firstDateItems = allItems.filter((item: any) =>
+        datesMatch(item.DateOfWinningCombination, firstDate)
+      );
+      const secondDateItems = allItems.filter((item: any) =>
+        datesMatch(item.DateOfWinningCombination, secondDate)
+      );
+
+      const firstTotal = firstDateItems.reduce(
+        (sum: number, item: any) => sum + (Number(item.TotalWinners) || 0),
+        0
+      );
+      const secondTotal = secondDateItems.reduce(
+        (sum: number, item: any) => sum + (Number(item.TotalWinners) || 0),
+        0
+      );
+
+      result[`firstDate${category.replace(/\s+/g, "")}`] = firstTotal;
+      result[`secondDate${category.replace(/\s+/g, "")}`] = secondTotal;
+    });
+
+    return result;
+  });
+};
+
 export const processSpecificDatePayload = (
   urlParam: string,
   payload: any,
@@ -295,8 +343,10 @@ export const processSpecificDatePayload = (
       return processChart5Data(payload, firstDate, secondDate, datesMatch);
     case "6":
       return processChart6Data(payload, firstDate, secondDate, datesMatch);
+    case "7":
+      return processChart7Data(payload, firstDate, secondDate, datesMatch);
     default:
-      //console.warn("Unknown urlParam:", urlParam);
+      console.warn("Unknown urlParam:", urlParam);
       return [];
   }
 };
@@ -345,36 +395,36 @@ export const processDurationChart2Data = (payload: any) => {
     return {
       drawOrder,
       firstRangeTumbok: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0)),
         0
       ),
       secondRangeTumbok: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalTumbokPayouts || 0)),
         0
       ),
       firstRangeSahod: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0)),
         0
       ),
       secondRangeSahod: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalSahodPayouts || 0)),
         0
       ),
       firstRangeRamble: firstRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0)),
         0
       ),
       secondRangeRamble: secondRangeItems.reduce(
-        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0) / 10000),
+        (sum: number, item: chartTwoFive_Range) => sum + ((item.TotalRamblePayouts || 0)),
         0
       ),
       
       firstRangeCasas: firstRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
         0
       ),
       secondRangeCasas: secondRangeItems.reduce(
-        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0) / 10000),
+        (sum: number, item: any) => sum + ((item.TotalCasasPayouts || 0)),
         0
       ),
     };
@@ -403,12 +453,12 @@ export const processDurationChart3Data = (payload: any) => {
       );
 
       result[`firstRange${category.replace(/\s+/g, "")}`] = firstRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + (item.TotalPayoutAmount ?? 0),
+        (sum: number, item: chartThreeSix_Range) => sum + ((item.TotalPayoutAmount ?? 0)),
         0
       );
 
       result[`secondRange${category.replace(/\s+/g, "")}`] = secondRangeItems.reduce(
-        (sum: number, item: chartThreeSix_Range) => sum + (item.TotalPayoutAmount ?? 0),
+        (sum: number, item: chartThreeSix_Range) => sum + ((item.TotalPayoutAmount ?? 0)),
         0
       );
     });
@@ -514,6 +564,55 @@ export const processDurationChart6Data = (payload: any) => {
   });
 };
 
+export const processDurationChart7Data = (payload: any) => {
+  const gameCategories = ["STL Pares", "STL Swer2", "STL Swer3", "STL Swer4"];
+
+  // Fallback to empty arrays if not present
+  const firstRange = payload?.DrawOrder?.FirstRange ?? [];
+  const secondRange = payload?.DrawOrder?.SecondRange ?? [];
+
+  // Extract unique draw orders from both ranges
+  const uniqueDrawOrders = [
+    ...new Set([
+      ...firstRange.map((item: any) => item.DrawOrder),
+      ...secondRange.map((item: any) => item.DrawOrder),
+    ]),
+  ];
+
+  return uniqueDrawOrders.map((drawOrder) => {
+    const result: any = { drawOrder };
+
+    gameCategories.forEach((category) => {
+      const firstRangeItems = firstRange.filter(
+        (item: chartThreeSix_Range) =>
+          item.DrawOrder === drawOrder && item.GameCategory === category
+      );
+
+      const secondRangeItems = secondRange.filter(
+        (item: chartThreeSix_Range) =>
+          item.DrawOrder === drawOrder && item.GameCategory === category
+      );
+
+      const firstTotal = firstRangeItems.reduce(
+        (sum: number, item: chartThreeSix_Range) =>
+          sum + (Number((item.TotalWinners) || 0) ),
+        0
+      );
+
+      const secondTotal = secondRangeItems.reduce(
+        (sum: number, item: chartThreeSix_Range) =>
+          sum + (Number((item.TotalWinners) || 0) ),
+        0
+      );
+
+      result[`firstRange${category.replace(/\s+/g, "")}`] = firstTotal;
+      result[`secondRange${category.replace(/\s+/g, "")}`] = secondTotal;
+    });
+
+    return result;
+  });
+};
+
 export const processDurationPayload = (urlParam: string, payload: any) => {
   if (!payload || !payload.DrawOrder) {
     console.warn("Invalid payload structure", payload, );
@@ -530,6 +629,8 @@ export const processDurationPayload = (urlParam: string, payload: any) => {
       return processDurationChart5Data(payload);
     case "6":
       return processDurationChart6Data(payload);
+    case "7":
+      return processDurationChart7Data(payload);
     default:
       console.warn("Unknown urlParam:", urlParam);
       return [];

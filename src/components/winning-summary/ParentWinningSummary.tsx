@@ -8,7 +8,6 @@ import ChartWinnersvsWinningsSummary from "@/components/winning-summary/Winnersv
 import TableWinningSummary from "@/components/winning-summary/WinningSummaryTable";
 import ChartWinnersBetTypeSummary from "@/components/winning-summary/WinnerCountBetTypeChart";
 import WinningSummarySkeleton from "@/components/winning-summary/WinningSummarySkeleton";
-import { buttonStyles } from "@/styles/theme";
 import { useAuthStore } from "@/store/useAuthStore";
 import ChartWinnersSummary from "@/components/winning-summary/WinnerCountChart";
 import Card from "../ui/dashboardcards/Cards";
@@ -172,14 +171,12 @@ export const ParentWinningSummaryPage = ({
 
   const ComparisonButton = (
     <div className="w-full xl:w-auto xl:self-end xl:ml-auto my-3 flex">
-      <Button
-        fullWidth
-        variant="contained"
-        sx={buttonStyles}
+      <button
         onClick={handleViewComparisonClick}
+        className="bg-[#0038A8] hover:bg-blue-700 text-white rounded-lg px-6 py-2 text-[0.8rem]"
       >
         View Comparison
-      </Button>
+      </button>
     </div>
   );
 

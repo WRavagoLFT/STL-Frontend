@@ -26,7 +26,8 @@ export const fetchFormOptionsData = async () => {
     const gameTypesResponse = await fetchGameCategories();
     const regionsRes = await fetchRegions();
     const provincesRes = await fetchProvinces();
-    const citiesRes = await fetchCities();
+    //const citiesRes = await fetchCities();
+    const citiesRes = await fetchCities({ availableOnly: true });
     const areaOpsRes = await fetchAreaOfOperations();
 
     setGameTypes(gameTypesResponse.data);
