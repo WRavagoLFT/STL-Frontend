@@ -39,32 +39,50 @@ export const generateSeries = (
 
     return [
       {
-        data: typedChartData.map((item) => ((isDuration ? item.firstRangeBettors : item.firstDateBettors) || 0) / 100000),
+        data: typedChartData.map(
+          (item) =>
+            ((isDuration ? item.firstRangeBettors : item.firstDateBettors) ||
+              0) / 100000
+        ),
         label: `Bettors ${firstLabel}`,
         color: "#E5C7FF",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeBettors' : 'firstDateBettors'] || 0)).toLocaleString()}`,
+          `${(typedChartData[context.dataIndex]?.[isDuration ? "firstRangeBettors" : "firstDateBettors"] || 0).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.secondRangeBettors : item.secondDateBettors) || 0) / 100000),
+        data: typedChartData.map(
+          (item) =>
+            ((isDuration ? item.secondRangeBettors : item.secondDateBettors) ||
+              0) / 100000
+        ),
         label: `Bettors ${secondLabel}`,
         color: "#5050A5",
         valueFormatter: (_value: number | null, context: any) =>
-          `${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeBettors' : 'secondDateBettors'] || 0)).toLocaleString()}`,
+          `${(typedChartData[context.dataIndex]?.[isDuration ? "secondRangeBettors" : "secondDateBettors"] || 0).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.secondRangeTotalBetAmount : item.firstDateBets) || 0) / 100000),
+        data: typedChartData.map(
+          (item) =>
+            ((isDuration
+              ? item.secondRangeTotalBetAmount
+              : item.firstDateBets) || 0) / 100000
+        ),
         label: `Bets ${firstLabel}`,
         color: "#7266C9",
         valueFormatter: (_value: number | null, context: any) =>
-          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeTotalBetAmount' : 'firstDateBets'] || 0)).toLocaleString()}`,
+          `₱${(typedChartData[context.dataIndex]?.[isDuration ? "secondRangeTotalBetAmount" : "firstDateBets"] || 0).toLocaleString()}`,
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.firstRangeTotalBetAmount : item.secondDateBets) || 0) / 100000),
+        data: typedChartData.map(
+          (item) =>
+            ((isDuration
+              ? item.firstRangeTotalBetAmount
+              : item.secondDateBets) || 0) / 100000
+        ),
         label: `Bets ${secondLabel}`,
         color: "#3B3B81",
         valueFormatter: (_value: number | null, context: any) =>
-          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeTotalBetAmount' : 'secondDateBets'] || 0)).toLocaleString()}`,
+          `₱${(typedChartData[context.dataIndex]?.[isDuration ? "firstRangeTotalBetAmount" : "secondDateBets"] || 0).toLocaleString()}`,
       },
     ];
   } else if (urlParam === "2" || urlParam === "5") {
@@ -74,78 +92,172 @@ export const generateSeries = (
       return [];
     }
 
+    const showPeso = urlParam === "2";
+    const formatValue = (value: number) =>
+      `${showPeso ? "₱" : ""}${value.toLocaleString()}`;
+
+    const getRawValue = (item: Chart25Data, key: keyof Chart25Data) =>
+      (item?.[key] as number | null) || 0;
+
     const series: any[] = [];
 
+    // Tumbok
     series.push(
       {
-        data: typedChartData.map((item) => ((isDuration ? item.firstRangeTumbok : item.firstDateTumbok) || 0) / 100000),
+        data: typedChartData.map(
+          (item) =>
+            getRawValue(
+              item,
+              isDuration ? "firstRangeTumbok" : "firstDateTumbok"
+            ) / 100000
+        ),
         label: `Tumbok ${firstLabel}`,
         color: "#E5C7FF",
-        valueFormatter: (_value: number | null, context: any) =>
-          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeTumbok' : 'firstDateTumbok'] || 0)).toLocaleString()}`,
+        valueFormatter: (_value: number | null, context: any) => {
+          const raw = getRawValue(
+            typedChartData[context.dataIndex],
+            isDuration ? "firstRangeTumbok" : "firstDateTumbok"
+          );
+          return formatValue(raw);
+        },
       },
       {
-        data: typedChartData.map((item) => ((isDuration ? item.secondRangeTumbok : item.secondDateTumbok) || 0) / 100000),
+        data: typedChartData.map(
+          (item) =>
+            getRawValue(
+              item,
+              isDuration ? "secondRangeTumbok" : "secondDateTumbok"
+            ) / 100000
+        ),
         label: `Tumbok ${secondLabel}`,
         color: "#5050A5",
-        valueFormatter: (_value: number | null, context: any) =>
-          `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeTumbok' : 'secondDateTumbok'] || 0)).toLocaleString()}`,
-      },
+        valueFormatter: (_value: number | null, context: any) => {
+          const raw = getRawValue(
+            typedChartData[context.dataIndex],
+            isDuration ? "secondRangeTumbok" : "secondDateTumbok"
+          );
+          return formatValue(raw);
+        },
+      }
     );
 
+    // Sahod & Casas
     if (gameCategoryId === 1 || gameCategoryId === 2 || gameCategoryId === 0) {
       series.push(
         {
-          data: typedChartData.map((item) => ((isDuration ? item.firstRangeSahod : item.firstDateSahod) || 0) / 100000),
+          data: typedChartData.map(
+            (item) =>
+              getRawValue(
+                item,
+                isDuration ? "firstRangeSahod" : "firstDateSahod"
+              ) / 100000
+          ),
           label: `Sahod ${firstLabel}`,
           color: "#7266C9",
-          valueFormatter: (_value: number | null, context: any) =>
-            `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeSahod' : 'firstDateSahod'] || 0)).toLocaleString()}`,
-        },
-        {
-          data: typedChartData.map((item) => ((isDuration ? item.secondRangeSahod : item.secondDateSahod) || 0) / 100000),
-          label: `Sahod ${secondLabel}`,
-          color: "#3B3B81",
-          valueFormatter: (_value: number | null, context: any) =>
-            `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeSahod' : 'secondDateSahod'] || 0)).toLocaleString()}`,
+          valueFormatter: (_value: number | null, context: any) => {
+            const raw = getRawValue(
+              typedChartData[context.dataIndex],
+              isDuration ? "firstRangeSahod" : "firstDateSahod"
+            );
+            return formatValue(raw);
+          },
         },
         {
           data: typedChartData.map(
-            (item) => ((isDuration ? item.firstRangeCasas : item.firstDateCasas) || 0) / 100000
+            (item) =>
+              getRawValue(
+                item,
+                isDuration ? "secondRangeSahod" : "secondDateSahod"
+              ) / 100000
+          ),
+          label: `Sahod ${secondLabel}`,
+          color: "#3B3B81",
+          valueFormatter: (_value: number | null, context: any) => {
+            const raw = getRawValue(
+              typedChartData[context.dataIndex],
+              isDuration ? "secondRangeSahod" : "secondDateSahod"
+            );
+            return formatValue(raw);
+          },
+        },
+        {
+          data: typedChartData.map(
+            (item) =>
+              getRawValue(
+                item,
+                isDuration ? "firstRangeCasas" : "firstDateCasas"
+              ) / 100000
           ),
           label: `Casas ${firstLabel}`,
           color: "#7266C9",
-          valueFormatter: (_value: number | null, context: any) =>
-            `₱${(typedChartData[context.dataIndex]?.[isDuration ? "firstRangeCasas" : "firstDateCasas"] || 0).toLocaleString()}`,
+          valueFormatter: (_value: number | null, context: any) => {
+            const raw = getRawValue(
+              typedChartData[context.dataIndex],
+              isDuration ? "firstRangeCasas" : "firstDateCasas"
+            );
+            return formatValue(raw);
+          },
         },
         {
           data: typedChartData.map(
-            (item) => ((isDuration ? item.secondRangeCasas : item.secondDateCasas) || 0) / 100000
+            (item) =>
+              getRawValue(
+                item,
+                isDuration ? "secondRangeCasas" : "secondDateCasas"
+              ) / 100000
           ),
           label: `Casas ${secondLabel}`,
           color: "#3B3B81",
-          valueFormatter: (_value: number | null, context: any) =>
-            `₱${(typedChartData[context.dataIndex]?.[isDuration ? "secondRangeCasas" : "secondDateCasas"] || 0).toLocaleString()}`,
-        },
+          valueFormatter: (_value: number | null, context: any) => {
+            const raw = getRawValue(
+              typedChartData[context.dataIndex],
+              isDuration ? "secondRangeCasas" : "secondDateCasas"
+            );
+            return formatValue(raw);
+          },
+        }
       );
     }
 
+    // Ramble
     if (gameCategoryId === 3 || gameCategoryId === 4 || gameCategoryId === 0) {
       series.push(
         {
-          data: typedChartData.map((item) => ((isDuration ? item.firstRangeRamble : item.firstDateRamble) || 0) / 100000),
+          data: typedChartData.map(
+            (item) =>
+              getRawValue(
+                item,
+                isDuration ? "firstRangeRamble" : "firstDateRamble"
+              ) / 100000
+          ),
           label: `Ramble ${firstLabel}`,
           color: "#7266C9",
-          valueFormatter: (_value: number | null, context: any) =>
-            `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'firstRangeRamble' : 'firstDateRamble'] || 0)).toLocaleString()}`,
+          valueFormatter: (_value: number | null, context: any) => {
+            const raw = getRawValue(
+              typedChartData[context.dataIndex],
+              isDuration ? "firstRangeRamble" : "firstDateRamble"
+            );
+            return formatValue(raw);
+          },
         },
         {
-          data: typedChartData.map((item) => ((isDuration ? item.secondRangeRamble : item.secondDateRamble) || 0) / 100000),
+          data: typedChartData.map(
+            (item) =>
+              getRawValue(
+                item,
+                isDuration ? "secondRangeRamble" : "secondDateRamble"
+              ) / 100000
+          ),
           label: `Ramble ${secondLabel}`,
           color: "#3B3B81",
-          valueFormatter: (_value: number | null, context: any) =>
-            `₱${((typedChartData[context.dataIndex]?.[isDuration ? 'secondRangeRamble' : 'secondDateRamble'] || 0)).toLocaleString()}`,
-        },
+          valueFormatter: (_value: number | null, context: any) => {
+            const raw = getRawValue(
+              typedChartData[context.dataIndex],
+              isDuration ? "secondRangeRamble" : "secondDateRamble"
+            );
+            return formatValue(raw);
+          },
+        }
       );
     }
 
@@ -157,30 +269,48 @@ export const generateSeries = (
       return [];
     }
 
+    const showPeso = urlParam === "3";
+
+    const formatValue = (value: number) =>
+      `${showPeso ? "₱" : ""}${value.toLocaleString()}`;
+
+    const getRawValue = (item: Chart36Data, key: keyof Chart36Data): number =>
+      (item?.[key] as number | null) || 0;
+
     return GAME_CATEGORIES.flatMap((category) => {
       const keyPrefix = isDuration ? "firstRange" : "firstDate";
       const secondKeyPrefix = isDuration ? "secondRange" : "secondDate";
       const categoryKey = category.replace(/\s+/g, "");
+      const fullKey1 = `${keyPrefix}${categoryKey}` as keyof Chart36Data;
+      const fullKey2 = `${secondKeyPrefix}${categoryKey}` as keyof Chart36Data;
 
       return [
         {
-          data: typedChartData.map((item) => ((item[`${keyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0) / 100000),
+          data: typedChartData.map(
+            (item) => getRawValue(item, fullKey1) / 100000
+          ),
           label: `${category.replace("STL", "STL ")} ${firstLabel}`,
-          color: getCategoryColor(category.replace(/\s+/g, ""), true),
+          color: getCategoryColor(categoryKey, true),
           valueFormatter: (_value: number | null, context: any) =>
-            `${((typedChartData[context.dataIndex]?.[`${keyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0).toLocaleString()}`,
+            formatValue(
+              getRawValue(typedChartData[context.dataIndex], fullKey1)
+            ),
         },
         {
-          data: typedChartData.map((item) => ((item[`${secondKeyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0) / 100000),
+          data: typedChartData.map(
+            (item) => getRawValue(item, fullKey2) / 100000
+          ),
           label: `${category.replace("STL", "STL ")} ${secondLabel}`,
-          color: getCategoryColor(category.replace(/\s+/g, ""), false),
+          color: getCategoryColor(categoryKey, false),
           valueFormatter: (_value: number | null, context: any) =>
-            `${((typedChartData[context.dataIndex]?.[`${secondKeyPrefix}${categoryKey}` as keyof Chart36Data] as number) || 0).toLocaleString()}`,
+            formatValue(
+              getRawValue(typedChartData[context.dataIndex], fullKey2)
+            ),
         },
       ];
     });
   }
 
-  //console.warn("Unknown urlParam:", urlParam);
+  console.warn("Unknown urlParam:", urlParam);
   return [];
 };

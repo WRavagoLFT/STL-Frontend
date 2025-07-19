@@ -56,11 +56,11 @@ const processChart1Data = (
   });
 };
 
-const processRegionalTumbokSahodCasasData = (
+const processChart2Data = (
   payload: { Region: Array<RegionSpecificData[]> },
   firstDate: string,
   secondDate: string,
-  useNestedBetTypes: boolean
+  useNestedBetTypes?: boolean
 ) => {
   return philippineRegions.map((region) => {
     const allRegionItems = payload.Region.flat().filter(
@@ -91,11 +91,41 @@ const processRegionalTumbokSahodCasasData = (
   });
 };
 
-const processChart2Data = (payload: { Region: Array<RegionSpecificData[]> }, firstDate: string, secondDate: string
-  ) => processRegionalTumbokSahodCasasData(payload, firstDate, secondDate, true);
 
-const processChart5Data = (payload: { Region: Array<RegionSpecificData[]> }, firstDate: string, secondDate: string
-  ) => processRegionalTumbokSahodCasasData(payload, firstDate, secondDate, false);
+const processChart5Data = (
+  payload: { Region: Array<RegionSpecificData[]> },
+  firstDate: string,
+  secondDate: string,
+  useNestedBetTypes?: boolean
+) => {
+  return philippineRegions.map((region) => {
+    const allRegionItems = payload.Region.flat().filter(
+      (item) => item.Region === region || item.Region === `Region ${region}`
+    );
+
+    const firstDateItems = allRegionItems.filter((item) =>
+      datesMatch(item.TransactionDate, firstDate)
+    );
+    const secondDateItems = allRegionItems.filter((item) =>
+      datesMatch(item.TransactionDate, secondDate)
+    );
+
+    const getTumbok = (item: any) =>
+      useNestedBetTypes ? item.TotalBettors || 0 : item.TotalBettors || 0;
+    const getSahod = (item: any) =>
+      useNestedBetTypes ? item.TotalBettors || 0 : item.TotalBettors || 0;
+
+    return {
+      region,
+      firstDateTumbok: firstDateItems.reduce((sum, item) => sum + getTumbok(item), 0),
+      secondDateTumbok: secondDateItems.reduce((sum, item) => sum + getTumbok(item), 0),
+      firstDateSahod: firstDateItems.reduce((sum, item) => sum + getSahod(item), 0),
+      secondDateSahod: secondDateItems.reduce((sum, item) => sum + getSahod(item), 0),
+      firstDateCasas: firstDateItems.reduce((sum, item) => sum + sumCasas(item), 0),
+      secondDateCasas: secondDateItems.reduce((sum, item) => sum + sumCasas(item), 0),
+    };
+  });
+};
 
 const processRegionalGameCategoryChartData = (
   payload: { Region: Array<RegionSpecificData[]> },
@@ -174,9 +204,9 @@ const processDurationChart1Data = (payload: RangePayload) => {
   });
 };
 
-const processDurationTumbokSahodCasas = (
+const processDurationChart2Data = (
   payload: RangePayload,
-  useNestedBetTypes: boolean
+  useNestedBetTypes?: boolean
 ) => {
   return philippineRegions.map((region) => {
     const firstRangeItems = payload.Region.FirstRange.filter((item) => item.Region === region || item.Region === `Region ${region}`);
@@ -197,8 +227,31 @@ const processDurationTumbokSahodCasas = (
   });
 };
 
-const processDurationChart2Data = (payload: RangePayload) => processDurationTumbokSahodCasas(payload, true);
-const processDurationChart5Data = (payload: RangePayload) => processDurationTumbokSahodCasas(payload, false);
+const processDurationChart5Data = (
+  payload: RangePayload,
+  useNestedBetTypes?: boolean
+) => {
+  return philippineRegions.map((region) => {
+    const firstRangeItems = payload.Region.FirstRange.filter((item) => item.Region === region || item.Region === `Region ${region}`);
+    const secondRangeItems = payload.Region.SecondRange.filter((item) => item.Region === region || item.Region === `Region ${region}`);
+
+    const getTumbok = (item: any) => useNestedBetTypes ? item.TotalBettors || 0 : item.TotalBettors || 0;
+    const getSahod = (item: any) => useNestedBetTypes ? item.TotalBettors || 0 : item.TotalBettors || 0;
+
+    return {
+      region,
+      firstRangeTumbok: firstRangeItems.reduce((sum, item) => sum + getTumbok(item), 0),
+      secondRangeTumbok: secondRangeItems.reduce((sum, item) => sum + getTumbok(item), 0),
+      firstRangeSahod: firstRangeItems.reduce((sum, item) => sum + getSahod(item), 0),
+      secondRangeSahod: secondRangeItems.reduce((sum, item) => sum + getSahod(item), 0),
+      firstRangeCasas: firstRangeItems.reduce((sum, item) => sum + sumCasas(item), 0),
+      secondRangeCasas: secondRangeItems.reduce((sum, item) => sum + sumCasas(item), 0),
+    };
+  });
+};
+
+// const processDurationChart2Data = (payload: RangePayload) => processDurationTumbokSahodCasas(payload, true);
+// const processDurationChart5Data = (payload: RangePayload) => processDurationTumbokSahodCasas(payload, false);
 
 const processDurationGameCategoryData = (
   payload: RangePayload,

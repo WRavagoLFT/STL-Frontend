@@ -177,7 +177,7 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
       <div className="w-full mb-2 flex flex-col xl:flex-row xl:items-center xl:justify-between">
          <div className="flex flex-col leading-none">
         
-        <p className="text-[16px] font-normal leading-[18px] mb-[10px]">
+        <p className="text-[16px] font-normal leading-[18px]">
           {`Summary of ${categoryFilter}`}
         </p>
           <CustomLegend
