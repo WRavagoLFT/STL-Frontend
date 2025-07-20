@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { LoginSectionData } from "@/data/LoginSectionData";
 import { verifyPass } from "@/lib/api/auth/auth.service";
@@ -26,8 +26,7 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [remarks, setRemarks] = useState("");
 
-  const handleTogglePasswordVisibility = () =>
-    setShowPassword((prev) => !prev);
+  const handleTogglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
   const handleVerifyUserAction = async () => {
     if (!password.trim()) {
@@ -41,7 +40,7 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
       setError("Remarks are required for suspension.");
       return;
     }
-  
+
     setLoading(true);
     try {
       const { success: isVerified } = await verifyPass(password);
@@ -55,17 +54,34 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
       setError("");
 
       if (mode === "suspend") {
-        await onConfirm(remarks); 
+        await onConfirm(remarks);
       } else {
         await onConfirm();
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("[ERROR] Unexpected error during verification:", err);
-      setError("An error occurred during verification.");
+
+      if (err?.response?.status === 401) {
+        setError("Incorrect password.");
+      } else {
+        setError("An error occurred during verification.");
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  // useEffect(() => {
+  //   if (open) {
+  //     document.body.style.overflow = "hidden"; // Disable scroll
+  //   } else {
+  //     document.body.style.overflow = ""; // Re-enable scroll
+  //   }
+
+  //   return () => {
+  //     document.body.style.overflow = ""; // Cleanup on unmount
+  //   };
+  // }, [open]);
 
   if (!open) return null;
 
@@ -108,33 +124,41 @@ const ConfirmUserActionModalPage: React.FC<ConfirmUserActionModalProps> = ({
             )}
 
             <div className="relative w-full mb-2">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`w-full px-4 py-2.5 pr-10 text-sm rounded-md bg-transparent border ${
-                  error ? "border-red-500" : "border-gray-600"
-                } bg-[#1F1F1F] placeholder-gray-400 focus:outline-none focus:ring-2 ${
-                  error ? "focus:ring-red-500" : "focus:ring-white-200"
-                }`}
-                autoFocus
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={handleTogglePasswordVisibility}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-sm text-gray-600"
-                tabIndex={-1}
-                disabled={loading}
-              >
-                {showPassword ? (
-                  <VisibilityOff fontSize="small" />
-                ) : (
-                  <Visibility fontSize="small" />
-                )}
-              </button>
+              <div className="flex items-center relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleVerifyUserAction();
+                    }
+                  }}
+                  className={`w-full px-4 py-2.5 pr-10 text-sm rounded-md bg-transparent border ${
+                    error ? "border-red-500" : "border-gray-600"
+                  } bg-[#1F1F1F] placeholder-gray-400 focus:outline-none focus:ring-2 ${
+                    error ? "focus:ring-red-500" : "focus:ring-white-200"
+                  }`}
+                  autoFocus
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={handleTogglePasswordVisibility}
+                  className="absolute right-3 text-sm text-gray-600"
+                  tabIndex={-1}
+                  disabled={loading}
+                >
+                  {showPassword ? (
+                    <VisibilityOff fontSize="small" />
+                  ) : (
+                    <Visibility fontSize="small" />
+                  )}
+                </button>
+              </div>
               {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
             </div>
 

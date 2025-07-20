@@ -189,7 +189,7 @@ const LoginPage = () => {
                 )}
                 <div className="ml-auto">
                   <a
-                    href="/auth/forgot-password"
+                    href="/forgot-password"
                     className="text-[#0038A8] text-xs hover:underline"
                   >
                     {LoginSectionData.forgotPassword}
