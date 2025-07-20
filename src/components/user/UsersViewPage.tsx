@@ -139,7 +139,6 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center my-4">
-        {/* Left side */}
         <div className="flex flex-col md:flex-row gap-4 md:gap-6">
           <button
             onClick={() => setActiveTab("kabo")}
@@ -162,8 +161,6 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
             Device Information
           </button>
         </div>
-
-        {/* Right side */}
         <div className="flex justify-start">
           <button
             onClick={() => setActiveTab("history")}

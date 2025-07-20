@@ -164,7 +164,6 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
       () => setIsCreateModalOpen(false)
     );
   };
-
   return (
     <Suspense fallback={<UsersSkeletonPage />}>
       <div className="mx-auto px-0 py-8 md:py-0">

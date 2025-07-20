@@ -40,8 +40,10 @@ const SidebarLogoSection: React.FC<SidebarUserSectionProps> = ({
             <div className="flex ml-auto">
               <img
                 src={UserSectionData.image}
-                alt="Logo"
-                className="transition-all duration-300 max-w-[8rem]"
+                alt="User avatar"
+                width={100}
+                height={100}
+                className="w-40 h-50 object-cover"
               />
             </div>
           )}

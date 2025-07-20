@@ -64,16 +64,6 @@ export const ChartCard = <T,>({
     };
     return map[pageType ?? ""] || "Users";
   })();
-
-  console.log("loading state: ", loading);
-
-  //const [loading, setLoading] = useState(true);
-  // useEffect(() => {
-  //   if (chartData && chartData.length > 0 && chartData[0].data.length > 0) {
-  //     setLoading(false);
-  //   }
-  // }, [chartData]);
-
   return (
     <div className="bg-transparent px-4 py-7 my-8 rounded-xl border border-[#0038A8] overflow-x-auto">
       <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -104,6 +94,7 @@ export const ChartCard = <T,>({
               item.deleted ?? 0,
               item.new ?? 0,
             ]}
+            loading={loading}
           />
         </div>
       </div>
