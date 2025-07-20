@@ -60,7 +60,6 @@ export const ChartsDataPage = <
   }, []);
 
   const computeStatsAndChartData = useCallback(() => {
-    //console.log('DASHBOARD DATA: ', dashboardData);
     if (!dashboardData || dashboardData.length === 0 || regionList.length === 0)
       return null;
 

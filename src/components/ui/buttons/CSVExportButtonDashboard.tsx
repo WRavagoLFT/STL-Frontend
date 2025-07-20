@@ -7,6 +7,7 @@ interface GenericExportButtonProps {
   title: string;
   getRowData: (item: any) => (string | number)[];
   filename?: string;
+  loading?: boolean;
 }
 
 const GenericCSVExportButton: React.FC<GenericExportButtonProps> = ({
@@ -15,6 +16,7 @@ const GenericCSVExportButton: React.FC<GenericExportButtonProps> = ({
   title,
   getRowData,
   filename,
+  loading
 }) => {
   const exportToExcel = () => {
     const currentDateTime = new Date().toLocaleString();
@@ -70,7 +72,9 @@ const GenericCSVExportButton: React.FC<GenericExportButtonProps> = ({
   return (
     <button
       onClick={exportToExcel}
-      className="bg-[#0038A8] hover:bg-blue-700 text-white rounded-lg px-6 py-2 text-[0.8rem]"
+      disabled={loading}
+      className={`rounded-lg px-6 py-2 text-[0.8rem] text-white transition
+        ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#0038A8] hover:bg-blue-700"}`}
     >
       Export as CSV
     </button>

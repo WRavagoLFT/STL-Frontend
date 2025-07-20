@@ -233,8 +233,10 @@ const DetailedTable = function <
         </div>
         {currentUserType !== 3 && pageType && (
           <button
-            className="bg-[#0038A8] hover:bg-blue-700 text-white rounded-lg px-7 py-2 text-[0.8rem]"
+            className={`rounded-lg px-7 py-2 text-[0.8rem] text-white transition
+              ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#0038A8] hover:bg-blue-700"}`}
             onClick={onAddClick}
+            disabled={loading}
           >
             Add{" "}
             {pageType === "Device Information"
@@ -497,6 +499,7 @@ const DetailedTable = function <
             columns={columns}
             statsPerRegion={data}
             operatorMap={operatorMap ? Object.values(operatorMap) : []}
+            loading={loading}
           />
         </div>
       )}

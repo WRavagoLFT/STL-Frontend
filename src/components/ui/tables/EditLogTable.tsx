@@ -231,6 +231,7 @@ const EditLogsTablePage = <T extends Transactions>({
           columns={columns}
           statsPerRegion={sortedAndFilteredData}
           operatorMap={operatorMap ? Object.values(operatorMap) : []}
+          loading={loading}
         />
       </div>
     </div>

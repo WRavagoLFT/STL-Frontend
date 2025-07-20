@@ -206,6 +206,7 @@ export interface CSVExportButtonProps {
   fileName?: string;
   columns?: any[];
   operatorMap?: any[];
+  loading?: boolean;
 }
 
 export type UserFormData = z.infer<typeof userSchema>;
