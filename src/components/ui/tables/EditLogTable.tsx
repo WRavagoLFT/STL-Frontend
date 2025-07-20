@@ -23,6 +23,7 @@ const EditLogsTablePage = <T extends Transactions>({
   columns,
   pageType,
   operatorMap,
+  loading,
 }: DetailedTableProps<T>) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -105,7 +106,23 @@ const EditLogsTablePage = <T extends Transactions>({
             </tr>
           </thead>
           <tbody>
-            {paginatedData.length === 0 ? (
+            {loading ? (
+              [...Array(5)].map((_, rowIndex) => (
+                <tr
+                  key={`loading-${rowIndex}`}
+                  className="border-b border-[#ACA993]"
+                >
+                  {columns.map((_, colIndex) => (
+                    <td
+                      key={`loading-${rowIndex}-${colIndex}`}
+                      className="px-2 py-2 w-[150px] max-w-[150px]"
+                    >
+                      <div className="h-4 w-3/4 bg-gray-300 rounded animate-pulse" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : paginatedData.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}

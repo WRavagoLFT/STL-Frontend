@@ -54,6 +54,7 @@ export const ChartCard = <T,>({
   pageType,
   title,
   statsPerRegion,
+  loading,
 }: Omit<ChartCardProps<T>, "label">) => {
   const pluralRole = (() => {
     const map: Record<string, string> = {
@@ -64,12 +65,14 @@ export const ChartCard = <T,>({
     return map[pageType ?? ""] || "Users";
   })();
 
-  const [loading, setLoading] = useState(true);
-  useEffect(() => {
-    if (chartData && chartData.length > 0 && chartData[0].data.length > 0) {
-      setLoading(false);
-    }
-  }, [chartData]);
+  console.log("loading state: ", loading);
+
+  //const [loading, setLoading] = useState(true);
+  // useEffect(() => {
+  //   if (chartData && chartData.length > 0 && chartData[0].data.length > 0) {
+  //     setLoading(false);
+  //   }
+  // }, [chartData]);
 
   return (
     <div className="bg-transparent px-4 py-7 my-8 rounded-xl border border-[#0038A8] overflow-x-auto">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense, useMemo } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import useUserRoleStore from "@/store/useUserStore";
 import { handleUpdateUser } from "@/hooks/handleUpdateUserAction";
@@ -60,6 +60,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
   }, [roleConfig, roleKey]);
 
   const { roleId, label, textlabel } = roleConfig;
+  const columns = useMemo(() => userTableColumns(roleId), [roleId]);
 
   const openCreateModal = () => setIsCreateModalOpen(true);
   const closeCreateModal = () => setIsCreateModalOpen(false);
@@ -178,6 +179,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
           }))}
           roleLabel={label}
           textlabel={textlabel}
+          loading={loading}
         />
 
         {currentUserType !== 3 && (
@@ -189,12 +191,13 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
                 region: user.Region?.RegionName || "Unknown",
               }))
             }
+            loading={loading}
           />
         )}
 
         <DetailedTable<UsersItem>
           data={data}
-          columns={userTableColumns(roleId)}
+          columns={columns}
           pageType={roleKey}
           roleId={roleId}
           operatorMap={operatorMap}
@@ -203,6 +206,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
           onAddClick={openCreateModal}
           onUpdateClick={openUpdateModal}
           onSubmit={handleSuspendUser}
+          loading={loading}
         />
 
         <AddUserModal

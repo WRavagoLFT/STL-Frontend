@@ -17,7 +17,7 @@ const Sidebar: React.FC = () => {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const userTypeId = useAuthStore((state) => state.userTypeId);
   const user = useAuthStore((state) => state.user);
-
+  
   const getUserRole = (userTypeId: number) => {
     switch (userTypeId) {
       case 1:
@@ -66,7 +66,7 @@ const Sidebar: React.FC = () => {
       >
         <div
           className={`p-3 bg-blue-800 text-white flex flex-col transition-all duration-200 
-          ${collapsed ? "w-20" : "w-64"} sticky top-0 h-screen z-50 overflow-y-auto sidebar-scrollbar scrollbar-hide`}
+          ${collapsed ? "w-20" : "w-[18rem]"} sticky top-0 h-screen z-50 overflow-y-auto sidebar-scrollbar scrollbar-hide`}
         >
           <SidebarLogoSection
             collapsed={collapsed}

@@ -14,13 +14,16 @@ const CardsPage = <T extends {
   UserStatusId?: number;
   DateOfRegistration?: string;
   IsActive?: number;
+  loading?: boolean;
 }>({
   dashboardData,
   textlabel,
+  loading,
 }: CardsPageProps<T>) => {
-  
+
   // Get the date for seven days ago
   const sevenDaysAgo = dayjs().subtract(7, "days");
+  console.log(loading);
 
   // Calculate the status for each user and categorize them
   const totalItems = dashboardData.length;
@@ -84,6 +87,7 @@ const CardsPage = <T extends {
           value={item.value}
           color={item.color}
           textlabel={item.textlabel || ""}
+          loading={loading}
         />
       ))}
     </div>

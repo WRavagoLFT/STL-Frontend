@@ -35,6 +35,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   const [device, setDevice] = useState<DeviceItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [editData, setEditData] = useState<any[]>([]);
+  const [editLoading, setEditLoading] = useState(false);
   const [columns, setColumns] = useState<any[]>([]);
   const {
     roleConfig,
@@ -59,11 +60,6 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
       : user?.UserTypeId === 2
       ? "/users/kabo"
       : "/";
-        
-  //console.log(user);
-  //console.log(slug);
-  //  THIS IS NULL
-  //console.log('ROLE CONFIG', roleConfig); 
 
   const loadData = useLoadDevices(
     setLoading,
@@ -90,14 +86,10 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
     );
   };
 
-  useEffect(() => {
-    //console.log("activeTab changed:", activeTab);
-    //console.log("user?.data.DeviceId:", user?.data?.DeviceId);
-    
+  useEffect(() => {    
     const shouldFetch = activeTab === "device" && !!user?.DeviceId;
     if (shouldFetch) {
       const slugString = `${user.DeviceId}-device`;
-      //console.log("fetching device with slug:", slugString);
       fetchAndSetDevice(slugString, setDevice, setLoading);
     }
   }, [activeTab, user?.DeviceId]);
@@ -106,6 +98,8 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
     const userId = user?.UserId;
 
     if (activeTab === "history" && userId) {
+      setEditLoading(true);
+
       try {
         const logsResponse = await editLogUser(userId);
 
@@ -117,6 +111,8 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
         }
       } catch (error) {
         console.error("[ERROR] Error loading edit logs:", error);
+      } finally {
+        setEditLoading(false);
       }
     } else {
       console.warn("[WARN] Skipping fetchLogs: either not in 'history' tab or UserId is missing.");
@@ -126,8 +122,6 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
   useEffect(() => {
     fetchLogs();
   }, [fetchLogs]);
-
-  console.log('', editData);
 
   return (
     <div>
@@ -299,7 +293,7 @@ const UsersViewPage: React.FC<UsersViewPageProps> = ({ user, slug }) => {
               </div>
             </div>
           </div>
-          <EditLogsTablePage data={editData} columns={columns} />
+          <EditLogsTablePage data={editData} columns={columns} loading={editLoading}/>
         </div>
       )}
     </div>

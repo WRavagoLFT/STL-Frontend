@@ -20,6 +20,7 @@ export interface Column<T> {
   sortKey?: keyof T | string;
   filterValue?: string | ((row: T) => string);
   onFilterChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  loading?: boolean
 }
 
 export interface SortableTableCellProps {
@@ -34,12 +35,14 @@ export interface CardProps<T = React.ReactNode> {
   value: T;
   color?: string;
   style?: React.CSSProperties;
+  loading?: boolean;
 }
 
 export interface CardsPageProps<T> {
   dashboardData: T[];
   roleLabel?: string;
   textlabel?: string;
+  loading?: boolean;
 }
 
 export interface ChartDataItem<T = unknown> {
@@ -57,6 +60,7 @@ export interface ChartCardProps<T = unknown> {
   title?: string;
   roleLabel?: string;
   statsPerRegion: any[];
+  loading?: boolean;
 }
 
 export interface CustomLegendProps {
@@ -76,6 +80,7 @@ export interface ChartsDataPageProps<T extends { region: string }> {
   getUserStatus?: (user: T, date: string) => string;
   pageType?: "executive" | "manager" | "operator" | "kabo" | "kubrador" | "Device Information";
   operatorMap?: Record<number, OperatorsItem>;
+  loading?: boolean;
 }
 
 export interface DetailedTableProps<T> {
@@ -100,6 +105,7 @@ export interface DetailedTableProps<T> {
   onUpdateClick?: (row: T) => void; // for update modal
   onSuspendClick?: (row: T) => void; // for update modal
   onSubmit?: (data: T) => void;
+  loading?: boolean;
 }
 
 export interface ChartBarItem {

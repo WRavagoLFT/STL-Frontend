@@ -31,30 +31,55 @@ export const loadUsers = async (
         fullName: `${user.FirstName} ${user.LastName}`,
       }));
 
-    setData(filteredUsers);
-
+    // Kabo map for Kubrador
     if (roleKey === "kubrador") {
-      setKaboMap(allUsers.filter((user) => user.UserTypeId === 2));
+      const kabos = allUsers.filter((user) => user.UserTypeId === 2);
+      setKaboMap(kabos);
     }
 
-    // Conditionally fetch operators
+    // Fetch operators & branches only if not kabo/kubrador
+    let enrichedUsers = [...filteredUsers];
+    let operatorMap: OperatorsItem[] = [];
+    let branchMap: any[] = [];
+
     if (roleKey !== "kabo" && roleKey !== "kubrador") {
       try {
         const operatorRes = await fetchOperators();
-        setOperatorMap(operatorRes.data);
+        operatorMap = operatorRes.data || [];
+        setOperatorMap(operatorMap);
       } catch (err) {
         console.warn("[loadUsers] Skipped Operator fetch due to permissions.");
       }
 
-      // Conditionally fetch PCSO branches
       try {
-        const pcsoBranchRes = await fetchPCSOBranch();
-        setPscoBranchMap(pcsoBranchRes);
+        const branchRes = await fetchPCSOBranch();
+        branchMap = branchRes.data || [];
+        setPscoBranchMap(branchMap);
       } catch (err) {
         console.warn("[loadUsers] Skipped PCSO branch fetch due to permissions.");
       }
+
+      // Enrich if necessary
+      if (roleKey === "executive") {
+        enrichedUsers = enrichedUsers.map((user) => ({
+          ...user,
+          OperatorDetails: operatorMap.find(
+            (op) => op.OperatorId === user.OperatorId
+          ),
+        }));
+      }
+
+      if (roleKey === "pcsobranch") {
+        enrichedUsers = enrichedUsers.map((user) => ({
+          ...user,
+          BranchName:
+            branchMap.find((br) => br.BranchId === user.BranchId)?.BranchName ||
+            "—",
+        }));
+      }
     }
 
+    setData(enrichedUsers);
   } catch (error) {
     console.error("Error in loadUsers:", (error as Error).message);
     setData([]);

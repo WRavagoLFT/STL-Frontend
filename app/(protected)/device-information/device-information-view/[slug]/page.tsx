@@ -7,7 +7,6 @@ import { fetchAndSetDevice } from "@/hooks/useLoadDevice";
 import { AccessGuard } from "@/components/auth/AccessGuard";
 import { DevicesViewPage } from "@/components/device-information/ParentDeviceView";
 
-
 const DeviceSlugPage = () => {
   const { slug } = useParams();
   const [device, setDevice] = useState<DeviceItem | null>(null);
