@@ -5,8 +5,42 @@ import { getUserStatus } from "@/hooks/dashboarddata";
 import { Column } from "@/types/interfaces";
 import { UsersItem } from "@/lib/api/users/users.service";
 
+type UserStatus = "Suspended" | "Inactive" | "Active";
+
 export const userTableColumns = (roleId: number): Column<UsersItem>[] => {
-  const columns: Column<UsersItem>[] = [
+  const getStatusButton = (status: string) => {
+    const backgroundColors: Record<UserStatus, string> = {
+      Suspended: "#FF7A7A",
+      Inactive: "#FFA726",
+      Active: "#046115",
+    };
+
+    const safeStatus = (["Suspended", "Inactive", "Active"] as const).includes(status as UserStatus)
+      ? (status as UserStatus)
+      : "Active"; // fallback to Active if unknown
+
+    return (
+      <Button
+        variant="contained"
+        sx={{
+          cursor: "auto",
+          textTransform: "none",
+          borderRadius: "12px",
+          padding: "2px 13px",
+          fontSize: "12px",
+          backgroundColor: backgroundColors[safeStatus],
+          color: "#fff",
+          "&:hover": {
+            backgroundColor: backgroundColors[safeStatus],
+          },
+        }}
+      >
+        {safeStatus}
+      </Button>
+    );
+  };
+
+  const baseColumns: Column<UsersItem>[] = [
     {
       key: "fullName",
       label: "Name",
@@ -18,7 +52,7 @@ export const userTableColumns = (roleId: number): Column<UsersItem>[] => {
       label: "Creation Date",
       sortable: true,
       filterable: true,
-      render: (user: UsersItem) =>
+      render: (user) =>
         user.DateOfRegistration
           ? dayjs(user.DateOfRegistration).format("YYYY/MM/DD HH:mm:ss")
           : "",
@@ -28,87 +62,55 @@ export const userTableColumns = (roleId: number): Column<UsersItem>[] => {
       label: "Created By",
       sortable: true,
       filterable: true,
-      render: (log: UsersItem) => log.CreatedBy ? log.CreatedBy : "No value",
+      render: (user) => user.CreatedBy ?? "No value",
     },
     {
       key: "Status",
       label: "Status",
       sortable: true,
       filterable: true,
-      render: (user: UsersItem) => {
-        const sevenDaysAgo = dayjs().subtract(7, "days");
-        const status = getUserStatus(user, sevenDaysAgo);
-        return (
-          <Button
-            variant="contained"
-            sx={{
-              cursor: "auto",
-              textTransform: "none",
-              borderRadius: "12px",
-              padding: "2px 13px",
-              fontSize: "12px",
-              backgroundColor:
-                status === "Suspended"
-                  ? "#FF7A7A"
-                  : status === "Inactive"
-                    ? "#FFA726"
-                    : "#046115",
-              color: "#ffff",
-              "&:hover": {
-                backgroundColor:
-                  status === "Suspended"
-                    ? "#F05252"
-                    : status === "Inactive"
-                      ? "#FFA726"
-                      : "#046115",
-              },
-            }}
-          >
-            {status}
-          </Button>
-        );
+      render: (user) => {
+        const status = getUserStatus(user, dayjs().subtract(7, "days"));
+        return getStatusButton(status);
       },
     },
   ];
 
+  const extraColumns: Column<UsersItem>[] = [];
+
   if (roleId === 1 || roleId === 2) {
-    columns.splice(1, 0, {
+    extraColumns.push({
       key: "AssignedArea",
       label: "Assigned Area / Zone",
       sortable: true,
       filterable: false,
-      render: (user) =>
-        user?.AssignedArea ?? "No Assigned Area available.",
+      render: (user) => user.AssignedArea ?? "No Assigned Area available.",
     });
   }
 
-  // Conditionally insert the column for RoleId === 4
   if (roleId === 4) {
-    columns.splice(1, 0, {
+    extraColumns.push({
       key: "OperatorDetails.OperatorName",
       label: "Company Name",
       sortable: true,
       filterable: false,
       render: (user) =>
-        user.OperatorDetails && user.OperatorDetails.OperatorName
-          ? user.OperatorDetails.OperatorName
-          : "No operator assigned",
+        user.OperatorDetails?.OperatorName ?? "No operator assigned",
     });
   }
 
-  // Conditionally insert the column for RoleId === 5
-  // to be adjusted
   if (roleId === 5) {
-    columns.splice(1, 0, {
+    extraColumns.push({
       key: "BranchName",
       label: "PSCO Branch",
       sortable: true,
       filterable: false,
-      render: (user) =>
-        user?.BranchName ?? "No branch name assigned",
+      render: (user) => user.BranchName ?? "No branch name assigned",
     });
   }
 
-  return columns;
-};
+  // Insert extra columns after the first column (Name)
+  baseColumns.splice(1, 0, ...extraColumns);
 
+  return baseColumns;
+};
