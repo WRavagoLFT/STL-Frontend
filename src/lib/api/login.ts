@@ -1,6 +1,6 @@
 import axios from "axios";
-import { handleRouter } from "../../utils/routerHandlers";
 import axiosInstance from "./axiosInstance";
+import { handleRouter } from "@/utils/routerHandlers";
 
 export const loginUser = async (
   payload: { email: string; password: string },
@@ -9,23 +9,19 @@ export const loginUser = async (
   try {
     const loginResponse = await axiosInstance.post("/auth/login/web", payload);
     await handleRouter(router);
-    //console.log("[loginUser] Login successful, response data:", loginResponse.data);
-
   } catch (error: unknown) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error("[loginUser] Axios error response:", error.response.data);
+      const status = error.response.status;
       const errorMessage =
         error.response?.data?.message ||
         "Login failed. Please check your credentials.";
-      throw new Error(errorMessage);
+
+      throw { status, message: errorMessage };
     } else if (error instanceof Error) {
-      console.error("[loginUser] Native error:", error.message);
-      throw new Error(
-        error.message || "An unexpected error occurred during login."
-      );
+      throw { status: 500, message: error.message };
     } else {
-      console.error("[loginUser] Unknown error during login:", error);
-      throw new Error("An unexpected error occurred.");
+      throw { status: 500, message: "An unexpected error occurred." };
     }
   }
 };
+

@@ -55,9 +55,28 @@ const LoginPage = () => {
     try {
       await loginUser(credentials, router);
     } catch (error: any) {
-      setErrors({
-        general: "Invalid credentials, please try again",
-      });
+      if (error.status === 401) {
+        setErrors({
+          general: "Incorrect email or password.",
+        });
+      } else if (
+        error.status === 500 &&
+        typeof error.message === "string" &&
+        error.message.includes("User not found")
+      ) {
+        setErrors({
+          general: "Account not found. Please check your credentials.",
+        });
+      } else if (error.status === 500) {
+        setErrors({
+          general: "A server error occurred. Please try again later.",
+        });
+      } else {
+        setErrors({
+          general: error.message || "Login failed. Please try again.",
+        });
+      }
+
       setIsLoggingIn(false);
     }
   };
@@ -66,7 +85,6 @@ const LoginPage = () => {
 
   return (
     <div className="bg-[#F8F0E3] container-2xl w-full min-h-screen flex flex-col items-center justify-center lg:items-stretch lg:flex-row">
-      {/* Left Section (Logo & Title) */}
       <div className="w-full lg:flex-1 flex flex-col justify-center items-center py-8 px-4 lg:py-0">
         <div className="text-center w-full max-w-md">
           <div className="flex justify-center gap-3 mb-4">
@@ -92,7 +110,6 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* Right Section (Login Form) */}
       <div className="w-full lg:flex-1 flex flex-col justify-center items-center px-4 pb-10 lg:pb-0 relative">
         <div className="w-full max-w-md">
           <div className="mb-8">
@@ -103,7 +120,6 @@ const LoginPage = () => {
               {LoginSectionData.cardDescription}
             </p>
           </div>
-
           <form onSubmit={handleLogin} className="w-full">
             {/* Email Input */}
             <div className="mb-4">
@@ -117,13 +133,16 @@ const LoginPage = () => {
                 onChange={(e) =>
                   setCredentials({ ...credentials, email: e.target.value })
                 }
-                className={`w-full px-3 py-2 pr-10 rounded-lg border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none
-              ${errors.email || errors.general ? "border-[#CE1126]" : "border-[#0038A8]"}`}
+                className={`w-full px-3 py-2 pr-10 rounded-lg border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none ${
+                  errors.email || errors.general
+                    ? "border-[#CE1126]"
+                    : "border-[#0038A8]"
+                }`}
                 suppressHydrationWarning
               />
-              {errors.email && (
-                <span className="text-[#CE1126] text-xs mt-1 block">
-                  {errors.email}
+              {(errors.password || errors.general) && (
+                <span className="text-[#CE1126] text-xs">
+                  {errors.password || errors.general}
                 </span>
               )}
             </div>
@@ -133,6 +152,7 @@ const LoginPage = () => {
               <label className="block mb-2 text-sm text-left">
                 {LoginSectionData.PasswordTitle}
               </label>
+
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
@@ -160,6 +180,7 @@ const LoginPage = () => {
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </button>
               </div>
+
               <div className="flex items-center justify-between mt-1">
                 {(errors.password || errors.general) && (
                   <span className="text-[#CE1126] text-xs">
@@ -192,7 +213,6 @@ const LoginPage = () => {
             </button>
           </form>
 
-          {/* Loading Overlay (if needed) */}
           {isLoggingIn && (
             <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
               <ActivityIndicator />
@@ -200,7 +220,6 @@ const LoginPage = () => {
           )}
         </div>
 
-        {/* Copyright Footer (fixed at bottom for mobile/tablet) */}
         <div className="absolute bottom-4 left-0 right-0 text-center px-4 lg:bottom-8">
           <p className="text-xs text-[#0038A8]">{LoginSectionData.copyright}</p>
         </div>
