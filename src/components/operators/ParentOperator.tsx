@@ -60,7 +60,8 @@ const OperatorsPage = () => {
             DateOfRegistration: op.DateOfOperation ?? undefined,
             IsActive: op.Status ?? undefined,
           }))}
-          textlabel={textlabel} 
+          textlabel={textlabel}
+          loading={loading}
         />
 
         <ChartsDataPage
@@ -81,6 +82,7 @@ const OperatorsPage = () => {
               ? op.Region 
               : undefined,
           }))}
+          loading={loading}
         />
 
         <DetailedTable
@@ -88,6 +90,7 @@ const OperatorsPage = () => {
           columns={tableColumns}
           pageType="operator"
           source="operators"
+          loading={loading}
           onAddClick={() => router.push("/operators/operators-add")}
         />
       </div>

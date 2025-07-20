@@ -146,6 +146,7 @@ export const ParentDevicePage = () => {
                   router.push("/device-information/device-information-add")
                 }
                 source="device"
+                loading={loading}
               />
             </div>
           </div>

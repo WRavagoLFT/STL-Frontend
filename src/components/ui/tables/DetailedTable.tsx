@@ -31,7 +31,9 @@ import { UsersItem } from "@/lib/api/users/users.service";
 import { OperatorsItem } from "@/lib/api/operators/operators.service";
 import { DeviceItem } from "@/lib/api/device/device.service";
 
-const DetailedTable = function <T extends UsersItem | OperatorsItem | DeviceItem>({
+const DetailedTable = function <
+  T extends UsersItem | OperatorsItem | DeviceItem,
+>({
   data,
   columns,
   actionsRender,
@@ -43,6 +45,7 @@ const DetailedTable = function <T extends UsersItem | OperatorsItem | DeviceItem
   onUpdateClick,
   onSubmit,
   onSuspendClick,
+  loading,
 }: DetailedTableProps<T>) {
   const {
     searchQuery,
@@ -100,7 +103,10 @@ const DetailedTable = function <T extends UsersItem | OperatorsItem | DeviceItem
   const sortedData = useMemo(
     () =>
       sortConfig
-        ? sortData(filteredData, sortConfig as SortConfig<UsersItem | OperatorsItem>)
+        ? sortData(
+            filteredData,
+            sortConfig as SortConfig<UsersItem | OperatorsItem>
+          )
         : [],
     [filteredData, sortConfig]
   );
@@ -280,7 +286,7 @@ const DetailedTable = function <T extends UsersItem | OperatorsItem | DeviceItem
                         isFilterVisible={true}
                       />
                     ) : (
-                      <span className="block h-4" /> // placeholder to keep height consistent
+                      <span className="block h-4" />
                     )}
                   </th>
                 ))}
@@ -288,8 +294,29 @@ const DetailedTable = function <T extends UsersItem | OperatorsItem | DeviceItem
               </tr>
             )}
           </thead>
+
           <tbody>
-            {paginatedData.length === 0 ? (
+            {loading ? (
+              // Render 5 placeholder rows while loading
+              [...Array(5)].map((_, rowIndex) => (
+                <tr
+                  key={`loading-${rowIndex}`}
+                  className="border-b border-[#ACA993]"
+                >
+                  {columns.map((_, colIndex) => (
+                    <td
+                      key={`loading-${rowIndex}-${colIndex}`}
+                      className="px-2 py-2 w-[150px] max-w-[150px]"
+                    >
+                      <div className="h-4 w-3/4 bg-gray-300 rounded animate-pulse" />
+                    </td>
+                  ))}
+                  <td className="text-center">
+                    <div className="h-4 w-10 bg-gray-300 rounded animate-pulse mx-auto" />
+                  </td>
+                </tr>
+              ))
+            ) : paginatedData.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length + 1}

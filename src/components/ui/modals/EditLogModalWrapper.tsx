@@ -11,8 +11,9 @@ export interface EditModalPageProps {
   columns: any[];
   onClose: () => void;
   userTypeId?: number;
-  selectedUser?: any; // for users
-  initialUserOperatorData? : any;
+  selectedUser?: any;
+  initialUserOperatorData?: any;
+  loading?: boolean;
 }
 
 const EditModalPage: React.FC<EditModalPageProps> = ({
@@ -24,25 +25,28 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
   userTypeId,
   selectedUser,
   initialUserOperatorData,
+  loading
 }) => {
   const [editData, setEditData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  //const [loading, setLoading] = useState<boolean>(true);
+
   const title =
     userTypeId === 3 ? "Manager" :
     userTypeId === 4 ? "Executive" : "Operator";
-  
-  //console.log('DATAAAA USER', initialUserOperatorData);
+
   useEffect(() => {
     if (!open) return;
 
     const getEditData = async () => {
-      setLoading(true);
-      const response = await fetchData(id);
-      if (response?.success) {
-        setEditData(response.data || []);
+      //setLoading(true);
+      try {
+        const response = await fetchData(id);
+        if (response?.success) {
+          setEditData(response.data || []);
+        }
+      } finally {
+        //setLoading(false);
       }
-      //console.log('EDIT DATA:', response.data);
-      setLoading(false);
     };
 
     getEditData();
@@ -70,7 +74,7 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
     >
       <div
         className="rounded-lg px-4 pt-5 pb-10 max-w-[90%] sm:max-w-[80%] md:max-w-[800px] 
-                   lg:max-w-[650px] xl:max-w-[940px] 
+                   lg:max-w-[650px] xl:max-w-[990px] 
                    max-h-[90vh] w-full shadow-lg relative bg-[#F8F0E3]"
         onClick={(e) => e.stopPropagation()}
       >
@@ -84,10 +88,10 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
         <div className="mt-3">
           <div className="text-2xl font-bold leading-none">
             {selectedUser?.FirstName ?? ""} {selectedUser?.LastName ?? ""} 
-            {initialUserOperatorData?.data.OperatorName ? `  ${initialUserOperatorData?.data.OperatorName}` : ""}
+            {initialUserOperatorData?.data?.OperatorName ? `  ${initialUserOperatorData.data.OperatorName}` : ""}
           </div>
           <div className="text-sm mb-3">{title}</div>
-          <EditLogsTablePage data={editData} columns={columns}/>
+          <EditLogsTablePage data={editData} columns={columns} loading={loading} />
         </div>
       </div>
     </div>

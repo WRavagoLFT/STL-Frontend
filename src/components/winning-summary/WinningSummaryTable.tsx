@@ -145,7 +145,7 @@ const TableWinningSummary = ({
 
   return (
     <div className="overflow-x-auto w-full">
-      <ReadOnlyTablePage data={transactions} columns={tableColumns} />
+      <ReadOnlyTablePage data={transactions} columns={tableColumns} loading={isLoading} />
     </div>
   );
 };

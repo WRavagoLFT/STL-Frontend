@@ -29,6 +29,7 @@ const ReadOnlyTablePage = <T extends Transactions>({
   actionsRender,
   pageType,
   operatorMap,
+  loading,
 }: DetailedTableProps<T>) => {
   const {
     searchQuery,
@@ -41,8 +42,9 @@ const ReadOnlyTablePage = <T extends Transactions>({
     handleChangePage,
     handleChangeRowsPerPage,
     setSearchQuery,
-    resetFilters, 
+    resetFilters,
   } = useDetailTableStore();
+  console.log("LOADING STATE PROP: ", loading);
 
   const filteredData = useMemo(() => {
     const filterKeys = columns
@@ -57,7 +59,10 @@ const ReadOnlyTablePage = <T extends Transactions>({
 
   const sortedData = useMemo(() => {
     if (!filteredData || !sortConfig) return [];
-    return sortData(filteredData, sortConfig as SortConfig<UsersItem | OperatorsItem>);
+    return sortData(
+      filteredData,
+      sortConfig as SortConfig<UsersItem | OperatorsItem>
+    );
   }, [filteredData, sortConfig]);
 
   const paginatedData = useMemo(() => {
@@ -146,7 +151,23 @@ const ReadOnlyTablePage = <T extends Transactions>({
             )}
           </thead>
           <tbody>
-            {paginatedData.length === 0 ? (
+            {loading ? (
+              [...Array(5)].map((_, rowIndex) => (
+                <tr
+                  key={`loading-${rowIndex}`}
+                  className="border-b border-[#ACA993]"
+                >
+                  {columns.map((_, colIndex) => (
+                    <td
+                      key={`loading-${rowIndex}-${colIndex}`}
+                      className="px-2 py-2 w-[150px] max-w-[150px]"
+                    >
+                      <div className="h-4 w-3/4 bg-gray-300 rounded animate-pulse" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : paginatedData.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length + (actionsRender ? 1 : 1)}

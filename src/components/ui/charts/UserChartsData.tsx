@@ -42,11 +42,14 @@ export const ChartsDataPage = <
   dashboardData,
   userType,
   pageType,
+  loading,
 }: ChartsDataPageProps<T>) => {
   const { sevenDaysAgo, setChartData } = useDashboardStore();
   const [chartData, setLocalChartData] = useState<ChartBarItem[]>([]);
   const [statsPerRegion, setStatsPerRegion] = useState<any[]>([]);
   const [regionList, setRegionList] = useState<Region[]>([]);
+
+  console.log('loading state on the user charts data: ', loading);
 
   useEffect(() => {
     async function loadRegions() {
@@ -56,7 +59,6 @@ export const ChartsDataPage = <
     loadRegions();
   }, []);
 
-  // Memoized function to compute stats and chart data
   const computeStatsAndChartData = useCallback(() => {
     //console.log('DASHBOARD DATA: ', dashboardData);
     if (!dashboardData || dashboardData.length === 0 || regionList.length === 0)
@@ -178,6 +180,7 @@ export const ChartsDataPage = <
       title={`${(pageType ?? "Unknown").charAt(0).toUpperCase() + (pageType ?? "Unknown").slice(1)} Summary`}
       pageType={pageType}
       statsPerRegion={statsPerRegion}
+      loading={loading}
     />
   );
 };

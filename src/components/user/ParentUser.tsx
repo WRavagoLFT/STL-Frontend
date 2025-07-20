@@ -178,6 +178,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
           }))}
           roleLabel={label}
           textlabel={textlabel}
+          loading={loading}
         />
 
         {currentUserType !== 3 && (
@@ -189,6 +190,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
                 region: user.Region?.RegionName || "Unknown",
               }))
             }
+            loading={loading}
           />
         )}
 
@@ -203,6 +205,7 @@ export default function UsersPage({ roleConfig, roleKey }: UsersPageProps) {
           onAddClick={openCreateModal}
           onUpdateClick={openUpdateModal}
           onSubmit={handleSuspendUser}
+          loading={loading}
         />
 
         <AddUserModal
