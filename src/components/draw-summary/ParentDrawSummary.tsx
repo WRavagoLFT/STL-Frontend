@@ -1,26 +1,32 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { fetchProvinces, fetchRegions } from "@/lib/api/location";
 import { fetchGameCategories } from "@/lib/api/gamecategories";
 import { fetchDrawSummary } from "@/lib/api/transactions";
 import Select from "react-select";
 import { useAuthStore } from "@/store/useAuthStore";
+import DrawSummarySkeletonPage from "./DrawSummarySkeleton";
 
-const DrawListSummaryPage = React.lazy(
-  () => import("@/components/draw-summary/DrawListSummary")
+const DrawListSummaryPage = dynamic(() =>
+  import("@/components/draw-summary/DrawListSummary")
 );
-const HotNumberPage = React.lazy(
-  () => import("@/components/draw-summary/HotNumbers")
+
+const HotNumberPage = dynamic(() =>
+  import("@/components/draw-summary/HotNumbers")
 );
-const ColdNumberPage = React.lazy(
-  () => import("@/components/draw-summary/ColdNumbers")
+
+const ColdNumberPage = dynamic(() =>
+  import("@/components/draw-summary/ColdNumbers")
 );
-const DrawCounterTablePage = React.lazy(
-  () => import("@/components/draw-summary/DrawCounterTable")
+
+const DrawCounterTablePage = dynamic(() =>
+  import("@/components/draw-summary/DrawCounterTable")
 );
-const DrawResultsSummaryPage = React.lazy(
-  () => import("@/components/draw-summary/DrawResultsSummary")
+
+const DrawResultsSummaryPage = dynamic(() =>
+  import("@/components/draw-summary/DrawResultsSummary")
 );
 
 export const ParentDrawSummaryPage = () => {
@@ -37,6 +43,7 @@ export const ParentDrawSummaryPage = () => {
   const [gameCategoryMap, setGameCategoryMap] = useState<Map<string, string>>(new Map());
   const [isViewing, setIsViewing] = useState(false);
   const currentUserType = useAuthStore((state) => state.userTypeId);
+  const [loading, setLoading] = useState(false);
 
   const monthOptions = [
     { value: "1", label: "January" },
@@ -54,64 +61,88 @@ export const ParentDrawSummaryPage = () => {
   ];
 
   const fetchData = async () => {
-    const dataFetch = await fetchDrawSummary(
-      Number(selectedProvince),
-      Number(selectedGameCategory),
-      Number(selectedMonth)
-    );
-    setData(dataFetch.data);
+    try {
+      setLoading(true);
+      const dataFetch = await fetchDrawSummary(
+        Number(selectedProvince),
+        Number(selectedGameCategory),
+        Number(selectedMonth)
+      );
+      setData(dataFetch.data);
+    } catch (error) {
+      console.error("Error fetching draw summary:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const loadData = async () => {
-    const regionFetch = await fetchRegions();
-    if (regionFetch?.data && Array.isArray(regionFetch.data)) {
-      setRegions(
-        regionFetch.data
-          .filter((region: any) => region?.RegionName && region?.RegionId)
-          .map((region: any) => ({
-            label: region.RegionName,
-            value: region.RegionId.toString(),
-          }))
+    try {
+      setLoading(true);
+
+      const regionFetch = await fetchRegions();
+      if (regionFetch?.data && Array.isArray(regionFetch.data)) {
+        setRegions(
+          regionFetch.data
+            .filter((region: any) => region?.RegionName && region?.RegionId)
+            .map((region: any) => ({
+              label: region.RegionName,
+              value: region.RegionId.toString(),
+            }))
+        );
+      }
+
+      const provinceFetch = await fetchProvinces();
+      setProvinces(provinceFetch.data);
+
+      const filteredProvinces = provinceFetch.data.filter(
+        (province: any) => province && province.RegionId === selectedRegion
       );
-    }
-
-    const provinceFetch = await fetchProvinces();
-    setProvinces(provinceFetch.data);
-
-    if (provinceFetch.data) {
-      const filteredProvinces = provinceFetch.data.filter((province: any) => {
-        return province && province.RegionId === selectedRegion;
-      });
 
       setFilteredProvinces(
-        filteredProvinces
-          .filter(
-            (province: any) => province.ProvinceId && province.ProvinceName
-          )
-          .map((province: any) => ({
-            label: province.ProvinceName,
-            value: province.ProvinceId.toString(),
-          }))
+        filteredProvinces.map((province: any) => ({
+          label: province.ProvinceName,
+          value: province.ProvinceId.toString(),
+        }))
       );
-    }
 
-    setSelectedRegion("1");
-    setSelectedProvince("1");
+      setSelectedRegion("1");
+      setSelectedProvince("1");
 
-    const gameCategoryFetch = await fetchGameCategories();
-    if (gameCategoryFetch?.data) {
-      const options = gameCategoryFetch.data.map((gameCategory: any) => ({
-        label: gameCategory.GameCategory,
-        value: gameCategory.GameCategoryId.toString(),
-      }));
-      const gameMap = new Map<string, string>();
-      gameCategoryFetch.data.forEach((gc: any) => {
-        gameMap.set(gc.GameCategoryId.toString(), gc.GameCategory);
-      });
-      setGameCategories(options); 
-      setGameCategoryMap(gameMap); 
+      const gameCategoryFetch = await fetchGameCategories();
+      if (gameCategoryFetch?.data) {
+        const options = gameCategoryFetch.data.map((gameCategory: any) => ({
+          label: gameCategory.GameCategory,
+          value: gameCategory.GameCategoryId.toString(),
+        }));
+        const gameMap = new Map<string, string>();
+        gameCategoryFetch.data.forEach((gc: any) => {
+          gameMap.set(gc.GameCategoryId.toString(), gc.GameCategory);
+        });
+        setGameCategories(options);
+        setGameCategoryMap(gameMap);
+      }
+    } catch (error) {
+      console.error("Error loading data:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // useEffect(() => {
+  //   const runAll = async () => {
+  //     setLoading(true);
+  //     try {
+  //       await Promise.all([loadData(), fetchData()]);
+  //     } catch (error) {
+  //       console.error("Error during data loading:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   runAll();
+  // }, []);
 
   useEffect(() => {
     loadData();
@@ -239,6 +270,10 @@ export const ParentDrawSummaryPage = () => {
     return results;
   };
 
+  // if (loading) {
+  //    return <DrawSummarySkeletonPage />;
+  //  }
+
   return (
     <>
       <div className="flex flex-col gap-2 md:gap-4 mt-8 md:mt-0">
@@ -267,7 +302,7 @@ export const ParentDrawSummaryPage = () => {
               }}
               options={regions}
               placeholder="Select a Region"
-              isDisabled={currentUserType === 5}
+              isDisabled={currentUserType === 5 || loading}
               classNamePrefix="custom-select"
               styles={{
                 control: (provided, state) => ({
@@ -304,6 +339,7 @@ export const ParentDrawSummaryPage = () => {
                   setSelectedProvince(selectedOption.value);
                 }
               }}
+              isDisabled={loading}
               options={filteredProvinces}
               placeholder="Select a Province"
               classNamePrefix="custom-select"
@@ -326,6 +362,7 @@ export const ParentDrawSummaryPage = () => {
                   setSelectedGameCategory(selectedOption.value);
                 }
               }}
+              isDisabled={loading}
               options={gameCategories}
               placeholder="Select a Game Category"
               classNamePrefix="custom-select"
@@ -349,6 +386,7 @@ export const ParentDrawSummaryPage = () => {
                   selectedOption ? parseInt(selectedOption.value) : 1
                 )
               }
+              isDisabled={loading}
               placeholder="Select a Month"
               classNamePrefix="custom-select"
             />
@@ -381,17 +419,20 @@ export const ParentDrawSummaryPage = () => {
                     secondDraw={getTodayResults(2) || []}
                     thirdDraw={getTodayResults(3) || []}
                     gameCategoryMap={gameCategoryMap}
+                    loading={loading}
                   />
                 )}
                 <div className="flex w-full gap-3">
                   {data?.HotNumbers && (
                     <HotNumberPage
                       number={data?.HotNumbers[0]?.number || "-"}
+                      loading={loading}
                     />
                   )}
                   {data?.ColdNumbers && (
                     <ColdNumberPage
                       number={data?.ColdNumbers[0]?.number || "-"}
+                      loading={loading}
                     />
                   )}
                 </div>
@@ -401,6 +442,7 @@ export const ParentDrawSummaryPage = () => {
                     <DrawCounterTablePage
                       numberArr={data?.FrequencyMap || []}
                       gameCategory={Number(selectedGameCategory)}
+                      loading={loading}
                     />
                   )}
                 </div>
@@ -419,6 +461,7 @@ export const ParentDrawSummaryPage = () => {
                   }
                   month={selectedMonth}
                   values={transformResultSummary(Number(selectedGameCategory))}
+                  loading={loading}
                 />
               )}
             </div>

@@ -14,8 +14,10 @@ import { userTableColumns } from "@/config/userTableColumns";
 import { userEditColumns } from "@/config/userEditLogTableColumns";
 import Swal from "sweetalert2";
 import { addUsers, AddUserPayload, suspendUser, UsersItem, editLogUser, UpdateUserPayload } from "@/lib/api/users/users.service";
-const ChartsDataPage = React.lazy(() => import("@/components/ui/charts/UserChartsData"));
-const CardsPage = React.lazy(() => import("@/components/user/CardsData"));
+import dynamic from "next/dynamic";
+
+const ChartsDataPage = dynamic(() => import("@/components/ui/charts/UserChartsData"));
+const CardsPage = dynamic(() => import("@/components/user/CardsData"));
 
 interface UsersPageProps {
   roleConfig: {

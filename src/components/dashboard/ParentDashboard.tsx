@@ -1,17 +1,17 @@
 "use client";
 
-import React, { Suspense, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { DashboardSkeletonPage } from "./DashboardSkeleton";
 import { ApiResponse } from "@/types/interfaces";
 import { WebDashboard } from "@/types/types";
 import { fetchWebDashboard } from "@/lib/api/transactions";
-const DashboardCardsPage = dynamic(() => import("./DashboardCards"), { ssr: false, loading: () => <DashboardSkeletonPage /> });
-const DrawResultsPage = dynamic(() => import("./DrawResults"), { ssr: false, loading: () => <DashboardSkeletonPage /> });
-const TopBettingRegionPage = dynamic(() => import("./TopBettingRegion"), { ssr: false, loading: () => <DashboardSkeletonPage /> });
-const TopWinningRegionPage = dynamic(() => import("./TopWinningRegion"), { ssr: false, loading: () => <DashboardSkeletonPage /> });
-const SummaryBettorsBetsPlacedPage = dynamic(() => import("./SummaryBettorsBetsPlaced"), { ssr: false, loading: () => <DashboardSkeletonPage /> });
-const SummaryWinnersDrawTimePage = dynamic(() => import("./SummaryWinnersDrawTime"), { ssr: false, loading: () => <DashboardSkeletonPage /> });
+import { DashboardSkeletonPage } from "./DashboardSkeleton";
+const DashboardCardsPage = dynamic(() => import("./DashboardCards"));
+const DrawResultsPage = dynamic(() => import("./DrawResults"));
+const TopBettingRegionPage = dynamic(() => import("./TopBettingRegion"));
+const TopWinningRegionPage = dynamic(() => import("./TopWinningRegion"));
+const SummaryBettorsBetsPlacedPage = dynamic(() => import("./SummaryBettorsBetsPlaced"));
+const SummaryWinnersDrawTimePage = dynamic(() => import("./SummaryWinnersDrawTime"));
 
 export const ParentDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -60,6 +60,10 @@ export const ParentDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
+
+  // if (loading) {
+  //   return <DashboardSkeletonPage />;
+  // };
 
   return (
     <div className="space-y-4 h-full mt-8 md:mt-0">

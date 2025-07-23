@@ -3,13 +3,10 @@
 import { AccessGuard } from "@/components/auth/AccessGuard";
 import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { UsersSkeletonPage } from "./UsersSkeleton";
 
-const UsersPage = dynamic(() => import("./ParentUser"), {
-  ssr: false,
-  loading: () => <div className="p-4"><UsersSkeletonPage/></div>,
-});
+const UsersPage = dynamic(() => import("./ParentUser"));
 
 type RoleKey = "kubrador" | "kabo" | "executives" | "managers";
 
@@ -76,7 +73,9 @@ export default function UsersPageWrapper() {
 
   return (
     <AccessGuard allowedUserTypes={roleConfig.permittedUserTypes}>
-      <UsersPage roleConfig={roleConfig} roleKey={roleKey as any} />
+      <Suspense fallback={<UsersSkeletonPage/>}>
+        <UsersPage roleConfig={roleConfig} roleKey={roleKey as any} />
+      </Suspense>
     </AccessGuard>
   );
 }

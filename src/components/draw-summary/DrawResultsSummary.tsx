@@ -25,25 +25,19 @@ const DrawResultsSummaryPage = ({
   secondDraw,
   thirdDraw,
   gameCategoryMap,
+  loading
 }: {
   firstDraw?: string[];
   secondDraw?: string[];
   thirdDraw?: string[];
   gameCategoryMap: Map<string, string>;
+  loading?: boolean;
 }) => {
   const currentUserType = useAuthStore((state) => state.userTypeId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [gameSchedule, setGameSchedule] = useState<number | "">("");
   const [gameTypes, setGameTypes] = useState<GameType[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  const openCreateModal = () => {
-    setIsCreateModalOpen(true);
-  };
-
-  const closeCreateModal = () => {
-    setIsCreateModalOpen(false);
-  };
 
   useEffect(() => {
     async function loadData() {
@@ -58,9 +52,9 @@ const DrawResultsSummaryPage = ({
 
   const gameScheduleOptions = Array.isArray(gameSchedule)
     ? gameSchedule.map((cat: GameScheduleItem) => ({
-        value: cat.GameScheduleID,
-        label: cat.GameScheduleName?.toString() || "",
-      }))
+      value: cat.GameScheduleID,
+      label: cat.GameScheduleName?.toString() || "",
+    }))
     : [];
 
   const handleOpenModal = () => setIsModalOpen(true);
@@ -134,41 +128,61 @@ const DrawResultsSummaryPage = ({
 
   return (
     <React.Fragment>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-4 lg:gap-6">
-        <div className="flex flex-col flex-1">
-          <p className="text-sm font-light mb-1">First Draw</p>
-          {renderDrawNumbers(firstDraw)}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-4 lg:gap-6 w-full">
+          {[1, 2, 3].map((_, idx) => (
+            <div key={idx} className="flex flex-col flex-1">
+              <div className="h-4 bg-gray-300 rounded w-1/3 mb-2 animate-pulse" />
+              <div className="grid grid-cols-2 gap-2">
+                {[...Array(2)].map((_, index) => (
+                  <div
+                    key={index}
+                    className="h-20 lg:h-28 bg-gray-200 border border-gray-300 rounded-sm animate-pulse"
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:flex gap-4 lg:gap-6">
+            <div className="flex flex-col flex-1">
+              <p className="text-sm font-light mb-1">First Draw</p>
+              {renderDrawNumbers(firstDraw)}
+            </div>
 
-        <div className="flex flex-col flex-1">
-          <p className="text-sm font-light mb-1">Second Draw</p>
-          {renderDrawNumbers(secondDraw)}
-        </div>
+            <div className="flex flex-col flex-1">
+              <p className="text-sm font-light mb-1">Second Draw</p>
+              {renderDrawNumbers(secondDraw)}
+            </div>
 
-        <div className="flex flex-col flex-1">
-          <p className="text-sm font-light mb-1">Third Draw</p>
-          {renderDrawNumbers(thirdDraw)}
-        </div>
-      </div>
+            <div className="flex flex-col flex-1">
+              <p className="text-sm font-light mb-1">Third Draw</p>
+              {renderDrawNumbers(thirdDraw)}
+            </div>
+          </div>
 
-      {currentUserType !== 3 && currentUserType !== 6 && (
-        <div className="mt-5 w-full flex justify-center sm:justify-end">
-          <button
-            onClick={handleOpenModal}
-            className="bg-[#0038A8] hover:bg-blue-700 text-sm text-white py-3 px-6 rounded-md w-full sm:w-auto"
-          >
-            Input Draw Combination
-          </button>
+          {currentUserType !== 3 && currentUserType !== 6 && (
+            <div className="mt-5 w-full flex justify-center sm:justify-end">
+              <button
+                onClick={handleOpenModal}
+                className="bg-[#0038A8] hover:bg-blue-700 text-sm text-white py-3 px-6 rounded-md w-full sm:w-auto"
+              >
+                Input Draw Combination
+              </button>
 
-          <AddGameCombinationModal
-            open={isModalOpen}
-            onClose={handleCloseModal}
-            onSubmit={handleAddGameCombinationSubmit}
-            gameCategoryMap={gameCategoryMap}
-            gameScheduleOptions={gameScheduleOptions}
-            gameTypes={gameTypes}
-          />
-        </div>
+              <AddGameCombinationModal
+                open={isModalOpen}
+                onClose={handleCloseModal}
+                onSubmit={handleAddGameCombinationSubmit}
+                gameCategoryMap={gameCategoryMap}
+                gameScheduleOptions={gameScheduleOptions}
+                gameTypes={gameTypes}
+              />
+            </div>
+          )}
+        </>
       )}
     </React.Fragment>
   );
