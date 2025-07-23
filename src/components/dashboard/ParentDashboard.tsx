@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { DashboardSkeletonPage } from "./DashboardSkeleton";
 import { ApiResponse } from "@/types/interfaces";
@@ -24,47 +24,42 @@ export const ParentDashboard = () => {
   });
   const [topBettingRegions, setTopBettingRegions] = useState<{ Region: string, TotalBetAmount: number }[]>();
   const [topWinningRegions, setTopWinningRegions] = useState<{ Region: string, TotalPayout: number }[]>([]);
-
   const [summary, setSummary] = useState<{ DrawOrder: number, Bettors: number, Bets: number, Winners: number, Payout: number }[]>([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
 
-        // YYYY-MM-DD format for the date
-        const date = new Date().toISOString().split('T')[0];
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const date = new Date().toISOString().split('T')[0];
 
-        const result: ApiResponse<WebDashboard> = await fetchWebDashboard({ from: date, to: date });
+      const result: ApiResponse<WebDashboard> = await fetchWebDashboard({ from: date, to: date });
 
-        //console.log(result)
-        if (!result.success) {
-          console.error("Failed to fetch dashboard data:", result.message);
-          setLoading(false);
-          return;
-        }
-
-        setDashboardCards({
-          totalBettors: result.data.Metrics.TotalBettors,
-          totalWinners: result.data.Metrics.TotalWinners,
-          totalBetsPlaced: result.data.Metrics.TotalBetsPlaced,
-          totalPayout: result.data.Metrics.TotalPayout,
-          totalRevenue: result.data.Metrics.TotalRevenue,
-        })
-
-        setTopBettingRegions(result.data.TopBettingRegions);
-
-        setTopWinningRegions(result.data.TopWinningRegions);
-
-        setSummary(result.data.Summary)
-
+      if (!result.success) {
+        console.error("Failed to fetch dashboard data:", result.message);
         setLoading(false);
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        setLoading(false);
+        return;
       }
-    };
 
-    fetchData();
+      setDashboardCards({
+        totalBettors: result.data.Metrics.TotalBettors,
+        totalWinners: result.data.Metrics.TotalWinners,
+        totalBetsPlaced: result.data.Metrics.TotalBetsPlaced,
+        totalPayout: result.data.Metrics.TotalPayout,
+        totalRevenue: result.data.Metrics.TotalRevenue,
+      });
+
+      setTopBettingRegions(result.data.TopBettingRegions);
+      setTopWinningRegions(result.data.TopWinningRegions);
+      setSummary(result.data.Summary);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   return (
     <div className="space-y-4 h-full mt-8 md:mt-0">
@@ -77,7 +72,9 @@ export const ParentDashboard = () => {
         <div className="w-full space-y-4">
           <div className="w-full flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
             <div className="lg:w-2/5 space-y-4">
-              <DrawResultsPage />
+              <DrawResultsPage
+                loading={loading}
+              />
               <TopBettingRegionPage 
                 data={topBettingRegions ?? []}
                 loading={loading}

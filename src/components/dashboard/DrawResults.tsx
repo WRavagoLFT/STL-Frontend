@@ -8,18 +8,15 @@ import Select from "react-select";
 import router from "next/router";
 import { fetchGameCategories } from "@/lib/api/gamecategories";
 
-const DrawResultsPage = () => {
+interface DrawResultsProps {
+  loading?: boolean;
+}
+const DrawResultsPage = ({ loading }: DrawResultsProps) => {
   const [selectedRegion, setSelectedRegion] = useState<number | "">("");
   const [selectedProvince, setSelectedProvince] = useState<number | "">("");
-  const [selectedGameCategory, setSelectedGameCategory] = useState<number | "">(
-    ""
-  );
-  const [filteredWinningCombinations, setFilteredWinningCombinations] =
-    useState<any[]>([]);
-
-  const [regions, setRegions] = useState<
-    { RegionName: string; RegionId: number; Region: string }[]
-  >([]);
+  const [selectedGameCategory, setSelectedGameCategory] = useState<number | "">("");
+  const [filteredWinningCombinations, setFilteredWinningCombinations] = useState<any[]>([]);
+  const [regions, setRegions] = useState<{ RegionName: string; RegionId: number; Region: string }[]>([]);
   const [provinces, setProvinces] = useState<
     {
       ProvinceName: string;
@@ -212,8 +209,9 @@ const DrawResultsPage = () => {
             onClick={() => {
               router.push("/draw-summary");
             }}
-            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
-          >
+            disabled={loading}
+            className={`rounded-lg px-3 py-2 text-[0.8rem] text-white transition
+              ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#0038A8] hover:bg-blue-700"}`}>
             View Draw Result
           </button>
         </div>
@@ -253,7 +251,7 @@ const DrawResultsPage = () => {
             onChange={(option) => setSelectedProvince(option?.value || "")}
             options={filteredProvinceOptions}
             placeholder="Select a Province"
-            classNamePrefix="custom-select" 
+            classNamePrefix="custom-select"
           />
         </div>
       </div>
@@ -263,8 +261,8 @@ const DrawResultsPage = () => {
             const item =
               selectedGameCategory && selectedRegion && selectedProvince
                 ? filteredWinningCombinations.find(
-                    (combo) => combo.GameScheduleID === gameTypeId
-                  )
+                  (combo) => combo.GameScheduleID === gameTypeId
+                )
                 : null;
 
             const totalBoxes =
@@ -287,9 +285,8 @@ const DrawResultsPage = () => {
                 </p>
 
                 <div
-                  className={`flex flex-wrap gap-2 w-full ${
-                    displayInGrid ? "" : "sm:flex-nowrap"
-                  }`}
+                  className={`flex flex-wrap gap-2 w-full ${displayInGrid ? "" : "sm:flex-nowrap"
+                    }`}
                 >
                   <div
                     className={`bg-transparent border border-[#0038A8] rounded-lg p-2 flex items-center justify-center 

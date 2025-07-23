@@ -74,6 +74,7 @@ const SummaryWinnersDrawTimePage = ({ data, loading }: WinnersProps) => {
                 item.winners,
                 item.winnings.toFixed(2),
               ]}
+              disabled={loading}
             />
           </div>
         )}

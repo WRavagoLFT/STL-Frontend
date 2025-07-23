@@ -63,8 +63,9 @@ const TopWinningRegionPage = ({ data, loading }: WinningRegionProps) => {
         <div className="mt-2 md:mt-0">
           <button
             onClick={() => router.push("/winning-summary/dashboard")}
-            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
-          >
+            disabled={loading}
+            className={`rounded-lg px-6 py-2 text-[0.8rem] text-white transition
+              ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#0038A8] hover:bg-blue-700"}`}>
             View Winners
           </button>
         </div>

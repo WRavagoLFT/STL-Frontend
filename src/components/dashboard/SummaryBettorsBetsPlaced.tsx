@@ -67,6 +67,7 @@ const SummaryBettorsBetsPlacedPage = ({ data, loading }: BettingSummaryProps) =>
               headers={["Game Name", "Bettors", "Bets"]}
               title="Bettors and Bets Summary"
               getRowData={(item) => [item.gameName, item.bettors, item.bets]}
+              disabled={loading}
             />
           </div>
         )}
