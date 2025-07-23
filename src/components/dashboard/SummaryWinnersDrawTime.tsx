@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { CircularProgress } from "@mui/material";
+import React, { useState, useEffect } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "@/store/useAuthStore";
+import { FaSpinner } from "react-icons/fa";
 
 const drawLabelMap: Record<number, string> = {
   1: "First Draw",
@@ -83,7 +83,7 @@ const SummaryWinnersDrawTimePage = ({ data, loading }: WinnersProps) => {
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <div className="min-w-[850px] md:min-w-[600px]">

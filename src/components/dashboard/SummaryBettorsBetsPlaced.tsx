@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "@/store/useAuthStore";
+import { FaSpinner } from "react-icons/fa";
 
 const CustomLegend = () => (
   <div className="flex flex-row space-x-5 justify-start mt-1 mr-4">
@@ -76,7 +76,7 @@ const SummaryBettorsBetsPlacedPage = ({ data, loading }: BettingSummaryProps) =>
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <div className="min-w-[850px] md:min-w-[600px]">
