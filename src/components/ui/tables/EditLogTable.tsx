@@ -18,7 +18,7 @@ import {
   sortDataEditLog,
 } from "@/utils/sortPaginationSearch";
 
-const EditLogsTablePage = <T extends Transactions>({
+export const EditLogsTablePage = <T extends Transactions>({
   data,
   columns,
   pageType,

@@ -36,20 +36,19 @@ interface BettingSummaryData {
 
 interface BettingSummaryProps {
   data: BettingSummaryData[]
+  loading?: boolean;
 }
 
-const SummaryBettorsBetsPlacedPage = (data: BettingSummaryProps) => {
+const SummaryBettorsBetsPlacedPage = ({ data, loading }: BettingSummaryProps) => {
   const [chartData, setChartData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   useEffect(() => {
-    setChartData(data.data.map((item) => ({
+    setChartData(data.map((item) => ({
       gameName: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw",
       bettors: item.Bettors,
       bets: item.Bets
     })))
-    setLoading(false)
   }, []);
 
   return (

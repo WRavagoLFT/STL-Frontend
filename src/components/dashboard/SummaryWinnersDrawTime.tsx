@@ -6,8 +6,6 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "@/store/useAuthStore";
 
-type DrawNumber = 1 | 2 | 3;
-
 const drawLabelMap: Record<number, string> = {
   1: "First Draw",
   2: "Second Draw",
@@ -41,20 +39,19 @@ interface WinnersData {
 
 interface WinnersProps {
   data: WinnersData[]
+  loading?: boolean;
 }
 
-const SummaryWinnersDrawTimePage = (data: WinnersProps) => {
-  const [loading, setLoading] = useState(true);
+const SummaryWinnersDrawTimePage = ({ data, loading }: WinnersProps) => {
   const [chartData, setChartData] = useState<{ draw: string; winners: number; winnings: number }[]>([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   useEffect(() => {
-    setChartData(data.data.map((item) => ({ 
-      draw: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw", 
-      winners: item.Winners, 
+    setChartData(data.map((item) => ({
+      draw: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw",
+      winners: item.Winners,
       winnings: item.Payout
     })));
-    setLoading(false);
   }, []);
 
   return (

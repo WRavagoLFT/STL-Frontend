@@ -1,16 +1,17 @@
 "use client";
 
-import { DeviceItem, editLogDevice, fetchUsageNotes, UpdateDevicePayload } from "@/lib/api/device/device.service";
 import React, { useCallback, useEffect, useState } from "react";
-import { useLoadDevices } from "./ParentDevice";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
+import { DeviceItem, editLogDevice, fetchUsageNotes, UpdateDevicePayload } from "@/lib/api/device/device.service";
+import { useLoadDevices } from "./ParentDevice";
 import { handleUpdateDevice } from "@/hooks/handleUpdateDeviceAction";
 import { deviceEditColumns } from "@/config/deviceEditLogTableColumns";
 import BackIconButton from "../ui/icons/BackButton";
 import UpdateDeviceForm from "./UpdateDeviceForm";
 import Input from "../ui/inputs/TextInputs";
-import EditLogsTablePage from "../ui/tables/EditLogTable";
-
+import { UsersSkeletonPage } from "../user/UsersSkeleton";
+const EditLogsTablePage = dynamic(() => import("@/components/ui/tables/EditLogTable"), {ssr: false, loading: () => <UsersSkeletonPage/>})
 
 type DevicesViewPageProps = {
   slug: string;
@@ -37,9 +38,9 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
   
   const loadData = useLoadDevices(
     setLoading,
-    () => {}, // define error handler if needed
-    (devices) => {}, // optional: device setter if relevant
-    (deviceInfo) => {} // optional
+    () => {},
+    (devices) => {},
+    (deviceInfo) => {}
   );
   
   const router = useRouter();
@@ -49,7 +50,6 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
     await handleUpdateDevice(data, loadData, router, redirectPath);
   };
 
-  // for edit logs
   const fetchLogs = useCallback(async () => {
     if (activeTab === "history" && device?.DeviceId) {
       try {
@@ -75,7 +75,7 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
     <div>
       <div className="flex items-center space-x-4">
         <BackIconButton
-          to="/device-information"
+          to="/device"
           bgColor="#0038A8"
           hoverColor="#004ccf"
           iconColor="#fff"
@@ -87,7 +87,6 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
       </div>
 
       <div className="grid grid-cols-2 gap-6 items-center my-4">
-        {/* Left side */}
         <div className="flex gap-6">
           <button
             onClick={() => setActiveTab("kabo")}
@@ -112,7 +111,6 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
         </div>
       </div>
 
-      {/* Conditionally render content based on activeTab */}
       {activeTab === "kabo" && (
         <div className="my-6">
           <UpdateDeviceForm
@@ -126,7 +124,6 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
         <div>
           <div className="my-6">
             <div className="grid grid-cols-4 gap-6">
-              {/* Created By */}
               <div className="flex flex-col w-full">
                 <label htmlFor="CreatedBy" className="block text-sm">
                   Created By
@@ -141,7 +138,6 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
                 />
               </div>
 
-              {/* Creation Date */}
               <div className="flex flex-col w-full">
                 <label htmlFor="DateOfRegistration" className="block text-sm">
                   Creation Date
@@ -160,7 +156,6 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
                 />
               </div>
 
-              {/* Last Updated By */}
               <div className="flex flex-col w-full">
                 <label htmlFor="LastUpdatedBy" className="block text-sm">
                   Last Updated By
@@ -175,7 +170,6 @@ export const DevicesViewPage: React.FC<DevicesViewPageProps> = ({ device, slug }
                 />
               </div>
 
-              {/* Last Updated Date */}
               <div className="flex flex-col w-full">
                 <label htmlFor="LastUpdatedDate" className="block text-sm">
                   Last Updated Date

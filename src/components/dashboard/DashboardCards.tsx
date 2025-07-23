@@ -9,6 +9,7 @@ interface DashboardCardsData {
   totalBetsPlaced: number;
   totalPayout: number;
   totalRevenue: number;
+  loading?: boolean;
 }
 
 const DashboardCardsPage = ({
@@ -17,6 +18,7 @@ const DashboardCardsPage = ({
   totalBetsPlaced,
   totalPayout,
   totalRevenue,
+  loading
 }: DashboardCardsData) => {
   const [dashboardData, setDashboardData] = useState({
     totalBettors: 0,
@@ -43,7 +45,6 @@ const DashboardCardsPage = ({
     });
   }, [])
 
-
   const cardItems = [
     { label: "Total Bettors", value: dashboardData.totalBettors },
     { label: "Total Winners", value: dashboardData.totalWinners },
@@ -64,7 +65,7 @@ const DashboardCardsPage = ({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 w-full">
       {cardItems.map((item, index) => (
-        <Card key={index} label={item.label} value={item.value} />
+        <Card key={index} label={item.label} value={item.value} loading={loading}/>
       ))}
     </div>
   );

@@ -24,26 +24,17 @@ const DrawResultsSummaryPage = React.lazy(
 );
 
 export const ParentDrawSummaryPage = () => {
-  const [regions, setRegions] = useState<{ label: string; value: string }[]>(
-    []
-  );
+  const [regions, setRegions] = useState<{ label: string; value: string }[]>([]);
   const [provinces, setProvinces] = useState<any[]>([]);
-  const [gameCategories, setGameCategories] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [filteredProvinces, setFilteredProvinces] = useState<
-    { label: string; value: string }[]
-  >([]);
+  const [gameCategories, setGameCategories] = useState<{ label: string; value: string }[]>([]);
+  const [filteredProvinces, setFilteredProvinces] = useState<{ label: string; value: string }[]>([]);
   const [selectedRegion, setSelectedRegion] = useState("1");
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedGameCategory, setSelectedGameCategory] = useState("1");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
-
   const [data, setData] = useState<any>({});
   const todayDate = new Date().getDate();
-  const [gameCategoryMap, setGameCategoryMap] = useState<Map<string, string>>(
-    new Map()
-  );
+  const [gameCategoryMap, setGameCategoryMap] = useState<Map<string, string>>(new Map());
   const [isViewing, setIsViewing] = useState(false);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 

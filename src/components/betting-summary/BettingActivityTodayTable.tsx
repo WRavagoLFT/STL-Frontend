@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { CircularProgress } from "@mui/material";
-
 import { FaDiceSix } from "react-icons/fa";
 import { fetchHistoricalRegion, fetchHistoricalSummary } from "@/lib/api/transactions";
 import { historicalSummaryByRegionCategory } from "@/utils/transforms";
@@ -14,9 +13,7 @@ interface RegionData {
 }
 
 const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
-  const [rankedRegions, setRankedRegions] = useState<
-    { region: RegionData; rank: number; trend: number }[]
-  >([]);
+  const [rankedRegions, setRankedRegions] = useState<{ region: RegionData; rank: number; trend: number }[]>([]);
   const [gameCategoryId, setGameCategoryId] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [showAll, setShowAll] = useState(false);

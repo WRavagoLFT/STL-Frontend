@@ -13,7 +13,6 @@ import { DeviceItem, UpdateDevicePayload } from "@/lib/api/device/device.service
 import { useAuthStore } from "@/store/useAuthStore";
 import { updateDeviceSchema } from "@/schemas/deviceSchema";
 
-
 interface UpdateDeviceFormProps {
   title?: string;
   onSubmit: (data: UpdateDevicePayload) => void;

@@ -1,10 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import UpdateDeviceForm from "@/components/device-information/UpdateDeviceForm";
 import BackIconButton from "@/components/ui/icons/BackButton";
 import UpdateUserForm from "@/components/user/UpdateUserForm";
-import AddDeviceForm from "@/components/device-information/AddDeviceForm";
 import EditLogsTablePage from "@/components/ui/tables/EditLogTable";
 import { userEditColumns } from "@/config/userEditLogTableColumns";
 import Input from "@/components/ui/inputs/TextInputs";
@@ -17,10 +15,12 @@ import { handleAddDevice } from "@/hooks/handleAddDeviceAction";
 import { handleUpdateDevice } from "@/hooks/handleUpdateDeviceAction";
 import { handleUpdateUser } from "@/hooks/handleUpdateUserAction";
 import { useRouter } from "next/navigation";
-import { useLoadDevices } from "../device-information/ParentDevice";
 import { editLogUser, UpdateUserPayload, UsersItem } from "@/lib/api/users/users.service";
 import { fetchAndSetDevice } from "@/hooks/useLoadDevice";
 import { AddDevicePayload, DeviceItem, UpdateDevicePayload } from "@/lib/api/device/device.service";
+import { useLoadDevices } from "../device/ParentDevice";
+import AddDeviceForm from "../device/AddDeviceForm";
+import UpdateDeviceForm from "../device/UpdateDeviceForm";
 
 type UsersViewPageProps = {
   user: UsersItem;

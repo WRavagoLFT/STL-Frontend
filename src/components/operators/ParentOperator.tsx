@@ -1,14 +1,15 @@
 "use client";
 
 import React, { Suspense, useCallback, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import DetailedTable from "@/components/ui/tables/DetailedTable";
-import ChartsDataPage from "@/components/ui/charts/UserChartsData";
 import { operatorTableColumns } from "@/config/operatorTableColumns";
-import CardsPage from "@/components/user/CardsData";
 import { useOperatorFormStore } from "@/store/useOperatorFormStore";
 import { fetchFormOptionsData, fetchOperatorsData } from "@/hooks/userLoadOperators";
 import { UsersSkeletonPage } from "@/components/user/UsersSkeleton";
+const CardsPage = dynamic(() => import("@/components/user/CardsData"), {ssr: false, loading: () => <UsersSkeletonPage/>});
+const ChartsDataPage = dynamic(() => import("@/components/ui/charts/UserChartsData"), {ssr: false, loading: () => <UsersSkeletonPage/>});
 
 const OperatorsPage = () => {
   const { data } = useOperatorFormStore();
