@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { WinnersandWinningsSummaryProps } from "../types";
 import {
@@ -18,6 +17,7 @@ import { CustomLegend } from "../CustomLegend";
 import { drawOrders, chartMap } from "../constant";
 import GenericCSVExportButton from "@/components/ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "@/store/useAuthStore";
+import { FaSpinner } from "react-icons/fa";
 
 const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
   gameCategoryId,
@@ -211,7 +211,7 @@ const SummaryWinnersAndWinnings: React.FC<WinnersandWinningsSummaryProps> = ({
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <div className="min-w-[1000px] md:min-w-[600px]">

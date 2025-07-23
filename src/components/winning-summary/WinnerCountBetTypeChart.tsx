@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { fetchWinners } from "@/lib/api/winners";
 import { useAuthStore } from "@/store/useAuthStore";
+import { FaSpinner } from "react-icons/fa";
 
 // Define bet type series per GameCategory
 const getBetTypeSeries = (gameCategoryId?: number) => {
@@ -168,7 +168,7 @@ const ChartWinnersBetTypeSummary = ({
       <div className="h-full w-full">
         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <BarChart

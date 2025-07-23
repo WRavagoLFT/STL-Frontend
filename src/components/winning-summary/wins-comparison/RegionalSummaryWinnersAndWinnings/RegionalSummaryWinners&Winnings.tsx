@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { WinnersandWinningsSummaryProps } from "../types";
 import {
@@ -18,6 +17,7 @@ import { CustomLegend } from "../CustomLegend";
 import { philippineRegions, chartMap } from "../constant";
 import GenericCSVExportButton from "../../../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "@/store/useAuthStore";
+import { FaSpinner } from "react-icons/fa";
 
 const RegionalSummaryWinnersAndWinnings: React.FC<
   WinnersandWinningsSummaryProps
@@ -256,7 +256,7 @@ const RegionalSummaryWinnersAndWinnings: React.FC<
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <div className="min-w-[1000px] md:min-w-[600px]">

@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
-import { FaDiceSix } from "react-icons/fa";
+import { FaDiceSix, FaSpinner } from "react-icons/fa";
 import { fetchHistoricalRegion, fetchHistoricalSummary } from "@/lib/api/transactions";
 import { historicalSummaryByRegionCategory } from "@/utils/transforms";
 
@@ -147,7 +146,7 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
 
       {isLoading ? (
         <div className="flex items-center justify-center flex-1">
-          <CircularProgress />
+          <FaSpinner className="animate-spin h-8 w-8" />
         </div>
       ) : (
         <div className="mt-2 w-full overflow-y-auto">

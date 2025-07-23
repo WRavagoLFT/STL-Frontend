@@ -1,11 +1,14 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { ThemeProvider, CssBaseline, CircularProgress } from "@mui/material";
+import { ThemeProvider, CssBaseline } from "@mui/material";
 import { match } from "path-to-regexp";
 import lightTheme from "@/styles/theme";
 import { AccessGuard } from "@/components/auth/AccessGuard";
 import Sidebar from "@/components/layout/Sidebar";
+import { FaSpinner } from "react-icons/fa";
+
+{/* <FaSpinner className="animate-spin h-8 w-8" /> */}
 
 const staticPaths = [
   "/dashboard",

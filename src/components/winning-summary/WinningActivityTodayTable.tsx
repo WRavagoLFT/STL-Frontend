@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { FaDiceSix } from "react-icons/fa";
+import { FaDiceSix, FaSpinner } from "react-icons/fa";
 import { fetchWinners } from "@/lib/api/winners";
-import { CircularProgress } from "@mui/material";
 
 interface RegionData {
   Region: string;
@@ -116,7 +115,7 @@ const TableWinningActivityToday = (params: { gameCategoryId?: number }) => {
 
       {isLoading ? (
         <div className="flex items-center justify-center flex-1">
-          <CircularProgress />
+          <FaSpinner className="animate-spin h-8 w-8" />
         </div>
       ) : (
         <div className="mt-2 w-full overflow-y-auto">
