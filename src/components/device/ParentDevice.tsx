@@ -14,7 +14,6 @@ import { UsersSkeletonPage } from "../user/UsersSkeleton";
 import Card from "../ui/dashboardcards/Cards";
 import DetailedTable from "../ui/tables/DetailedTable";
 
-
 export interface DeviceInfoSummary {
   TotalDevices: number;
   TotalActiveDevices: number;
@@ -68,7 +67,7 @@ export const useLoadDevices = (
     }
   }, [setLoading, setError, setDevices, setDeviceInfoData]);
 
-export const ParentDevicePage = () => {
+const ParentDevicePage = () => {
   const [devices, setDevices] = useState<DeviceItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -155,3 +154,5 @@ export const ParentDevicePage = () => {
     </>
   );
 };
+
+export default ParentDevicePage;

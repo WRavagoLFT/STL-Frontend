@@ -156,7 +156,7 @@ const DetailedTable = function <
           .replace(/\s+/g, "-")
           .replace(/[^\w\-]+/g, "")}`;
         modalStore.setSelectedData(targetRow);
-        router.push(`/device-information/device-information-view/${slug}`);
+        router.push(`/device/device-view/${slug}`);
       } else {
         onUpdateClick
           ? onUpdateClick(targetRow)

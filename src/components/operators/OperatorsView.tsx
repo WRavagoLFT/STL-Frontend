@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import OperatorViewPage from "@/components/operators/UpdateOperatorForm";
-import RetailReceiptOperatorsPage from "@/components/operators/RetailReceipts";
-import BackIconButton from "@/components/ui/icons/BackButton";
 import router, { useRouter } from "next/navigation";
-import EditModalPage from "@/components/ui/modals/EditLogModalWrapper";
+import dynamic from "next/dynamic";
+import BackIconButton from "@/components/ui/icons/BackButton";
 import { operatorEditColumns } from "@/config/operatorEditLogTableColumns";
 import { AccessGuard } from "@/components/auth/AccessGuard";
 import { fetchFormOptionsData } from "@/hooks/userLoadOperators";
@@ -17,6 +15,10 @@ import {
   UpdateOperatorPayload,
   editLogOperator,
 } from "@/lib/api/operators/operators.service";
+import { UsersSkeletonPage } from "../user/UsersSkeleton";
+const EditModalPage= dynamic(() => import("@/components/ui/modals/EditLogModalWrapper"), {ssr: false, loading: () => <UsersSkeletonPage/>});
+const OperatorViewPage = dynamic(() => import("@/components/operators/UpdateOperatorForm"), {ssr: false, loading: () => <UsersSkeletonPage/>});
+const RetailReceiptOperatorsPage = dynamic(() => import("@/components/operators/RetailReceipts"), {ssr: false, loading: () => <UsersSkeletonPage/>});
 
 interface OperatorViewPageProps {
   slug: string;
@@ -70,7 +72,7 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
         });
 
         // Optional: re-fetch or refresh data
-        // await loadData();
+        await fetchFormOptionsData();
       } else {
         Swal.fire({
           icon: "error",

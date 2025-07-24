@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { CircularProgress } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import {
   WinnersandWinningsSummaryProps,
@@ -10,6 +9,7 @@ import {
   fetchCompareHistoricalWinnersDate,
   fetchCompareHistoricalWinnersRange,
 } from "@/lib/api/winners";
+import { FaSpinner } from "react-icons/fa";
 
 interface ChartData {
   region: string;
@@ -336,7 +336,7 @@ const ChartTopRegionByWinsandWinners: React.FC<
       <div className="h-full flex flex-col flex-grow">
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <LineChart

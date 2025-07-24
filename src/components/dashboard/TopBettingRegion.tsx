@@ -5,16 +5,6 @@ import { FaDiceSix } from "react-icons/fa";
 import router from "next/router";
 import { useAuthStore } from "@/store/useAuthStore";
 
-interface RegionData {
-  RegionId?: number;
-  Region: string;
-  RegionFull?: string;
-  TotalPayout?: number;
-  trend?: number;
-  TotalBettors: number;
-  TotalBetAmount: number;
-}
-
 interface BettingRegionData {
   Region: string;
   TotalBetAmount: number;
@@ -22,12 +12,14 @@ interface BettingRegionData {
 
 interface BettingRegionProps {
   data: BettingRegionData[];
+  loading?: boolean;
 }
 
-const TopBettingRegionPage = (data: BettingRegionProps) => {
+const TopBettingRegionPage = ({ data, loading }: BettingRegionProps) => {
   const [rankedRegions, setRankedRegions] = useState<
     { region: BettingRegionData; rank: number; trend: number }[]
   >([]);
+
   const currentUserType = useAuthStore((state) => state.userTypeId);
   const bettingLabel =
     currentUserType === 3
@@ -35,13 +27,25 @@ const TopBettingRegionPage = (data: BettingRegionProps) => {
       : "Top Betting Regions Today";
 
   useEffect(() => {
-    if (!data || !data.data || data.data.length === 0) {
-      console.warn("No data provided for Top Betting Regions.");
-      return;
-    }
-    data.data.sort((a, b) => b.TotalBetAmount - a.TotalBetAmount);
-    setRankedRegions(data.data.map((item, index) => ({ region: item, rank: index + 1, trend: 0 })));
-  }, []);
+    if (!data || data.length === 0) return;
+
+    const sorted = [...data].sort((a, b) => b.TotalBetAmount - a.TotalBetAmount);
+    setRankedRegions(
+      sorted.map((item, index) => ({
+        region: item,
+        rank: index + 1,
+        trend: 0,
+      }))
+    );
+  }, [data]);
+
+  const renderSkeletonItem = (key: number) => (
+    <div key={key} className="flex items-center py-2 animate-pulse">
+      <div className="w-[15%] h-4 bg-gray-300 rounded" />
+      <div className="ml-2 flex-1 h-4 bg-gray-300 rounded" />
+      <div className="w-20 h-4 bg-gray-300 rounded" />
+    </div>
+  );
 
   return (
     <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
@@ -55,8 +59,9 @@ const TopBettingRegionPage = (data: BettingRegionProps) => {
         <div className="mt-2 md:mt-0">
           <button
             onClick={() => router.push("/betting-summary/dashboard")}
-            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
-          >
+            disabled={loading}
+            className={`rounded-lg px-7 py-2 text-[0.8rem] text-white transition
+              ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#0038A8] hover:bg-blue-700"}`}>
             View Bettors
           </button>
         </div>
@@ -65,7 +70,11 @@ const TopBettingRegionPage = (data: BettingRegionProps) => {
       <div className="border-b border-[#0038A8]" />
 
       <div className="mt-2 w-full max-h-[720px] overflow-y-auto">
-        {rankedRegions.length === 0 ? (
+        {loading ? (
+          <>
+            {Array.from({ length: 5 }).map((_, i) => renderSkeletonItem(i))}
+          </>
+        ) : rankedRegions.length === 0 ? (
           <div className="p-8 text-sm text-center text-[#888]">
             <p>Top Winning Regions</p>
             <p>Data will be displayed once available.</p>
@@ -73,7 +82,7 @@ const TopBettingRegionPage = (data: BettingRegionProps) => {
         ) : (
           rankedRegions.slice(0, 5).map((item, index) => (
             <div
-              key={ /*item.region.RegionId ??  */ item.region.Region}
+              key={item.region.Region}
               className={`flex items-center py-2 ${
                 index === rankedRegions.length - 1 ? "border-none" : ""
               }`}
@@ -84,15 +93,15 @@ const TopBettingRegionPage = (data: BettingRegionProps) => {
                     item.trend > 0
                       ? "text-[#046115]"
                       : item.trend < 0
-                        ? "text-[#CE1126]"
-                        : "text-[#aaa]"
+                      ? "text-[#CE1126]"
+                      : "text-[#aaa]"
                   }`}
                 >
                   {item.trend > 0
                     ? `↑${item.trend}`
                     : item.trend < 0
-                      ? `↓${Math.abs(item.trend)}`
-                      : "→"}
+                    ? `↓${Math.abs(item.trend)}`
+                    : "→"}
                 </span>
               </div>
 

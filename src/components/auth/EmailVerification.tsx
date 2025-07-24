@@ -76,8 +76,8 @@ const EmailVerification = () => {
     }
 
     const result = await verifyOtp(authStore.email, otp.join(""));
-    console.log("Auth store email is: " + authStore.email, "| OTP is: " + otp.join(""))
-    console.log(result)
+    //console.log("Auth store email is: " + authStore.email, "| OTP is: " + otp.join(""))
+    //console.log(result)
     
     if(!result.success) {
       setCurrentError(result.message)
@@ -85,7 +85,7 @@ const EmailVerification = () => {
 
     else {
       authStore.setResetToken(result.data.resetToken)
-      console.log("reset token is: " + authStore.resetToken)
+      //console.log("reset token is: " + authStore.resetToken)
       setIsOTPVerified(true);
       router.push("/set-password"); 
     }

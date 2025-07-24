@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
-
-import { FaDiceSix } from "react-icons/fa";
+import { FaDiceSix, FaSpinner } from "react-icons/fa";
 import { fetchHistoricalRegion, fetchHistoricalSummary } from "@/lib/api/transactions";
 import { historicalSummaryByRegionCategory } from "@/utils/transforms";
 
@@ -14,9 +12,7 @@ interface RegionData {
 }
 
 const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
-  const [rankedRegions, setRankedRegions] = useState<
-    { region: RegionData; rank: number; trend: number }[]
-  >([]);
+  const [rankedRegions, setRankedRegions] = useState<{ region: RegionData; rank: number; trend: number }[]>([]);
   const [gameCategoryId, setGameCategoryId] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -150,7 +146,7 @@ const TableBettingActivityToday = (params: { gameCategoryId?: number }) => {
 
       {isLoading ? (
         <div className="flex items-center justify-center flex-1">
-          <CircularProgress />
+          <FaSpinner className="animate-spin h-8 w-8" />
         </div>
       ) : (
         <div className="mt-2 w-full overflow-y-auto">

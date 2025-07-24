@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "@/store/useAuthStore";
 import { fetchHistoricalSummary } from "@/lib/api/transactions";
+import { FaSpinner } from "react-icons/fa";
 
 const getBetTypeSeries = (gameCategoryId?: number) => {
   switch (gameCategoryId) {
@@ -161,7 +161,7 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
       <div className="h-full w-full">
         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <BarChart

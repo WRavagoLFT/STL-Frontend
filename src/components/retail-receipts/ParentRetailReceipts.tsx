@@ -15,29 +15,17 @@ import {
   fetchRetailReceiptsData,
 } from "@/lib/api/transactions";
 import Select, { ActionMeta, SingleValue } from "react-select";
-
 import RetailReceiptSkeleton from "@/components/retail-receipts/RetailReceiptSkeleton";
 import { ExportRetailDataToPDF } from "@/components/retail-receipts/ExportRetailDataToPdf";
 import ExportRetailDataToExcel from "@/components/retail-receipts/ExportReceiptsCSV";
+import dynamic from "next/dynamic";
 
-const ReceiptCardsPage = React.lazy(
-  () => import("@/components/retail-receipts/ReceiptsCardPage")
-);
-const GrossAACSharePage = React.lazy(
-  () => import("@/components/retail-receipts/GrossAACShare")
-);
-const GrossPSCOSharePage = React.lazy(
-  () => import("@/components/retail-receipts/GrossPSCOShare")
-);
-const AACTaxesPage = React.lazy(
-  () => import("@/components/retail-receipts/ACCSTaxes")
-);
-const NetAACIncomePage = React.lazy(
-  () => import("@/components/retail-receipts/NetAACIncome")
-);
-const NetPSCOIncomePage = React.lazy(
-  () => import("@/components/retail-receipts/NetPSCOIncome")
-);
+const ReceiptCardsPage = dynamic(() => import("@/components/retail-receipts/ReceiptsCardPage"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
+const GrossAACSharePage = dynamic(() => import("@/components/retail-receipts/GrossAACShare"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
+const GrossPSCOSharePage = dynamic(() => import("@/components/retail-receipts/GrossPSCOShare"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
+const AACTaxesPage = dynamic(() => import("@/components/retail-receipts/ACCSTaxes"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
+const NetAACIncomePage = dynamic(() => import("@/components/retail-receipts/NetAACIncome"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
+const NetPSCOIncomePage = dynamic(() => import("@/components/retail-receipts/NetPSCOIncome"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
 
 export type OptionType = {
   label: string;
@@ -349,4 +337,3 @@ export const ParentRetailReceipt = () => {
     </AccessGuard>
   );
 };
-  

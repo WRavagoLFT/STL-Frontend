@@ -85,7 +85,7 @@ const routeMap: Record<string, string> = {
   "Betting Summary": "/betting-summary",
   "Winning Summary": "/winning-summary",
   "Draw Summary": "/draw-summary",
-  "Device Information": "/device-information",
+  "Device Information": "/device",
   "Retail Receipt": "/retail-receipt",
   Logout: "#logout",
 };

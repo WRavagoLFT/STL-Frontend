@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { CircularProgress } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { BettorsandBetsSummaryProps, getLegendItemsMap_Specific, getLegendItemsMap_Duration, } from "../../../store/useBettingStore";
 import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from "@/lib/api/transactions";
+import { FaSpinner } from "react-icons/fa";
 
 interface ChartData {
   region: string;
@@ -335,7 +335,7 @@ const ChartTopRegionByBetsandBettors: React.FC<BettorsandBetsSummaryProps> = ({
       <div className="h-full flex flex-col flex-grow">
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <LineChart

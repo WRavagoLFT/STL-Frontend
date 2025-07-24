@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { BettorsandBetsSummaryProps } from "../types";
 import { formatDate, getGameCategoryParam } from "../utils";
@@ -11,6 +10,7 @@ import GenericCSVExportButton from "../../../ui/buttons/CSVExportButtonDashboard
 import CustomLegend from "../CustomLegend";
 import { useAuthStore } from "@/store/useAuthStore";
 import { fetchCompareHistoricalDate, fetchCompareHistoricalRange } from "@/lib/api/transactions";
+import { FaSpinner } from "react-icons/fa";
 
 const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
   gameCategoryId,
@@ -199,7 +199,7 @@ const ChartBettorsAndBetsSummary: React.FC<BettorsandBetsSummaryProps> = ({
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <div className="min-w-[1000px] md:min-w-[600px]">

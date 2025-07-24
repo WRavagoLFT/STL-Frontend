@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "@/store/useAuthStore";
+import { FaSpinner } from "react-icons/fa";
 
 const CustomLegend = () => (
   <div className="flex flex-row space-x-5 justify-start mt-1 mr-4">
@@ -36,20 +36,19 @@ interface BettingSummaryData {
 
 interface BettingSummaryProps {
   data: BettingSummaryData[]
+  loading?: boolean;
 }
 
-const SummaryBettorsBetsPlacedPage = (data: BettingSummaryProps) => {
+const SummaryBettorsBetsPlacedPage = ({ data, loading }: BettingSummaryProps) => {
   const [chartData, setChartData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   useEffect(() => {
-    setChartData(data.data.map((item) => ({
+    setChartData(data.map((item) => ({
       gameName: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw",
       bettors: item.Bettors,
       bets: item.Bets
     })))
-    setLoading(false)
   }, []);
 
   return (
@@ -68,6 +67,7 @@ const SummaryBettorsBetsPlacedPage = (data: BettingSummaryProps) => {
               headers={["Game Name", "Bettors", "Bets"]}
               title="Bettors and Bets Summary"
               getRowData={(item) => [item.gameName, item.bettors, item.bets]}
+              disabled={loading}
             />
           </div>
         )}
@@ -76,7 +76,7 @@ const SummaryBettorsBetsPlacedPage = (data: BettingSummaryProps) => {
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <div className="min-w-[850px] md:min-w-[600px]">

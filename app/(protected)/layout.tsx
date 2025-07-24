@@ -1,19 +1,22 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { ThemeProvider, CssBaseline, CircularProgress } from "@mui/material";
+import { ThemeProvider, CssBaseline } from "@mui/material";
 import { match } from "path-to-regexp";
 import lightTheme from "@/styles/theme";
 import { AccessGuard } from "@/components/auth/AccessGuard";
 import Sidebar from "@/components/layout/Sidebar";
+import { FaSpinner } from "react-icons/fa";
+
+{/* <FaSpinner className="animate-spin h-8 w-8" /> */}
 
 const staticPaths = [
   "/dashboard",
   "/operators",
   "/operators/operators-add",
   "/retail-receipt",
-  "/device-information",
-  "/device-information/device-information-add",
+  "/device",
+  "/device/device-add",
   "/draw-summary",
   "/bets-comparisons",
   "/wins-comparisons",
@@ -23,7 +26,7 @@ const dynamicPaths = [
   "/users/:role",
   "/users/users-view/:slug",
   "/operators/operators-view/:slug",
-  "/device-information/device-information-view/:slug",
+  "/device/device-view/:slug",
   "/winning-summary/:slug",
   "/betting-summary/:mainSlug",
   "/betting-summary/:mainSlug/betting-comparisons/:comparisonSlug",

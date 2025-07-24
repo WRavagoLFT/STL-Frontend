@@ -5,9 +5,9 @@ import { useParams } from "next/navigation";
 import { DeviceItem } from "@/lib/api/device/device.service";
 import { fetchAndSetDevice } from "@/hooks/useLoadDevice";
 import { AccessGuard } from "@/components/auth/AccessGuard";
-import { DevicesViewPage } from "@/components/device-information/ParentDeviceView";
+import { DevicesViewPage } from "./ParentDeviceView";
 
-const DeviceSlugPage = () => {
+const DeviceViewSlugClientPage = () => {
   const { slug } = useParams();
   const [device, setDevice] = useState<DeviceItem | null>(null);
   const [loading, setLoading] = useState(true);
@@ -37,4 +37,4 @@ const DeviceSlugPage = () => {
   );
 };
 
-export default DeviceSlugPage;
+export default DeviceViewSlugClientPage;

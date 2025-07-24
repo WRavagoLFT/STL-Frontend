@@ -2,17 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { FaMoneyBillAlt } from "react-icons/fa";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/useAuthStore";
-
-interface RegionData {
-  RegionId?: number;
-  Region: string;
-  RegionFull?: string;
-  TotalWinners?: number;
-  TotalPayout: number;
-  trend?: number;
-}
 
 interface WinningRegionData {
   Region: string;
@@ -21,26 +12,44 @@ interface WinningRegionData {
 
 interface WinningRegionProps {
   data: WinningRegionData[];
+  loading?: boolean;
 }
 
-const TopWinningRegionPage = (data: WinningRegionProps) => {
+const TopWinningRegionPage = ({ data, loading }: WinningRegionProps) => {
+  const router = useRouter();
   const [rankedRegions, setRankedRegions] = useState<
-    { region: RegionData; rank: number; trend: number }[]
+    { region: WinningRegionData; rank: number; trend: number }[]
   >([]);
+
   const currentUserType = useAuthStore((state) => state.userTypeId);
   const winningLabel =
     currentUserType === 3
       ? "Top Winning Area Today"
       : "Top Winning Regions Today";
 
-  useEffect(() => {    
-    if (!data || !data.data || data.data.length === 0) {
-      console.warn("No data provided for Top Betting Regions.");
+  const renderSkeletonItem = (key: number) => (
+    <div key={key} className="flex items-center py-2 animate-pulse">
+      <div className="w-[15%] h-4 bg-gray-300 rounded" />
+      <div className="ml-2 flex-1 h-4 bg-gray-300 rounded" />
+      <div className="w-20 h-4 bg-gray-300 rounded" />
+    </div>
+  );
+
+  useEffect(() => {
+    if (!data || data.length === 0) {
+      console.warn("No data provided for Top Winning Regions.");
       return;
     }
-    data.data.sort((a, b) => b.TotalPayout - a.TotalPayout);
-    setRankedRegions(data.data.map((item, index) => ({ region: item, rank: index + 1, trend: 0 })));
-  }, []);
+
+    const sorted = [...data].sort((a, b) => (b.TotalPayout ?? 0) - (a.TotalPayout ?? 0));
+    setRankedRegions(
+      sorted.map((region, index) => ({
+        region,
+        rank: index + 1,
+        trend: 0, // You can compute trend from historical data if needed
+      }))
+    );
+  }, [data]);
 
   return (
     <div className="w-full flex-1 bg-transparent p-4 rounded-xl border border-[#0038A8] flex flex-col">
@@ -54,16 +63,22 @@ const TopWinningRegionPage = (data: WinningRegionProps) => {
         <div className="mt-2 md:mt-0">
           <button
             onClick={() => router.push("/winning-summary/dashboard")}
-            className="text-xs bg-[#0038A8] hover:bg-blue-700 text-white px-3 py-2 rounded-lg"
-          >
+            disabled={loading}
+            className={`rounded-lg px-6 py-2 text-[0.8rem] text-white transition
+              ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#0038A8] hover:bg-blue-700"}`}>
             View Winners
           </button>
         </div>
       </div>
+
       <div className="h-px bg-[#ACA993] mt-1 mb-2" />
 
       <div className="mt-2 w-full max-h-[720px] overflow-y-auto">
-        {rankedRegions.length === 0 ? (
+        {loading ? (
+          <>
+            {Array.from({ length: 5 }).map((_, i) => renderSkeletonItem(i))}
+          </>
+        ) : rankedRegions.length === 0 ? (
           <div className="p-8 text-sm text-center text-[#888]">
             <p>Top Winning Regions</p>
             <p>Data will be displayed once available.</p>
@@ -71,7 +86,7 @@ const TopWinningRegionPage = (data: WinningRegionProps) => {
         ) : (
           rankedRegions.slice(0, 5).map((item, index) => (
             <div
-              key={item.region.RegionId ?? item.region.Region}
+              key={item.region.Region}
               className={`flex items-center py-2 ${
                 index === rankedRegions.length - 1 ? "border-none" : ""
               }`}
@@ -82,15 +97,15 @@ const TopWinningRegionPage = (data: WinningRegionProps) => {
                     item.trend > 0
                       ? "text-[#046115]"
                       : item.trend < 0
-                        ? "text-[#CE1126]"
-                        : "text-[#aaa]"
+                      ? "text-[#CE1126]"
+                      : "text-[#aaa]"
                   }`}
                 >
                   {item.trend > 0
                     ? `↑${item.trend}`
                     : item.trend < 0
-                      ? `↓${Math.abs(item.trend)}`
-                      : "→"}
+                    ? `↓${Math.abs(item.trend)}`
+                    : "→"}
                 </span>
               </div>
 

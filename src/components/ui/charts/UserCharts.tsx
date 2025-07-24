@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { CircularProgress } from "@mui/material";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { ChartCardProps } from "@/types/interfaces";
 import GenericCSVExportButton from "../buttons/CSVExportButtonDashboard";
+import { FaSpinner } from "react-icons/fa";
 
 const getLegendItems = (pageType: string) => {
   const labelMap: Record<string, string> = {
@@ -102,7 +102,7 @@ export const ChartCard = <T,>({
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <div className="min-w-[850px] md:min-w-[600px]">

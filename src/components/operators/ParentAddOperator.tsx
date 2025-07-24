@@ -1,7 +1,7 @@
 "use client";
 
-import router, { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
+import router, { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import AddOperatorPage from "@/components/operators/AddOperator";
 import BackIconButton from "@/components/ui/icons/BackButton";

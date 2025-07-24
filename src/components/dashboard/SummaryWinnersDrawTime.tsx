@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { CircularProgress } from "@mui/material";
+import React, { useState, useEffect } from "react";
 import { BarChart } from "@mui/x-charts/BarChart";
 import GenericCSVExportButton from "../ui/buttons/CSVExportButtonDashboard";
 import { useAuthStore } from "@/store/useAuthStore";
-
-type DrawNumber = 1 | 2 | 3;
+import { FaSpinner } from "react-icons/fa";
 
 const drawLabelMap: Record<number, string> = {
   1: "First Draw",
@@ -41,20 +39,19 @@ interface WinnersData {
 
 interface WinnersProps {
   data: WinnersData[]
+  loading?: boolean;
 }
 
-const SummaryWinnersDrawTimePage = (data: WinnersProps) => {
-  const [loading, setLoading] = useState(true);
+const SummaryWinnersDrawTimePage = ({ data, loading }: WinnersProps) => {
   const [chartData, setChartData] = useState<{ draw: string; winners: number; winnings: number }[]>([]);
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   useEffect(() => {
-    setChartData(data.data.map((item) => ({ 
-      draw: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw", 
-      winners: item.Winners, 
+    setChartData(data.map((item) => ({
+      draw: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw",
+      winners: item.Winners,
       winnings: item.Payout
     })));
-    setLoading(false);
   }, []);
 
   return (
@@ -77,6 +74,7 @@ const SummaryWinnersDrawTimePage = (data: WinnersProps) => {
                 item.winners,
                 item.winnings.toFixed(2),
               ]}
+              disabled={loading}
             />
           </div>
         )}
@@ -85,7 +83,7 @@ const SummaryWinnersDrawTimePage = (data: WinnersProps) => {
       <div className="h-full w-full mt-4">
         {loading ? (
           <div className="flex items-center justify-center h-[300px]">
-            <CircularProgress />
+            <FaSpinner className="animate-spin h-8 w-8" />
           </div>
         ) : (
           <div className="min-w-[850px] md:min-w-[600px]">
