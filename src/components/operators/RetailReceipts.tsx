@@ -17,8 +17,14 @@ export type OptionType = {
   value: string;
 };
 
-const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const RetailReceiptOperatorsPage = ({
+  operatorId,
+  isOpen = false, // default to true if not provided
+}: {
+  operatorId: number;
+  isOpen?: boolean;
+}) => {
+  //const [isOpen, setIsOpen] = useState(false);
   const [operationDate, setOperationDate] = useState(() => {
     const today = new Date();
     return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
@@ -33,6 +39,10 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
   const [filterBy, setFilterBy] = useState<OptionType>(filterOptions[0]); // default to Monthly
   const [selectedYear, setSelectedYear] = useState<OptionType | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isAACOpen, setIsAACOpen] = useState(true);
+  const [isAACtaxOpen, setIsAACtaxOpen] = useState(true);
+  const [isPCSOOpen, setIsPCSOOpen] = useState(true);
+  const [isPCSOTaxOpen, setIsPCSOTaxOpen] = useState(true);
 
   const currentYearOption = useMemo(() => {
     const year = new Date().getFullYear();
@@ -217,16 +227,26 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
               placeholder="Select Year"
               classNamePrefix="react-select"
               styles={{
-                control: (provided, state) => ({
-                  ...provided,
-                  borderRadius: "0.5rem",
-                  color: "#2F2F2F",
-                  padding: "0.25rem",
-                  boxShadow: state.isFocused ? "none" : provided.boxShadow,
-                }),
+                  control: (provided, state) => {
+                    const isDisabled = state.isDisabled;
+                    return {
+                      ...provided,
+                      fontSize: "0.875rem",
+                      //padding: "2px",
+                      minHeight: "35px",
+                      height: "32px",
+                      borderRadius: "9px",
+                      borderColor: "#0038A8",
+                      color: isDisabled ? "#6B7280" : "inherit",
+                      backgroundColor: "transparent",
+                      boxShadow: "none",
+                      '&:hover': {
+                        borderColor: "#0038A8",
+                      },
+                    };
+                  },
                 menu: (provided) => ({
                   ...provided,
-                  //backgroundColor: "#F8C73F",
                   zIndex: 10,
                 }),
               }}
@@ -253,6 +273,8 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
             totalPercentage={aacTotalPercentage}
             totalShareAmount={aacTotalShareAmount}
             breakdown={aacBreakdown}
+            isOpen={isAACOpen}
+            setIsOpen={setIsAACOpen}
           />
         </div>
 
@@ -261,6 +283,8 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
             totalPercentage={aacTaxTotalPercentage}
             totalShareAmount={aacTaxTotalShareAmount}
             breakdown={aacTaxBreakdown}
+            isOpen={isAACtaxOpen}
+            setIsOpen={setIsAACtaxOpen}
           />
         </div>
         <div className="w-full">
@@ -277,6 +301,8 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
             totalPercentage={pcsoTotalPercentage}
             totalShareAmount={pcsoTotalShareAmount}
             breakdown={pcsoBreakdown}
+            isOpen={isPCSOOpen}
+            setIsOpen={setIsPCSOOpen}
           />
         </div>
         <div className="w-full">
@@ -284,6 +310,8 @@ const RetailReceiptOperatorsPage = ({ operatorId }: { operatorId: number }) => {
             totalPercentage={pcsoTaxTotalPercentage}
             totalShareAmount={pcsoTaxTotalShareAmount}
             breakdown={pcsoTaxBreakdown}
+            isOpen={isPCSOTaxOpen}
+            setIsOpen={setIsPCSOTaxOpen}
           />
         </div>
         <div className="w-full">

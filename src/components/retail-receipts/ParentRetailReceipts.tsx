@@ -37,15 +37,16 @@ export const ParentRetailReceipt = () => {
     const today = new Date();
     return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
   });
-
   const filterOptions: OptionType[] = [
     { label: "Monthly", value: "Monthly" },
     { label: "Yearly", value: "Yearly" },
   ];
-
   const [receiptData, setReceiptData] = useState<any | null>(null);
   const [filterBy, setFilterBy] = useState<OptionType>(filterOptions[0]);
-
+  const [isAACOpen, setIsAACOpen] = useState(false);
+  const [isAACtaxOpen, setIsAACtaxOpen] = useState(false);
+  const [isPCSOOpen, setIsPCSOOpen] = useState(false);
+  const [isPCSOTaxOpen, setIsPCSOTaxOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState<OptionType | null>(null);
   const [loading, setLoading] = useState(false);
   const [receiptDataMetrics, setReceiptDataMetrics] = useState<{
@@ -167,7 +168,6 @@ export const ParentRetailReceipt = () => {
     operationDate,
     yearNumber
   );
-
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
       <Suspense fallback={<RetailReceiptSkeleton />}>
@@ -271,11 +271,15 @@ export const ParentRetailReceipt = () => {
                     totalPercentage={aacTotalPercentage}
                     totalShareAmount={aacTotalShareAmount}
                     breakdown={aacBreakdown}
+                    isOpen={isAACOpen}
+                    setIsOpen={setIsAACOpen}
                   />
                   <AACTaxesPage
                     totalPercentage={aacTaxTotalPercentage}
                     totalShareAmount={aacTaxTotalShareAmount}
                     breakdown={aacTaxBreakdown}
+                    isOpen={isAACtaxOpen}
+                    setIsOpen={setIsAACtaxOpen}
                   />
                   <NetAACIncomePage
                     netAmount={netAacTotalAmount}
@@ -289,11 +293,15 @@ export const ParentRetailReceipt = () => {
                     totalPercentage={netPcsoTotalPercentage}
                     totalShareAmount={netPcsoTotalAmount}
                     breakdown={pcsoBreakdown}
+                    isOpen={isPCSOOpen}
+                    setIsOpen={setIsPCSOOpen}
                   />
                   <PCSOTaxesPage
                     totalPercentage={pcsoTaxTotalPercentage}
                     totalShareAmount={pcsoTaxTotalShareAmount}
                     breakdown={pcsoTaxBreakdown}
+                    isOpen={isPCSOTaxOpen}
+                    setIsOpen={setIsPCSOTaxOpen}
                   />
                   <NetPSCOIncomePage
                     netAmount={pcsoTotalShareAmount}

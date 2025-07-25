@@ -9,9 +9,9 @@ const GrossPSCOSharePage: React.FC<ShareBreakdownPageProps> = ({
   breakdown,
   defaultBreakdown = [],
   title = "Gross PCSO Share",
+  setIsOpen,
+  isOpen,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
   const breakdownToShow =
     breakdown && breakdown.length > 0 ? breakdown : defaultBreakdown;
 

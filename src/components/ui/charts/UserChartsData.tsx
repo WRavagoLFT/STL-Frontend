@@ -49,7 +49,7 @@ export const ChartsDataPage = <
   const [statsPerRegion, setStatsPerRegion] = useState<any[]>([]);
   const [regionList, setRegionList] = useState<Region[]>([]);
 
-  console.log('loading state on the user charts data: ', loading);
+  //console.log('loading state on the user charts data: ', loading);
 
   useEffect(() => {
     async function loadRegions() {

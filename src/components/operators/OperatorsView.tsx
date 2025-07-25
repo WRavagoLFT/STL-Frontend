@@ -15,7 +15,7 @@ import {
   UpdateOperatorPayload,
   editLogOperator,
 } from "@/lib/api/operators/operators.service";
-const EditModalPage= dynamic(() => import("@/components/ui/modals/EditLogModalWrapper"));
+import EditModalPage from "../ui/modals/EditLogModalWrapper";
 const OperatorViewPage = dynamic(() => import("@/components/operators/UpdateOperatorForm"));
 const RetailReceiptOperatorsPage = dynamic(() => import("@/components/operators/RetailReceipts"));
 
@@ -33,10 +33,15 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
   );
   const [editLoading, setEditLoading] = useState(false);
 
-  const handleViewEditLogs = (operatorId: number) => {
-    setSelectedOperatorId(operatorId);
+  const handleViewEditLogs = async (operatorId: number) => {
     setEditLoading(true);
-    setShowEditLog(true);
+    setSelectedOperatorId(operatorId);
+
+    try {
+      setShowEditLog(true); // Show only after "loading" is ready
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const { gameTypes, regions, provinces, cities, areaOfOperations } =
@@ -122,18 +127,15 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
               onSubmit={handleUpdateOperator}
             />
 
-            {selectedOperatorId !== null && showEditLog && (
-              <>
-                <EditModalPage
-                  open={showEditLog}
-                  id={selectedOperatorId}
-                  fetchData={editLogOperator}
-                  columns={editLogtableColumns}
-                  onClose={() => setShowEditLog(false)}
-                  initialUserOperatorData={operator}
-                 
-                />
-              </>
+            {selectedOperatorId !== null && showEditLog && !editLoading && (
+              <EditModalPage
+                open={showEditLog}
+                id={selectedOperatorId}
+                fetchData={editLogOperator}
+                columns={editLogtableColumns}
+                onClose={() => setShowEditLog(false)}
+                initialUserOperatorData={operator}
+              />
             )}
           </div>
 
