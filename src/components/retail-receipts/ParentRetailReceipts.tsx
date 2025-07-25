@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { AccessGuard } from "@/components/auth/AccessGuard";
 import PCSOTaxesPage from "@/components/retail-receipts/PCSOTaxes";
-import { useRetailReceiptProcessor } from "@/components/retail-receipts/useRetailReceiptProcessor";
+import { useRetailReceiptProcessor } from "@/components/retail-receipts/RetailReceiptProcessor";
 import {
   fetchRetailReceiptsMetrics,
   fetchRetailReceiptsData,
@@ -20,12 +20,12 @@ import { ExportRetailDataToPDF } from "@/components/retail-receipts/ExportRetail
 import ExportRetailDataToExcel from "@/components/retail-receipts/ExportReceiptsCSV";
 import dynamic from "next/dynamic";
 
-const ReceiptCardsPage = dynamic(() => import("@/components/retail-receipts/ReceiptsCardPage"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const GrossAACSharePage = dynamic(() => import("@/components/retail-receipts/GrossAACShare"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const GrossPSCOSharePage = dynamic(() => import("@/components/retail-receipts/GrossPSCOShare"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const AACTaxesPage = dynamic(() => import("@/components/retail-receipts/ACCSTaxes"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const NetAACIncomePage = dynamic(() => import("@/components/retail-receipts/NetAACIncome"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const NetPSCOIncomePage = dynamic(() => import("@/components/retail-receipts/NetPSCOIncome"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
+const ReceiptCardsPage = dynamic(() => import("@/components/retail-receipts/ReceiptsCardPage"));
+const GrossAACSharePage = dynamic(() => import("@/components/retail-receipts/GrossAACShare"));
+const GrossPSCOSharePage = dynamic(() => import("@/components/retail-receipts/GrossPSCOShare"));
+const AACTaxesPage = dynamic(() => import("@/components/retail-receipts/ACCSTaxes"));
+const NetAACIncomePage = dynamic(() => import("@/components/retail-receipts/NetAACIncome"));
+const NetPSCOIncomePage = dynamic(() => import("@/components/retail-receipts/NetPSCOIncome"));
 
 export type OptionType = {
   label: string;
@@ -37,15 +37,16 @@ export const ParentRetailReceipt = () => {
     const today = new Date();
     return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
   });
-
   const filterOptions: OptionType[] = [
     { label: "Monthly", value: "Monthly" },
     { label: "Yearly", value: "Yearly" },
   ];
-
   const [receiptData, setReceiptData] = useState<any | null>(null);
   const [filterBy, setFilterBy] = useState<OptionType>(filterOptions[0]);
-
+  const [isAACOpen, setIsAACOpen] = useState(false);
+  const [isAACtaxOpen, setIsAACtaxOpen] = useState(false);
+  const [isPCSOOpen, setIsPCSOOpen] = useState(false);
+  const [isPCSOTaxOpen, setIsPCSOTaxOpen] = useState(false);
   const [selectedYear, setSelectedYear] = useState<OptionType | null>(null);
   const [loading, setLoading] = useState(false);
   const [receiptDataMetrics, setReceiptDataMetrics] = useState<{
@@ -167,7 +168,6 @@ export const ParentRetailReceipt = () => {
     operationDate,
     yearNumber
   );
-
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
       <Suspense fallback={<RetailReceiptSkeleton />}>
@@ -271,11 +271,15 @@ export const ParentRetailReceipt = () => {
                     totalPercentage={aacTotalPercentage}
                     totalShareAmount={aacTotalShareAmount}
                     breakdown={aacBreakdown}
+                    isOpen={isAACOpen}
+                    setIsOpen={setIsAACOpen}
                   />
                   <AACTaxesPage
                     totalPercentage={aacTaxTotalPercentage}
                     totalShareAmount={aacTaxTotalShareAmount}
                     breakdown={aacTaxBreakdown}
+                    isOpen={isAACtaxOpen}
+                    setIsOpen={setIsAACtaxOpen}
                   />
                   <NetAACIncomePage
                     netAmount={netAacTotalAmount}
@@ -289,11 +293,15 @@ export const ParentRetailReceipt = () => {
                     totalPercentage={netPcsoTotalPercentage}
                     totalShareAmount={netPcsoTotalAmount}
                     breakdown={pcsoBreakdown}
+                    isOpen={isPCSOOpen}
+                    setIsOpen={setIsPCSOOpen}
                   />
                   <PCSOTaxesPage
                     totalPercentage={pcsoTaxTotalPercentage}
                     totalShareAmount={pcsoTaxTotalShareAmount}
                     breakdown={pcsoTaxBreakdown}
+                    isOpen={isPCSOTaxOpen}
+                    setIsOpen={setIsPCSOTaxOpen}
                   />
                   <NetPSCOIncomePage
                     netAmount={pcsoTotalShareAmount}

@@ -5,9 +5,9 @@ import dynamic from "next/dynamic";
 import { ApiResponse } from "@/types/interfaces";
 import { WebDashboard } from "@/types/types";
 import { fetchWebDashboard } from "@/lib/api/transactions";
-import { DashboardSkeletonPage } from "./DashboardSkeleton";
+
 const DashboardCardsPage = dynamic(() => import("./DashboardCards"));
-const DrawResultsPage = dynamic(() => import("./DrawResults"));
+const DrawResultsContainer = dynamic(() => import("./DrawResultsContainer"));
 const TopBettingRegionPage = dynamic(() => import("./TopBettingRegion"));
 const TopWinningRegionPage = dynamic(() => import("./TopWinningRegion"));
 const SummaryBettorsBetsPlacedPage = dynamic(() => import("./SummaryBettorsBetsPlaced"));
@@ -61,10 +61,6 @@ export const ParentDashboard = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  // if (loading) {
-  //   return <DashboardSkeletonPage />;
-  // };
-
   return (
     <div className="space-y-4 h-full mt-8 md:mt-0">
       <h1 className="text-3xl font-bold">Dashboard</h1>
@@ -76,9 +72,7 @@ export const ParentDashboard = () => {
         <div className="w-full space-y-4">
           <div className="w-full flex flex-col lg:flex-row space-y-4 lg:space-y-0 lg:space-x-4">
             <div className="lg:w-2/5 space-y-4">
-              <DrawResultsPage
-                loading={loading}
-              />
+              <DrawResultsContainer loading={loading} />
               <TopBettingRegionPage 
                 data={topBettingRegions ?? []}
                 loading={loading}

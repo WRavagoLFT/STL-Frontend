@@ -6,7 +6,7 @@ import { ParentDashboard } from "@/components/dashboard/ParentDashboard";
 export default function Page() {
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
-      <Suspense fallback={<div> <DashboardSkeletonPage/> </div>}>
+      <Suspense fallback={<DashboardSkeletonPage/>}>
         <ParentDashboard />
       </Suspense>
     </AccessGuard>

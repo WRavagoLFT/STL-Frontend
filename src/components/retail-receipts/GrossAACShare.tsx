@@ -9,8 +9,10 @@ const GrossAACSharePage: React.FC<ShareBreakdownPageProps> = ({
   breakdown,
   defaultBreakdown = [],
   title = "Gross AAC Share",
+  setIsOpen,
+  isOpen,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  //const [isOpen, setIsOpen] = useState(false);
 
   const breakdownToShow =
     breakdown && breakdown.length > 0

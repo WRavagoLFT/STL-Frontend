@@ -15,10 +15,9 @@ import {
   UpdateOperatorPayload,
   editLogOperator,
 } from "@/lib/api/operators/operators.service";
-import { UsersSkeletonPage } from "../user/UsersSkeleton";
-const EditModalPage= dynamic(() => import("@/components/ui/modals/EditLogModalWrapper"), {ssr: false, loading: () => <UsersSkeletonPage/>});
-const OperatorViewPage = dynamic(() => import("@/components/operators/UpdateOperatorForm"), {ssr: false, loading: () => <UsersSkeletonPage/>});
-const RetailReceiptOperatorsPage = dynamic(() => import("@/components/operators/RetailReceipts"), {ssr: false, loading: () => <UsersSkeletonPage/>});
+import EditModalPage from "../ui/modals/EditLogModalWrapper";
+const OperatorViewPage = dynamic(() => import("@/components/operators/UpdateOperatorForm"));
+const RetailReceiptOperatorsPage = dynamic(() => import("@/components/operators/RetailReceipts"));
 
 interface OperatorViewPageProps {
   slug: string;
@@ -34,10 +33,15 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
   );
   const [editLoading, setEditLoading] = useState(false);
 
-  const handleViewEditLogs = (operatorId: number) => {
-    setSelectedOperatorId(operatorId);
+  const handleViewEditLogs = async (operatorId: number) => {
     setEditLoading(true);
-    setShowEditLog(true);
+    setSelectedOperatorId(operatorId);
+
+    try {
+      setShowEditLog(true); // Show only after "loading" is ready
+    } finally {
+      setEditLoading(false);
+    }
   };
 
   const { gameTypes, regions, provinces, cities, areaOfOperations } =
@@ -123,18 +127,15 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
               onSubmit={handleUpdateOperator}
             />
 
-            {selectedOperatorId !== null && showEditLog && (
-              <>
-                <EditModalPage
-                  open={showEditLog}
-                  id={selectedOperatorId}
-                  fetchData={editLogOperator}
-                  columns={editLogtableColumns}
-                  onClose={() => setShowEditLog(false)}
-                  initialUserOperatorData={operator}
-                  loading={editLoading}
-                />
-              </>
+            {selectedOperatorId !== null && showEditLog && !editLoading && (
+              <EditModalPage
+                open={showEditLog}
+                id={selectedOperatorId}
+                fetchData={editLogOperator}
+                columns={editLogtableColumns}
+                onClose={() => setShowEditLog(false)}
+                initialUserOperatorData={operator}
+              />
             )}
           </div>
 

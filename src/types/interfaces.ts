@@ -229,4 +229,7 @@ export interface ShareBreakdownPageProps {
   breakdown: Share[];
   defaultBreakdown?: Share[];
   title?: string;
+  setIsOpen: (val: boolean) => void;
+
+  isOpen: boolean;
 }

@@ -6,7 +6,7 @@ import { UsersSkeletonPage } from "@/components/user/UsersSkeleton";
 export default function Page() {
   return (
     <AccessGuard allowedUserTypes={[3, 4, 5]}>
-      <Suspense fallback={<div><UsersSkeletonPage /></div>}>
+      <Suspense fallback={<UsersSkeletonPage />}>
         <UserViewSlugClientPage />
       </Suspense>
     </AccessGuard>

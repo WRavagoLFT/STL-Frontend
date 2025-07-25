@@ -19,12 +19,14 @@ const OperatorsPage = () => {
   const [hasFetched, setHasFetched] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const loadFormOptions = useCallback(async () => {
+  const loadInitialData = useCallback(async () => {
     setLoading(true);
     await fetchFormOptionsData();
+    await fetchOperatorsData();
     setHasFetched(true);
     setLoading(false);
   }, []);
+
 
   const loadOperators = useCallback(async () => {
     await fetchOperatorsData();
@@ -33,9 +35,9 @@ const OperatorsPage = () => {
   // Form options fetch
   useEffect(() => {
     if (!hasFetched) {
-      loadFormOptions();
+      loadInitialData();
     }
-  }, [hasFetched, loadFormOptions]);
+  }, [hasFetched, loadInitialData]);
 
   // Operators fetch
   useEffect(() => {
