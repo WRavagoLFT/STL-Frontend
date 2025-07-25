@@ -131,7 +131,7 @@ const OperatorsView: React.FC<OperatorViewPageProps> = ({ slug, operator }) => {
                   columns={editLogtableColumns}
                   onClose={() => setShowEditLog(false)}
                   initialUserOperatorData={operator}
-                  loading={editLoading}
+                 
                 />
               </>
             )}

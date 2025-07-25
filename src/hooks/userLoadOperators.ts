@@ -11,7 +11,7 @@ export const fetchOperatorsData = async () => {
   } catch (error) {
     console.error("Error fetching operators:", error);
   }
-};``
+};
 
 export const fetchFormOptionsData = async () => {
   try {
@@ -23,12 +23,19 @@ export const fetchFormOptionsData = async () => {
       setAreaOfOperations,
     } = useOperatorFormStore.getState();
 
-    const gameTypesResponse = await fetchGameCategories();
-    const regionsRes = await fetchRegions();
-    const provincesRes = await fetchProvinces();
-    //const citiesRes = await fetchCities();
-    const citiesRes = await fetchCities({ availableOnly: true });
-    const areaOpsRes = await fetchAreaOfOperations();
+    const [
+      gameTypesResponse,
+      regionsRes,
+      provincesRes,
+      citiesRes,
+      areaOpsRes,
+    ] = await Promise.all([
+      fetchGameCategories(),
+      fetchRegions(),
+      fetchProvinces(),
+      fetchCities({ availableOnly: true }),
+      fetchAreaOfOperations(),
+    ]);
 
     setGameTypes(gameTypesResponse.data);
     setRegions(regionsRes.data);
@@ -39,3 +46,4 @@ export const fetchFormOptionsData = async () => {
     console.error("Error fetching form options:", error);
   }
 };
+

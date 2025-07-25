@@ -13,7 +13,6 @@ export interface EditModalPageProps {
   userTypeId?: number;
   selectedUser?: any;
   initialUserOperatorData?: any;
-  loading?: boolean;
 }
 
 const EditModalPage: React.FC<EditModalPageProps> = ({
@@ -25,10 +24,9 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
   userTypeId,
   selectedUser,
   initialUserOperatorData,
-  loading
 }) => {
   const [editData, setEditData] = useState<any[]>([]);
-  //const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const title =
     userTypeId === 3 ? "Manager" :
@@ -38,14 +36,19 @@ const EditModalPage: React.FC<EditModalPageProps> = ({
     if (!open) return;
 
     const getEditData = async () => {
-      //setLoading(true);
+      setLoading(true);
       try {
         const response = await fetchData(id);
         if (response?.success) {
           setEditData(response.data || []);
+        } else {
+          setEditData([]);
         }
+      } catch (err) {
+        console.error("Failed to fetch edit logs:", err);
+        setEditData([]);
       } finally {
-        //setLoading(false);
+        setLoading(false);
       }
     };
 

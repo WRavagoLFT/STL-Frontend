@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { fetchOperatorById } from "@/services/userService";
 import OperatorsView from "@/components/operators/OperatorsView";
-import { UsersSkeletonPage } from "../user/UsersSkeleton";
+import { OperatorsViewSkeletonPage } from "./OperatorsViewSkeleton";
 
 export default function OperatorSlugClientPage() {
   const { slug } = useParams();
@@ -18,7 +18,7 @@ export default function OperatorSlugClientPage() {
     fetchOperatorById(id).then(setOperator);
   }, [slug]);
 
-  if (!operator) return <div><UsersSkeletonPage/></div>;
+  if (!operator) return <OperatorsViewSkeletonPage/>;
 
   return (
     <OperatorsView operator={operator} slug={slug as string} />
