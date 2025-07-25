@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import GrossAACSharePage from "../retail-receipts/GrossAACShare";
-import { useRetailReceiptProcessor } from "@/components/retail-receipts/useRetailReceiptProcessor";
+import { useRetailReceiptProcessor } from "@/components/retail-receipts/RetailReceiptProcessor";
 import AACTaxesPage from "../retail-receipts/ACCSTaxes";
 import NetAACIncomePage from "../retail-receipts/NetAACIncome";
 import GrossPSCOSharePage from "../retail-receipts/GrossPSCOShare";

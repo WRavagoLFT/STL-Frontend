@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { AccessGuard } from "@/components/auth/AccessGuard";
 import PCSOTaxesPage from "@/components/retail-receipts/PCSOTaxes";
-import { useRetailReceiptProcessor } from "@/components/retail-receipts/useRetailReceiptProcessor";
+import { useRetailReceiptProcessor } from "@/components/retail-receipts/RetailReceiptProcessor";
 import {
   fetchRetailReceiptsMetrics,
   fetchRetailReceiptsData,
@@ -20,12 +20,12 @@ import { ExportRetailDataToPDF } from "@/components/retail-receipts/ExportRetail
 import ExportRetailDataToExcel from "@/components/retail-receipts/ExportReceiptsCSV";
 import dynamic from "next/dynamic";
 
-const ReceiptCardsPage = dynamic(() => import("@/components/retail-receipts/ReceiptsCardPage"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const GrossAACSharePage = dynamic(() => import("@/components/retail-receipts/GrossAACShare"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const GrossPSCOSharePage = dynamic(() => import("@/components/retail-receipts/GrossPSCOShare"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const AACTaxesPage = dynamic(() => import("@/components/retail-receipts/ACCSTaxes"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const NetAACIncomePage = dynamic(() => import("@/components/retail-receipts/NetAACIncome"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
-const NetPSCOIncomePage = dynamic(() => import("@/components/retail-receipts/NetPSCOIncome"), { ssr: false, loading: () => <RetailReceiptSkeleton /> });
+const ReceiptCardsPage = dynamic(() => import("@/components/retail-receipts/ReceiptsCardPage"));
+const GrossAACSharePage = dynamic(() => import("@/components/retail-receipts/GrossAACShare"));
+const GrossPSCOSharePage = dynamic(() => import("@/components/retail-receipts/GrossPSCOShare"));
+const AACTaxesPage = dynamic(() => import("@/components/retail-receipts/ACCSTaxes"));
+const NetAACIncomePage = dynamic(() => import("@/components/retail-receipts/NetAACIncome"));
+const NetPSCOIncomePage = dynamic(() => import("@/components/retail-receipts/NetPSCOIncome"));
 
 export type OptionType = {
   label: string;

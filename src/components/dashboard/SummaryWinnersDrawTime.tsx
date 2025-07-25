@@ -47,12 +47,22 @@ const SummaryWinnersDrawTimePage = ({ data, loading }: WinnersProps) => {
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   useEffect(() => {
-    setChartData(data.map((item) => ({
-      draw: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw",
-      winners: item.Winners,
-      winnings: item.Payout
-    })));
-  }, []);
+    const defaultDraws = [1, 2, 3];
+    const mapped = defaultDraws.map((drawOrder) => {
+      const item = data.find((d) => d.DrawOrder === drawOrder);
+      return {
+        draw:
+          drawOrder === 1
+            ? "First Draw"
+            : drawOrder === 2
+            ? "Second Draw"
+            : "Third Draw",
+        winners: item?.Winners || 0,
+        winnings: item?.Payout || 0,
+      };
+    });
+    setChartData(mapped);
+  }, [data]);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">

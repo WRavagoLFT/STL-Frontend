@@ -15,10 +15,9 @@ import {
   UpdateOperatorPayload,
   editLogOperator,
 } from "@/lib/api/operators/operators.service";
-import { UsersSkeletonPage } from "../user/UsersSkeleton";
-const EditModalPage= dynamic(() => import("@/components/ui/modals/EditLogModalWrapper"), {ssr: false, loading: () => <UsersSkeletonPage/>});
-const OperatorViewPage = dynamic(() => import("@/components/operators/UpdateOperatorForm"), {ssr: false, loading: () => <UsersSkeletonPage/>});
-const RetailReceiptOperatorsPage = dynamic(() => import("@/components/operators/RetailReceipts"), {ssr: false, loading: () => <UsersSkeletonPage/>});
+const EditModalPage= dynamic(() => import("@/components/ui/modals/EditLogModalWrapper"));
+const OperatorViewPage = dynamic(() => import("@/components/operators/UpdateOperatorForm"));
+const RetailReceiptOperatorsPage = dynamic(() => import("@/components/operators/RetailReceipts"));
 
 interface OperatorViewPageProps {
   slug: string;

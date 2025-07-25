@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { useRetailReceiptProcessor } from "@/components/retail-receipts/useRetailReceiptProcessor";
+import { useRetailReceiptProcessor } from "@/components/retail-receipts/RetailReceiptProcessor";
 
 export interface ExportRetailDataToExcelProps {
   receiptData: any;

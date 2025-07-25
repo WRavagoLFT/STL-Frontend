@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { ApiResponse } from "@/types/interfaces";
 import { WebDashboard } from "@/types/types";
 import { fetchWebDashboard } from "@/lib/api/transactions";
-import { DashboardSkeletonPage } from "./DashboardSkeleton";
+
 const DashboardCardsPage = dynamic(() => import("./DashboardCards"));
 const DrawResultsPage = dynamic(() => import("./DrawResults"));
 const TopBettingRegionPage = dynamic(() => import("./TopBettingRegion"));
@@ -60,10 +60,6 @@ export const ParentDashboard = () => {
   useEffect(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
-
-  // if (loading) {
-  //   return <DashboardSkeletonPage />;
-  // };
 
   return (
     <div className="space-y-4 h-full mt-8 md:mt-0">

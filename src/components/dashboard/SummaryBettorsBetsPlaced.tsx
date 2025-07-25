@@ -44,12 +44,22 @@ const SummaryBettorsBetsPlacedPage = ({ data, loading }: BettingSummaryProps) =>
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   useEffect(() => {
-    setChartData(data.map((item) => ({
-      gameName: item.DrawOrder === 1 ? "First Draw" : item.DrawOrder === 2 ? "Second Draw" : "Third Draw",
-      bettors: item.Bettors,
-      bets: item.Bets
-    })))
-  }, []);
+    const defaultDraws = [1, 2, 3];
+    const mapped = defaultDraws.map((drawOrder) => {
+      const item = data.find((d) => d.DrawOrder === drawOrder);
+      return {
+        gameName:
+          drawOrder === 1
+            ? "First Draw"
+            : drawOrder === 2
+            ? "Second Draw"
+            : "Third Draw",
+        bettors: item?.Bettors || 0,
+        bets: item?.Bets || 0,
+      };
+    });
+    setChartData(mapped);
+  }, [data]);
 
   return (
     <div className="bg-transparent px-4 py-7 rounded-xl border border-[#0038A8] overflow-x-auto">
