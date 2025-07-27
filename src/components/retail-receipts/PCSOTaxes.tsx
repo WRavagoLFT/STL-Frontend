@@ -20,7 +20,7 @@ const PCSOTaxesPage: React.FC<ShareBreakdownPageProps> = ({
         {loading ? (
           <div className="flex flex-col md:flex-row gap-6 mb-4">
             <div className="w-full space-y-4">
-              <div className="bg-[#F6BA12] p-4 rounded-lg shadow-sm animate-pulse space-y-2">
+              <div className="bg-[#F6BA12] px-4 py-6 rounded-lg shadow-sm animate-pulse space-y-2">
               </div>
             </div>
           </div>
