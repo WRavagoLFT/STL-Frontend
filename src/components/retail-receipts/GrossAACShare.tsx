@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState } from "react";
+import React from "react";
 import { ShareBreakdownPageProps } from "@/types/interfaces";
 
 const GrossAACSharePage: React.FC<ShareBreakdownPageProps> = ({
@@ -11,9 +9,8 @@ const GrossAACSharePage: React.FC<ShareBreakdownPageProps> = ({
   title = "Gross AAC Share",
   setIsOpen,
   isOpen,
+  loading
 }) => {
-  //const [isOpen, setIsOpen] = useState(false);
-
   const breakdownToShow =
     breakdown && breakdown.length > 0
       ? breakdown
@@ -24,45 +21,60 @@ const GrossAACSharePage: React.FC<ShareBreakdownPageProps> = ({
   return (
     <div className="flex flex-col">
       <div className="w-full mb-3">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 lg:grid-cols-2 items-center gap-2 text-left"
-          aria-expanded={isOpen}
-        >
-          <div className="flex flex-col">
-            <div className="flex justify-between lg:items-center">
-              <span className="text-sm font-bold">{title}</span>
-              <span className="text-sm font-medium md:hidden">
-                {totalPercentage.toFixed(3)}%
-              </span>
+        {loading ? (
+          <div className="flex flex-col md:flex-row gap-6 mb-4">
+            <div className="w-full space-y-4">
+              <div className="bg-[#F6BA12] p-4 rounded-lg shadow-sm animate-pulse space-y-2">
+              </div>
             </div>
-            <span className="text-sm font-medium hidden md:block">
-              {totalPercentage.toFixed(3)}%
-            </span>
-            <span className="text-lg font-bold md:hidden mt-1">
-              ₱{" "}
-              {totalShareAmount.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </span>
           </div>
-          <div className="hidden md:flex  lg:justify-end text-base font-semibold">
-            ₱{" "}
-            {totalShareAmount.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </div>
-        </button>
+        ) : (
+          <>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 lg:grid-cols-2 items-center gap-2 text-left"
+              aria-expanded={isOpen}
+            >
+
+              <div className="flex flex-col">
+                <div className="flex justify-between lg:items-center">
+                  <span className="text-sm font-bold">{title}</span>
+                  <span className="text-sm font-medium md:hidden">
+                    {totalPercentage.toFixed(3)}%
+                  </span>
+                </div>
+                <span className="text-sm font-medium hidden md:block">
+                  {totalPercentage.toFixed(3)}%
+                </span>
+                <span className="text-lg font-bold md:hidden mt-1">
+                  ₱{" "}
+                  {totalShareAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
+              <div className="hidden md:flex  lg:justify-end text-base font-semibold">
+                ₱{" "}
+                {totalShareAmount.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </div>
+            </button>
+          </>
+        )}
 
         {!isOpen && (
           <div
             className="bg-transparent border border-[#0038A8] p-2 rounded-md mt-3"
           >
             <span className="text-sm font-bold">{title} Details</span>
-
-            {breakdownToShow.length > 0 ? (
+            {loading ? (
+              <div className="mt-2 text-sm italic text-gray-500">
+                Loading share breakdown...
+              </div>
+            ) : breakdownToShow.length > 0 ? (
               breakdownToShow.map((item, index) => (
                 <div
                   key={index}

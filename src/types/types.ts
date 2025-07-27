@@ -77,6 +77,7 @@ export interface Share {
 export interface NetIncomePageProps {
   netAmount: number;
   netPercentage: number;
+  loading?: boolean;
 }
 
 export type Branch = {

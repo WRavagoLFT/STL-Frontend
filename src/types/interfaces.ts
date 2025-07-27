@@ -232,4 +232,5 @@ export interface ShareBreakdownPageProps {
   setIsOpen: (val: boolean) => void;
 
   isOpen: boolean;
+  loading?: boolean;
 }
