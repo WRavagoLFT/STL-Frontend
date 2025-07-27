@@ -16,8 +16,8 @@ import {
   editLogOperator,
 } from "@/lib/api/operators/operators.service";
 import EditModalPage from "../ui/modals/EditLogModalWrapper";
+import RetailReceiptOperatorsPage from "./RetailReceipts";
 const OperatorViewPage = dynamic(() => import("@/components/operators/UpdateOperatorForm"));
-const RetailReceiptOperatorsPage = dynamic(() => import("@/components/operators/RetailReceipts"));
 
 interface OperatorViewPageProps {
   slug: string;
