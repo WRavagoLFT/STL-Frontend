@@ -133,22 +133,21 @@ const LoginPage = () => {
                 onChange={(e) =>
                   setCredentials({ ...credentials, email: e.target.value })
                 }
-                className={`w-full px-3 py-2 pr-10 rounded-lg border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none ${
-                  errors.email || errors.general
+                className={`w-full px-3 py-2 pr-10 rounded-lg border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none ${errors.email || errors.general
                     ? "border-[#CE1126]"
                     : "border-[#0038A8]"
-                }`}
+                  }`}
                 suppressHydrationWarning
               />
-              {(errors.password || errors.general) && (
+              {errors.email && (
                 <span className="text-[#CE1126] text-xs">
-                  {errors.password || errors.general}
+                  {errors.email}
                 </span>
               )}
             </div>
 
             {/* Password Input */}
-            <div className="mb-4">
+            <div className="mb-5">
               <label className="block mb-2 text-sm text-left">
                 {LoginSectionData.PasswordTitle}
               </label>
@@ -164,11 +163,10 @@ const LoginPage = () => {
                       password: e.target.value,
                     })
                   }
-                  className={`w-full px-3 py-2 pr-10 rounded-lg border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none ${
-                    errors.password || errors.general
+                  className={`w-full px-3 py-2 pr-10 rounded-lg border text-sm lg:text-base bg-[#F8F0E3] text-[#0038A8] placeholder-[#ACA993] focus:outline-none ${errors.password || errors.general
                       ? "border-[#CE1126]"
                       : "border-[#0038A8]"
-                  }`}
+                    }`}
                   suppressHydrationWarning
                 />
                 <button
@@ -182,9 +180,9 @@ const LoginPage = () => {
               </div>
 
               <div className="flex items-center justify-between mt-1">
-                {(errors.password || errors.general) && (
+                {errors.password && (
                   <span className="text-[#CE1126] text-xs">
-                    {errors.password || errors.general}
+                    {errors.password}
                   </span>
                 )}
                 <div className="ml-auto">
@@ -198,15 +196,20 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {errors.general && (
+              <span className="flex justify-center text-[#CE1126] text-[13px]">
+                {errors.general}
+              </span>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoggingIn}
-              className={`w-full mt-4 py-2 text-sm rounded-md transition ${
-                isLoggingIn
+              className={`w-full mt-3 py-2 text-sm rounded-md transition ${isLoggingIn
                   ? "bg-[#F6BA12] text-[#212121] cursor-not-allowed opacity-70"
                   : "bg-[#F6BA12] text-[#212121] hover:opacity-70"
-              }`}
+                }`}
               suppressHydrationWarning
             >
               {LoginSectionData.buttonText}
