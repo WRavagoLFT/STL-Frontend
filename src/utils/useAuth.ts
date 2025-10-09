@@ -41,7 +41,7 @@ export function useAuth() {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        //await fetchForceToken();
+        await fetchForceToken();
         const res = await getCurrentUser();
 
         if (res?.success && res.data && res.data.UserTypeId !== undefined) {

@@ -54,8 +54,6 @@ const ChartWinnersSummary = () => {
         to: today,
       });
 
-      console.log("[DEBUG] Raw response from fetchWinners:", response);
-
       const res = response.data.filter((item: TransactionData) => {
         if (!item.DateOfTransaction) return false;
         const localDate = new Date(item.DateOfTransaction).toLocaleDateString("en-CA", {
