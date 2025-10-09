@@ -57,6 +57,8 @@ const TableBettingActivityToday = ({ gameCategoryId }: { gameCategoryId?: number
         ? historicalSummaryByRegionCategory(todayRes.data, gameCategoryId)
         : todayRes.data;
 
+        console.log(todayData);
+
       const yestData = yestRes.success
         ? gameCategoryId
           ? historicalSummaryByRegionCategory(yestRes.data, gameCategoryId)
