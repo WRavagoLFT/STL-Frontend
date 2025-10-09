@@ -445,11 +445,11 @@ export const getLegendItemsMap_Duration = (
     ],
     "Top Betting Region by Total Bettors": [
       {
-        label: "E5C7FF",
+        label: `Ranking - ${firstDateSpecific ? firstDateSpecific : "N/A"} - ${secondDateSpecific ? secondDateSpecific : "N/A"}`,
         color: "#E5C7FF",
       },
       {
-        label: "Ranking",
+        label: `Ranking - ${firstDateSpecific ? firstDateSpecific : "N/A"} - ${secondDateSpecific ? secondDateSpecific : "N/A"}`,
         color: "#5050A5",
       },
     ],
