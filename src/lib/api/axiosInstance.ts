@@ -51,7 +51,7 @@ axiosInstance.interceptors.response.use(
     const message = error?.response?.data?.message;
     const status = error?.response?.status;
 
-    const isTokenExpired = status === 403 && message === "Token expired.";
+    const isTokenExpired = ((status === 401 ) || (status === 403)) && message.toLowercase().includes("token expired");
 
     if (isTokenExpired) {
       if (!isRefreshing) {
