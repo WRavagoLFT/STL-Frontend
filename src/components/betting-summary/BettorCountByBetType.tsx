@@ -55,82 +55,68 @@ const ChartBettorsBetTypeSummary = (params: { gameCategoryId?: number }) => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const today = new Date().toLocaleDateString("en-CA", {
-          timeZone: "Asia/Manila",
-        });
-        const response = await fetchHistoricalSummary();
+        // Prepare API filters
+        const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Manila" });
+        const apiFilters: { from: string; to: string } = { from: today, to: today };
 
-        //console.log("HISTORICAL REGION:", response.data);
+        // Fetch historical summary with server-side date filtering
+        const response = await fetchHistoricalSummary(apiFilters);
 
-        let res = response.data.filter(
-          (item: { TransactionDate?: string; GameCategoryId: number }) =>
-            item.TransactionDate?.startsWith(today)
-        );
+        if (!response.success || !response.data?.length) {
+          console.warn("No historical data found or API call failed");
+          setData([]);
+          return;
+        }
 
-        if (params.gameCategoryId && params.gameCategoryId > 0) {
-          res = res.filter(
-            (item: { GameCategoryId: number }) =>
-              item.GameCategoryId === params.gameCategoryId
+        // Optional client-side filtering by gameCategoryId
+        let filteredData = response.data;
+        if (params?.gameCategoryId && params.gameCategoryId > 0) {
+          filteredData = filteredData.filter(
+            (item: { GameCategoryId: number }) => item.GameCategoryId === params.gameCategoryId
           );
         }
 
-        //console.log("Filtered items for today (" + today + "):", res);
+        // Aggregate by DrawOrder
+        const aggregatedData: Record<number, { tumbok: number; sahod: number; casas: number; ramble: number }> = {};
 
-        if (response.success && Array.isArray(res)) {
-          const aggregatedData: Record<number, { [key: string]: number }> = {};
+        filteredData.forEach((item: any) => {
+          const draw = item.DrawOrder;
+          if (!aggregatedData[draw]) {
+            aggregatedData[draw] = { tumbok: 0, sahod: 0, casas: 0, ramble: 0 };
+          }
+          aggregatedData[draw].tumbok += item.TotalTumbok || 0;
+          aggregatedData[draw].sahod += item.TotalSahod || 0;
+          aggregatedData[draw].casas += item.TotalCasas || 0;
+          aggregatedData[draw].ramble += item.TotalRamble || 0;
+        });
 
-          res.forEach((item: any) => {
-            const draw = item.DrawOrder;
-            if (!aggregatedData[draw]) {
-              aggregatedData[draw] = {
-                totalTumbok: 0,
-                totalSahod: 0,
-                totalCasas: 0,
-                totalRamble: 0,
-              };
-            }
+        // Format data for all three draws
+        const formattedData = [1, 2, 3].map((drawNum) => {
+          const drawLabel =
+            drawNum === 1 ? "First Draw" : drawNum === 2 ? "Second Draw" : "Third Draw";
 
-            aggregatedData[draw].totalTumbok += item.TotalTumbok || 0;
-            aggregatedData[draw].totalSahod += item.TotalSahod || 0;
-            aggregatedData[draw].totalCasas += item.TotalCasas || 0;
-            aggregatedData[draw].totalRamble += item.TotalRamble || 0;
-          });
+          const values = aggregatedData[drawNum] || { tumbok: 0, sahod: 0, casas: 0, ramble: 0 };
 
-          const formattedData = [1, 2, 3].map((drawNum) => {
-            const drawLabel =
-              drawNum === 1
-                ? "First Draw"
-                : drawNum === 2
-                  ? "Second Draw"
-                  : "Third Draw";
+          return {
+            draw: drawLabel,
+            tumbok: values.tumbok / 100000,
+            sahod: values.sahod / 100000,
+            casas: values.casas / 100000,
+            ramble: values.ramble / 100000,
+          };
+        });
 
-            const values = aggregatedData[drawNum] || {
-              totalTumbok: 0,
-              totalSahod: 0,
-              totalCasas: 0,
-              totalRamble: 0,
-            };
-
-            return {
-              draw: drawLabel,
-              tumbok: values.totalTumbok / 100000,
-              sahod: values.totalSahod / 100000,
-              casas: values.totalCasas / 100000,
-              ramble: values.totalRamble / 100000,
-            };
-          });
-
-          setData(formattedData);
-        }
+        setData(formattedData);
       } catch (error) {
         console.error("Error loading BettorsvsBetsPlacedSummary:", error);
+        setData([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [params.gameCategoryId]);
+  }, [params?.gameCategoryId]);
 
   const series = getBetTypeSeries(params.gameCategoryId);
 

@@ -43,69 +43,67 @@ const ChartBettorsvsBetsPlacedSummary = (params: {
   const currentUserType = useAuthStore((state) => state.userTypeId);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const response = await fetchHistoricalSummary();
+      // Prepare API filters
+      const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Manila" });
+      const apiFilters: { from: string; to: string } = { from: today, to: today };
 
-      if (response.success) {
-        const today = new Date().toLocaleDateString("en-CA", {
-          timeZone: "Asia/Manila",
-        });
+      // Fetch historical data with server-side filtering by date
+      const response = await fetchHistoricalSummary(apiFilters);
 
-        let filteredData = response.data.filter((item: TransactionData) =>
-          item.TransactionDate.startsWith(today)
-        );
-
-        if (params.gameCategoryId) {
-          filteredData = filteredData.filter(
-            (item: TransactionData) =>
-              item.GameCategoryId === params.gameCategoryId
-          );
-        }
-
-        const localSummary: typeof summary = {
-          1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
-          2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
-          3: { gameName: "Third Draw", bettors: 0, bets: 0, winners: 0 },
-        };
-
-        filteredData.forEach(
-          (item: {
-            DrawOrder: number;
-            TotalBettors: number;
-            TotalBetAmount: number;
-            TotalWinners: number;
-          }) => {
-            if (localSummary[item.DrawOrder]) {
-              localSummary[item.DrawOrder].bettors += item.TotalBettors || 0;
-              localSummary[item.DrawOrder].bets += item.TotalBetAmount || 0;
-              localSummary[item.DrawOrder].winners += item.TotalWinners || 0;
-            }
-          }
-        );
-
-        const formattedData = Object.values(localSummary);
-
-        const scaledData = formattedData.map((item) => ({
-          ...item,
-          bets: item.bets,
-          ratio: item.bettors === 0 ? 0 : item.bets / item.bettors,
-        }));
-
-        setData(scaledData);
-
-        const transformedChartData = scaledData.map((item) => ({
-          draw: item.gameName,
-          bettors: item.bettors,
-          bets: item.bets,
-          ratio: item.ratio,
-        }));
-
-        setChartData(transformedChartData);
-      } else {
-        console.error("API Request Failed:", response.message);
+      if (!response.success || !response.data?.length) {
+        console.warn("No historical data found or API call failed");
+        setData([]);
+        setChartData([]);
+        return;
       }
+
+      // Optional client-side filtering by gameCategoryId
+      let filteredData = response.data;
+      if (params?.gameCategoryId) {
+        filteredData = filteredData.filter(
+          (item: TransactionData) => item.GameCategoryId === params.gameCategoryId
+        );
+      }
+
+      // Aggregate data by DrawOrder
+      const localSummary: Record<number, { gameName: string; bettors: number; bets: number; winners: number }> = {
+        1: { gameName: "First Draw", bettors: 0, bets: 0, winners: 0 },
+        2: { gameName: "Second Draw", bettors: 0, bets: 0, winners: 0 },
+        3: { gameName: "Third Draw", bettors: 0, bets: 0, winners: 0 },
+      };
+
+      filteredData.forEach((item: TransactionData) => {
+        const draw = localSummary[item.DrawOrder];
+        if (draw) {
+          draw.bettors += item.TotalBettors || 0;
+          draw.bets += item.TotalBetAmount || 0;
+          draw.winners += item.TotalWinners || 0;
+        }
+      });
+
+      // Format data and calculate ratio
+      const formattedData = Object.values(localSummary).map((item) => ({
+        ...item,
+        ratio: item.bettors === 0 ? 0 : item.bets / item.bettors,
+      }));
+
+      setData(formattedData);
+
+      // Transform for chart
+      const transformedChartData = formattedData.map((item) => ({
+        draw: item.gameName,
+        bettors: item.bettors,
+        bets: item.bets,
+        ratio: item.ratio,
+      }));
+
+      setChartData(transformedChartData);
     } catch (error) {
-      console.error("Error Fetching Data:", error);
+      console.error("Error fetching data:", error);
+      setData([]);
+      setChartData([]);
     } finally {
       setLoading(false);
     }
