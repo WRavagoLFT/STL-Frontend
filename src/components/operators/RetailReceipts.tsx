@@ -120,7 +120,7 @@ const RetailReceiptOperatorsPage = ({
   }, [fetchRetailData]);
 
   //console.log("Operator ID passed to useRetailReceiptProcessor:", operatorId);
-  
+
   const yearNumber = selectedYear ? Number(selectedYear.value) : undefined;
 
   const {
@@ -175,24 +175,24 @@ const RetailReceiptOperatorsPage = ({
             options={filterOptions}
             classNamePrefix="react-select"
             styles={{
-                control: (provided, state) => {
-                  const isDisabled = state.isDisabled;
-                  return {
-                    ...provided,
-                    fontSize: "0.875rem",
-                    //padding: "2px",
-                    minHeight: "35px",
-                    height: "32px",
-                    borderRadius: "9px",
+              control: (provided, state) => {
+                const isDisabled = state.isDisabled;
+                return {
+                  ...provided,
+                  fontSize: "0.875rem",
+                  //padding: "2px",
+                  minHeight: "35px",
+                  height: "32px",
+                  borderRadius: "9px",
+                  borderColor: "#0038A8",
+                  color: isDisabled ? "#6B7280" : "inherit",
+                  backgroundColor: "transparent",
+                  boxShadow: "none",
+                  '&:hover': {
                     borderColor: "#0038A8",
-                    color: isDisabled ? "#6B7280" : "inherit",
-                    backgroundColor: "transparent",
-                    boxShadow: "none",
-                    '&:hover': {
-                      borderColor: "#0038A8",
-                    },
-                  };
-                },
+                  },
+                };
+              },
               menu: (provided) => ({
                 ...provided,
                 zIndex: 10,
@@ -227,24 +227,24 @@ const RetailReceiptOperatorsPage = ({
               placeholder="Select Year"
               classNamePrefix="react-select"
               styles={{
-                  control: (provided, state) => {
-                    const isDisabled = state.isDisabled;
-                    return {
-                      ...provided,
-                      fontSize: "0.875rem",
-                      //padding: "2px",
-                      minHeight: "35px",
-                      height: "32px",
-                      borderRadius: "9px",
+                control: (provided, state) => {
+                  const isDisabled = state.isDisabled;
+                  return {
+                    ...provided,
+                    fontSize: "0.875rem",
+                    //padding: "2px",
+                    minHeight: "35px",
+                    height: "32px",
+                    borderRadius: "9px",
+                    borderColor: "#0038A8",
+                    color: isDisabled ? "#6B7280" : "inherit",
+                    backgroundColor: "transparent",
+                    boxShadow: "none",
+                    '&:hover': {
                       borderColor: "#0038A8",
-                      color: isDisabled ? "#6B7280" : "inherit",
-                      backgroundColor: "transparent",
-                      boxShadow: "none",
-                      '&:hover': {
-                        borderColor: "#0038A8",
-                      },
-                    };
-                  },
+                    },
+                  };
+                },
                 menu: (provided) => ({
                   ...provided,
                   zIndex: 10,
@@ -254,14 +254,29 @@ const RetailReceiptOperatorsPage = ({
           )}
         </div>
       </div>
-      <div className="flex gap-4 mb-1">
-        <div className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 md:grid-cols-2 items-center gap-2 text-left">
-          <div className="flex flex-col">
-            <span className="text-sm font-bold">STL Collections</span>
-          </div>
-          <div className="flex justify-center md:justify-end text-base font-semibold">
-            ₱ {receiptData?.Collections?.toLocaleString() || "0.00"}
-          </div>
+      <div className="flex gap-6 mt-1 mb-1">
+        <div className="w-full">
+          {loading ? (
+            <div className="flex flex-col md:flex-row gap-6 mb-1">
+              <div className="w-full space-y-4">
+                <div className="bg-[#F6BA12] px-4 py-5 rounded-lg shadow-sm animate-pulse space-y-2">
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="flex gap-4 mb-1">
+                <div className="w-full bg-[#F6BA12] p-2 rounded-md grid grid-cols-1 md:grid-cols-2 items-center gap-2 text-left">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-bold">STL Collections</span>
+                  </div>
+                  <div className="flex justify-center md:justify-end text-base font-semibold">
+                    ₱ {receiptData?.Collections?.toLocaleString() || "0.00"}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
       <div className="w-full mt-4">
@@ -275,6 +290,7 @@ const RetailReceiptOperatorsPage = ({
             breakdown={aacBreakdown}
             isOpen={isAACOpen}
             setIsOpen={setIsAACOpen}
+            loading={loading}
           />
         </div>
 
@@ -285,12 +301,14 @@ const RetailReceiptOperatorsPage = ({
             breakdown={aacTaxBreakdown}
             isOpen={isAACtaxOpen}
             setIsOpen={setIsAACtaxOpen}
+            loading={loading}
           />
         </div>
         <div className="w-full">
           <NetAACIncomePage
             netAmount={netAacTotalAmount}
             netPercentage={netAacTotalPercentage}
+            loading={loading}
           />
         </div>
         <div className="w-full mt-2">
@@ -303,6 +321,7 @@ const RetailReceiptOperatorsPage = ({
             breakdown={pcsoBreakdown}
             isOpen={isPCSOOpen}
             setIsOpen={setIsPCSOOpen}
+            loading={loading}
           />
         </div>
         <div className="w-full">
@@ -312,12 +331,14 @@ const RetailReceiptOperatorsPage = ({
             breakdown={pcsoTaxBreakdown}
             isOpen={isPCSOTaxOpen}
             setIsOpen={setIsPCSOTaxOpen}
+            loading={loading}
           />
         </div>
         <div className="w-full">
           <NetPSCOIncomePage
             netAmount={netPcsoTotalAmount}
             netPercentage={netPcsoTotalPercentage}
+            loading={loading}
           />
         </div>
       </div>

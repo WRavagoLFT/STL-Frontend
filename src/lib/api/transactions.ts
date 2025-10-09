@@ -14,7 +14,6 @@ const handleError = (label: string, error: any) => {
   return { success: false, message, data: [] };
 };
 
-// Fetch historical summary
 export const fetchHistoricalSummary = async (filters?: {from?: string; to?: string;}) => {
   try {
     const url = validateRelativeUrl("/transactions/getHistorical");
@@ -25,7 +24,6 @@ export const fetchHistoricalSummary = async (filters?: {from?: string; to?: stri
   }
 };
 
-// Fetch historical summary by region
 export const fetchHistoricalRegion = async <T = any>(filters?: { date?: string }): Promise<T> => {
   try {
     const url = validateRelativeUrl("/transactions/getHistoricalRegion");
@@ -41,7 +39,6 @@ export const fetchHistoricalRegion = async <T = any>(filters?: { date?: string }
   }
 };
 
-// Fetch detailed transactions
 export const fetchTransactions = async (filters?: {
   from?: string;
   to?: string;

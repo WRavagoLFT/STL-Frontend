@@ -37,7 +37,19 @@ const TableBettingSummary = ({
   const fetchTransactionsData = async () => {
     setIsLoading(true);
     try {
-      const response = await fetchTransactions();
+      
+      const params: { from?: string; to?: string } = {};
+
+      if (filters.date) {
+        params.from = filters.date;
+        params.to = filters.date;
+      } else {
+        const today = dayjs().format("YYYY-MM-DD");
+        params.from = today;
+        params.to = today;
+      }
+
+      const response = await fetchTransactions(params);
 
       if (!response.success || response.data.length === 0) {
         console.warn("No transactions found or API call failed");
@@ -45,48 +57,14 @@ const TableBettingSummary = ({
         return;
       }
 
-      const selectedDate = filters.date || dayjs().format("YYYY-MM-DD");
-
-      let filteredTransactions = response.data;
-
-      if (selectedDate) {
-        filteredTransactions = response.data.filter(
-          (item: { DateOfTransaction: string }) => {
-            if (!item.DateOfTransaction) {
-              console.warn("Invalid DateOfTransaction:", item);
-              return false;
-            }
-
-            const transactionDate = dayjs(item.DateOfTransaction, [
-              "YYYY-MM-DD",
-              "DD/MM/YYYY",
-              "MM/DD/YYYY",
-              "YYYY-MM-DD HH:mm:ss",
-            ]);
-
-            if (!transactionDate.isValid()) {
-              console.warn("Unparseable date:", item.DateOfTransaction);
-              return false;
-            }
-
-            return transactionDate.format("YYYY-MM-DD") === selectedDate;
-          }
-        );
-
-        // Debug: log only filtered transactions for today or selected date
-        console.log(
-          `Filtered transactions for ${selectedDate}:`,
-          filteredTransactions
-        );
-      }
-
+      // Optional client-side filtering by gameCategoryId
       const filteredData =
         gameCategoryId && gameCategoryId > 0
-          ? filteredTransactions.filter(
+          ? response.data.filter(
               (item: { GameCategoryId: number }) =>
                 item.GameCategoryId === gameCategoryId
             )
-          : filteredTransactions;
+          : response.data;
 
       const formattedData: Transactions[] = filteredData.map(
         (transaction: any) => {
@@ -114,8 +92,8 @@ const TableBettingSummary = ({
               transaction.DrawOrder === 1
                 ? "First Draw"
                 : transaction.DrawOrder === 2
-                  ? "Second Draw"
-                  : "Third Draw",
+                ? "Second Draw"
+                : "Third Draw",
             betAmount: transaction.BetAmount,
             tumbok: transaction.Tumbok,
             sahod: transaction.Sahod,

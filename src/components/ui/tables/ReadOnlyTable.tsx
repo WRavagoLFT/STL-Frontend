@@ -44,7 +44,6 @@ const ReadOnlyTablePage = <T extends Transactions>({
     setSearchQuery,
     resetFilters,
   } = useDetailTableStore();
-  console.log("LOADING STATE PROP: ", loading);
 
   const filteredData = useMemo(() => {
     const filterKeys = columns

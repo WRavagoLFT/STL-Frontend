@@ -65,7 +65,7 @@ export const ChartCard = <T,>({
     return map[pageType ?? ""] || "Users";
   })();
   return (
-    <div className="bg-transparent px-4 py-7 my-8 rounded-xl border border-[#0038A8] overflow-x-auto">
+    <div className="bg-transparent px-4 py-5 my-5 rounded-xl border border-[#0038A8] overflow-x-auto">
       <div className="w-full mb-2 flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col leading-none">
           <p className="text-sm md:text-base lg:text-lg leading-none">
@@ -109,7 +109,7 @@ export const ChartCard = <T,>({
             <BarChart
               height={300}
               grid={{ vertical: true }}
-              margin={{ left: 60, right: 20, top: 20, bottom: 40 }}
+              margin={{ left: 60, right: 20, top: 20, bottom: 47 }}
               slotProps={{
                 legend: { hidden: true },
                 noDataOverlay: {
@@ -129,7 +129,7 @@ export const ChartCard = <T,>({
                   scaleType: "band",
                   data: regions,
                   label: "Regions",
-                  tickLabelProps: { style: { fontSize: "12px" } },
+                  //tickLabelProps: { style: { fontSize: "12px" } },
                 } as any,
               ]}
               yAxis={[

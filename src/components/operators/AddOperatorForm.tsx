@@ -209,10 +209,10 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
       }
     },
   });
-  
+
   const getError = (field: string) =>
     formik.touched[field as keyof typeof formik.touched] &&
-    formik.errors[field as keyof typeof formik.errors]
+      formik.errors[field as keyof typeof formik.errors]
       ? (formik.errors[field as keyof typeof formik.errors] as string)
       : null;
 
@@ -220,7 +220,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
   const regionsError = getError("regions");
   const provincesError = getError("provinces");
   const cityErrors = getError("cities");
-  
+
   return (
     <form onSubmit={formik.handleSubmit}>
       <div className="text-md font-bold my-1">Owner Information</div>
@@ -359,7 +359,7 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
               Generate
             </button>
           </div>
-          
+
           {/* Error Message */}
           <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
             {formik.touched.execPassword && formik.errors.execPassword
@@ -505,9 +505,9 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                       ? "#EF4444 !important"
                       : "#0038A8 !important",
                   fontSize: "0.875rem",
-                  // padding: "2px",
-                  minHeight: "35px",
-                  height: "32px",
+                  //padding: "2px",
+                  //minHeight: "35px",
+                  //height: "32px",
                   borderRadius: "9px",
                   color: isDisabled ? "#6B7280" : "inherit",
                   backgroundColor: "transparent",
@@ -599,8 +599,8 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                         : "#0038A8 !important",
                     fontSize: "0.875rem",
                     //padding: "2px",
-                    minHeight: "35px",
-                    height: "32px",
+                    //minHeight: "35px",
+                    //height: "32px",
                     borderRadius: "9px",
                     color: isDisabled ? "#6B7280" : "inherit",
                     backgroundColor: "transparent",
@@ -666,8 +666,8 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                         : "#0038A8 !important",
                     fontSize: "0.875rem",
                     //padding: "2px",
-                    minHeight: "35px",
-                    height: "32px",
+                    //minHeight: "35px",
+                    //height: "32px",
                     borderRadius: "9px",
                     color: isDisabled ? "#6B7280" : "inherit",
                     backgroundColor: "transparent",
@@ -736,8 +736,8 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                           : "#0038A8 !important",
                       fontSize: "0.875rem",
                       //padding: "2px",
-                      minHeight: "35px",
-                      height: "32px",
+                      //minHeight: "35px",
+                      //height: "32px",
                       borderRadius: "9px",
                       color: isDisabled ? "#6B7280" : "inherit",
                       backgroundColor: "transparent",
@@ -792,46 +792,46 @@ const AddOperatorForm: React.FC<AddOperatorFormProps> = ({
                 menuPortalTarget={
                   typeof window !== "undefined" ? document.body : null
                 }
-              styles={{
-                control: (provided, state) => {
-                  const isDisabled = state.isDisabled;
-                  const hasError = !!cityErrors;
+                styles={{
+                  control: (provided, state) => {
+                    const isDisabled = state.isDisabled;
+                    const hasError = !!cityErrors;
 
-                  return {
-                    ...provided,
-                    borderColor: isDisabled
-                      ? "#A1A1AA !important"
-                      : hasError
-                        ? "#EF4444 !important"
-                        : "#0038A8 !important",
-                    fontSize: "0.875rem",
-                    //padding: "2px",
-                    minHeight: "35px",
-                    height: "32px",
-                    borderRadius: "9px",
-                    color: isDisabled ? "#6B7280" : "inherit",
-                    backgroundColor: "transparent",
-                    cursor: isDisabled ? "not-allowed" : "default",
-                    "&:hover": {
+                    return {
+                      ...provided,
                       borderColor: isDisabled
-                        ? "#A1A1AA"
+                        ? "#A1A1AA !important"
                         : hasError
-                          ? "#EF4444"
-                          : "#0038A8",
-                    },
-                    boxShadow: "none",
-                  };
-                },
-                menuPortal: (base) => ({
-                  ...base,
-                  zIndex: 1000000,
-                }),
-                menu: (provided) => ({
-                  ...provided,
-                  maxHeight: 400,
-                  overflowY: "auto",
-                }),
-              }}
+                          ? "#EF4444 !important"
+                          : "#0038A8 !important",
+                      fontSize: "0.875rem",
+                      //padding: "2px",
+                      //minHeight: "35px",
+                      //height: "32px",
+                      borderRadius: "9px",
+                      color: isDisabled ? "#6B7280" : "inherit",
+                      backgroundColor: "transparent",
+                      cursor: isDisabled ? "not-allowed" : "default",
+                      "&:hover": {
+                        borderColor: isDisabled
+                          ? "#A1A1AA"
+                          : hasError
+                            ? "#EF4444"
+                            : "#0038A8",
+                      },
+                      boxShadow: "none",
+                    };
+                  },
+                  menuPortal: (base) => ({
+                    ...base,
+                    zIndex: 1000000,
+                  }),
+                  menu: (provided) => ({
+                    ...provided,
+                    maxHeight: 400,
+                    overflowY: "auto",
+                  }),
+                }}
               />
               <p className="text-[#CE1126] text-xs mt-0.5 min-h-[1rem]">
                 {getError("cities") || "\u00A0"}

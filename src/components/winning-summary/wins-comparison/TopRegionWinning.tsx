@@ -88,7 +88,7 @@ const CustomLegend: React.FC<WinnersandWinningsSummaryProps> = ({
           categoryFilter,
           firstDateSpecific,
           secondDateSpecific
-        )
+        ) 
       : getLegendItemsMap_Duration(
           categoryFilter,
           firstDateSpecific,
@@ -312,9 +312,11 @@ const ChartTopRegionByWinsandWinners: React.FC<
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
   const maxY = Math.max(
     ...chartData.map((item) => Math.max(item.firstValue, item.secondValue))
   );
+  
   return (
     <div className="bg-[#F8F0E3] p-4 rounded-lg pb-8 w-full h-[685px] border border-[#0038A8]">
       <p className="text-[16px] font-normal leading-[18px] mb-[10px]">

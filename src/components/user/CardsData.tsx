@@ -23,8 +23,7 @@ const CardsPage = <T extends {
 
   // Get the date for seven days ago
   const sevenDaysAgo = dayjs().subtract(7, "days");
-  console.log(loading);
-
+  
   // Calculate the status for each user and categorize them
   const totalItems = dashboardData.length;
   

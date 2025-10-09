@@ -171,177 +171,215 @@ export const ParentRetailReceipt = () => {
   return (
     <AccessGuard allowedUserTypes={[3, 4, 6]}>
       <Suspense fallback={<RetailReceiptSkeleton />}>
-        {loading ? (
-          <RetailReceiptSkeleton />
-        ) : (
-          <div className="py-8 md:py-1">
-            <h1 className="text-3xl font-bold mb-3">STL Retail Receipt</h1>
-            <div className="flex flex-col md:flex-row gap-4 lg:pr-2 mb-4 w-full lg:w-2/5">
-              <div className="w-full lg:w-1/2">
-                <div>
-                  <label
-                    htmlFor="filterBy"
-                    className="text-sm font-medium text-[#0038A8]"
-                  >
-                    Filter by
-                  </label>
-                  <Select
-                    name="filterBy"
-                    value={filterBy}
-                    onChange={(selectedOption) => {
-                      if (!loading && selectedOption) {
-                        setFilterBy(selectedOption);
-                        if (selectedOption.value === "Monthly") {
-                          setSelectedYear(null);
-                        }
+        <div className="py-8 md:py-1">
+          <h1 className="text-3xl font-bold mb-3">STL Retail Receipt</h1>
+          <div className="flex flex-col md:flex-row gap-4 lg:pr-2 mb-4 w-full lg:w-2/5">
+            <div className="w-full lg:w-1/2">
+              <div>
+                <label
+                  htmlFor="filterBy"
+                  className="text-sm font-medium text-[#0038A8]"
+                >
+                  Filter by
+                </label>
+                <Select
+                  name="filterBy"
+                  value={filterBy}
+                  onChange={(selectedOption) => {
+                    if (!loading && selectedOption) {
+                      setFilterBy(selectedOption);
+                      if (selectedOption.value === "Monthly") {
+                        setSelectedYear(null);
                       }
-                    }}
-                    options={filterOptions}
-                    classNamePrefix="custom-select"
-                  />
-                </div>
-              </div>
-              <div className="w-full lg:w-1/2">
-                <div className="flex flex-col gap-1">
-                  <label
-                    htmlFor="operationDate"
-                    className="text-sm font-medium text-[#0038A8]"
-                  >
-                    Date of Report
-                  </label>
-
-                  {filterBy?.value === "Monthly" && (
-                    <input
-                      id="operationDate"
-                      type="month"
-                      value={operationDate}
-                      onChange={(e) => setOperationDate(e.target.value)}
-                      className="text-sm py-2 px-2 bg-[#F6BA12] text-black border border-transparent focus:outline-none rounded cursor-default"
-                    />
-                  )}
-
-                  {filterBy?.value === "Yearly" && (
-                    <Select
-                      name="year"
-                      value={selectedYear}
-                      options={yearOptions}
-                      onChange={handleYearChange}
-                      classNamePrefix="custom-select"
-                      menuPortalTarget={document.body}
-                    />
-                  )}
-                </div>
+                    }
+                  }}
+                  options={filterOptions}
+                  classNamePrefix="custom-select"
+                  styles={selectStyles}
+                />
               </div>
             </div>
+            <div className="w-full lg:w-1/2">
+              <div className="flex flex-col gap-1">
+                <label
+                  htmlFor="operationDate"
+                  className="text-sm font-medium text-[#0038A8]"
+                >
+                  Date of Report
+                </label>
 
-            <ReceiptCardsPage
-              receiptDataMetrics={receiptDataMetrics}
-              textlabel="Collection"
-            />
+                {filterBy?.value === "Monthly" && (
+                  <input
+                    id="operationDate"
+                    type="month"
+                    value={operationDate}
+                    onChange={(e) => setOperationDate(e.target.value)}
+                      className="bg-[#F6BA12] text-sm min-h-[35px] text-[black] h-[32px] border-transparent border-[#0038A8]
+                       hover:border-[#0038A8] rounded-[9px] shadow-none focus:outline-none px-2 cursor-default"
+                  />
+                )}
 
-            <div className="flex gap-6 mt-4 mb-3">
-              <div className="w-full md:w-1/2 md:pr-3">
-                <div className="w-full bg-[#F6BA12] p-2 rounded-md flex flex-col lg:flex-row lg:items-center md:justify-between">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-bold">STL Collections</span>
-                    <span className="text-lg font-bold md:hidden">
+                {filterBy?.value === "Yearly" && (
+                  <Select
+                    name="year"
+                    value={selectedYear}
+                    options={yearOptions}
+                    onChange={handleYearChange}
+                    classNamePrefix="custom-select"
+                    menuPortalTarget={document.body}
+                    styles={selectStyles}
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+          <ReceiptCardsPage
+            receiptDataMetrics={receiptDataMetrics ?? null}
+            textlabel="Collection"
+            loading={loading}
+          />
+          <div className="flex gap-6 mt-4 mb-3">
+            <div className="w-full md:w-1/2 md:pr-3">
+              {loading ? (
+                <div className="flex flex-col md:flex-row gap-6 mb-1">
+                  <div className="w-full space-y-4">
+                    <div className="bg-[#F6BA12] px-4 py-5 rounded-lg shadow-sm animate-pulse space-y-2">
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="w-full bg-[#F6BA12] p-2 rounded-md flex flex-col lg:flex-row lg:items-center md:justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold">STL Collections</span>
+                      <span className="text-lg font-bold md:hidden">
+                        ₱{" "}
+                        {receiptData?.Collections?.toLocaleString("en-PH", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }) || "0.00"}
+                      </span>
+                    </div>
+
+                    <div className="hidden md:block text-base font-semibold">
                       ₱{" "}
                       {receiptData?.Collections?.toLocaleString("en-PH", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       }) || "0.00"}
-                    </span>
+                    </div>
                   </div>
-
-                  <div className="hidden md:block text-base font-semibold">
-                    ₱{" "}
-                    {receiptData?.Collections?.toLocaleString("en-PH", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }) || "0.00"}
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
+          </div>
 
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="w-full md:w-1/2 flex flex-col justify-between">
-                <div>
-                  <GrossAACSharePage
-                    totalPercentage={aacTotalPercentage}
-                    totalShareAmount={aacTotalShareAmount}
-                    breakdown={aacBreakdown}
-                    isOpen={isAACOpen}
-                    setIsOpen={setIsAACOpen}
-                  />
-                  <AACTaxesPage
-                    totalPercentage={aacTaxTotalPercentage}
-                    totalShareAmount={aacTaxTotalShareAmount}
-                    breakdown={aacTaxBreakdown}
-                    isOpen={isAACtaxOpen}
-                    setIsOpen={setIsAACtaxOpen}
-                  />
-                  <NetAACIncomePage
-                    netAmount={netAacTotalAmount}
-                    netPercentage={netAacTotalPercentage}
-                  />
-                </div>
-              </div>
-              <div className="w-full md:w-1/2 flex flex-col justify-between">
-                <div>
-                  <GrossPSCOSharePage
-                    totalPercentage={netPcsoTotalPercentage}
-                    totalShareAmount={netPcsoTotalAmount}
-                    breakdown={pcsoBreakdown}
-                    isOpen={isPCSOOpen}
-                    setIsOpen={setIsPCSOOpen}
-                  />
-                  <PCSOTaxesPage
-                    totalPercentage={pcsoTaxTotalPercentage}
-                    totalShareAmount={pcsoTaxTotalShareAmount}
-                    breakdown={pcsoTaxBreakdown}
-                    isOpen={isPCSOTaxOpen}
-                    setIsOpen={setIsPCSOTaxOpen}
-                  />
-                  <NetPSCOIncomePage
-                    netAmount={pcsoTotalShareAmount}
-                    netPercentage={pcsoTotalPercentage}
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="w-full md:w-1/2 mt-4 md:mt-8 flex flex-row gap-2 md:gap-3 md:pr-3">
-              <div className="w-1/2">
-                <ExportRetailDataToExcel
-                  receiptData={receiptData}
-                  receiptDataMetrics={receiptDataMetrics}
-                  filterBy={filterBy}
-                  operationDate={operationDate}
-                  yearNumber={yearNumber}
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="w-full md:w-1/2 flex flex-col justify-between">
+              <div>
+                <GrossAACSharePage
+                  totalPercentage={aacTotalPercentage}
+                  totalShareAmount={aacTotalShareAmount}
+                  breakdown={aacBreakdown}
+                  isOpen={isAACOpen}
+                  setIsOpen={setIsAACOpen}
+                  loading={loading}
+                />
+                <AACTaxesPage
+                  totalPercentage={aacTaxTotalPercentage}
+                  totalShareAmount={aacTaxTotalShareAmount}
+                  breakdown={aacTaxBreakdown}
+                  isOpen={isAACtaxOpen}
+                  setIsOpen={setIsAACtaxOpen}
+                  loading={loading}
+                />
+                <NetAACIncomePage
+                  netAmount={netAacTotalAmount}
+                  netPercentage={netAacTotalPercentage}
+                  loading={loading}
                 />
               </div>
-              <div className="w-1/2">
-                <ExportRetailDataToPDF
-                  filterBy={filterBy}
-                  operationDate={operationDate}
-                  yearNumber={yearNumber}
-                  receiptDataMetrics={receiptDataMetrics}
-                  aacTotalShareAmount={aacTotalShareAmount}
-                  pcsoTotalShareAmount={pcsoTotalShareAmount}
-                  aacTaxTotalShareAmount={aacTaxTotalShareAmount}
-                  pcsoTaxTotalShareAmount={pcsoTaxTotalShareAmount}
-                  netAacTotalAmount={netAacTotalAmount}
-                  netPcsoTotalAmount={netPcsoTotalAmount}
-                  aacBreakdown={aacBreakdown}
-                  pcsoBreakdown={pcsoBreakdown}
-                  aacTaxBreakdown={aacTaxBreakdown}
-                  pcsoTaxBreakdown={pcsoTaxBreakdown}
+            </div>
+            <div className="w-full md:w-1/2 flex flex-col justify-between">
+              <div>
+                <GrossPSCOSharePage
+                  totalPercentage={netPcsoTotalPercentage}
+                  totalShareAmount={netPcsoTotalAmount}
+                  breakdown={pcsoBreakdown}
+                  isOpen={isPCSOOpen}
+                  setIsOpen={setIsPCSOOpen}
+                  loading={loading}
+                />
+                <PCSOTaxesPage
+                  totalPercentage={pcsoTaxTotalPercentage}
+                  totalShareAmount={pcsoTaxTotalShareAmount}
+                  breakdown={pcsoTaxBreakdown}
+                  isOpen={isPCSOTaxOpen}
+                  setIsOpen={setIsPCSOTaxOpen}
+                  loading={loading}
+                />
+                <NetPSCOIncomePage
+                  netAmount={pcsoTotalShareAmount}
+                  netPercentage={pcsoTotalPercentage}
+                  loading={loading}
                 />
               </div>
             </div>
           </div>
-        )}
+          <div className="w-full md:w-1/2 mt-4 md:mt-8 flex flex-row gap-2 md:gap-3 md:pr-3">
+            <div className="w-1/2">
+              <ExportRetailDataToExcel
+                receiptData={receiptData}
+                receiptDataMetrics={receiptDataMetrics}
+                filterBy={filterBy}
+                operationDate={operationDate}
+                yearNumber={yearNumber}
+                loading={loading}
+              />
+            </div>
+            <div className="w-1/2">
+              <ExportRetailDataToPDF
+                filterBy={filterBy}
+                operationDate={operationDate}
+                yearNumber={yearNumber}
+                receiptDataMetrics={receiptDataMetrics}
+                aacTotalShareAmount={aacTotalShareAmount}
+                pcsoTotalShareAmount={pcsoTotalShareAmount}
+                aacTaxTotalShareAmount={aacTaxTotalShareAmount}
+                pcsoTaxTotalShareAmount={pcsoTaxTotalShareAmount}
+                netAacTotalAmount={netAacTotalAmount}
+                netPcsoTotalAmount={netPcsoTotalAmount}
+                aacBreakdown={aacBreakdown}
+                pcsoBreakdown={pcsoBreakdown}
+                aacTaxBreakdown={aacTaxBreakdown}
+                pcsoTaxBreakdown={pcsoTaxBreakdown}
+                loading={loading}
+              />
+            </div>
+          </div>
+        </div>
       </Suspense>
     </AccessGuard>
   );
+};
+
+const selectStyles = {
+  control: (provided: any, state: any) => ({
+    ...provided,
+    fontSize: "0.875rem",
+    minHeight: "35px",
+    height: "32px",
+    paddingBottom: "2rem",
+    borderRadius: "9px",
+    borderColor: "#0038A8",
+    backgroundColor: "transparent",
+    boxShadow: "none",
+    "&:hover": {
+      borderColor: "#0038A8",
+    },
+  }),
+  menu: (provided: any) => ({
+    ...provided,
+    zIndex: 10,
+  }),
 };

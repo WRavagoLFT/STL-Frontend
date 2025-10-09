@@ -9,7 +9,7 @@ const montserrat = Montserrat({
 
 export const metadata: Metadata = {
   title: "Small Town Lottery",
-  description: "Small Town Lottery System",
+  description: "Small Town Lottery Web Application System",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
