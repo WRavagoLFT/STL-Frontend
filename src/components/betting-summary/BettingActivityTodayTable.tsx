@@ -42,8 +42,8 @@ const TableBettingActivityToday = ({ gameCategoryId }: { gameCategoryId?: number
 
       // Fetch today's and yesterday's data in parallel (date-only)
       const [todayRes, yestRes] = await Promise.all([
-        fetchHistoricalRegion({ date: todayStr }),
-        fetchHistoricalRegion({ date: yesterdayStr }),
+        fetchHistoricalRegion({ from: todayStr, to: todayStr }),
+        fetchHistoricalRegion({ from: yesterdayStr, to: yesterdayStr }),
       ]);
 
       if (!todayRes.success || !todayRes.data?.length) {

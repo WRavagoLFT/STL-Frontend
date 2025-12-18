@@ -24,7 +24,7 @@ export const fetchHistoricalSummary = async (filters?: {from?: string; to?: stri
   }
 };
 
-export const fetchHistoricalRegion = async <T = any>(filters?: { date?: string }): Promise<T> => {
+export const fetchHistoricalRegion = async <T = any>(filters?: { from?: string; to?: string; }): Promise<T> => {
   try {
     const url = validateRelativeUrl("/transactions/getHistoricalRegion");
     const response = await axiosInstance.get(url, {
